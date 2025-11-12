@@ -129,10 +129,11 @@ Use the following code to validate telemetry is disabled.
 
 python
 
-```
+```python
 from mlflow.telemetry import get_telemetry_client
 
 assert get_telemetry_client() is None, "Telemetry is enabled"
+
 ```
 
 ### How to opt-out for your organization?[​](#how-to-opt-out-for-your-organization "Direct link to How to opt-out for your organization?")

@@ -28,7 +28,7 @@ This integration empowers efficient tracking, management, and deployment of NLP 
 
 python
 
-```
+```python
 # Disable tokenizers warnings when constructing pipelines
 %env TOKENIZERS_PARALLELISM=false
 
@@ -36,10 +36,7 @@ import warnings
 
 # Disable a few less-than-useful UserWarnings from setuptools and pydantic
 warnings.filterwarnings("ignore", category=UserWarning)
-```
 
-```
-env: TOKENIZERS_PARALLELISM=false
 ```
 
 ### Setting Up the Environment for Sentence Embedding[​](#setting-up-the-environment-for-sentence-embedding "Direct link to Setting Up the Environment for Sentence Embedding")
@@ -61,12 +58,13 @@ This model excels in transforming sentences into semantically rich embeddings, a
 
 python
 
-```
+```python
 from sentence_transformers import SentenceTransformer
 
 import mlflow
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
+
 ```
 
 ### Defining the Model Signature with MLflow[​](#defining-the-model-signature-with-mlflow "Direct link to Defining the Model Signature with MLflow")
@@ -88,7 +86,7 @@ Defining the model signature is a crucial step in setting up our Sentence Transf
 
 python
 
-```
+```python
 example_sentences = ["A sentence to encode.", "Another sentence to encode."]
 
 # Infer the signature of the custom model by providing an input example and the resultant prediction output.
@@ -101,15 +99,7 @@ signature = mlflow.models.infer_signature(
 
 # Visualize the signature
 signature
-```
 
-```
-inputs: 
-[string]
-outputs: 
-[Tensor('float32', (-1, 384))]
-params: 
-None
 ```
 
 ### Creating an experiment[​](#creating-an-experiment "Direct link to Creating an experiment")
@@ -118,17 +108,14 @@ We create a new MLflow Experiment so that the run we're going to log our model t
 
 python
 
-```
+```python
 # If you are running this tutorial in local mode, leave the next line commented out.
 # Otherwise, uncomment the following line and set your tracking uri to your local or remote tracking server.
 
 # mlflow.set_tracking_uri("http://127.0.0.1:8080")
 
 mlflow.set_experiment("Introduction to Sentence Transformers")
-```
 
-```
-<Experiment: artifact_location='file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/sentence-transformers/tutorials/quickstart/mlruns/469990615226680434', creation_time=1701280211449, experiment_id='469990615226680434', last_update_time=1701280211449, lifecycle_stage='active', name='Introduction to Sentence Transformers', tags={}>
 ```
 
 ### Logging the Sentence Transformer Model with MLflow[​](#logging-the-sentence-transformer-model-with-mlflow "Direct link to Logging the Sentence Transformer Model with MLflow")
@@ -148,7 +135,7 @@ Logging the model in MLflow is essential for tracking, version control, and depl
 
 python
 
-```
+```python
 with mlflow.start_run():
   logged_model = mlflow.sentence_transformers.log_model(
       model=model,
@@ -156,6 +143,7 @@ with mlflow.start_run():
       signature=signature,
       input_example=example_sentences,
   )
+
 ```
 
 ### Loading the Model and Testing Inference[​](#loading-the-model-and-testing-inference "Direct link to Loading the Model and Testing Inference")
@@ -180,7 +168,7 @@ After logging the Sentence Transformer model in MLflow, we demonstrate how to lo
 
 python
 
-```
+```python
 inference_test = ["I enjoy pies of both apple and cherry.", "I prefer cookies."]
 
 # Load our custom model by providing the uri for where the model was logged.
@@ -194,12 +182,7 @@ print(f"The return structure length is: {len(embeddings_test)}")
 
 for i, embedding in enumerate(embeddings_test):
   print(f"The size of embedding {i + 1} is: {len(embeddings_test[i])}")
-```
 
-```
-The return structure length is: 2
-The size of embedding 1 is: 384
-The size of embedding 2 is: 384
 ```
 
 ### Displaying Samples of Generated Embeddings[​](#displaying-samples-of-generated-embeddings "Direct link to Displaying Samples of Generated Embeddings")
@@ -218,16 +201,10 @@ Examine the content of embeddings to verify their quality and understand the mod
 
 python
 
-```
+```python
 for i, embedding in enumerate(embeddings_test):
   print(f"The sample of the first 10 entries in embedding {i + 1} is: {embedding[:10]}")
-```
 
-```
-The sample of the first 10 entries in embedding 1 is: [ 0.04866192 -0.03687946  0.02408808  0.03534171 -0.12739632  0.00999414
-0.07135344 -0.01433522  0.04296691 -0.00654414]
-The sample of the first 10 entries in embedding 2 is: [-0.03879027 -0.02373698  0.01314073  0.03589077 -0.01641303 -0.0857707
-0.08282158 -0.03173266  0.04507608  0.02777079]
 ```
 
 ### Native Model Loading in MLflow for Extended Functionality[​](#native-model-loading-in-mlflow-for-extended-functionality "Direct link to Native Model Loading in MLflow for Extended Functionality")
@@ -246,7 +223,7 @@ Explore the full range of Sentence Transformer functionalities with MLflow's sup
 
 python
 
-```
+```python
 # Load the saved model as a native Sentence Transformers model (unlike above, where we loaded as a generic python function)
 loaded_model_native = mlflow.sentence_transformers.load_model(logged_model.model_uri)
 
@@ -257,17 +234,7 @@ for i, embedding in enumerate(native_embeddings):
   print(
       f"The sample of the native library encoding call for embedding {i + 1} is: {embedding[:10]}"
   )
-```
 
-```
-2023/11/30 15:50:24 INFO mlflow.sentence_transformers: 'runs:/eeab3c1b13594fdea13e07585b1c0596/sbert_model' resolved as 'file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/sentence-transformers/tutorials/quickstart/mlruns/469990615226680434/eeab3c1b13594fdea13e07585b1c0596/artifacts/sbert_model'
-```
-
-```
-The sample of the native library encoding call for embedding 1 is: [ 0.04866192 -0.03687946  0.02408808  0.03534171 -0.12739632  0.00999414
-0.07135344 -0.01433522  0.04296691 -0.00654414]
-The sample of the native library encoding call for embedding 2 is: [-0.03879027 -0.02373698  0.01314073  0.03589077 -0.01641303 -0.0857707
-0.08282158 -0.03173266  0.04507608  0.02777079]
 ```
 
 ### Conclusion: Embracing the Power of Sentence Transformers with MLflow[​](#conclusion-embracing-the-power-of-sentence-transformers-with-mlflow "Direct link to Conclusion: Embracing the Power of Sentence Transformers with MLflow")

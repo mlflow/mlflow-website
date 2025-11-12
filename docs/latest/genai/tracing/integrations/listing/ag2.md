@@ -8,10 +8,11 @@
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.ag2.autolog()
+
 ```
 
 MLflow captures the following information about the multi-agent execution:
@@ -26,7 +27,7 @@ MLflow captures the following information about the multi-agent execution:
 
 python
 
-```
+```python
 import os
 from typing import Annotated, Literal
 
@@ -94,6 +95,7 @@ user_proxy.register_for_execution(name="calculator")(calculator)
 response = user_proxy.initiate_chat(
     assistant, message="What is (44231 + 13312 / (230 - 20)) * 4?"
 )
+
 ```
 
 ## Token usage[​](#token-usage "Direct link to Token usage")
@@ -102,7 +104,7 @@ MLflow >= 3.2.0 supports token usage tracking for AG2. The token usage for each 
 
 python
 
-```
+```python
 import json
 import mlflow
 
@@ -136,11 +138,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 1569
   Output tokens: 229
@@ -171,6 +174,7 @@ chat_completion_6:
   Input tokens: 364
   Output tokens: 38
   Total tokens: 402
+
 ```
 
 ### Disable auto-tracing[​](#disable-auto-tracing "Direct link to Disable auto-tracing")

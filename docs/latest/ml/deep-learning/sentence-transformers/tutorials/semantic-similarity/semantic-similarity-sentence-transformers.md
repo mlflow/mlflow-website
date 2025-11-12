@@ -23,7 +23,7 @@ Throughout this tutorial, you'll gain hands-on experience in managing and deploy
 
 python
 
-```
+```python
 # Disable tokenizers warnings when constructing pipelines
 %env TOKENIZERS_PARALLELISM=false
 
@@ -31,10 +31,7 @@ import warnings
 
 # Disable a few less-than-useful UserWarnings from setuptools and pydantic
 warnings.filterwarnings("ignore", category=UserWarning)
-```
 
-```
-env: TOKENIZERS_PARALLELISM=false
 ```
 
 ### Implementing a Custom SimilarityModel with MLflow[​](#implementing-a-custom-similaritymodel-with-mlflow "Direct link to Implementing a Custom SimilarityModel with MLflow")
@@ -67,7 +64,7 @@ This custom `SimilarityModel` exemplifies the adaptability of MLflow's `PythonMo
 
 python
 
-```
+```python
 import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer, util
@@ -112,6 +109,7 @@ class SimilarityModel(PythonModel):
       embedding_2 = self.model.encode(sentence_2)
 
       return np.array(util.cos_sim(embedding_1, embedding_2).tolist())
+
 ```
 
 ### Preparing the Sentence Transformer Model and Signature[​](#preparing-the-sentence-transformer-model-and-signature "Direct link to Preparing the Sentence Transformer Model and Signature")
@@ -142,7 +140,7 @@ Having meticulously prepared the Sentence Transformer model and its signature, w
 
 python
 
-```
+```python
 # Load a pre-trained sentence transformer model
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
@@ -168,15 +166,7 @@ signature = infer_signature(input_example, test_output)
 
 # Visualize the signature
 signature
-```
 
-```
-inputs: 
-['sentence_1': string, 'sentence_2': string]
-outputs: 
-[Tensor('float64', (-1, 1))]
-params: 
-None
 ```
 
 ### Creating an experiment[​](#creating-an-experiment "Direct link to Creating an experiment")
@@ -185,17 +175,14 @@ We create a new MLflow Experiment so that the run we're going to log our model t
 
 python
 
-```
+```python
 # If you are running this tutorial in local mode, leave the next line commented out.
 # Otherwise, uncomment the following line and set your tracking uri to your local or remote tracking server.
 
 # mlflow.set_tracking_uri("http://127.0.0.1:8080")
 
 mlflow.set_experiment("Semantic Similarity")
-```
 
-```
-<Experiment: artifact_location='file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/sentence-transformers/tutorials/semantic-similarity/mlruns/577235153137414660', creation_time=1701280997564, experiment_id='577235153137414660', last_update_time=1701280997564, lifecycle_stage='active', name='Semantic Similarity', tags={}>
 ```
 
 ### Logging the Custom Model with MLflow[​](#logging-the-custom-model-with-mlflow "Direct link to Logging the Custom Model with MLflow")
@@ -220,7 +207,7 @@ Having logged our `SimilarityModel` in MLflow, it stands ready for advanced appl
 
 python
 
-```
+```python
 pyfunc_path = "/tmp/sbert_pyfunc"
 
 with mlflow.start_run() as run:
@@ -232,14 +219,7 @@ with mlflow.start_run() as run:
       artifacts=artifacts,
       pip_requirements=["sentence_transformers", "numpy"],
   )
-```
 
-```
-Downloading artifacts:   0%|          | 0/11 [00:00<?, ?it/s]
-```
-
-```
-2023/11/30 16:10:34 INFO mlflow.store.artifact.artifact_repo: The progress bar can be disabled by setting the environment variable MLFLOW_ENABLE_ARTIFACTS_PROGRESS_BAR to false
 ```
 
 ### Model Inference and Testing Similarity Prediction[​](#model-inference-and-testing-similarity-prediction "Direct link to Model Inference and Testing Similarity Prediction")
@@ -267,7 +247,7 @@ Demonstrate the use of the `SimilarityModel` to compute semantic similarity betw
 
 python
 
-```
+```python
 # Load our custom semantic similarity model implementation by providing the uri that the model was logged to
 loaded_dynamic = mlflow.pyfunc.load_model(model_info.model_uri)
 
@@ -278,10 +258,7 @@ similarity_data = pd.DataFrame([{"sentence_1": "I like apples", "sentence_2": "I
 similarity_score = loaded_dynamic.predict(similarity_data)
 
 print(f"The similarity between these sentences is: {similarity_score}")
-```
 
-```
-The similarity between these sentences is: [[0.63414472]]
 ```
 
 ### Evaluating Semantic Similarity with Distinct Text Pairs[​](#evaluating-semantic-similarity-with-distinct-text-pairs "Direct link to Evaluating Semantic Similarity with Distinct Text Pairs")
@@ -310,7 +287,7 @@ Explore the model's capability to discern varying degrees of semantic similarity
 
 python
 
-```
+```python
 low_similarity = {
   "sentence_1": "The explorer stood at the edge of the dense rainforest, "
   "contemplating the journey ahead. The untamed wilderness was "
@@ -348,11 +325,7 @@ print(f"The similarity score for the 'low_similarity' pair is: {low_similarity_s
 high_similarity_score = loaded_dynamic.predict(high_similarity)
 
 print(f"The similarity score for the 'high_similarity' pair is: {high_similarity_score}")
-```
 
-```
-The similarity score for the 'low_similarity' pair is: [[-0.00052751]]
-The similarity score for the 'high_similarity' pair is: [[0.83703309]]
 ```
 
 ### Conclusion: Harnessing the Power of Custom MLflow Python Functions in NLP[​](#conclusion-harnessing-the-power-of-custom-mlflow-python-functions-in-nlp "Direct link to Conclusion: Harnessing the Power of Custom MLflow Python Functions in NLP")

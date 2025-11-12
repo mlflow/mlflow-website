@@ -8,10 +8,11 @@
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.llama_index.autolog()
+
 ```
 
 tip
@@ -24,27 +25,29 @@ First, let's download a test data to create a toy index:
 
 text
 
-```
+```text
 !mkdir -p data
 !curl -L https://raw.githubusercontent.com/run-llama/llama_index/main/docs/docs/examples/data/paul_graham/paul_graham_essay.txt -o ./data/paul_graham_essay.txt
+
 ```
 
 Load them into a simple in-memory vector index:
 
 text
 
-```
+```text
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 
 documents = SimpleDirectoryReader("data").load_data()
 index = VectorStoreIndex.from_documents(documents)
+
 ```
 
 Now you can enable LlamaIndex auto tracing and start querying the index:
 
 python
 
-```
+```python
 import mlflow
 
 # Enabling tracing for LlamaIndex
@@ -57,6 +60,7 @@ mlflow.set_experiment("LlamaIndex")
 # Query the index
 query_engine = index.as_query_engine()
 response = query_engine.query("What was the first program the author wrote?")
+
 ```
 
 ## Token usage[​](#token-usage "Direct link to Token usage")
@@ -65,7 +69,7 @@ MLflow >= 3.2.0 supports token usage tracking for LlamaIndex. The token usage fo
 
 python
 
-```
+```python
 import json
 import mlflow
 from llama_index.llms.openai import OpenAI
@@ -98,11 +102,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 14
   Output tokens: 7
@@ -113,6 +118,7 @@ OpenAI.chat:
   Input tokens: 14
   Output tokens: 7
   Total tokens: 21
+
 ```
 
 ### LlamaIndex workflow[​](#llamaindex-workflow "Direct link to LlamaIndex workflow")

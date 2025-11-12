@@ -13,8 +13,9 @@ Install the required packages:
 
 bash
 
-```
+```bash
 pip install --upgrade "mlflow" openai>=1.0.0
+
 ```
 
 note
@@ -31,18 +32,19 @@ For the fastest setup, you can run MLflow locally:
 
 bash
 
-```
+```bash
 # Start MLflow tracking server locally
 mlflow ui
 
 # This will start the server at http://127.0.0.1:5000
+
 ```
 
 If you have a remote MLflow tracking server, configure the connection:
 
 python
 
-```
+```python
 import os
 import mlflow
 
@@ -50,16 +52,18 @@ import mlflow
 os.environ["MLFLOW_TRACKING_URI"] = "http://your-mlflow-server:5000"
 # Or directly in code
 mlflow.set_tracking_uri("http://your-mlflow-server:5000")
+
 ```
 
 If you have a Databricks account, configure the connection:
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.login()
+
 ```
 
 This will prompt you for your configuration details (Databricks Host url and a PAT).
@@ -70,11 +74,12 @@ Set your OpenAI API key as an environment variable:
 
 python
 
-```
+```python
 import os
 
 # Set your OpenAI API key
 os.environ["OPENAI_API_KEY"] = "your-api-key-here"  # Replace with your actual API key
+
 ```
 
 tip
@@ -83,16 +88,17 @@ You can also set the environment variable in your shell before running the scrip
 
 bash
 
-```
+```bash
 export OPENAI_API_KEY="your-api-key-here"
 export MLFLOW_TRACKING_URI="http://your-mlflow-server:5000"  # Optional: for remote server, set as 'databricks' if connecting to a Databricks account
+
 ```
 
 ## Step 2: Create a simple application with tracing[​](#step-2-create-a-simple-application-with-tracing "Direct link to Step 2: Create a simple application with tracing")
 
 python
 
-```
+```python
 import mlflow
 import openai
 from openai import OpenAI
@@ -131,6 +137,7 @@ print("\nTraces have been captured!")
 print(
     "View them in the MLflow UI at: http://127.0.0.1:5000 (or your MLflow server URL)"
 )
+
 ```
 
 ## Step 3: Run the application[​](#step-3-run-the-application "Direct link to Step 3: Run the application")
@@ -142,11 +149,12 @@ Simply run the code cell above. You should see output similar to:
 
 text
 
-```
+```text
 Query: What's the weather like in San Francisco?
 Response: I don't have real-time weather data, but San Francisco typically has mild temperatures year-round...
 Traces have been captured!
 View them in the MLflow UI at: http://127.0.0.1:5000
+
 ```
 
 tip
@@ -158,19 +166,21 @@ If you're using Jupyter with MLflow 2.20+, the trace UI will automatically displ
 
 bash
 
-```
+```bash
 python weather_app.py
+
 ```
 
 You should see output similar to:
 
 text
 
-```
+```text
 Query: What's the weather like in San Francisco?
 Response: I don't have real-time weather data, but San Francisco typically has mild temperatures year-round...
 Traces have been captured!
 View them in the MLflow UI at: http://127.0.0.1:5000
+
 ```
 
 ## Step 4: Explore traces in the MLflow UI[​](#step-4-explore-traces-in-the-mlflow-ui "Direct link to Step 4: Explore traces in the MLflow UI")
@@ -193,7 +203,7 @@ Enhance your application with custom tracing for better observability:
 
 python
 
-```
+```python
 import mlflow
 from openai import OpenAI
 
@@ -263,6 +273,7 @@ for location in locations:
     print(f"Response: {response[:100]}...")
 
 print("\nEnhanced traces captured! Check the MLflow UI for detailed trace information.")
+
 ```
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")

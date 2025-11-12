@@ -8,7 +8,7 @@ The easiest way to start is with automatic tracing for supported libraries:
 
 python
 
-```
+```python
 import mlflow
 import openai
 
@@ -20,17 +20,19 @@ client = openai.OpenAI()
 response = client.chat.completions.create(
     model="gpt-4o-mini", messages=[{"role": "user", "content": "Hello!"}]
 )
+
 ```
 
 For custom code, use the `@mlflow.trace` decorator:
 
 python
 
-```
+```python
 @mlflow.trace
 def my_function(input_data):
     # Your logic here
     return "processed result"
+
 ```
 
 ### Q: Which libraries does MLflow Tracing support automatically?[​](#q-which-libraries-does-mlflow-tracing-support-automatically "Direct link to Q: Which libraries does MLflow Tracing support automatically?")
@@ -49,7 +51,7 @@ Yes! Jupyter integration is available in MLflow 2.20 and above. The trace UI aut
 
 python
 
-```
+```python
 import mlflow
 
 # Set tracking URI to your MLflow server
@@ -63,18 +65,20 @@ def my_function():
 
 # Trace UI will appear automatically in the notebook
 my_function()
+
 ```
 
 To control the display:
 
 python
 
-```
+```python
 # Disable notebook display
 mlflow.tracing.disable_notebook_display()
 
 # Enable notebook display
 mlflow.tracing.enable_notebook_display()
+
 ```
 
 ### Q: How can I customize the request and response previews in the UI?[​](#q-how-can-i-customize-the-request-and-response-previews-in-the-ui "Direct link to Q: How can I customize the request and response previews in the UI?")
@@ -83,7 +87,7 @@ You can customize what appears in the Request and Response columns of the trace 
 
 python
 
-```
+```python
 @mlflow.trace
 def predict(messages: list[dict]) -> str:
     # Customize the request preview for long message histories
@@ -96,6 +100,7 @@ def predict(messages: list[dict]) -> str:
     # Customize response preview
     mlflow.update_current_trace(response_preview=f"Result: {result[:50]}...")
     return result
+
 ```
 
 ## Production and Performance[​](#production-and-performance "Direct link to Production and Performance")
@@ -112,7 +117,7 @@ Asynchronous logging can significantly reduce performance overhead (about 80% fo
 
 python
 
-```
+```python
 import mlflow
 
 # Enable async logging
@@ -125,6 +130,7 @@ with mlflow.start_span(name="foo") as span:
 
 # Manually flush if needed
 mlflow.flush_trace_async_logging()
+
 ```
 
 **Configuration options:**
@@ -147,7 +153,7 @@ To register a custom hooks, use the [`mlflow.tracing.configure`](/mlflow-website
 
 python
 
-```
+```python
 import mlflow
 from mlflow.entities.span import Span, SpanType
 
@@ -166,6 +172,7 @@ mlflow.tracing.configure(span_processors=[filter_retrieval_output])
 
 # Any traces created after the configuration will be filtered by the hook.
 ...
+
 ```
 
 Refer to the [Redacting Sensitive Data Safe](/mlflow-website/docs/latest/genai/tracing/observe-with-traces/masking.md) guide for more details about the hook API and examples.
@@ -184,7 +191,7 @@ The `trace_destination` parameter was introduced to the [@mlflow.trace](/mlflow-
 
 python
 
-```
+```python
 import mlflow
 from mlflow.entities.trace_location import MlflowExperimentLocation
 
@@ -193,6 +200,7 @@ from mlflow.entities.trace_location import MlflowExperimentLocation
 def math_agent(request: Request):
     # Your model logic here
     ...
+
 ```
 
 Note that the `trace_destination` parameter is only effective when it is set to the root span of the trace. If it is set to a child span, MLflow will ignore it and print a warning.
@@ -203,7 +211,7 @@ The [`mlflow.tracing.set_destination()`](/mlflow-website/docs/latest/api_referen
 
 python
 
-```
+```python
 import mlflow
 from mlflow.entities.trace_location import MlflowExperimentLocation
 
@@ -225,6 +233,7 @@ def chat_agent(request: Request):
     # Your model logic here
     with mlflow.start_span(name="chat-agent") as span:
         ...
+
 ```
 
 ## Troubleshooting[​](#troubleshooting "Direct link to Troubleshooting")
@@ -241,8 +250,9 @@ There are multiple possible reasons why a trace may not be viewable in the MLflo
 
    bash
 
-   ```
+   ```bash
    mlflow ui --host 0.0.0.0 --port 5000
+
    ```
 
 4. **Experiment permissions**: Verify you have access to the experiment containing the trace.
@@ -261,7 +271,7 @@ For example, the following code sets the timeout to 5 seconds and simulates how 
 
 python
 
-```
+```python
 import mlflow
 import os
 import time
@@ -283,6 +293,7 @@ def child():
 
 
 long_running()
+
 ```
 
 note
@@ -297,26 +308,29 @@ Several issues could prevent traces from appearing:
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_tracking_uri("http://localhost:5000")  # or your server URL
+
 ```
 
 **Experiment not set**: Make sure you're logging to the correct experiment:
 
 python
 
-```
+```python
 mlflow.set_experiment("my-tracing-experiment")
+
 ```
 
 **Autolog not called**: For supported libraries, ensure autolog is called before usage:
 
 python
 
-```
+```python
 mlflow.openai.autolog()  # Call before using OpenAI
+
 ```
 
 ## Multi-threading and Concurrency[​](#multi-threading-and-concurrency "Direct link to Multi-threading and Concurrency")
@@ -329,7 +343,7 @@ Here's a quick example:
 
 python
 
-```
+```python
 import contextvars
 import mlflow
 from concurrent.futures import ThreadPoolExecutor
@@ -352,6 +366,7 @@ def main_function(data_list):
 
         results = [future.result() for future in futures]
     return results
+
 ```
 
 ### Q: Does MLflow Tracing work with async/await code?[​](#q-does-mlflow-tracing-work-with-asyncawait-code "Direct link to Q: Does MLflow Tracing work with async/await code?")
@@ -360,7 +375,7 @@ Yes, MLflow Tracing supports async functions. The `@mlflow.trace` decorator work
 
 python
 
-```
+```python
 import asyncio
 import mlflow
 
@@ -374,6 +389,7 @@ async def async_function(query: str):
 
 # Usage
 asyncio.run(async_function("test query"))
+
 ```
 
 ## Configuration and Control[​](#configuration-and-control "Direct link to Configuration and Control")
@@ -386,7 +402,7 @@ To **enable** tracing (if it had been temporarily disabled), [`mlflow.tracing.en
 
 python
 
-```
+```python
 import mlflow
 
 # Disable tracing
@@ -406,6 +422,7 @@ mlflow.tracing.enable()
 
 # Now traces will be generated again
 my_function()  # This will generate a trace
+
 ```
 
 ### Q: Can I enable/disable tracing for my application without modifying code?[​](#q-can-i-enabledisable-tracing-for-my-application-without-modifying-code "Direct link to Q: Can I enable/disable tracing for my application without modifying code?")
@@ -416,22 +433,24 @@ Yes, you can use environment variables and global configuration:
 
 bash
 
-```
+```bash
 export MLFLOW_TRACING_ENABLED=false
 python your_app.py  # No traces will be generated
+
 ```
 
 **Conditional tracing**: Use programmatic control:
 
 python
 
-```
+```python
 import mlflow
 import os
 
 # Only trace in development
 if os.getenv("ENVIRONMENT") == "development":
     mlflow.openai.autolog()
+
 ```
 
 ## MLflow Runs Integration[​](#mlflow-runs-integration "Direct link to MLflow Runs Integration")
@@ -442,7 +461,7 @@ If a trace is generated within a run context, it will automatically be associate
 
 python
 
-```
+```python
 import mlflow
 
 # Create and activate an experiment
@@ -454,16 +473,18 @@ with mlflow.start_run() as run:
     with mlflow.start_span(name="Run Span") as parent_span:
         parent_span.set_inputs({"input": "a"})
         parent_span.set_outputs({"response": "b"})
+
 ```
 
 You can then retrieve traces for a specific run:
 
 python
 
-```
+```python
 # Retrieve traces associated with a specific Run
 traces = mlflow.search_traces(run_id=run.info.run_id)
 print(traces)
+
 ```
 
 ## Data Management[​](#data-management "Direct link to Data Management")
@@ -474,7 +495,7 @@ You can delete traces using the [`mlflow.client.MlflowClient.delete_traces()`](/
 
 python
 
-```
+```python
 from mlflow.client import MlflowClient
 import time
 
@@ -487,6 +508,7 @@ current_time = int(time.time() * 1000)
 deleted_count = client.delete_traces(
     experiment_id="1", max_timestamp_millis=current_time, max_traces=10
 )
+
 ```
 
 tip

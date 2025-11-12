@@ -8,10 +8,11 @@
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.strands.autolog()
+
 ```
 
 MLflow trace automatically captures the following information about Agentic calls:
@@ -27,7 +28,7 @@ MLflow trace automatically captures the following information about Agentic call
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.strands.autolog()
@@ -50,6 +51,7 @@ model = OpenAIModel(
 agent = Agent(model=model, tools=[calculator])
 response = agent("What is 2+2")
 print(response)
+
 ```
 
 ![Strands Agent SDK Tracing via autolog](/mlflow-website/docs/latest/assets/images/strands-tracing-d93b7aa1a7acb19402282286c1b02843.png)
@@ -60,7 +62,7 @@ MLflow >= 3.4.0 supports token usage tracking for Strand Agent SDK. The token us
 
 python
 
-```
+```python
 response = agent("What is 2+2")
 print(response)
 
@@ -82,11 +84,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 2629
   Output tokens: 31
@@ -101,6 +104,7 @@ chat_2:
   Input tokens: 1328
   Output tokens: 15
   Total tokens: 1343
+
 ```
 
 ### Disable auto-tracing[​](#disable-auto-tracing "Direct link to Disable auto-tracing")

@@ -8,7 +8,7 @@ The most straightforward function evaluation involves a callable that takes data
 
 python
 
-```
+```python
 import mlflow
 import pandas as pd
 import numpy as np
@@ -61,6 +61,7 @@ with mlflow.start_run():
 
     print(f"Function Accuracy: {result.metrics['accuracy_score']:.3f}")
     print(f"Function F1 Score: {result.metrics['f1_score']:.3f}")
+
 ```
 
 This approach is ideal when:
@@ -80,7 +81,7 @@ Evaluate complete data processing and prediction pipelines:
 
 python
 
-```
+```python
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
@@ -134,13 +135,14 @@ with mlflow.start_run(run_name="Complete_Pipeline_Function"):
     )
 
     print(f"Pipeline Function Performance: {result.metrics['accuracy_score']:.3f}")
+
 ```
 
 Evaluate ensemble methods that combine multiple models:
 
 python
 
-```
+```python
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
@@ -213,13 +215,14 @@ with mlflow.start_run(run_name="Ensemble_Function_Evaluation"):
     )
 
     print(f"Ensemble Function Accuracy: {result.metrics['accuracy_score']:.3f}")
+
 ```
 
 Evaluate functions that combine ML predictions with business rules:
 
 python
 
-```
+```python
 def business_rule_function(input_data):
     """Function combining ML predictions with business rules."""
 
@@ -292,6 +295,7 @@ with mlflow.start_run(run_name="Business_Rule_Function"):
 
     print(f"Business Rule Function Accuracy: {result.metrics['accuracy_score']:.3f}")
     print(f"Rule Changes: {rule_changes} ({change_rate:.1%})")
+
 ```
 
 ## Function Testing and Validation[​](#function-testing-and-validation "Direct link to Function Testing and Validation")
@@ -303,7 +307,7 @@ Test functions with different parameter configurations:
 
 python
 
-```
+```python
 def create_parameterized_function(
     threshold=0.5, use_scaling=True, feature_selection=None
 ):
@@ -372,13 +376,14 @@ for i, config in enumerate(parameter_configs):
 best_config = max(results.keys(), key=lambda k: results[k]["accuracy"])
 print(f"Best configuration: {results[best_config]['config']}")
 print(f"Best accuracy: {results[best_config]['accuracy']:.3f}")
+
 ```
 
 Create monitoring wrapper for production functions:
 
 python
 
-```
+```python
 import time
 
 
@@ -462,6 +467,7 @@ with mlflow.start_run(run_name="Production_Function_Evaluation"):
     result = mlflow.evaluate(
         monitored_function, eval_data, targets="target", model_type="classifier"
     )
+
 ```
 
 ## Key Use Cases and Benefits[​](#key-use-cases-and-benefits "Direct link to Key Use Cases and Benefits")

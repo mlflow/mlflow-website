@@ -37,7 +37,7 @@ MLflow can automatically log metrics, parameters, and models from your TensorFlo
 
 python
 
-```
+```python
 import mlflow
 import numpy as np
 import tensorflow as tf
@@ -71,6 +71,7 @@ model.compile(
 # Training with automatic logging
 with mlflow.start_run():
     model.fit(data, label, batch_size=5, epochs=2)
+
 ```
 
 Autologging Requirements and Limitations
@@ -136,13 +137,14 @@ You can customize autologging behavior by passing arguments to [`mlflow.tensorfl
 
 python
 
-```
+```python
 mlflow.tensorflow.autolog(
     log_models=True,
     log_input_examples=True,
     log_model_signatures=True,
     log_every_n_steps=1,
 )
+
 ```
 
 How TensorFlow Autologging Works
@@ -165,7 +167,7 @@ MLflow provides [`mlflow.tensorflow.MlflowCallback`](/mlflow-website/docs/latest
 
 python
 
-```
+```python
 import mlflow
 from tensorflow import keras
 
@@ -182,6 +184,7 @@ with mlflow.start_run() as run:
         epochs=10,
         callbacks=[mlflow.tensorflow.MlflowCallback(run)],
     )
+
 ```
 
 Callback Configuration Options
@@ -190,11 +193,12 @@ The `MlflowCallback` accepts several parameters to customize logging behavior:
 
 python
 
-```
+```python
 mlflow.tensorflow.MlflowCallback(
     log_every_epoch=True,  # Log metrics at the end of each epoch
     log_every_n_steps=None,  # Log metrics every N steps (overrides log_every_epoch)
 )
+
 ```
 
 * **Epoch-based Logging**: Set `log_every_epoch=True` (default) to log at the end of each epoch
@@ -207,7 +211,7 @@ You can create your own callback by subclassing `keras.callbacks.Callback` to im
 
 python
 
-```
+```python
 from tensorflow import keras
 import math
 import mlflow
@@ -233,6 +237,7 @@ class CustomMlflowCallback(keras.callbacks.Callback):
             "average_weight",
             sum(w.sum() for w in weights) / sum(w.size for w in weights),
         )
+
 ```
 
 Keras Callback Lifecycle Hooks
@@ -261,7 +266,7 @@ If you haven't enabled autologging (which saves models automatically), you can m
 
 python
 
-```
+```python
 import mlflow
 import tensorflow as tf
 from tensorflow import keras
@@ -286,6 +291,7 @@ model_info = mlflow.tensorflow.log_model(model, name="model")
 # Later, load the model for inference
 loaded_model = mlflow.tensorflow.load_model(model_info.model_uri)
 predictions = loaded_model.predict(tf.random.uniform([1, 28, 28, 3]))
+
 ```
 
 Understanding MLflow Model Saving
@@ -306,7 +312,7 @@ By default, MLflow saves TensorFlow models in the TensorFlow SavedModel format (
 
 python
 
-```
+```python
 # Save in H5 format (weights only)
 mlflow.tensorflow.log_model(
     model, name="model", keras_model_kwargs={"save_format": "h5"}
@@ -316,6 +322,7 @@ mlflow.tensorflow.log_model(
 mlflow.tensorflow.log_model(
     model, name="model", keras_model_kwargs={"save_format": "keras"}
 )
+
 ```
 
 Comparing Model Formats
@@ -348,7 +355,7 @@ A model signature describes the expected input and output formats of your model.
 
 python
 
-```
+```python
 import mlflow
 from mlflow.models import infer_signature
 import tensorflow as tf
@@ -365,6 +372,7 @@ signature = infer_signature(sample_input, sample_output)
 
 # Log model with inferred signature
 model_info = mlflow.tensorflow.log_model(model, name="model", signature=signature)
+
 ```
 
 When autologging is enabled with `log_input_examples=True` and `log_model_signatures=True`, MLflow automatically infers and logs the signature from your training data.
@@ -379,7 +387,7 @@ For complete control over your model signature, you can manually define the inpu
 
 python
 
-```
+```python
 import mlflow
 import tensorflow as tf
 import numpy as np
@@ -411,6 +419,7 @@ signature = ModelSignature(inputs=input_schema)
 
 # Log model with signature
 model_info = mlflow.tensorflow.log_model(model, name="model", signature=signature)
+
 ```
 
 Manual definition is useful when:
@@ -430,7 +439,7 @@ Tracking Transfer Learning
 
 python
 
-```
+```python
 import mlflow
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -467,13 +476,14 @@ with mlflow.start_run() as run:
     mlflow.log_artifact("model_architecture.png")
 
     # Continue with normal training...
+
 ```
 
 Tracking Multi-Model Experiments
 
 python
 
-```
+```python
 import mlflow
 
 # Main experiment run
@@ -498,6 +508,7 @@ with mlflow.start_run(run_name="ensemble_experiment") as parent_run:
     ensemble_model = create_ensemble([model_1, model_2])
     mlflow.tensorflow.log_model(ensemble_model, name="ensemble_model")
     mlflow.log_metric("ensemble_accuracy", ensemble_accuracy)
+
 ```
 
 ### Hyperparameter Optimization[​](#hyperparameter-optimization "Direct link to Hyperparameter Optimization")
@@ -506,7 +517,7 @@ Combine TensorFlow with hyperparameter tuning tools while tracking everything in
 
 python
 
-```
+```python
 import mlflow
 import tensorflow as tf
 from tensorflow import keras
@@ -590,6 +601,7 @@ with mlflow.start_run(run_name="hyperparameter_optimization"):
     final_model = create_model(study.best_trial)
     final_model.fit(x_train, y_train, epochs=10)
     mlflow.tensorflow.log_model(final_model, name="best_model")
+
 ```
 
 ### Deployment Preparation[​](#deployment-preparation "Direct link to Deployment Preparation")
@@ -598,15 +610,16 @@ Once you've trained and logged your TensorFlow model with MLflow, deploying it l
 
 bash
 
-```
+```bash
 mlflow models serve -m models:/<model_id> -p 5000
+
 ```
 
 Test your deployed model:
 
 python
 
-```
+```python
 import requests
 import json
 
@@ -622,6 +635,7 @@ response = requests.post(
 
 predictions = response.json()
 print("Predictions:", predictions)
+
 ```
 
 Advanced Deployment Options
@@ -630,7 +644,7 @@ The `mlflow models serve` command supports several options for customization:
 
 bash
 
-```
+```bash
 # Specify environment manager
 mlflow models serve -m models:/<model_id> -p 5000 --env-manager conda
 
@@ -639,6 +653,7 @@ mlflow models serve -m models:/<model_id> -p 5000 --enable-mlserver
 
 # Set custom host
 mlflow models serve -m models:/<model_id> -p 5000 --host 0.0.0.0
+
 ```
 
 For production deployments, consider:

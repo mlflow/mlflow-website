@@ -41,7 +41,7 @@ If you want to use autologging with PyTorch, [Lightning](https://lightning.ai) p
 
 python
 
-```
+```python
 import mlflow
 import pytorch_lightning as pl
 
@@ -51,6 +51,7 @@ mlflow.pytorch.autolog()
 # Define your Lightning module and train as usual
 trainer = pl.Trainer(max_epochs=10)
 trainer.fit(model, train_dataloader, val_dataloader)
+
 ```
 
 With Lightning + MLflow, you get:
@@ -97,7 +98,7 @@ Here's an end-to-end example of tracking a PyTorch experiment with MLflow:
 
 python
 
-```
+```python
 import mlflow
 import torch
 import torch.nn as nn
@@ -271,6 +272,7 @@ with mlflow.start_run():
     mlflow.log_metrics({"test_loss": test_loss, "test_accuracy": test_acc})
 
     print(f"Final Test Accuracy: {test_acc:.2f}%")
+
 ```
 
 If you run this code with a local MLflow server, you'll see comprehensive tracking in the MLflow UI:
@@ -285,7 +287,7 @@ MLflow makes it easy to save and load PyTorch models for reproducible inference:
 
 python
 
-```
+```python
 import mlflow
 import numpy as np
 import torch
@@ -324,6 +326,7 @@ loaded_model = mlflow.pyfunc.load_model(model_info.model_uri)
 sample_input = np.random.uniform(size=[1, 28, 28]).astype(np.float32)
 predictions = loaded_model.predict(sample_input)
 print("Predictions:", predictions)
+
 ```
 
 TorchScript Compatibility
@@ -332,7 +335,7 @@ MLflow seamlessly works with TorchScript, which can optimize your models for pro
 
 python
 
-```
+```python
 # Create a scripted version of your model
 scripted_model = torch.jit.script(model)
 
@@ -340,6 +343,7 @@ scripted_model = torch.jit.script(model)
 model_info = mlflow.pytorch.log_model(scripted_model, name="scripted_model")
 
 # The logged model will contain the compiled graph
+
 ```
 
 Benefits of using TorchScript with MLflow:
@@ -359,7 +363,7 @@ A model signature defines the schema of inputs and outputs, enhancing model unde
 
 python
 
-```
+```python
 import mlflow
 from mlflow.models import infer_signature
 import numpy as np
@@ -378,6 +382,7 @@ signature = infer_signature(sample_input, sample_output)
 
 # Log model with signature
 model_info = mlflow.pytorch.log_model(model, name="model", signature=signature)
+
 ```
 
 attention
@@ -394,7 +399,7 @@ For complete control over your model signature, you can manually define the inpu
 
 python
 
-```
+```python
 import mlflow
 import numpy as np
 from mlflow.types import Schema, TensorSpec
@@ -407,6 +412,7 @@ signature = ModelSignature(inputs=input_schema, outputs=output_schema)
 
 # Log model with signature
 model_info = mlflow.pytorch.log_model(model, name="model", signature=signature)
+
 ```
 
 Manual definition is useful when:
@@ -426,7 +432,7 @@ Comprehensive Tracking with Visualizations
 
 python
 
-```
+```python
 import mlflow
 import torch
 import matplotlib.pyplot as plt
@@ -526,13 +532,14 @@ class MLflowTracker:
         plt.savefig("training_curves.png")
         mlflow.log_artifact("training_curves.png")
         plt.close()
+
 ```
 
 Usage in training loop:
 
 python
 
-```
+```python
 # Initialize tracker
 tracker = MLflowTracker(
     model,
@@ -565,6 +572,7 @@ with mlflow.start_run():
 
     # Log model
     model_info = mlflow.pytorch.log_model(model, name="model")
+
 ```
 
 ### Hyperparameter Optimization[​](#hyperparameter-optimization "Direct link to Hyperparameter Optimization")
@@ -573,7 +581,7 @@ Combine PyTorch with hyperparameter optimization tools while tracking everything
 
 python
 
-```
+```python
 import mlflow
 import optuna
 from functools import partial
@@ -645,6 +653,7 @@ with mlflow.start_run(run_name="hyperparam_optimization"):
     # Log best parameters and score
     mlflow.log_params(study.best_params)
     mlflow.log_metric("best_val_accuracy", study.best_value)
+
 ```
 
 ## Real-World Applications[​](#real-world-applications "Direct link to Real-World Applications")

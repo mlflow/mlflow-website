@@ -8,8 +8,9 @@
 
 bash
 
-```
+```bash
 pip install mlflow>=3.6.0 agent-framework opentelemetry-exporter-otlp-proto-http
+
 ```
 
 ## Step 2: Start the MLflow Tracking Server[​](#step-2-start-the-mlflow-tracking-server "Direct link to Step 2: Start the MLflow Tracking Server")
@@ -18,8 +19,9 @@ Start the MLflow Tracking Server with a SQL-based backend store:
 
 bash
 
-```
+```bash
 mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
+
 ```
 
 This example uses SQLite as the backend store. To use other types of SQL databases such as PostgreSQL, MySQL, and MSSQL, change the store URI as described in the [backend store documentation](/mlflow-website/docs/latest/self-hosting/architecture/backend-store.md). OpenTelemetry ingestion is not supported with file-based backend stores.
@@ -33,7 +35,7 @@ Configure the OpenTelemetry tracer to export traces to the MLflow Tracking Serve
 
 python
 
-```
+```python
 from agent_framework.observability import setup_observability
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 
@@ -48,6 +50,7 @@ exporter = OTLPSpanExporter(
 )
 # enable_sensitive_data=True is required for recording LLM inputs and outputs.
 setup_observability(enable_sensitive_data=True, exporters=[exporter])
+
 ```
 
 ## Step 4: Run the Agent[​](#step-4-run-the-agent "Direct link to Step 4: Run the Agent")
@@ -56,7 +59,7 @@ Define and invoke the agent in a Python script like `agent.py` as usual. Microso
 
 python
 
-```
+```python
 import asyncio
 from random import randint
 from typing import Annotated
@@ -86,14 +89,16 @@ async def main():
 # Comment this out if you are using notebook.
 if __name__ == "__main__":
     asyncio.run(main())
+
 ```
 
 Run the script to invoke the agent.
 
 bash
 
-```
+```bash
 python agent.py
+
 ```
 
 Open the MLflow UI at `http://localhost:5000` and navigate to the experiment to see the traces.

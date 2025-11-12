@@ -69,7 +69,7 @@ Here's an example of a complete tool calling sequence using `ResponsesAgentRespo
 
 python
 
-```
+```python
 from mlflow.pyfunc import ResponsesAgent
 from mlflow.types.responses import ResponsesAgentRequest, ResponsesAgentResponse
 
@@ -96,6 +96,7 @@ class SimpleResponsesAgent(ResponsesAgent):
             ],
             custom_outputs={"key1": "custom-value1"},
         )
+
 ```
 
 #### Streaming agent output[​](#streaming-agent-output "Direct link to Streaming agent output")
@@ -113,7 +114,7 @@ To stream text within the ResponsesAgent interface, you should:
 
 python
 
-```
+```python
 from mlflow.types.responses import ResponsesAgentStreamEvent
 
 
@@ -143,6 +144,7 @@ class SimpleResponsesAgent(ResponsesAgent):
                 id="msg_1",
             ),
         )
+
 ```
 
 ##### Tool calling with streaming[​](#tool-calling-with-streaming "Direct link to Tool calling with streaming")
@@ -151,7 +153,7 @@ You can also stream tool calls and their results. Each tool call and its output 
 
 python
 
-```
+```python
 from mlflow.types.responses import ResponsesAgentStreamEvent
 
 
@@ -184,6 +186,7 @@ class SimpleResponsesAgent(ResponsesAgent):
                 id="msg_1",
             ),
         )
+
 ```
 
 ### Logging and Serving[​](#logging-and-serving "Direct link to Logging and Serving")
@@ -192,12 +195,13 @@ Log your agent using the [Models-from-code](/mlflow-website/docs/latest/ml/model
 
 python
 
-```
+```python
 with mlflow.start_run():
     logged_agent_info = mlflow.pyfunc.log_model(
         python_model="agent.py",  # replace with your relative path to agent code
         name="agent",
     )
+
 ```
 
 For ease of use, MLflow has built in the following features:
@@ -221,7 +225,7 @@ To test out a ResponsesAgent, you can pass a single input dictionary that follow
 
 python
 
-```
+```python
 import mlflow
 
 # load it back from mlflow
@@ -232,6 +236,7 @@ loaded_model.predict(
         "context": {"conversation_id": "123", "user_id": "456"},
     }
 )
+
 ```
 
 To serve the model, refer to the [`serving options`](#serving-options) for detailed instructions.
@@ -244,7 +249,7 @@ Here's an example of an agent that calls OpenAI's gpt-5 model with the ChatCompl
 
 python
 
-```
+```python
 import mlflow
 from mlflow.models import set_model
 from mlflow.pyfunc import ResponsesAgent
@@ -287,6 +292,7 @@ class SimpleResponsesAgent(ResponsesAgent):
 mlflow.openai.autolog()
 agent = SimpleResponsesAgent()
 set_model(agent)
+
 ```
 
 ### Simple Chat Example with a Responses API LLM[​](#simple-chat-example-with-a-responses-api-llm "Direct link to Simple Chat Example with a Responses API LLM")
@@ -295,7 +301,7 @@ Here's an example of an agent that calls OpenAI's gpt-4o model with the Response
 
 python
 
-```
+```python
 # uncomment below if running inside a jupyter notebook
 # %%writefile agent.py
 import os
@@ -336,6 +342,7 @@ class SimpleResponsesAgent(ResponsesAgent):
 mlflow.openai.autolog()
 agent = SimpleResponsesAgent(model="gpt-4o")
 set_model(agent)
+
 ```
 
 ### Wrapping a LangGraph Agent[​](#wrapping-a-langgraph-agent "Direct link to Wrapping a LangGraph Agent")
@@ -344,7 +351,7 @@ Here's an example of wrapping a LangGraph agent in a ResponsesAgent:
 
 python
 
-```
+```python
 from typing import Generator
 
 import mlflow
@@ -391,6 +398,7 @@ mlflow.langchain.autolog()
 graph = None  # TODO: replace with your compiled LangGraph agent
 agent = LangGraphResponsesAgent(graph)
 set_model(agent)
+
 ```
 
 ### Tool Calling Example[​](#tool-calling-example "Direct link to Tool Calling Example")
@@ -399,7 +407,7 @@ Here's an example of an agent that calls OpenAI's gpt-4o model with a simple too
 
 python
 
-```
+```python
 # uncomment below if running inside a jupyter notebook
 # %%writefile agent.py
 import json
@@ -571,6 +579,7 @@ SYSTEM_PROMPT = "You are a helpful assistant that can call tools to get informat
 mlflow.openai.autolog()
 AGENT = ToolCallingAgent(model="gpt-4o", tools=tools)
 mlflow.models.set_model(AGENT)
+
 ```
 
 ## Serving Options[​](#serving-options "Direct link to Serving Options")
@@ -583,15 +592,16 @@ Start a local server for development and testing:
 
 bash
 
-```
+```bash
 mlflow models serve -m models:/<model_id> -p 5000
+
 ```
 
 Test the served model:
 
 python
 
-```
+```python
 import requests
 
 response = requests.post(
@@ -600,13 +610,15 @@ response = requests.post(
 )
 
 print(response.json())
+
 ```
 
 bash
 
-```
+```bash
 mlflow models build-docker -m runs:/<run_id>/responses_agent -n my-responses-agent
 docker run -p 5000:8080 my-responses-agent
+
 ```
 
 note
@@ -617,17 +629,18 @@ Prerequisite: register the logged model into Databricks-UC
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.register_model("model:/<model_id>", "<catalog>.<schema>.<model_name>")
+
 ```
 
 For managed MLflow on Databricks, ResponsesAgent models integrate seamlessly with Databricks Model Serving:
 
 python
 
-```
+```python
 from mlflow.deployments import get_deploy_client
 
 client = get_deploy_client("databricks")
@@ -650,6 +663,7 @@ endpoint = client.create_endpoint(
         },
     },
 )
+
 ```
 
 ## Schema and Types[​](#schema-and-types "Direct link to Schema and Types")
@@ -658,7 +672,7 @@ ResponsesAgent works with structured schemas for requests and responses, check [
 
 python
 
-```
+```python
 # Example Request schema
 {
     "input": [
@@ -697,6 +711,7 @@ python
         }
     ],
 }
+
 ```
 
 ## Troubleshooting[​](#troubleshooting "Direct link to Troubleshooting")
@@ -724,7 +739,7 @@ python
 
    python
 
-   ```
+   ```python
    import os
 
    # Allow individual requests up to 15 minutes
@@ -737,6 +752,7 @@ python
 
    client = get_deploy_client("databricks")
    response = client.predict(endpoint="my-agent", inputs=data)
+
    ```
 
    tip
@@ -750,7 +766,7 @@ python
 
 python
 
-```
+```python
 import mlflow
 
 # enable autologging if your agent internally uses MLflow tracing-supported libraries internally, such as LangChain, OpenAI, etc.
@@ -764,4 +780,5 @@ agent.predict(
         "context": {"conversation_id": "123", "user_id": "456"},
     }
 )
+
 ```

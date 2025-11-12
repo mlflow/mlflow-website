@@ -23,7 +23,7 @@ After running the above code, you can proceed to the MLflow UI to view the logge
 
 python
 
-```
+```python
 import random
 from functools import partial
 from itertools import starmap
@@ -63,6 +63,7 @@ mlflow.set_experiment("No Child Runs")
 
 # Execute 5 hyperparameter tuning runs
 consume(starmap(execute_tuning, ((x,) for x in range(5))))
+
 ```
 
 #### Iterative development simulation[​](#iterative-development-simulation "Direct link to Iterative development simulation")
@@ -73,9 +74,10 @@ In order to arrive at this limited set of selection parameters ranges and condit
 
 python
 
-```
+```python
 # What if we need to run this again?
 consume(starmap(execute_tuning, ((x,) for x in range(5))))
+
 ```
 
 ### Using Child Runs for Improved Organization[​](#using-child-runs-for-improved-organization "Direct link to Using Child Runs for Improved Organization")
@@ -96,7 +98,7 @@ Let's dive into the code and observe the seamless organization and enhanced func
 
 python
 
-```
+```python
 # Define a function to log parameters and metrics and add tag
 # logging for search_runs functionality
 def log_run(run_name, test_no, param1_choices, param2_choices, tag_ident):
@@ -146,6 +148,7 @@ param_2_values = ["u", "v", "w"]
 
 # Execute hyperparameter tuning runs with custom parameter choices
 consume(starmap(execute_tuning, ((x, param_1_values, param_2_values) for x in range(5))))
+
 ```
 
 ### Tailoring the Hyperparameter Tuning Process[​](#tailoring-the-hyperparameter-tuning-process "Direct link to Tailoring the Hyperparameter Tuning Process")
@@ -168,12 +171,13 @@ Let's execute this section of the code and delve deeper into the insights and im
 
 python
 
-```
+```python
 # Execute additional hyperparameter tuning runs with custom parameter choices
 param_1_values = ["x", "y", "z"]
 param_2_values = ["u", "v", "w"]
 ident = "params_test_2"
 consume(starmap(execute_tuning, ((x, param_1_values, param_2_values, ident) for x in range(5))))
+
 ```
 
 ### Refining the Hyperparameter Search Space[​](#refining-the-hyperparameter-search-space "Direct link to Refining the Hyperparameter Search Space")
@@ -203,11 +207,12 @@ In conclusion, while refining the search space is essential for efficient and ef
 
 python
 
-```
+```python
 param_1_values = ["b", "c"]
 param_2_values = ["d", "f"]
 ident = "params_test_3"
 consume(starmap(execute_tuning, ((x, param_1_values, param_2_values, ident) for x in range(5))))
+
 ```
 
 ### Challenge: Logging Best Metrics and Parameters[​](#challenge-logging-best-metrics-and-parameters "Direct link to Challenge: Logging Best Metrics and Parameters")
@@ -230,7 +235,7 @@ Before moving on to the solution below, **give it a try yourself!** This exercis
 
 python
 
-```
+```python
 # Define a function to log parameters and metrics and add tag
 # logging for search_runs functionality
 def log_run(run_name, test_no, param1_choices, param2_choices, tag_ident):
@@ -310,4 +315,5 @@ consume(
       execute_tuning, ((x, param_1_values, param_2_values, "subset_test", 25) for x in range(5))
   )
 )
+
 ```

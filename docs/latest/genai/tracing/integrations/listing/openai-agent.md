@@ -6,10 +6,11 @@
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.openai.autolog()
+
 ```
 
 ## Basic Example[​](#basic-example "Direct link to Basic Example")
@@ -18,7 +19,7 @@ The following example demonstrates how to use the OpenAI Agents SDK with MLflow 
 
 python
 
-```
+```python
 import mlflow
 import asyncio
 from agents import Agent, Runner
@@ -56,6 +57,7 @@ async def main():
 # If you are running this code in a Jupyter notebook, replace this with `await main()`.
 if __name__ == "__main__":
     asyncio.run(main())
+
 ```
 
 ## Function Calling[​](#function-calling "Direct link to Function Calling")
@@ -64,7 +66,7 @@ OpenAI Agents SDK support defining functions that can be called by the agent. ML
 
 python
 
-```
+```python
 import asyncio
 
 from agents import Agent, Runner, function_tool
@@ -94,6 +96,7 @@ async def main():
 # If you are running this code in a Jupyter notebook, replace this with `await main()`.
 if __name__ == "__main__":
     asyncio.run(main())
+
 ```
 
 ![OpenAI Tracing via autolog](/mlflow-website/docs/latest/assets/images/openai-agent-tracing-function-calling-a01f7b2fb8f5c73f54d43b2a8e2d63de.png)
@@ -104,7 +107,7 @@ OpenAI Agents SDK support defining guardrails that can be used to check the inpu
 
 python
 
-```
+```python
 from pydantic import BaseModel
 from agents import (
     Agent,
@@ -164,6 +167,7 @@ async def main():
 # If you are running this code in a Jupyter notebook, replace this with `await main()`.
 if __name__ == "__main__":
     asyncio.run(main())
+
 ```
 
 ![OpenAI Tracing via autolog](/mlflow-website/docs/latest/assets/images/openai-agent-tracing-guardrail-c35d8df829459ed5a5927866c6b745d8.png)

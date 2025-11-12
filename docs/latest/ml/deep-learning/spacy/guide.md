@@ -12,7 +12,7 @@ MLflow provides native support for spaCy models through the [`mlflow.spacy.log_m
 
 python
 
-```
+```python
 import mlflow
 import spacy
 
@@ -22,6 +22,7 @@ nlp = spacy.load("en_core_web_sm")
 # Log the model to MLflow
 with mlflow.start_run():
     mlflow.spacy.log_model(nlp, name="spacy_model")
+
 ```
 
 What Gets Automatically Captured
@@ -52,7 +53,7 @@ When your spaCy model includes a `TextCategorizer` component, MLflow automatical
 
 python
 
-```
+```python
 import mlflow
 import spacy
 from spacy import Language
@@ -85,6 +86,7 @@ loaded_model = mlflow.pyfunc.load_model(model_info.model_uri)
 test_data = pd.DataFrame({"text": ["This is great!", "This is terrible!"]})
 predictions = loaded_model.predict(test_data)
 print(predictions)
+
 ```
 
 Text Classification Integration Details
@@ -117,7 +119,7 @@ spaCy's training system can be integrated with MLflow through custom loggers reg
 
 python
 
-```
+```python
 import sys
 import spacy
 from spacy import Language
@@ -161,6 +163,7 @@ def mlflow_logger():
         return log_step, finalize
 
     return setup_logger
+
 ```
 
 Training Configuration Setup
@@ -171,31 +174,34 @@ Training Configuration Setup
 
 bash
 
-```
+```bash
 python -m spacy init config --pipeline textcat --lang en config.cfg
+
 ```
 
 2. **Update Logger Configuration**:
 
 ini
 
-```
+```ini
 [training.logger]
 @loggers = "mlflow_logger.v1"
 
 [training]
 max_steps = 1000
 eval_frequency = 100
+
 ```
 
 3. **Configure Data Paths**:
 
 ini
 
-```
+```ini
 [paths]
 train = "./train.spacy"
 dev = "./dev.spacy"
+
 ```
 
 #### Advanced Logger Features[​](#advanced-logger-features "Direct link to Advanced Logger Features")
@@ -212,7 +218,7 @@ Here's a comprehensive example showing spaCy training with MLflow integration:
 
 python
 
-```
+```python
 import mlflow
 import spacy
 import pandas as pd
@@ -296,6 +302,7 @@ with mlflow.start_run(run_name="spacy_text_classification"):
     spacy_train("config.cfg")
 
 print("Training completed and logged to MLflow!")
+
 ```
 
 ## Saving and Loading spaCy Models[​](#saving-and-loading-spacy-models "Direct link to Saving and Loading spaCy Models")
@@ -306,7 +313,7 @@ MLflow provides multiple ways to save and load spaCy models:
 
 python
 
-```
+```python
 import mlflow
 import spacy
 
@@ -323,6 +330,7 @@ loaded_nlp = mlflow.spacy.load_model(model_info.model_uri)
 doc = loaded_nlp("This is a test sentence.")
 for token in doc:
     print(f"{token.text}: {token.pos_}, {token.dep_}")
+
 ```
 
 Loading Options and Use Cases
@@ -331,7 +339,7 @@ Loading Options and Use Cases
 
 python
 
-```
+```python
 # Full spaCy functionality - all pipeline components
 nlp = mlflow.spacy.load_model(model_info.model_uri)
 
@@ -339,13 +347,14 @@ nlp = mlflow.spacy.load_model(model_info.model_uri)
 doc = nlp("Analyze this text completely.")
 entities = [(ent.text, ent.label_) for ent in doc.ents]
 dependencies = [(token.text, token.dep_, token.head.text) for token in doc]
+
 ```
 
 #### PyFunc Loading (Text Classification Only)[​](#pyfunc-loading-text-classification-only "Direct link to PyFunc Loading (Text Classification Only)")
 
 python
 
-```
+```python
 # Simplified interface for text classification
 classifier = mlflow.pyfunc.load_model(model_info.model_uri)
 
@@ -354,6 +363,7 @@ import pandas as pd
 
 test_data = pd.DataFrame({"text": ["Sample text to classify"]})
 predictions = classifier.predict(test_data)
+
 ```
 
 #### When to Use Each Approach[​](#when-to-use-each-approach "Direct link to When to Use Each Approach")
@@ -368,7 +378,7 @@ Adding signatures to spaCy models improves documentation and enables validation:
 
 python
 
-```
+```python
 import mlflow
 from mlflow.models import infer_signature
 import pandas as pd
@@ -404,6 +414,7 @@ else:
 mlflow.spacy.log_model(
     nlp, name="spacy_model", signature=signature, input_example=sample_input
 )
+
 ```
 
 Manual Signature Definition
@@ -412,7 +423,7 @@ For complete control over your model signature:
 
 python
 
-```
+```python
 import mlflow
 from mlflow.types import Schema, ColSpec
 from mlflow.models import ModelSignature
@@ -430,6 +441,7 @@ signature = ModelSignature(inputs=input_schema, outputs=output_schema)
 
 # Log model with manual signature
 mlflow.spacy.log_model(nlp, name="model", signature=signature)
+
 ```
 
 Manual signatures are useful when:
@@ -447,7 +459,7 @@ Track custom spaCy components and their performance:
 
 python
 
-```
+```python
 import mlflow
 import spacy
 from spacy import Language
@@ -528,6 +540,7 @@ with mlflow.start_run():
     with open("evaluation_results.json", "w") as f:
         json.dump(results, f, indent=2)
     mlflow.log_artifact("evaluation_results.json")
+
 ```
 
 ### Multi-Language Model Tracking[​](#multi-language-model-tracking "Direct link to Multi-Language Model Tracking")
@@ -538,7 +551,7 @@ Multilingual Experiment Tracking
 
 python
 
-```
+```python
 import mlflow
 import spacy
 from collections import defaultdict
@@ -615,6 +628,7 @@ def evaluate_multilingual_models():
 
 # Run multilingual evaluation
 results = evaluate_multilingual_models()
+
 ```
 
 #### Benefits of Multilingual Tracking[​](#benefits-of-multilingual-tracking "Direct link to Benefits of Multilingual Tracking")
@@ -630,7 +644,7 @@ Track different pipeline configurations and optimizations:
 
 python
 
-```
+```python
 import mlflow
 import spacy
 import time
@@ -731,6 +745,7 @@ def optimize_pipeline_configuration():
 # Run pipeline optimization
 best_config, score = optimize_pipeline_configuration()
 print(f"Best configuration: {best_config} with score: {score}")
+
 ```
 
 ## Production Deployment[​](#production-deployment "Direct link to Production Deployment")
@@ -741,7 +756,7 @@ Deploy your spaCy models locally using MLflow's serving infrastructure:
 
 python
 
-```
+```python
 # First, log your model with proper configuration
 import mlflow
 import spacy
@@ -764,13 +779,14 @@ with mlflow.start_run() as run:
     model_uri = (
         model_info.model_uri
     )  # The format of this attribute is 'models:/<model_id>'
+
 ```
 
 Then deploy the model using the MLflow CLI:
 
 bash
 
-```
+```bash
 # Serve the model locally (for text classification models with PyFunc flavor)
 mlflow models serve -m models:/<model_id> -p 5000
 
@@ -778,6 +794,7 @@ mlflow models serve -m models:/<model_id> -p 5000
 curl http://localhost:5000/invocations \
   -H "Content-Type: application/json" \
   -d '{"inputs": [{"text": "This is a great product!"}]}'
+
 ```
 
 Advanced Deployment Options
@@ -786,7 +803,7 @@ The `mlflow models serve` command supports several options for spaCy models:
 
 bash
 
-```
+```bash
 # Specify environment manager
 mlflow models serve -m models:/<model_id> -p 5000 --env-manager conda
 
@@ -795,6 +812,7 @@ mlflow models serve -m models:/<model_id> -p 5000 --enable-mlserver
 
 # Set custom host for network access
 mlflow models serve -m models:/<model_id> -p 5000 --host 0.0.0.0
+
 ```
 
 For production deployments, consider:

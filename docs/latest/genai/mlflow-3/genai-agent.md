@@ -6,17 +6,19 @@ Run the following command to install MLflow 3 and langchain-openai packages.
 
 text
 
-```
+```text
 pip install --upgrade 'mlflow>=3.0.0rc0' --pre
 pip install langchain-openai
+
 ```
 
 Set `OPENAI_API_KEY` environment variable in CLI to authenticate to OpenAI APIs.
 
 bash
 
-```
+```bash
 export OPENAI_API_KEY=your_api_key_here
+
 ```
 
 This example demonstrates how to use MLflow to trace and evaluate langchain model requests with prompt engineering. It showcases how to register prompts, generate traces, and assess response performance using evaluation datasets. The example also highlights the ability to track interactive traces and link them to the logged model for better observability.
@@ -27,7 +29,7 @@ First, we register a prompt template as a prompt version in MLflow. This allows 
 
 python
 
-```
+```python
 import mlflow
 
 system_prompt = mlflow.genai.register_prompt(
@@ -35,6 +37,7 @@ system_prompt = mlflow.genai.register_prompt(
     template="You are a chatbot that can answer questions about IT. Answer this question: {{question}}",
     commit_message="Initial version of chatbot",
 )
+
 ```
 
 Switch to the **Prompts** tab to view the registered prompt and its details:
@@ -47,7 +50,7 @@ Next, we use `ChatPromptTemplate` with the prompt registered in the previous ste
 
 python
 
-```
+```python
 from langchain.schema.output_parser import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
@@ -57,6 +60,7 @@ chain = prompt | ChatOpenAI(temperature=0.7) | StrOutputParser()
 question = "What is MLflow?"
 print(chain.invoke({"question": question}))
 # MLflow is an open-source platform for managing the end-to-end machine learning lifecycle...
+
 ```
 
 ## Test the model with tracing observability[​](#test-the-model-with-tracing-observability "Direct link to Test the model with tracing observability")
@@ -65,7 +69,7 @@ In this section, we manually test the model with example queries and leverage ML
 
 python
 
-```
+```python
 # set the active model for linking traces
 mlflow.set_active_model(name="langchain_model")
 
@@ -89,6 +93,7 @@ mlflow.search_traces(model_id=active_model_id)
 # 0  e807ab0a020f4794989a24c84c2892ad  Trace(trace_id=e807ab0a020f4794989a24c84c2892ad)  ...           []  e807ab0a020f4794989a24c84c2892ad
 # 1  4eb83e4adb6a4f3494bc5b33aca4e970  Trace(trace_id=4eb83e4adb6a4f3494bc5b33aca4e970)  ...           []  4eb83e4adb6a4f3494bc5b33aca4e970
 # 2  42b100851f934c969c352930f699308d  Trace(trace_id=42b100851f934c969c352930f699308d)  ...           []  42b100851f934c969c352930f699308d
+
 ```
 
 Check out the **Models** tab in the experiment to view the new logged model with name `langchain_model`.
@@ -109,7 +114,7 @@ Finally, we use [`mlflow.evaluate()`](/mlflow-website/docs/latest/api_reference/
 
 python
 
-````
+````python
 # Prepare the eval dataset in a pandas DataFrame
 import pandas as pd
 
@@ -151,6 +156,7 @@ result.tables["eval_results_table"]
 # 0  What is MLflow Tracking and how does it work?  ...  The output directly addresses the input questi...
 # 1                         What is Unity Catalog?  ...  The output is completely irrelevant to the inp...
 # 2        What are user-defined functions (UDFs)?  ...  The output directly addresses the input questi...
+
 ````
 
 Navigating to the active model, you can see the metrics and their details displayed in the MLflow UI. This includes metrics like answer correctness and answer relevance, providing insights into the model's performance.

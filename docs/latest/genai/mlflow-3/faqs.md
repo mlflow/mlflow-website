@@ -14,20 +14,21 @@ For example, the following code fails to load the model in MLflow 3.x since the 
 
 python
 
-```
+```python
 import mlflow
 
 with mlflow.start_run() as run:
     mlflow.sklearn.log_model(my_model, name="model")
     mlflow.sklearn.load_model(mlflow.get_artifact_uri("model"))
     # Throws a `ResourceNotFound` error.
+
 ```
 
 To avoid this error, call `mlflow.<flavor>.load_model` with the model URI returned by `mlflow.<flavor>.log_model`:
 
 python
 
-```
+```python
 import mlflow
 
 with mlflow.start_run() as run:
@@ -38,13 +39,14 @@ with mlflow.start_run() as run:
     mlflow.sklearn.load_model(f"models:/{info.model_id}")
     # if neither `model_id` nor `model_uri` is available (deprecated and will be removed in future versions)
     mlflow.sklearn.load_model(f"runs:/{run.info.run_id}/model")
+
 ```
 
 Why does this happen? In MLflow 3.x, the model artifacts are stored in a different location than in MLflow 2.x. The following is a comparison of the two versions using the `tree` format:
 
 shell
 
-```
+```shell
 # MLflow 2.x
 experiments/
   └── <experiment_id>/
@@ -59,6 +61,7 @@ experiments/
       └── <model_id>/
         └── artifacts/
           └── ... # model artifacts are stored here
+
 ```
 
 #### I want to modify `requirements.txt` of my model. How can I do that?[​](#i-want-to-modify-requirementstxt-of-my-model-how-can-i-do-that "Direct link to i-want-to-modify-requirementstxt-of-my-model-how-can-i-do-that")
@@ -67,7 +70,7 @@ You can modify `requirements.txt` of your model using [`mlflow.models.update_mod
 
 python
 
-```
+```python
 import mlflow
 
 
@@ -82,6 +85,7 @@ mlflow.models.update_model_requirements(
     operation="add",
     requirement_list=["scikit-learn"],
 )
+
 ```
 
 #### I'm still not ready to upgrade to MLflow 3.x. How can I pin my MLflow version to 2.x?[​](#im-still-not-ready-to-upgrade-to-mlflow-3x-how-can-i-pin-my-mlflow-version-to-2x "Direct link to I'm still not ready to upgrade to MLflow 3.x. How can I pin my MLflow version to 2.x?")
@@ -90,6 +94,7 @@ You can pin MLflow to the latest 2.x version by using the following command:
 
 bash
 
-```
+```bash
 pip install 'mlflow<3'
+
 ```

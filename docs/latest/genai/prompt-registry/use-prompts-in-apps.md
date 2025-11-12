@@ -13,7 +13,7 @@ It uses a special URI format: `prompts:/<prompt_name>/<version_or_alias>`.
 
 python
 
-```
+```python
 import mlflow
 
 prompt_name = "my-sdk-prompt"
@@ -26,6 +26,7 @@ mlflow.genai.load_prompt(name_or_uri=f"prompts:/{prompt_name}/1")
 
 # Load by alias (assuming an alias 'staging' points to a version of a prompt)
 mlflow.genai.load_prompt(name_or_uri=f"prompts:/{prompt_name}@staging")
+
 ```
 
 ## Formatting Prompts with Variables[​](#formatting-prompts-with-variables "Direct link to Formatting Prompts with Variables")
@@ -34,7 +35,7 @@ Once you have loaded a prompt object (which is a `Prompt` instance), you can pop
 
 python
 
-```
+```python
 import mlflow
 
 # define a prompt template
@@ -68,6 +69,7 @@ response = (
     .choices[0]
     .message.content
 )
+
 ```
 
 ## Using Prompts with Other Frameworks (LangChain, LlamaIndex)[​](#using-prompts-with-other-frameworks-langchain-llamaindex "Direct link to Using Prompts with Other Frameworks (LangChain, LlamaIndex)")
@@ -76,7 +78,7 @@ MLflow prompts use the `{{variable}}` double-brace syntax for templating. Some o
 
 python
 
-```
+```python
 import mlflow
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
@@ -103,6 +105,7 @@ chain = langchain_prompt | llm
 # Invoke the chain
 response = chain.invoke({"num_sentences": 1, "sentences": "This is a test sentence."})
 print(response)
+
 ```
 
 ## Linking Prompts to Logged Models for Full Lineage[​](#linking-prompts-to-logged-models-for-full-lineage "Direct link to Linking Prompts to Logged Models for Full Lineage")

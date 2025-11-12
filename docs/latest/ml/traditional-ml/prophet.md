@@ -42,7 +42,7 @@ MLflow's Prophet integration makes time series forecasting experiments effortles
 
 python
 
-```
+```python
 import mlflow
 import mlflow.prophet
 import pandas as pd
@@ -87,6 +87,7 @@ with mlflow.start_run():
     mlflow.prophet.log_model(
         pr_model=model, name="prophet_model", input_example=df[["ds"]].head()
     )
+
 ```
 
 What Gets Automatically Captured

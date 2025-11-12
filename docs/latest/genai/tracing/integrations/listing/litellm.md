@@ -8,10 +8,11 @@
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.litellm.autolog()
+
 ```
 
 MLflow trace automatically captures the following information about LiteLLM calls:
@@ -27,7 +28,7 @@ MLflow trace automatically captures the following information about LiteLLM call
 
 python
 
-```
+```python
 import mlflow
 import litellm
 
@@ -43,6 +44,7 @@ response = litellm.completion(
     model="claude-3-5-sonnet-20240620",
     messages=[{"role": "user", "content": "Hey! how's it going?"}],
 )
+
 ```
 
 ### Async API[​](#async-api "Direct link to Async API")
@@ -51,13 +53,14 @@ MLflow supports tracing LiteLLM's async APIs:
 
 python
 
-```
+```python
 mlflow.litellm.autolog()
 
 response = await litellm.acompletion(
     model="claude-3-5-sonnet-20240620",
     messages=[{"role": "user", "content": "Hey! how's it going?"}],
 )
+
 ```
 
 ### Streaming[​](#streaming "Direct link to Streaming")
@@ -66,7 +69,7 @@ MLflow supports tracing LiteLLM's sync and async streaming APIs:
 
 python
 
-```
+```python
 mlflow.litellm.autolog()
 
 response = litellm.completion(
@@ -76,6 +79,7 @@ response = litellm.completion(
 )
 for chunk in response:
     print(chunk.choices[0].delta.content, end="|")
+
 ```
 
 MLflow will record concatenated outputs from the stream chunks as a span output.

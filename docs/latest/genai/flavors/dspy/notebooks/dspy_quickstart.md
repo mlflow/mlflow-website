@@ -25,8 +25,9 @@ Below we create a simple program that demonstrates the power of DSPy. We will bu
 
 python
 
-```
+```python
 %pip install -U datasets openai "dspy>=3.0.3" "mlflow>=3.4.0"
+
 ```
 
 ## Setup[​](#setup "Direct link to Setup")
@@ -37,17 +38,18 @@ After installing the relevant dependencies, let's set up access to an OpenAI LLM
 
 python
 
-```
+```python
 # Set OpenAI API Key to the environment variable. You can also pass the token to dspy.LM()
 import getpass
 import os
 
 os.environ["OPENAI_API_KEY"] = getpass.getpass("Enter your OpenAI Key:")
+
 ```
 
 python
 
-```
+```python
 import dspy
 
 # Define your model. We will use OpenAI for simplicity
@@ -60,6 +62,7 @@ lm = dspy.LM(
   temperature=0.1,
 )
 dspy.settings.configure(lm=lm)
+
 ```
 
 ### Create MLflow Experiment[​](#create-mlflow-experiment "Direct link to Create MLflow Experiment")
@@ -68,10 +71,11 @@ Create a new MLflow Experiment to track your DSPy models, metrics, parameters, a
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_experiment("DSPy Quickstart")
+
 ```
 
 ### Turn on Auto Tracing with MLflow[​](#turn-on-auto-tracing-with-mlflow "Direct link to Turn on Auto Tracing with MLflow")
@@ -80,8 +84,9 @@ mlflow.set_experiment("DSPy Quickstart")
 
 python
 
-```
+```python
 mlflow.dspy.autolog()
+
 ```
 
 ### Set Up Data[​](#set-up-data "Direct link to Set Up Data")
@@ -90,7 +95,7 @@ Next, we will download the [Reuters 21578](https://huggingface.co/datasets/yangw
 
 python
 
-```
+```python
 import numpy as np
 import pandas as pd
 from datasets import load_dataset
@@ -166,12 +171,7 @@ unique_train_labels = {example.label for example in dataset.train}
 print(len(train_dataset), len(test_dataset))
 print(f"Train labels: {unique_train_labels}")
 print(train_dataset[0])
-```
 
-```
-24 8
-Train labels: {'interest', 'earn', 'money-fx', 'trade', 'ship', 'grain', 'acq', 'crude'}
-Example({'text': 'bankamerica bacp raises prime rate to pct bankamerica corp following moves by other major banks said it has raised its prime rate to pct from pct effective today reuter', 'label': 'interest'}) (input_keys={'text'})
 ```
 
 ### Set up DSPy Signature and Module[​](#set-up-dspy-signature-and-module "Direct link to Set up DSPy Signature and Module")
@@ -190,7 +190,7 @@ In the below example, note that we simply provide the expected labels to `output
 
 python
 
-```
+```python
 class TextClassificationSignature(dspy.Signature):
   text = dspy.InputField()
   label = dspy.OutputField(
@@ -205,6 +205,7 @@ class TextClassifier(dspy.Module):
 
   def forward(self, text: str):
       return self.generate_classification(text=text)
+
 ```
 
 ## Run it\![​](#run-it "Direct link to Run it!")
@@ -215,7 +216,7 @@ Let's demonstrate predicting via the DSPy module and associated signature. The p
 
 python
 
-```
+```python
 # Initilize our impact_improvement class
 text_classifier = TextClassifier()
 
@@ -224,15 +225,7 @@ print(text_classifier(text=message))
 
 message = "I enjoy ice skating"
 print(text_classifier(text=message))
-```
 
-```
-Prediction(
-  label='interest'
-)
-Prediction(
-  label='interest'
-)
 ```
 
 ### Review Traces[​](#review-traces "Direct link to Review Traces")
@@ -254,7 +247,7 @@ Note that in the below example, we leverage a simple metric definition of exact 
 
 python
 
-```
+```python
 from dspy import SIMBA
 
 
@@ -270,6 +263,7 @@ optimizer = SIMBA(
 )
 
 compiled_pe = optimizer.compile(TextClassifier(), trainset=train_dataset)
+
 ```
 
 ### Compare Pre/Post Compiled Accuracy[​](#compare-prepost-compiled-accuracy "Direct link to Compare Pre/Post Compiled Accuracy")
@@ -278,7 +272,7 @@ Finally, let's explore how well our trained model can predict on unseen test dat
 
 python
 
-```
+```python
 def check_accuracy(classifier, test_data: pd.DataFrame = test_dataset) -> float:
   residuals = []
   predictions = []
@@ -294,11 +288,7 @@ print(f"Uncompiled accuracy: {np.mean(uncompiled_residuals)}")
 
 compiled_residuals, compiled_predictions = check_accuracy(compiled_pe)
 print(f"Compiled accuracy: {np.mean(compiled_residuals)}")
-```
 
-```
-Uncompiled accuracy: 0.875
-Compiled accuracy: 1.0
 ```
 
 As shown above, our compiled accuracy is non-zero - our base LLM inferred meaning of the classification labels simply via our initial prompt. However, with DSPy training, the prompts, demonstrations, and input/output signatures have been updated to give our model to 100% accuracy on unseen data. That's a gain of 12 percentage points!
@@ -307,42 +297,22 @@ Let's take a look at each prediction in our test set.
 
 python
 
-```
+```python
 for uncompiled_residual, uncompiled_prediction in zip(uncompiled_residuals, uncompiled_predictions):
   is_correct = "Correct" if bool(uncompiled_residual) else "Incorrect"
   prediction = uncompiled_prediction.label
   print(f"{is_correct} prediction: {' ' * (12 - len(is_correct))}{prediction}")
-```
 
-```
-Incorrect prediction:    money-fx
-Correct prediction:      crude
-Correct prediction:      money-fx
-Correct prediction:      earn
-Incorrect prediction:    interest
-Correct prediction:      grain
-Correct prediction:      trade
-Incorrect prediction:    trade
 ```
 
 python
 
-```
+```python
 for compiled_residual, compiled_prediction in zip(compiled_residuals, compiled_predictions):
   is_correct = "Correct" if bool(compiled_residual) else "Incorrect"
   prediction = compiled_prediction.label
   print(f"{is_correct} prediction: {' ' * (12 - len(is_correct))}{prediction}")
-```
 
-```
-Correct prediction:      interest
-Correct prediction:      crude
-Correct prediction:      money-fx
-Correct prediction:      earn
-Correct prediction:      acq
-Correct prediction:      grain
-Correct prediction:      trade
-Correct prediction:      ship
 ```
 
 ## Log and Load the Model with MLflow[​](#log-and-load-the-model-with-mlflow "Direct link to Log and Load the Model with MLflow")
@@ -351,7 +321,7 @@ Now that we have a compiled model with higher classification accuracy, let's lev
 
 python
 
-```
+```python
 import mlflow
 
 with mlflow.start_run():
@@ -360,10 +330,7 @@ with mlflow.start_run():
       name="model",
       input_example="what is 2 + 2?",
   )
-```
 
-```
-Downloading artifacts:   0%|          | 0/7 [00:00<?, ?it/s]
 ```
 
 Open the MLflow UI again and check the complied model is recorded to a new MLflow Run. Now you can load the model back for inference using `mlflow.dspy.load_model` or `mlflow.pyfunc.load_model`.
@@ -372,7 +339,7 @@ Open the MLflow UI again and check the complied model is recorded to a new MLflo
 
 python
 
-```
+```python
 # Define input text
 print("
 ==============Input Text============")
@@ -395,21 +362,7 @@ loaded_model_pyfunc = mlflow.pyfunc.load_model(model_info.model_uri)
 print("
 --------------PyFunc Prediction------------")
 print(loaded_model_pyfunc.predict(text)["label"])
-```
 
-```
-
-==============Input Text============
-Text: top discount rate at u k bill tender rises to pct
-
---------------Original DSPy Prediction------------
-interest
-
---------------Loaded DSPy Prediction------------
-interest
-
---------------PyFunc Prediction------------
-interest
 ```
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")

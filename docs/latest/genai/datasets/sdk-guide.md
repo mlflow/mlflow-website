@@ -8,7 +8,7 @@ MLflow provides a fluent API for working with evaluation datasets that makes com
 
 python
 
-```
+```python
 from mlflow.genai.datasets import (
     create_dataset,
     get_dataset,
@@ -16,6 +16,7 @@ from mlflow.genai.datasets import (
     set_dataset_tags,
     delete_dataset_tag,
 )
+
 ```
 
 ## Your Dataset Journey[​](#your-dataset-journey "Direct link to Your Dataset Journey")
@@ -44,7 +45,7 @@ Start by creating a new evaluation dataset with meaningful metadata using the [`
 
 python
 
-```
+```python
 from mlflow.genai.datasets import create_dataset
 
 # Create a new dataset with tags for organization
@@ -59,6 +60,7 @@ dataset = create_dataset(
         "status": "development",
     },
 )
+
 ```
 
 ### Step 2: Add Your First Test Cases[​](#step-2-add-your-first-test-cases "Direct link to Step 2: Add Your First Test Cases")
@@ -72,7 +74,7 @@ Build your dataset by adding test cases from production traces and manual curati
 
 python
 
-```
+```python
 import mlflow
 
 # Search for production traces to build your dataset
@@ -107,11 +109,12 @@ for trace in production_traces:
 
 # Add annotated traces to dataset (expectations are automatically included)
 dataset.merge_records(production_traces)
+
 ```
 
 python
 
-```
+```python
 # Test cases can be manually defined as dictionaries
 # merge_records() accepts both dict and pandas.DataFrame formats for manual
 # record additions
@@ -149,6 +152,7 @@ test_cases = [
 
 # Add to your dataset (accepts list[dict], list[Trace] or pandas.DataFrame)
 dataset.merge_records(test_cases)
+
 ```
 
 ### Step 3: Evolve Your Dataset[​](#step-3-evolve-your-dataset "Direct link to Step 3: Evolve Your Dataset")
@@ -157,7 +161,7 @@ As you discover edge cases and improve your understanding, continuously update y
 
 python
 
-```
+```python
 # Capture a production failure
 failure_case = {
     "inputs": {"question": "'; DROP TABLE users; --", "user_type": "malicious"},
@@ -188,6 +192,7 @@ for record in dataset.records:
 
 # Merge updates (intelligently handles duplicates)
 dataset.merge_records(updated_records)
+
 ```
 
 ### Step 4: Organize with Tags[​](#step-4-organize-with-tags "Direct link to Step 4: Organize with Tags")
@@ -196,7 +201,7 @@ Use tags to track dataset evolution and enable powerful searches. Learn more abo
 
 python
 
-```
+```python
 from mlflow.genai.datasets import set_dataset_tags
 
 # Update dataset metadata
@@ -214,6 +219,7 @@ set_dataset_tags(
     dataset_id=dataset.dataset_id,
     tags={"development_only": None},  # Setting to None removes the tag
 )
+
 ```
 
 ### Step 5: Search and Discover[​](#step-5-search-and-discover "Direct link to Step 5: Search and Discover")
@@ -222,7 +228,7 @@ Find datasets using powerful search capabilities with [`mlflow.genai.datasets.se
 
 python
 
-```
+```python
 from mlflow.genai.datasets import search_datasets
 
 # Find datasets by experiment
@@ -239,6 +245,7 @@ production_ready = search_datasets(
 )
 
 # The PagedList automatically handles pagination when iterating
+
 ```
 
 #### Common Filter String Examples[​](#common-filter-string-examples "Direct link to Common Filter String Examples")
@@ -268,7 +275,7 @@ This functionality enables several important use cases:
 
 python
 
-```
+```python
 from mlflow.genai.datasets import (
     add_dataset_to_experiments,
     remove_dataset_from_experiments,
@@ -285,6 +292,7 @@ dataset = remove_dataset_from_experiments(
     dataset_id="d-1a2b3c4d5e6f7890abcdef1234567890", experiment_ids=["3"]
 )
 print(f"Updated experiment associations: {dataset.experiment_ids}")
+
 ```
 
 ## The Active Record Pattern[​](#the-active-record-pattern "Direct link to The Active Record Pattern")
@@ -293,7 +301,7 @@ The `EvaluationDataset` object follows an active record pattern—it's both a da
 
 python
 
-```
+```python
 # Get a dataset
 dataset = get_dataset(dataset_id="d-1a2b3c4d5e6f7890abcdef1234567890")
 
@@ -314,6 +322,7 @@ df = dataset.to_df()
 # Access auto-computed properties
 schema = dataset.schema  # Field structure
 profile = dataset.profile  # Dataset statistics
+
 ```
 
 ## How Record Merging Works[​](#how-record-merging-works "Direct link to How Record Merging Works")
@@ -329,7 +338,7 @@ When you add records for the first time, they're stored with their inputs, expec
 
 python
 
-```
+```python
 # Initial record
 record_v1 = {
     "inputs": {"question": "What is MLflow?", "context": "ML platform overview"},
@@ -338,13 +347,14 @@ record_v1 = {
 
 dataset.merge_records([record_v1])
 # Creates a new record in the dataset
+
 ```
 
 When you merge a record with identical inputs, the existing record is updated by **merging** the new expectations and tags with the existing ones:
 
 python
 
-```
+```python
 # Updated version with same inputs but enhanced expectations
 record_v2 = {
     "inputs": {
@@ -363,13 +373,14 @@ record_v2 = {
 dataset.merge_records([record_v2])
 # The record is updated, not duplicated
 # Final record has all expectations from both v1 and v2 merged together
+
 ```
 
 This update behavior is particularly useful when adding expectations to production traces:
 
 python
 
-```
+```python
 # First pass: Add traces without expectations
 traces = mlflow.search_traces(experiment_ids=["0"], max_results=100, return_type="list")
 dataset.merge_records(traces)
@@ -389,13 +400,14 @@ updated_traces = mlflow.search_traces(
 
 # Re-merge the updated traces - existing records are updated with expectations
 dataset.merge_records(updated_traces[:20])
+
 ```
 
 Records are considered unique based on their **entire inputs dictionary**. Even small differences create separate records:
 
 python
 
-```
+```python
 # These are treated as different records due to different inputs
 record_a = {
     "inputs": {"question": "What is MLflow?", "temperature": 0.7},
@@ -412,6 +424,7 @@ record_b = {
 
 dataset.merge_records([record_a, record_b])
 # Results in 2 separate records due to different temperature values
+
 ```
 
 ## Understanding Source Types[​](#understanding-source-types "Direct link to Understanding Source Types")
@@ -444,7 +457,7 @@ Records created from MLflow traces are automatically assigned the `TRACE` source
 
 python
 
-```
+```python
 # When adding traces directly (automatic TRACE source)
 traces = mlflow.search_traces(experiment_ids=["0"], return_type="list")
 dataset.merge_records(traces)  # All records get TRACE source type
@@ -454,13 +467,14 @@ traces_df = mlflow.search_traces(experiment_ids=["0"])  # Returns DataFrame
 dataset.merge_records(
     traces_df
 )  # Automatically detects traces and assigns TRACE source
+
 ```
 
 Records with expectations are inferred as `HUMAN` source (subject matter expert annotations):
 
 python
 
-```
+```python
 # Records with expectations indicate human review/annotation
 human_curated = [
     {
@@ -470,13 +484,14 @@ human_curated = [
     }
 ]
 dataset.merge_records(human_curated)
+
 ```
 
 Records with only inputs (no expectations) are inferred as `CODE` source (programmatically generated):
 
 python
 
-```
+```python
 # Records without expectations indicate programmatic generation
 generated_tests = [
     {"inputs": {"question": f"Test question {i}"}}
@@ -484,6 +499,7 @@ generated_tests = [
     # Automatically inferred as CODE source (no expectations field)
 ]
 dataset.merge_records(generated_tests)
+
 ```
 
 ### Manual Source Specification[​](#manual-source-specification "Direct link to Manual Source Specification")
@@ -498,7 +514,7 @@ This inference happens client-side in the `merge_records()` method before record
 
 python
 
-```
+```python
 # Specify HUMAN source for manually curated test cases
 human_curated = {
     "inputs": {"question": "What are your business hours?"},
@@ -529,6 +545,7 @@ generated = {
 }
 
 dataset.merge_records([human_curated, from_docs, generated])
+
 ```
 
 ### Available Source Types[​](#available-source-types "Direct link to Available Source Types")
@@ -563,7 +580,7 @@ Source unknown or not provided - for legacy or imported data
 
 python
 
-```
+```python
 # Convert dataset to DataFrame for analysis
 df = dataset.to_df()
 
@@ -572,11 +589,12 @@ source_distribution = df["source_type"].value_counts()
 print("Data sources in dataset:")
 for source_type, count in source_distribution.items():
     print(f"  {source_type}: {count} records")
+
 ```
 
 python
 
-```
+```python
 # Analyze expectations by source
 human_records = df[df["source_type"] == "HUMAN"]
 trace_records = df[df["source_type"] == "TRACE"]
@@ -590,13 +608,14 @@ print(f"Generated test records: {len(code_records)}")
 high_value_test_cases = df[
     (df["source_type"] == "HUMAN") | (df["source_type"] == "DOCUMENT")
 ]
+
 ```
 
 The `source_data` field stores rich metadata about record origins:
 
 python
 
-```
+```python
 # Example with detailed source metadata
 detailed_source = {
     "inputs": {"question": "Complex integration test"},
@@ -618,6 +637,7 @@ detailed_source = {
 dataset.merge_records([detailed_source])
 df = dataset.to_df()
 # source_data preserved for analysis
+
 ```
 
 ## Search Filter Reference[​](#search-filter-reference "Direct link to Search Filter Reference")
@@ -642,7 +662,7 @@ Use these fields in your filter strings. **Note:** The fluent API returns a `Pag
 
 python
 
-```
+```python
 # Complex filter example
 datasets = search_datasets(
     filter_string="""
@@ -652,6 +672,7 @@ datasets = search_datasets(
     """,
     order_by=["last_update_time DESC"],
 )
+
 ```
 
 ## Using the Client API[​](#using-the-client-api "Direct link to Using the Client API")
@@ -666,7 +687,7 @@ For applications and advanced use cases, you can also use the `MlflowClient` API
 
 python
 
-```
+```python
 from mlflow import MlflowClient
 
 client = MlflowClient()
@@ -677,22 +698,24 @@ dataset = client.create_dataset(
     experiment_id=["0"],
     tags={"version": "1.0", "team": "ml-platform"},
 )
+
 ```
 
 python
 
-```
+```python
 # Get a dataset by ID
 dataset = client.get_dataset(dataset_id="d-7f2e3a9b8c1d4e5f6a7b8c9d0e1f2a3b")
 
 # Access properties
 print(f"Dataset: {dataset.name}")
 print(f"Records: {len(dataset.records)}")
+
 ```
 
 python
 
-```
+```python
 # Search for datasets
 datasets = client.search_datasets(
     experiment_ids=["0"],
@@ -703,11 +726,12 @@ datasets = client.search_datasets(
 
 for dataset in datasets:
     print(f"{dataset.name}: {dataset.dataset_id}")
+
 ```
 
 python
 
-```
+```python
 # Set tags
 client.set_dataset_tags(
     dataset_id=dataset.dataset_id, tags={"status": "production", "validated": "true"}
@@ -715,13 +739,15 @@ client.set_dataset_tags(
 
 # Delete a tag
 client.delete_dataset_tag(dataset_id=dataset.dataset_id, key="deprecated")
+
 ```
 
 python
 
-```
+```python
 # Delete a dataset
 client.delete_dataset(dataset_id=dataset.dataset_id)
+
 ```
 
 The client API provides the same capabilities as the fluent API but is better suited for:

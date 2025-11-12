@@ -39,7 +39,7 @@ MLflow provides first-class support for spaCy models with automatic flavor detec
 
 python
 
-```
+```python
 import mlflow
 import spacy
 
@@ -49,6 +49,7 @@ nlp = spacy.load("en_core_web_sm")
 
 # Log to MLflow with one line
 model_info = mlflow.spacy.log_model(nlp, name="spacy_model")
+
 ```
 
 What Gets Automatically Captured
@@ -80,7 +81,7 @@ MLflow's spaCy integration provides specialized support for text classification 
 
 python
 
-```
+```python
 import mlflow
 
 # For models with TextCategorizer components
@@ -92,6 +93,7 @@ loaded_model = mlflow.pyfunc.load_model(
     model_info.model_uri
 )  # The format of 'model_uri' is 'models:/<model_id>'
 predictions = loaded_model.predict(test_dataframe)
+
 ```
 
 Text Classification Excellence
@@ -110,7 +112,7 @@ Training Integration Capabilities
 
 python
 
-```
+```python
 import spacy
 import mlflow
 
@@ -136,6 +138,7 @@ def mlflow_logger():
         return log_step, finalize
 
     return setup_logger
+
 ```
 
 #### Custom Logger Benefits[​](#custom-logger-benefits "Direct link to Custom Logger Benefits")
@@ -152,12 +155,13 @@ Multiple loading options for different use cases:
 
 python
 
-```
+```python
 # Native spaCy format - full functionality
 nlp = mlflow.spacy.load_model("models:/<model_id>")
 
 # PyFunc format - for deployment and inference
 predictor = mlflow.pyfunc.load_model("models:/<model_id>")
+
 ```
 
 ## Real-World Applications[​](#real-world-applications "Direct link to Real-World Applications")

@@ -116,10 +116,11 @@ MLflow Tracing is integrated with various GenAI libraries and provides one-line 
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.openai.autolog()  # or replace 'openai' with other library names, e.g., "anthropic"
+
 ```
 
 Click on the logos below to learn more about the individual integration:

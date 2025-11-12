@@ -10,8 +10,9 @@ MLflow is available on PyPI. If you don't already have it installed on your loca
 
 bash
 
-```
+```bash
 pip install mlflow
+
 ```
 
 ## Step 2. Configure MLflow to Log to SQLite Database[​](#step-2-configure-mlflow-to-log-to-sqlite-database "Direct link to Step 2. Configure MLflow to Log to SQLite Database")
@@ -20,16 +21,18 @@ To point MLflow to your local SQLite database, you need to set the environment v
 
 bash
 
-```
+```bash
 export MLFLOW_TRACKING_URI=sqlite:///mlruns.db
+
 ```
 
 If you are in a notebook, run the following cell instead:
 
 text
 
-```
+```text
 %env MLFLOW_TRACKING_URI=sqlite:///mlruns.db
+
 ```
 
 note
@@ -42,7 +45,7 @@ Now you are ready to start logging your experiment runs. For example, the follow
 
 python
 
-```
+```python
 import mlflow
 
 from sklearn.model_selection import train_test_split
@@ -60,6 +63,7 @@ rf.fit(X_train, y_train)
 
 # Use the model to make predictions on the test dataset.
 predictions = rf.predict(X_test)
+
 ```
 
 ## Step 4. View Your Logged Run in Tracking UI[​](#step-4-view-your-logged-run-in-tracking-ui "Direct link to Step 4. View Your Logged Run in Tracking UI")
@@ -68,8 +72,9 @@ Once your training job finishes, you can run the following command to launch the
 
 bash
 
-```
+```bash
 mlflow ui --port 8080 --backend-store-uri sqlite:///mlruns.db
+
 ```
 
 Then, navigate to [`http://localhost:8080`](http://localhost:8080) in your browser to view the results.

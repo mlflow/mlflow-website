@@ -44,7 +44,7 @@ You can also use the [`mlflow.langchain.load_model()`](/mlflow-website/docs/late
 
 python
 
-```
+```python
 import os
 
 from langchain.chains import LLMChain
@@ -77,14 +77,16 @@ loaded_model = mlflow.pyfunc.load_model(logged_model.model_uri)
 
 # Predict using the loaded model
 print(loaded_model.predict([{"product": "colorful socks"}]))
+
 ```
 
 The output of the example is shown below:
 
 python
 
-```
+```python
 ["\n\nColorful Cozy Creations."]
+
 ```
 
 #### What the Simple LLMChain Example Showcases[​](#what-the-simple-llmchain-example-showcases "Direct link to What the Simple LLMChain Example Showcases")
@@ -135,7 +137,7 @@ This example illustrates the process of logging a LangChain Agent in MLflow, hig
 
 python
 
-```
+```python
 import os
 
 from langchain.agents import AgentType, initialize_agent, load_tools
@@ -178,14 +180,16 @@ question = "What was the high temperature in SF yesterday in Fahrenheit? What is
 answer = loaded_model.predict([{"input": question}])
 
 print(answer)
+
 ```
 
 The output of the example above is shown below:
 
 python
 
-```
+```python
 ["1.1044000282035853"]
+
 ```
 
 #### What the Simple Agent Example Showcases[​](#what-the-simple-agent-example-showcases "Direct link to What the Simple Agent Example Showcases")
@@ -219,7 +223,7 @@ The following example demonstrates setting up and using the `predict_stream` fun
 
 python
 
-```
+```python
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain_openai import OpenAI
@@ -247,6 +251,7 @@ response_stream = loaded_model.predict_stream(input_data)
 for response_part in response_stream:
     print("Streaming Response Part:", response_part)
     # Each part of the response is handled as soon as it is generated
+
 ```
 
 ### Advanced Integration with Callbacks[​](#advanced-integration-with-callbacks "Direct link to Advanced Integration with Callbacks")
@@ -259,7 +264,7 @@ Most uses of callback handlers involve logging of traces involved in the various
 
 python
 
-```
+```python
 from langchain_core.callbacks import StdOutCallbackHandler
 
 handler = StdOutCallbackHandler()
@@ -268,6 +273,7 @@ handler = StdOutCallbackHandler()
 response_stream = loaded_model.predict_stream(input_data, callback_handlers=[handler])
 for enhanced_response in response_stream:
     print("Enhanced Streaming Response:", enhanced_response)
+
 ```
 
 These examples and explanations show how developers can utilize the real-time streaming output capabilities of LangChain models within MLflow, enabling the creation of highly responsive and interactive applications.
@@ -316,7 +322,7 @@ LangChain's integration with MLflow introduces a more efficient way to manage an
 
 python
 
-```
+```python
 import os
 import tempfile
 
@@ -369,14 +375,16 @@ print(
         [{"query": "What did the president say about Ketanji Brown Jackson"}]
     )
 )
+
 ```
 
 The output of the example above is shown below:
 
 python
 
-```
+```python
 [" The president said..."]
+
 ```
 
 ### Logging and Evaluating a LangChain Retriever in MLflow[​](#logging-and-evaluating-a-langchain-retriever-in-mlflow "Direct link to Logging and Evaluating a LangChain Retriever in MLflow")
@@ -398,7 +406,7 @@ The `langchain` flavor in MLflow extends its functionalities to include the logg
 
 python
 
-```
+```python
 import os
 import tempfile
 
@@ -447,13 +455,14 @@ print(
         [{"query": "What did the president say about Ketanji Brown Jackson"}]
     )
 )
+
 ```
 
 The output of the example above is shown below:
 
 python
 
-```
+```python
 [
     [
         {
@@ -466,6 +475,7 @@ python
         },
     ]
 ]
+
 ```
 
 ### MLflow Langchain Autologging[​](#mlflow-langchain-autologging "Direct link to MLflow Langchain Autologging")

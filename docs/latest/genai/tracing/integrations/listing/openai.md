@@ -9,19 +9,21 @@
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.openai.autolog()
+
 ```
 
 typescript
 
-```
+```typescript
 import { OpenAI } from "openai";
 import { tracedOpenAI } from "mlflow-openai";
 
 const client = tracedOpenAI(new OpenAI());
+
 ```
 
 MLflow trace automatically captures the following information about OpenAI calls:
@@ -74,7 +76,7 @@ See [OpenAI Agents SDK Tracing](/mlflow-website/docs/latest/genai/tracing/integr
 
 python
 
-```
+```python
 import openai
 import mlflow
 
@@ -99,11 +101,12 @@ response = openai_client.chat.completions.create(
     messages=messages,
     max_completion_tokens=100,
 )
+
 ```
 
 python
 
-```
+```python
 import openai
 import mlflow
 
@@ -119,11 +122,12 @@ openai_client = openai.OpenAI()
 response = client.responses.create(
     model="o4-mini", input="What is the capital of France?"
 )
+
 ```
 
 typescript
 
-```
+```typescript
 import { OpenAI } from "openai";
 import { tracedOpenAI } from "mlflow-openai";
 
@@ -138,6 +142,7 @@ const response = await client.chat.completions.create({
         {"role": "user", "content": "What's the weather like in Seattle?"},
     ],
 })
+
 ```
 
 ## Streaming[​](#streaming "Direct link to Streaming")
@@ -150,7 +155,7 @@ MLflow Tracing supports streaming API of the OpenAI SDK. With the same set up of
 
 python
 
-```
+```python
 import openai
 import mlflow
 
@@ -168,11 +173,12 @@ stream = client.chat.completions.create(
 )
 for chunk in stream:
     print(chunk.choices[0].delta.content or "", end="")
+
 ```
 
 python
 
-```
+```python
 import openai
 import mlflow
 
@@ -188,11 +194,12 @@ stream = client.responses.create(
 )
 for event in stream:
     print(event)
+
 ```
 
 typescript
 
-```
+```typescript
 import { OpenAI } from "openai";
 import { tracedOpenAI } from "mlflow-openai";
 
@@ -206,6 +213,7 @@ const stream = await client.chat.completions.create({
     ],
     stream: true,
 });
+
 ```
 
 ## Async[​](#async "Direct link to Async")
@@ -218,7 +226,7 @@ MLflow Tracing supports asynchronous API of the OpenAI SDK since MLflow 2.21.0. 
 
 python
 
-```
+```python
 import openai
 
 # Enable trace logging
@@ -234,11 +242,12 @@ response = await client.chat.completions.create(
     # Async streaming is also supported
     # stream=True
 )
+
 ```
 
 python
 
-```
+```python
 import openai
 
 # Enable trace logging
@@ -249,6 +258,7 @@ client = openai.AsyncOpenAI()
 response = await client.responses.create(
     model="gpt-4o-mini", input="How fast would a glass of water freeze on Titan?"
 )
+
 ```
 
 OpenAI Typescript / Javascript SDK is natively async. See the basic example above.
@@ -267,7 +277,7 @@ The following example implements a simple function calling agent using OpenAI Fu
 
 python
 
-```
+```python
 import json
 from openai import OpenAI
 import mlflow
@@ -345,11 +355,12 @@ def run_tool_agent(question: str):
 # Run the tool calling agent
 question = "What's the weather like in Paris today?"
 answer = run_tool_agent(question)
+
 ```
 
 python
 
-```
+```python
 import json
 import requests
 from openai import OpenAI
@@ -427,6 +438,7 @@ def run_tool_agent(question: str):
 # Run the tool calling agent
 question = "What's the weather like in Paris today?"
 answer = run_tool_agent(question)
+
 ```
 
 Refer to the [Typescript OpenAI Quickstart](/mlflow-website/docs/latest/genai/tracing/quickstart/typescript-openai.md) for the example of function calling agent in Typescript SDK.
@@ -440,7 +452,7 @@ MLflow >= 3.1.0 supports token usage tracking for OpenAI. The token usage for ea
 
 python
 
-```
+```python
 import json
 import mlflow
 
@@ -469,11 +481,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 typescript
 
-```
+```typescript
 import * as mlflow from "mlflow-tracing";
 
 // After your OpenAI call completes, flush and fetch the trace
@@ -497,11 +510,12 @@ if (lastTraceId) {
     }
   }
 }
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 84
   Output tokens: 22
@@ -516,6 +530,7 @@ Completions_2:
   Input tokens: 39
   Output tokens: 8
   Total tokens: 47
+
 ```
 
 ### Supported APIs:[​](#supported-apis-1 "Direct link to Supported APIs:")

@@ -44,7 +44,7 @@ MLflow makes it incredibly easy to work with sentence transformer models:
 
 python
 
-```
+```python
 import mlflow
 import mlflow.sentence_transformers
 from sentence_transformers import SentenceTransformer
@@ -72,6 +72,7 @@ with mlflow.start_run():
     )
 
 print(f"Model logged with URI: {model_info.model_uri}")
+
 ```
 
 ### Loading and Using Models[​](#loading-and-using-models "Direct link to Loading and Using Models")
@@ -80,7 +81,7 @@ Once logged, you can easily load and use your models:
 
 python
 
-```
+```python
 # Load as a sentence transformer model (preserves all functionality)
 loaded_transformer = mlflow.sentence_transformers.load_model(model_info.model_uri)
 embeddings = loaded_transformer.encode(["New text to encode"])
@@ -91,6 +92,7 @@ predictions = loaded_pyfunc.predict(["New text to encode"])
 
 print("Embeddings shape:", embeddings.shape)
 print("Predictions shape:", predictions.shape)
+
 ```
 
 Understanding Model Signatures for Embeddings
@@ -99,7 +101,7 @@ Model signatures are crucial for sentence transformers as they define the expect
 
 python
 
-```
+```python
 import mlflow
 import numpy as np
 from sentence_transformers import SentenceTransformer
@@ -129,6 +131,7 @@ with mlflow.start_run():
         signature=signature,
         input_example=batch_input,
     )
+
 ```
 
 Benefits of proper signatures:
@@ -144,7 +147,7 @@ Here's a complete example of building and logging a semantic search system:
 
 python
 
-```
+```python
 import mlflow
 import numpy as np
 import pandas as pd
@@ -263,6 +266,7 @@ def build_semantic_search_system():
 
 # Run the semantic search system
 model_info = build_semantic_search_system()
+
 ```
 
 ### Using MLflow's Evaluation Framework[​](#using-mlflows-evaluation-framework "Direct link to Using MLflow's Evaluation Framework")
@@ -271,7 +275,7 @@ MLflow's comprehensive evaluation API can be adapted for sentence transformer mo
 
 python
 
-```
+```python
 import mlflow
 from mlflow.models import make_metric
 import pandas as pd
@@ -443,6 +447,7 @@ def evaluate_embedding_model_with_mlflow(model_name):
 
 # Evaluate a single model
 metrics, eval_result = evaluate_embedding_model_with_mlflow("all-MiniLM-L6-v2")
+
 ```
 
 ### Domain-Specific Fine-tuning[​](#domain-specific-fine-tuning "Direct link to Domain-Specific Fine-tuning")
@@ -451,7 +456,7 @@ Fine-tune sentence transformers for your specific domain while tracking the enti
 
 python
 
-```
+```python
 import mlflow
 from sentence_transformers import SentenceTransformer, InputExample, losses
 from torch.utils.data import DataLoader
@@ -547,6 +552,7 @@ def fine_tune_sentence_transformer():
 
 # Run fine-tuning
 fine_tuned_model_info = fine_tune_sentence_transformer()
+
 ```
 
 ### Production-Ready Model Deployment[​](#production-ready-model-deployment "Direct link to Production-Ready Model Deployment")
@@ -555,7 +561,7 @@ Create models ready for production deployment:
 
 python
 
-```
+```python
 import mlflow
 from mlflow.models import ModelSignature
 from mlflow.types.schema import Schema, ColSpec
@@ -597,6 +603,7 @@ def create_production_ready_model():
 
 # Create production model
 production_model = create_production_ready_model()
+
 ```
 
 ### Batch Processing Pipeline[​](#batch-processing-pipeline "Direct link to Batch Processing Pipeline")
@@ -605,7 +612,7 @@ Create efficient batch processing for large-scale embeddings:
 
 python
 
-```
+```python
 import time
 
 
@@ -672,6 +679,7 @@ def create_batch_embedding_pipeline():
 
 # Run batch processing pipeline
 create_batch_embedding_pipeline()
+
 ```
 
 ## Advanced Workflows[​](#advanced-workflows "Direct link to Advanced Workflows")
@@ -683,7 +691,7 @@ create_batch_embedding_pipeline()
 
 python
 
-```
+```python
 def comprehensive_model_comparison():
     """Compare multiple sentence transformer models systematically."""
 
@@ -742,13 +750,14 @@ def comprehensive_model_comparison():
 
 # Run comprehensive comparison
 comprehensive_model_comparison()
+
 ```
 
 ### Performance vs. Quality Trade-offs[​](#performance-vs-quality-trade-offs "Direct link to Performance vs. Quality Trade-offs")
 
 python
 
-```
+```python
 import matplotlib.pyplot as plt
 
 
@@ -841,13 +850,14 @@ def analyze_speed_quality_tradeoffs():
 
 # Run speed-quality analysis
 analyze_speed_quality_tradeoffs()
+
 ```
 
 ### Domain-Specific Evaluation Pipeline[​](#domain-specific-evaluation-pipeline "Direct link to Domain-Specific Evaluation Pipeline")
 
 python
 
-```
+```python
 def create_domain_evaluation_pipeline(domain_name, test_cases):
     """Create a domain-specific evaluation pipeline."""
 
@@ -964,6 +974,7 @@ legal_test_cases = [
 ]
 
 legal_results = create_domain_evaluation_pipeline("legal", legal_test_cases)
+
 ```
 
 ## Best Practices and Optimization[​](#best-practices-and-optimization "Direct link to Best Practices and Optimization")
@@ -993,7 +1004,7 @@ legal_results = create_domain_evaluation_pipeline("legal", legal_test_cases)
 
 python
 
-```
+```python
 def optimized_batch_encoding():
     """Demonstrate optimized batch processing techniques."""
 
@@ -1060,13 +1071,14 @@ def optimized_batch_encoding():
 
 
 optimized_batch_encoding()
+
 ```
 
 ### Production API Wrapper[​](#production-api-wrapper "Direct link to Production API Wrapper")
 
 python
 
-```
+```python
 import mlflow
 from typing import List, Dict, Optional
 import numpy as np
@@ -1191,6 +1203,7 @@ def deploy_embedding_service():
 
 # Deploy the service
 service, deployment_info = deploy_embedding_service()
+
 ```
 
 ## Real-World Applications[​](#real-world-applications "Direct link to Real-World Applications")

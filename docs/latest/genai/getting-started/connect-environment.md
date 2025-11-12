@@ -25,8 +25,9 @@ This guide describes using a Databricks Personal Access Token. MLflow also works
 
 bash
 
-```
+```bash
 pip install --upgrade "mlflow>=3.1"
+
 ```
 
 <br />
@@ -41,11 +42,12 @@ Set the tracking URI to a local database URI (e.g., `sqlite:///mlflow.db`). This
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_tracking_uri("sqlite:///mlflow.db")
 mlflow.set_experiment("my-genai-experiment")
+
 ```
 
 **Option B: File System**
@@ -54,11 +56,12 @@ MLflow will automatically use local file storage if no tracking URI is specified
 
 python
 
-```
+```python
 import mlflow
 
 # Creates local mlruns directory for experiments
 mlflow.set_experiment("my-genai-experiment")
+
 ```
 
 TO BE DEPRECATED SOON
@@ -71,21 +74,23 @@ Start a remote MLflow tracking server following the [Self Hosting Guide](/mlflow
 
 python
 
-```
+```python
 import mlflow
 
 # Connect to remote MLflow server
 mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_experiment("my-genai-experiment")
+
 ```
 
 Alternatively, you can configure the tracking URI and experiment using environment variables:
 
 bash
 
-```
+```bash
 export MLFLOW_TRACKING_URI="http://localhost:5000"
 export MLFLOW_EXPERIMENT_NAME="my-genai-experiment"
+
 ```
 
 <br />
@@ -96,7 +101,7 @@ Create a test file and run this code:
 
 python
 
-```
+```python
 import mlflow
 
 # Print connection information
@@ -107,6 +112,7 @@ print(f"Active Experiment: {mlflow.get_experiment_by_name('my-genai-experiment')
 with mlflow.start_run():
     mlflow.log_param("test_param", "test_value")
     print("✓ Successfully connected to MLflow!")
+
 ```
 
 <br />
@@ -117,11 +123,12 @@ If you are using local tracking (option A or B), run the following command and a
 
 bash
 
-```
+```bash
 # For Option A
 mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5000
 # For Option B
 mlflow ui --port 5000
+
 ```
 
 If you have the remote tracking server running (option C), access the MLflow UI at the same URI.
@@ -141,9 +148,10 @@ To resolve this, configure your tracking server with the appropriate flags. For 
 
 bash
 
-```
+```bash
 mlflow server --allowed-hosts "mlflow.company.com,localhost:*" \
               --cors-allowed-origins "https://app.company.com"
+
 ```
 
 **Note**: These security options are only available with the default FastAPI-based server (uvicorn). They are not supported when using Flask directly or with `--gunicorn-opts` or `--waitress-opts`.
@@ -156,8 +164,9 @@ Install MLflow with Databricks connectivity:
 
 bash
 
-```
+```bash
 pip install --upgrade "mlflow[databricks]>=3.1"
+
 ```
 
 <br />
@@ -181,11 +190,12 @@ Choose one of the following authentication methods:
 
 bash
 
-```
+```bash
 export DATABRICKS_TOKEN=<databricks-personal-access-token>
 export DATABRICKS_HOST=https://<workspace-name>.cloud.databricks.com
 export MLFLOW_TRACKING_URI=databricks
 export MLFLOW_EXPERIMENT_ID=<experiment-id>
+
 ```
 
 **Option B: .env File**
@@ -195,31 +205,34 @@ export MLFLOW_EXPERIMENT_ID=<experiment-id>
 
 bash
 
-```
+```bash
 DATABRICKS_TOKEN=<databricks-personal-access-token>
 DATABRICKS_HOST=https://<workspace-name>.cloud.databricks.com
 MLFLOW_TRACKING_URI=databricks
 MLFLOW_EXPERIMENT_ID=<experiment-id>
+
 ```
 
 3. Install the `python-dotenv` package:
 
 bash
 
-```
+```bash
 pip install python-dotenv
+
 ```
 
 4. Load environment variables in your code:
 
 python
 
-```
+```python
 # At the beginning of your Python script
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
+
 ```
 
 #### Step 4: Verify Your Connection[​](#step-4-verify-your-connection "Direct link to Step 4: Verify Your Connection")
@@ -228,13 +241,14 @@ Create a test file and run this code to verify your connection:
 
 python
 
-```
+```python
 import mlflow
 
 # Test logging to verify connection
 print(f"MLflow Tracking URI: {mlflow.get_tracking_uri()}")
 with mlflow.start_run():
     print("✓ Successfully connected to MLflow!")
+
 ```
 
 #### Step 1: Install MLflow[​](#step-1-install-mlflow-2 "Direct link to Step 1: Install MLflow")
@@ -243,9 +257,10 @@ Databricks runtimes include MLflow, but for the best experience with GenAI capab
 
 bash
 
-```
+```bash
 %pip install --upgrade "mlflow[databricks]>=3.1"
 dbutils.library.restartPython()
+
 ```
 
 <br />
@@ -272,13 +287,14 @@ Run this code in a notebook cell to verify your connection:
 
 python
 
-```
+```python
 import mlflow
 
 # Test logging to verify connection
 print(f"MLflow Tracking URI: {mlflow.get_tracking_uri()}")
 with mlflow.start_run():
     print("✓ Successfully connected to MLflow!")
+
 ```
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")

@@ -41,7 +41,7 @@ MLflow provides first-class support for Spark MLlib's Pipeline framework:
 
 python
 
-```
+```python
 import mlflow
 import mlflow.spark
 from pyspark.ml.classification import LogisticRegression
@@ -58,6 +58,7 @@ pipeline = Pipeline(stages=[tokenizer, hashingTF, lr])
 model = pipeline.fit(training_df)
 
 model_info = mlflow.spark.log_model(model, artifact_path="spark-pipeline")
+
 ```
 
 Complete Pipeline Capture

@@ -31,7 +31,7 @@ Ready to enhance your speech-to-text capabilities? Let's explore automatic speec
 
 python
 
-```
+```python
 # Disable tokenizers warnings when constructing pipelines
 %env TOKENIZERS_PARALLELISM=false
 
@@ -39,10 +39,7 @@ import warnings
 
 # Disable a few less-than-useful UserWarnings from setuptools and pydantic
 warnings.filterwarnings("ignore", category=UserWarning)
-```
 
-```
-env: TOKENIZERS_PARALLELISM=false
 ```
 
 ### Setting Up the Environment and Acquiring Audio Data[​](#setting-up-the-environment-and-acquiring-audio-data "Direct link to Setting Up the Environment and Acquiring Audio Data")
@@ -67,7 +64,7 @@ The following code block covers these initial setup steps, providing the foundat
 
 python
 
-```
+```python
 import requests
 import transformers
 
@@ -96,10 +93,7 @@ model.generation_config.alignment_heads = [[2, 2], [3, 0], [3, 2], [3, 3], [3, 4
 audio_transcription_pipeline = transformers.pipeline(
   task=task, model=model, tokenizer=tokenizer, feature_extractor=feature_extractor
 )
-```
 
-```
-Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
 ```
 
 ### Formatting the Transcription Output[​](#formatting-the-transcription-output "Direct link to Formatting the Transcription Output")
@@ -110,7 +104,7 @@ The `format_transcription` function takes a long string of transcribed text and 
 
 python
 
-```
+```python
 def format_transcription(transcription):
   """
   Function for formatting a long string by splitting into sentences and adding newlines.
@@ -125,6 +119,7 @@ def format_transcription(transcription):
   # Join the sentences with a newline character
   return "
 ".join(sentences)
+
 ```
 
 ### Executing the Transcription Pipeline[​](#executing-the-transcription-pipeline "Direct link to Executing the Transcription Pipeline")
@@ -145,22 +140,12 @@ Execute the following code to transcribe the audio and assess the quality and ac
 
 python
 
-```
+```python
 # Verify that our pipeline is capable of processing an audio file and transcribing it
 transcription = audio_transcription_pipeline(audio)
 
 print(format_transcription(transcription["text"]))
-```
 
-```
-We choose to go to the moon in this decade and do the other things.
-Not because they are easy, but because they are hard.
-3, 2, 1, 0.
-All engines running.
-Liftoff.
-We have a liftoff.
-32 minutes past the hour.
-Liftoff on Apollo 11.
 ```
 
 ### Model Signature and Configuration[​](#model-signature-and-configuration "Direct link to Model Signature and Configuration")
@@ -181,7 +166,7 @@ Run the next code block to infer the model's signature and configure key paramet
 
 python
 
-```
+```python
 # Specify parameters and their defaults that we would like to be exposed for manipulation during inference time
 model_config = {
   "chunk_length_s": 20,
@@ -198,15 +183,7 @@ signature = mlflow.models.infer_signature(
 
 # Visualize the signature
 signature
-```
 
-```
-inputs: 
-[binary]
-outputs: 
-[string]
-params: 
-['chunk_length_s': long (default: 20), 'stride_length_s': long (default: [5, 3]) (shape: (-1,))]
 ```
 
 ### Creating an experiment[​](#creating-an-experiment "Direct link to Creating an experiment")
@@ -215,17 +192,14 @@ We create a new MLflow Experiment so that the run we're going to log our model t
 
 python
 
-```
+```python
 # If you are running this tutorial in local mode, leave the next line commented out.
 # Otherwise, uncomment the following line and set your tracking uri to your local or remote tracking server.
 
 # mlflow.set_tracking_uri("http://127.0.0.1:8080")
 
 mlflow.set_experiment("Whisper Transcription ASR")
-```
 
-```
-<Experiment: artifact_location='file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/transformers/tutorials/audio-transcription/mlruns/864092483920291025', creation_time=1701294423466, experiment_id='864092483920291025', last_update_time=1701294423466, lifecycle_stage='active', name='Whisper Transcription ASR', tags={}>
 ```
 
 ### Logging the Model with MLflow[​](#logging-the-model-with-mlflow "Direct link to Logging the Model with MLflow")
@@ -247,7 +221,7 @@ Executing the code in the next cell will log the Whisper model in the current ML
 
 python
 
-```
+```python
 # Log the pipeline
 with mlflow.start_run():
   model_info = mlflow.transformers.log_model(
@@ -261,6 +235,7 @@ with mlflow.start_run():
       # following line:
       # save_pretrained=False,
   )
+
 ```
 
 ### Loading and Using the Model Pipeline[​](#loading-and-using-the-model-pipeline "Direct link to Loading and Using the Model Pipeline")
@@ -281,7 +256,7 @@ This step is a form of validation before moving to more complex deployment scena
 
 python
 
-```
+```python
 # Load the pipeline in its native format
 loaded_transcriber = mlflow.transformers.load_model(model_uri=model_info.model_uri)
 
@@ -291,31 +266,7 @@ transcription = loaded_transcriber(audio)
 print(f"
 Whisper native output transcription:
 {format_transcription(transcription['text'])}")
-```
 
-```
-2023/11/30 12:51:43 INFO mlflow.transformers: 'runs:/f7503a09d20f4fb481544968b5ed28dd/whisper_transcriber' resolved as 'file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/transformers/tutorials/audio-transcription/mlruns/864092483920291025/f7503a09d20f4fb481544968b5ed28dd/artifacts/whisper_transcriber'
-```
-
-```
-Loading checkpoint shards:   0%|          | 0/13 [00:00<?, ?it/s]
-```
-
-```
-Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
-```
-
-```
-
-Whisper native output transcription:
-We choose to go to the moon in this decade and do the other things.
-Not because they are easy, but because they are hard.
-3, 2, 1, 0.
-All engines running.
-Liftoff.
-We have a liftoff.
-32 minutes past the hour.
-Liftoff on Apollo 11.
 ```
 
 ### Using the Pyfunc Flavor for Inference[​](#using-the-pyfunc-flavor-for-inference "Direct link to Using the Pyfunc Flavor for Inference")
@@ -334,7 +285,7 @@ Note the difference in the output format when using `pyfunc` compared to the nat
 
 python
 
-```
+```python
 # Load the saved transcription pipeline as a generic python function
 pyfunc_transcriber = mlflow.pyfunc.load_model(model_uri=model_info.model_uri)
 
@@ -345,28 +296,7 @@ pyfunc_transcription = pyfunc_transcriber.predict([audio])
 print(f"
 Pyfunc output transcription:
 {format_transcription(pyfunc_transcription[0])}")
-```
 
-```
-Loading checkpoint shards:   0%|          | 0/13 [00:00<?, ?it/s]
-```
-
-```
-Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
-2023/11/30 12:52:02 WARNING mlflow.transformers: params provided to the `predict` method will override the inference configuration saved with the model. If the params provided are not valid for the pipeline, MlflowException will be raised.
-```
-
-```
-
-Pyfunc output transcription:
-We choose to go to the moon in this decade and do the other things.
-Not because they are easy, but because they are hard.
-3, 2, 1, 0.
-All engines running.
-Liftoff.
-We have a liftoff.
-32 minutes past the hour.
-Liftoff on Apollo 11.
 ```
 
 ### Tutorial Roundup[​](#tutorial-roundup "Direct link to Tutorial Roundup")

@@ -55,7 +55,7 @@ Feedback is often created by different sources, such as human annotators, LLM ju
 
 json
 
-```
+```json
 {
     "name": "hallucination",
     "value": false,
@@ -65,13 +65,14 @@ json
         "source_id": "john@example.com"
     }
 }
+
 ```
 
 **LLM Judge Feedback for Factual Accuracy**
 
 json
 
-```
+```json
 {
     "name": "factual_accuracy",
     "value": 0.85,
@@ -85,13 +86,14 @@ json
         "judge_prompt": "prompts:factual_accuracy_judge/1"
     }
 }
+
 ```
 
 **Error Feedback from LLM Judge (Rate Limit Exceeded)**
 
 json
 
-```
+```json
 {
     "name": "safety",
     "error": {
@@ -104,6 +106,7 @@ json
         "source_id": "openai:/4o-mini"
     }
 }
+
 ```
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")

@@ -28,7 +28,7 @@ Here's how to add user and session tracking to your application:
 
 python
 
-```
+```python
 import mlflow
 
 
@@ -46,11 +46,12 @@ def chat_completion(message: list[dict], user_id: str, session_id: str):
 
     # Your chat logic here
     return generate_response(message)
+
 ```
 
 typescript
 
-```
+```typescript
 import * as mlflow from "mlflow-tracing";
 
 const chatCompletion = mlflow.trace(
@@ -68,6 +69,7 @@ const chatCompletion = mlflow.trace(
     },
     { name: "chat_completion" }
 );
+
 ```
 
 ## Web Application Example[​](#web-application-example "Direct link to Web Application Example")
@@ -77,7 +79,7 @@ const chatCompletion = mlflow.trace(
 
 python
 
-```
+```python
 import mlflow
 import os
 from fastapi import FastAPI, Request
@@ -134,13 +136,14 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
 ```
 
 **Example request:**
 
 bash
 
-```
+```bash
 python app.py
 
 curl -X POST http://localhost:8000/chat \
@@ -148,21 +151,23 @@ curl -X POST http://localhost:8000/chat \
     -H "X-Session-ID: session-123" \
     -H "X-User-ID: user-456" \
     -d '{"message": "Hello, how are you?"}'
-```
 
 ```
+
+```python
 ```
 
 **Example request:**
 
 bash
 
-```
+```bash
 curl -X POST "http://127.0.0.1:8000/chat" \
      -H "Content-Type: application/json" \
      -H "X-Session-ID: session-def-456" \
      -H "X-User-ID: user-jane-doe-12345" \
      -d '{"message": "What is my account balance?"}'
+
 ```
 
 ## Querying[​](#querying "Direct link to Querying")
@@ -174,7 +179,7 @@ Filter traces in the MLflow UI using these search queries:
 
 text
 
-```
+```text
 # Find all traces for a specific user
 metadata.`mlflow.trace.user` = 'user-123'
 
@@ -183,13 +188,14 @@ metadata.`mlflow.trace.session` = 'session-abc-456'
 
 # Find traces for a user within a specific session
 metadata.`mlflow.trace.user` = 'user-123' AND metadata.`mlflow.trace.session` = 'session-abc-456'
+
 ```
 
 Analyze user behavior patterns programmatically:
 
 python
 
-```
+```python
 import mlflow
 import pandas as pd
 
@@ -208,6 +214,7 @@ success_rate = user_traces_df["info.state"].value_counts()["OK"] / total_interac
 print(f"User has {total_interactions} interactions across {unique_sessions} sessions")
 print(f"Average response time: {avg_response_time} ms")
 print(f"Success rate: {success_rate}")
+
 ```
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")

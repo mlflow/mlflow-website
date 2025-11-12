@@ -34,8 +34,9 @@ First, install the required packages by running the following command:
 
 bash
 
-```
+```bash
 pip install --upgrade mlflow>=3.3 openai
+
 ```
 
 MLflow stores evaluation results in a tracking server. Connect your local environment to the tracking server by one of the following methods.
@@ -49,18 +50,20 @@ For the fastest setup, you can install the [mlflow](https://pypi.org/project/mlf
 
 bash
 
-```
+```bash
 mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5000
+
 ```
 
 This will start the server at port 5000 on your local machine. Connect your notebook/IDE to the server by setting the tracking URI. You can also access to the MLflow UI at <http://localhost:5000>.
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_tracking_uri("http://localhost:5000")
+
 ```
 
 You can also brows the MLflow UI at <http://localhost:5000>.
@@ -69,21 +72,23 @@ MLflow provides a Docker Compose file to start a local MLflow server with a post
 
 bash
 
-```
+```bash
 git clone https://github.com/mlflow/mlflow.git
 cd docker-compose
 cp .env.dev.example .env
 docker compose up -d
+
 ```
 
 This will start the server at port 5000 on your local machine. Connect your notebook/IDE to the server by setting the tracking URI. You can also access to the MLflow UI at <http://localhost:5000>.
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_tracking_uri("http://localhost:5000")
+
 ```
 
 Refer to the [instruction](https://github.com/mlflow/mlflow/tree/master/docker-compose/README.md) for more details, e.g., overriding the default environment variables.
@@ -92,7 +97,7 @@ If you have a remote MLflow tracking server, configure the connection:
 
 python
 
-```
+```python
 import os
 import mlflow
 
@@ -100,16 +105,18 @@ import mlflow
 os.environ["MLFLOW_TRACKING_URI"] = "http://your-mlflow-server:5000"
 # Or directly in code
 mlflow.set_tracking_uri("http://your-mlflow-server:5000")
+
 ```
 
 If you have a Databricks account, configure the connection:
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.login()
+
 ```
 
 This will prompt you for your configuration details (Databricks Host url and a PAT).
@@ -124,7 +131,7 @@ Let's define a simple prompt template to evaluate. We use [MLflow Prompt Registr
 
 python
 
-```
+```python
 import mlflow
 
 # Define prompt templates. MLflow supports both text and chat format prompt templates.
@@ -147,6 +154,7 @@ mlflow.genai.register_prompt(
     template=PROMPT_V1,
     commit_message="Initial prompt",
 )
+
 ```
 
 ### Step 2: Create evaluation dataset[​](#step-2-create-evaluation-dataset "Direct link to Step 2: Create evaluation dataset")
@@ -155,7 +163,7 @@ The evaluation dataset is defined as a list of dictionaries, each with an `input
 
 python
 
-```
+```python
 eval_dataset = [
     {
         "inputs": {"question": "What causes rain?"},
@@ -177,6 +185,7 @@ eval_dataset = [
         "tags": {"topic": "medicine"},
     },
 ]
+
 ```
 
 ### Step 3: Create prediction function[​](#step-3-create-prediction-function "Direct link to Step 3: Create prediction function")
@@ -185,7 +194,7 @@ Now wrap the prompt template in a simple function that takes a question to gener
 
 python
 
-```
+```python
 from openai import OpenAI
 
 client = OpenAI()
@@ -200,6 +209,7 @@ def predict_fn(question: str) -> str:
         model="gpt-4.1-mini", messages=rendered_prompt
     )
     return response.choices[0].message.content
+
 ```
 
 ### Step 4: Define task-specific scorers[​](#step-4-define-task-specific-scorers "Direct link to Step 4: Define task-specific scorers")
@@ -211,7 +221,7 @@ Finally, let's define a few [scorers](/mlflow-website/docs/latest/genai/eval-mon
 
 python
 
-```
+```python
 from mlflow.entities import Feedback
 from mlflow.genai import scorer
 from mlflow.genai.scorers import Guidelines
@@ -236,6 +246,7 @@ def concept_coverage(outputs: str, expectations: dict) -> Feedback:
             f"Included {len(included)} out of {len(concepts)} concepts. Missing: {concepts - included}"
         ),
     )
+
 ```
 
 tip
@@ -248,12 +259,13 @@ Now we are ready to run the evaluation!
 
 python
 
-```
+```python
 mlflow.genai.evaluate(
     data=eval_dataset,
     predict_fn=predict_fn,
     scorers=[is_concise, is_professional, concept_coverage],
 )
+
 ```
 
 Once the evaluation is done, open the MLflow UI in your browser and navigate to the experiment page. You should see MLflow creates a new Run and logs the evaluation results.
@@ -270,7 +282,7 @@ The prompt evaluation is an iterative process. You can register a new prompt ver
 
 python
 
-```
+```python
 # Define V2 prompt template
 PROMPT_V2 = [
     {
@@ -289,6 +301,7 @@ mlflow.genai.evaluate(
     predict_fn=predict_fn,
     scorers=[is_concise, is_professional, concept_coverage],
 )
+
 ```
 
 ## Compare Evaluation Results[​](#compare-evaluation-results "Direct link to Compare Evaluation Results")

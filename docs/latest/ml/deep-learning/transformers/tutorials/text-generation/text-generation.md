@@ -30,7 +30,7 @@ Now, let's dive into the world of MLflow and Transformers!
 
 python
 
-```
+```python
 # Disable tokenizers warnings when constructing pipelines
 %env TOKENIZERS_PARALLELISM=false
 
@@ -38,10 +38,7 @@ import warnings
 
 # Disable a few less-than-useful UserWarnings from setuptools and pydantic
 warnings.filterwarnings("ignore", category=UserWarning)
-```
 
-```
-env: TOKENIZERS_PARALLELISM=false
 ```
 
 ### Imports and Pipeline configuration[​](#imports-and-pipeline-configuration "Direct link to Imports and Pipeline configuration")
@@ -80,7 +77,7 @@ Due to the utility and simple, high-level API, MLflow's `transformers` implement
 
 python
 
-```
+```python
 import transformers
 
 import mlflow
@@ -100,6 +97,7 @@ input_example = ["prompt 1", "prompt 2", "prompt 3"]
 
 # Define the parameters (and their defaults) for optional overrides at inference time.
 parameters = {"max_length": 512, "do_sample": True, "temperature": 0.4}
+
 ```
 
 ### Introduction to Model Signatures in MLflow[​](#introduction-to-model-signatures-in-mlflow "Direct link to Introduction to Model Signatures in MLflow")
@@ -140,7 +138,7 @@ MLflow enforces the signature at the time of model inference, ensuring that the 
 
 python
 
-```
+```python
 # Generate the signature for the model that will be used for inference validation and type checking (as well as validation of parameters being submitted during inference)
 signature = mlflow.models.infer_signature(
   input_example,
@@ -150,15 +148,7 @@ signature = mlflow.models.infer_signature(
 
 # Visualize the signature
 signature
-```
 
-```
-inputs: 
-[string]
-outputs: 
-[string]
-params: 
-['max_length': long (default: 512), 'do_sample': boolean (default: True), 'temperature': double (default: 0.4)]
 ```
 
 ### Creating an experiment[​](#creating-an-experiment "Direct link to Creating an experiment")
@@ -167,17 +157,14 @@ We create a new MLflow Experiment so that the run we're going to log our model t
 
 python
 
-```
+```python
 # If you are running this tutorial in local mode, leave the next line commented out.
 # Otherwise, uncomment the following line and set your tracking uri to your local or remote tracking server.
 
 # mlflow.set_tracking_uri("http://127.0.0.1:8080")
 
 mlflow.set_experiment("Transformers Introduction")
-```
 
-```
-<Experiment: artifact_location='file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/transformers/tutorials/text-generation/mlruns/528654983476503755', creation_time=1701288466448, experiment_id='528654983476503755', last_update_time=1701288466448, lifecycle_stage='active', name='Transformers Introduction', tags={}>
 ```
 
 ### Logging the Transformers Model with MLflow[​](#logging-the-transformers-model-with-mlflow "Direct link to Logging the Transformers Model with MLflow")
@@ -200,7 +187,7 @@ To avoid the unnecessary copy, you can use 'reference-only' save mode which is i
 
 python
 
-```
+```python
 with mlflow.start_run():
   model_info = mlflow.transformers.log_model(
       transformers_model=generation_pipeline,
@@ -210,6 +197,7 @@ with mlflow.start_run():
       # Uncomment the following line to save the model in 'reference-only' mode:
       # save_pretrained=False,
   )
+
 ```
 
 ### Loading the Text Generation Model[​](#loading-the-text-generation-model "Direct link to Loading the Text Generation Model")
@@ -224,13 +212,10 @@ Once the model, referred to as `sentence_generator`, is loaded, it operates as a
 
 python
 
-```
+```python
 # Load our pipeline as a generic python function
 sentence_generator = mlflow.pyfunc.load_model(model_info.model_uri)
-```
 
-```
-Loading checkpoint shards:   0%|          | 0/7 [00:00<?, ?it/s]
 ```
 
 #### Formatting Predictions for Tutorial Readability[​](#formatting-predictions-for-tutorial-readability "Direct link to Formatting Predictions for Tutorial Readability")
@@ -239,7 +224,7 @@ Please note that the following function, `format_predictions`, is used only for 
 
 python
 
-```
+```python
 def format_predictions(predictions):
   """
   Function for formatting the output for readability in a Jupyter Notebook
@@ -262,6 +247,7 @@ def format_predictions(predictions):
       formatted_predictions.append(formatted_text)
 
   return formatted_predictions
+
 ```
 
 ### Generating Predictions with Custom Parameters[​](#generating-predictions-with-custom-parameters "Direct link to Generating Predictions with Custom Parameters")
@@ -296,7 +282,7 @@ The `predictions` variable captures the model's output for each input prompt. We
 
 python
 
-```
+```python
 # Validate that our loaded pipeline, as a generic pyfunc, can produce an output that makes sense
 predictions = sentence_generator.predict(
   data=[
@@ -313,18 +299,7 @@ for i, formatted_text in enumerate(formatted_predictions):
   print(f"Response to prompt {i + 1}:
 {formatted_text}
 ")
-```
 
-```
-2023/11/30 14:24:08 WARNING mlflow.transformers: params provided to the `predict` method will override the inference configuration saved with the model. If the params provided are not valid for the pipeline, MlflowException will be raised.
-```
-
-```
-Response to prompt 1:
-Going hiking can be a great way to explore the outdoors and have fun, while kayaking can be an exciting way to take in the scenery and have a great experience.
-
-Response to prompt 2:
-Q: What did the bird say when he was walking in the woods? a: "Hey, I'm going to get some food!".
 ```
 
 ### Closing Remarks[​](#closing-remarks "Direct link to Closing Remarks")

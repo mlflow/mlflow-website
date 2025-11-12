@@ -48,20 +48,22 @@ MLflow provides several ways to register a model version
 
 text
 
-```
+```text
 # Option 1: specify `registered_model_name` parameter when logging a model
 mlflow.<flavor>.log_model(..., registered_model_name="<YOUR_MODEL_NAME>")
 
 # Option 2: register a logged model
 mlflow.register_model(model_uri="<YOUR_MODEL_URI>", name="<YOUR_MODEL_NAME>")
+
 ```
 
 After registering the model, you can load it back with the model name and version
 
 text
 
-```
+```text
 mlflow.<flavor>.load_model("models:/<YOUR_MODEL_NAME>/<YOUR_MODEL_VERSION>")
+
 ```
 
 #### Register a model on MLflow UI[​](#register-a-model-on-mlflow-ui "Direct link to Register a model on MLflow UI")
@@ -100,22 +102,24 @@ Register a model in Databricks UC
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_registry_uri("databricks-uc")
+
 ```
 
 Use MLflow APIs to register the model
 
 text
 
-```
+```text
 # Option 1: specify `registered_model_name` parameter when logging a model
 mlflow.<flavor>.log_model(..., registered_model_name="<YOUR_MODEL_NAME>")
 
 # Option 2: register a logged model
 mlflow.register_model(model_uri="<YOUR_MODEL_URI>", name="<YOUR_MODEL_NAME>")
+
 ```
 
 warning
@@ -126,8 +130,9 @@ After registering the model, you can load it back with the model name and versio
 
 text
 
-```
+```text
 mlflow.<flavor>.load_model("models:/<YOUR_MODEL_NAME>/<YOUR_MODEL_VERSION>")
+
 ```
 
 #### Register a model on Databricks UI[​](#register-a-model-on-databricks-ui "Direct link to Register a model on Databricks UI")

@@ -8,10 +8,11 @@
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.pydantic_ai.autolog()
+
 ```
 
 MLflow trace automatically captures the following information about ​PydanticAI agents:
@@ -32,7 +33,7 @@ First, enable auto-tracing for PydanticAI, and optionally create an MLflow exper
 
 python
 
-```
+```python
 import mlflow
 
 # Turn on auto tracing by calling mlflow.pydantic_ai.autolog()
@@ -42,13 +43,14 @@ mlflow.pydantic_ai.autolog()
 # Optional: Set a tracking URI and an experiment
 mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_experiment("PydanticAI")
+
 ```
 
 Next, let's define a multi-agent workflow using PydanticAI. The example below sets up a weather agent where users can ask for the weather in multiple locations, and the agent will use the get\_lat\_lng tool to get the latitude and longitude of the locations, then use the get\_weather tool to get the weather for those locations.
 
 python
 
-```
+```python
 import os
 from dataclasses import dataclass
 from typing import Any
@@ -183,6 +185,7 @@ await main()
 
 # Uncomment this is you are using an IDE or Python script.
 # asyncio.run(main())
+
 ```
 
 ## Advanced Example: Utilising MCP Server[​](#advanced-example-utilising-mcp-server "Direct link to Advanced Example: Utilising MCP Server")
@@ -195,7 +198,7 @@ The example below demonstrates how to run an MCP server using PydanticAI with ML
 
 python
 
-```
+```python
 import mlflow
 import asyncio
 
@@ -234,6 +237,7 @@ await main()
 
 # Uncomment this is you are using an IDE or Python script.
 # asyncio.run(main())
+
 ```
 
 ## Token usage[​](#token-usage "Direct link to Token usage")
@@ -242,7 +246,7 @@ MLflow >= 3.1.0 supports token usage tracking for PydanticAI. The token usage fo
 
 python
 
-```
+```python
 import json
 import mlflow
 
@@ -274,11 +278,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 432
   Output tokens: 53
@@ -297,6 +302,7 @@ InstrumentedModel.request_3:
   Input tokens: 179
   Output tokens: 20
   Total tokens: 199
+
 ```
 
 ### Disable auto-tracing[​](#disable-auto-tracing "Direct link to Disable auto-tracing")

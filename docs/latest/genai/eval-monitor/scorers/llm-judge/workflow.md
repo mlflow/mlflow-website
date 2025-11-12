@@ -36,7 +36,7 @@ Start by defining your evaluation criteria:
 
 python
 
-```
+```python
 from typing import Literal
 import mlflow
 from mlflow.genai.judges import make_judge
@@ -64,6 +64,7 @@ support_judge = make_judge(
     model="anthropic:/claude-opus-4-1-20250805",
     feedback_value_type=Literal["excellent", "good", "needs_improvement", "poor"],
 )
+
 ```
 
 ## Step 2: Generate Traces and Collect Feedback[​](#step-2-generate-traces-and-collect-feedback "Direct link to Step 2: Generate Traces and Collect Feedback")
@@ -72,7 +73,7 @@ Run your application to generate traces, then collect human feedback:
 
 python
 
-```
+```python
 # Generate traces from your application
 @mlflow.trace
 def customer_support_app(issue):
@@ -100,6 +101,7 @@ for issue in issues:
 
         # Log judge's assessment
         mlflow.log_assessment(trace_id=trace_id, assessment=assessment)
+
 ```
 
 ### Collecting Human Feedback[​](#collecting-human-feedback "Direct link to Collecting Human Feedback")
@@ -157,7 +159,7 @@ If you have existing ground truth labels, log them programmatically:
 
 python
 
-```
+```python
 # Example: You have ground truth labels
 ground_truth = {
     trace_ids[0]: "excellent",  # Known good response
@@ -174,6 +176,7 @@ for trace_id, truth_value in ground_truth.items():
             source_type=AssessmentSourceType.HUMAN, source_id="ground_truth"
         ),
     )
+
 ```
 
 ## Step 3: Align Judge with Human Feedback[​](#step-3-align-judge-with-human-feedback "Direct link to Step 3: Align Judge with Human Feedback")
@@ -182,7 +185,7 @@ Use the SIMBA optimizer to improve judge accuracy:
 
 python
 
-```
+```python
 # Retrieve traces with both judge and human assessments
 traces = mlflow.search_traces(experiment_ids=[experiment_id], return_type="list")
 
@@ -215,6 +218,7 @@ if len(aligned_traces) >= 10:
     print("Judge aligned successfully!")
 else:
     print(f"Need at least 10 traces (have {len(aligned_traces)})")
+
 ```
 
 ## Step 4: Test and Register[​](#step-4-test-and-register "Direct link to Step 4: Test and Register")
@@ -223,7 +227,7 @@ Test the aligned judge and register it when ready:
 
 python
 
-```
+```python
 # Test the aligned judge on new data
 test_cases = [
     {
@@ -246,6 +250,7 @@ for case in test_cases:
 # Register the aligned judge for production use
 aligned_judge.register(experiment_id=experiment_id)
 print("Judge registered and ready for deployment!")
+
 ```
 
 ## Step 5: Use the Registered Judge in Production[​](#step-5-use-the-registered-judge-in-production "Direct link to Step 5: Use the Registered Judge in Production")
@@ -254,7 +259,7 @@ Retrieve and use your registered judge with `mlflow.genai.evaluate()`:
 
 python
 
-```
+```python
 from mlflow.genai.scorers import get_scorer
 import pandas as pd
 
@@ -285,6 +290,7 @@ print(results.tables["eval_results_table"])
 
 # Assessments are automatically logged to the traces
 # You can view them in the MLflow UI Traces tab
+
 ```
 
 ## Best Practices[​](#best-practices "Direct link to Best Practices")

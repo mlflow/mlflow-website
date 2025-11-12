@@ -28,8 +28,9 @@ To use the MLflow MCP server, install MLflow with the `mcp` extra:
 
 bash
 
-```
+```bash
 pip install 'mlflow[mcp]>=3.5.1'
+
 ```
 
 ## Set up[​](#set-up "Direct link to Set up")
@@ -44,54 +45,57 @@ Add to your VS Code configuration file (`.vscode/mcp.json`):
 
 json
 
-```
+```json
 {
   "servers": {
     "mlflow-mcp": {
       "command": "uv",
-      "args": ["run", "--with", "mlflow>=3.5.1", "--extra", "mcp", "mlflow", "mcp", "run"],
+      "args": ["run", "--with", "mlflow[mcp]>=3.5.1", "mlflow", "mcp", "run"],
       "env": {
         "MLFLOW_TRACKING_URI": "<MLFLOW_TRACKING_URI>"
       }
     }
   }
 }
+
 ```
 
 Add to your Cursor configuration file (`.cursor/mcp.json`):
 
 json
 
-```
+```json
 {
   "mcpServers": {
     "mlflow-mcp": {
       "command": "uv",
-      "args": ["run", "--with", "mlflow>=3.5.1", "--extra", "mcp", "mlflow", "mcp", "run"],
+      "args": ["run", "--with", "mlflow[mcp]>=3.5.1", "mlflow", "mcp", "run"],
       "env": {
         "MLFLOW_TRACKING_URI": "<MLFLOW_TRACKING_URI>"
       }
     }
   }
 }
+
 ```
 
 Add to your Claude `.claude/settings.json`:
 
 json
 
-```
+```json
 {
   "mcpServers": {
     "mlflow-mcp": {
       "command": "uv",
-      "args": ["run", "--with", "mlflow>=3.5.1", "--extra", "mcp", "mlflow", "mcp", "run"],
+      "args": ["run", "--with", "mlflow[mcp]>=3.5.1", "mlflow", "mcp", "run"],
       "env": {
         "MLFLOW_TRACKING_URI": "<MLFLOW_TRACKING_URI>"
       }
     }
   }
 }
+
 ```
 
 Replace `<MLFLOW_TRACKING_URI>` with your MLflow tracking server URL:
@@ -130,7 +134,7 @@ Example usage with tools:
 
 python
 
-```
+```python
 # With search_traces
 search_traces(
     experiment_id="1",
@@ -142,6 +146,7 @@ get_trace(
     trace_id="tr-abc123",
     extract_fields="info.assessments.*,info.tags.*",
 )
+
 ```
 
 ### Common Field Patterns[​](#common-field-patterns "Direct link to Common Field Patterns")
@@ -176,7 +181,7 @@ get_trace(
 
 bash
 
-```
+```bash
 # Get basic trace info
 info.trace_id,info.state,info.execution_duration
 
@@ -191,6 +196,7 @@ data.spans.*.name
 
 # Get trace name (use backticks for dots in field names)
 info.tags.`mlflow.traceName`
+
 ```
 
 ## Use Cases and Examples[​](#use-cases-and-examples "Direct link to Use Cases and Examples")
@@ -201,9 +207,10 @@ Use the MCP server to quickly identify problematic traces:
 
 text
 
-```
+```text
 User: Find all failed traces in experiment 1 from the last hour
 Agent: Uses `search_traces` with `filter_string="status='ERROR' AND timestamp_ms > [recent_timestamp]"`
+
 ```
 
 ### Performance Analysis[​](#performance-analysis "Direct link to Performance Analysis")
@@ -212,9 +219,10 @@ Analyze execution patterns and bottlenecks:
 
 text
 
-```
+```text
 User: Show me the slowest traces in experiment 2 with execution times over 5 seconds
 Agent: Uses `search_traces` with `filter_string="execution_time_ms > 5000"` and `order_by="execution_time_ms DESC"`
+
 ```
 
 ### Quality Assessment Workflow[​](#quality-assessment-workflow "Direct link to Quality Assessment Workflow")
@@ -223,9 +231,10 @@ Log and manage trace evaluations:
 
 text
 
-```
+```text
 User: Log a relevance score of 0.85 for trace tr-abc123 with rationale about accuracy
 Agent: Uses `log_feedback` with appropriate parameters
+
 ```
 
 ### Data Cleanup[​](#data-cleanup "Direct link to Data Cleanup")
@@ -234,9 +243,10 @@ Remove old or test traces:
 
 text
 
-```
+```text
 User: Delete traces older than 30 days from experiment 1
 Agent: Uses `delete_traces` with timestamp-based filtering
+
 ```
 
 ## Environment Configuration[​](#environment-configuration "Direct link to Environment Configuration")

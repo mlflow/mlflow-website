@@ -10,17 +10,18 @@ First, define the guidelines as a simple string:
 
 python
 
-```
+```python
 tone = "The response must maintain a courteous, respectful tone throughout.  It must show empathy for customer concerns."
 easy_to_understand = "The response must use clear, concise language and structure responses logically. It must avoid jargon or explain technical terms when used."
 banned_topics = "If the request is a question about product pricing, the response must politely decline to answer and refer the user to the pricing page."
+
 ```
 
 Then pass each guideline to the `Guidelines` class to create a scorer and run evaluation:
 
 python
 
-```
+```python
 import mlflow
 
 eval_dataset = [
@@ -47,6 +48,7 @@ mlflow.genai.evaluate(
         Guidelines(name="banned_topics", guidelines=banned_topics),
     ],
 )
+
 ```
 
 ![Guidelines scorers result](/mlflow-website/docs/latest/images/mlflow-3/eval-monitor/scorers/guideline-scorers-results.png)

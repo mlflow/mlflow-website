@@ -28,7 +28,7 @@ For native Transformers tasks, MLflow will automatically infer the task type fro
 
 python
 
-```
+```python
 import mlflow
 import transformers
 
@@ -43,6 +43,7 @@ with mlflow.start_run():
 
 print(f"Inferred task: {model_info.flavors['transformers']['task']}")
 # >> Inferred task: text-generation
+
 ```
 
 ## Advanced Tasks for OpenAI-Compatible Inference[​](#advanced-tasks-for-openai-compatible-inference "Direct link to Advanced Tasks for OpenAI-Compatible Inference")
@@ -61,7 +62,7 @@ The required step to use these advanced task types is just to specify the `task`
 
 python
 
-```
+```python
 import mlflow
 
 with mlflow.start_run():
@@ -72,6 +73,7 @@ with mlflow.start_run():
         # Optional, recommended for large models to avoid creating a local copy of the model weights
         save_pretrained=False,
     )
+
 ```
 
 note
@@ -96,7 +98,7 @@ The following code snippet demonstrates how to log a Transformers pipeline with 
 
 python
 
-```
+```python
 import mlflow
 import transformers
 
@@ -154,6 +156,7 @@ print(prediction)
 # >>   'model': 'gpt2',
 # >>   'object': 'chat.completion',
 # >>   'usage': {'completion_tokens': 7, 'prompt_tokens': 13, 'total_tokens': 20}}]
+
 ```
 
 Note that the input and output modifications only apply when the model is loaded with [`mlflow.pyfunc.load_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_model) (e.g. when serving the model with the `mlflow models serve` CLI tool). If you want to load just the raw pipeline, you can use [`mlflow.transformers.load_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.transformers.html#mlflow.transformers.load_model).
@@ -177,7 +180,7 @@ When serving the model saved with the `llm/v1` task type, MLflow uses the same d
 
 python
 
-```
+```python
 with mlflow.start_run():
     model_info = mlflow.transformers.log_model(
         transformers_model=pipeline,
@@ -189,6 +192,7 @@ with mlflow.start_run():
         },
         save_pretrained=False,
     )
+
 ```
 
 attention

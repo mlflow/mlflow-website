@@ -8,13 +8,14 @@ By default, MLflow exports traces to the MLflow Tracking Server. To export trace
 
 bash
 
-```
+```bash
 pip install opentelemetry-exporter-otlp
+
 ```
 
 python
 
-```
+```python
 import mlflow
 import os
 
@@ -27,6 +28,7 @@ os.environ["OTEL_SERVICE_NAME"] = "your-service-name"
 with mlflow.start_span(name="foo") as span:
     span.set_inputs({"a": 1})
     span.set_outputs({"b": 2})
+
 ```
 
 ## OpenTelemetry Configuration[​](#opentelemetry-configuration "Direct link to OpenTelemetry Configuration")
@@ -35,10 +37,11 @@ MLflow uses the standard OTLP exporter for exporting traces to OpenTelemetry Col
 
 bash
 
-```
+```bash
 export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT="http://localhost:4317/v1/traces"
 export OTEL_EXPORTER_OTLP_TRACES_PROTOCOL="http/protobuf"
 export OTEL_EXPORTER_OTLP_TRACES_HEADERS="api_key=12345"
+
 ```
 
 ## Integrated Observability Platforms[​](#integrated-observability-platforms "Direct link to Integrated Observability Platforms")
@@ -67,7 +70,7 @@ By default, when OTLP export is configured, MLflow sends traces only to the Open
 
 python
 
-```
+```python
 import mlflow
 import os
 
@@ -83,6 +86,7 @@ mlflow.set_experiment("my-experiment")
 with mlflow.start_span(name="foo") as span:
     span.set_inputs({"a": 1})
     span.set_outputs({"b": 2})
+
 ```
 
 ## Metrics Export[​](#metrics-export "Direct link to Metrics Export")
@@ -93,8 +97,9 @@ MLflow can export OpenTelemetry metrics when a metrics endpoint is configured. T
 
 bash
 
-```
+```bash
 pip install opentelemetry-exporter-otlp
+
 ```
 
 To enable metrics export:
@@ -103,7 +108,7 @@ To enable metrics export:
 
 bash
 
-```
+```bash
 # For OpenTelemetry Collector (gRPC endpoint)
 export OTEL_EXPORTER_OTLP_METRICS_ENDPOINT="http://localhost:4317"
 export OTEL_EXPORTER_OTLP_METRICS_PROTOCOL="grpc"
@@ -111,6 +116,7 @@ export OTEL_EXPORTER_OTLP_METRICS_PROTOCOL="grpc"
 # OR for OpenTelemetry Collector (HTTP endpoint)
 export OTEL_EXPORTER_OTLP_METRICS_ENDPOINT="http://localhost:4318/v1/metrics"
 export OTEL_EXPORTER_OTLP_METRICS_PROTOCOL="http/protobuf"
+
 ```
 
 #### Direct Prometheus Export[​](#direct-prometheus-export "Direct link to Direct Prometheus Export")
@@ -119,10 +125,11 @@ Prometheus can directly receive OpenTelemetry metrics exported by MLflow:
 
 bash
 
-```
+```bash
 # Configure MLflow to send metrics directly to Prometheus
 export OTEL_EXPORTER_OTLP_METRICS_ENDPOINT="http://localhost:9090/api/v1/otlp/v1/metrics"
 export OTEL_EXPORTER_OTLP_METRICS_PROTOCOL="http/protobuf"
+
 ```
 
 **Prometheus configuration**: Start Prometheus with `--web.enable-otlp-receiver` and `--enable-feature=otlp-deltatocumulative` flags to accept OTLP metrics directly.
@@ -162,7 +169,7 @@ This histogram allows you to analyze:
 
 python
 
-```
+```python
 import mlflow
 import os
 
@@ -175,4 +182,5 @@ with mlflow.start_span(name="process_request", span_type="CHAIN") as span:
     span.set_inputs({"query": "What is MLflow?"})
     # Your application logic here
     span.set_outputs({"response": "MLflow is an open source platform..."})
+
 ```

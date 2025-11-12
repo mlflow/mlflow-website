@@ -49,7 +49,7 @@ For questions with definitive answers:
 
 python
 
-```
+```python
 mlflow.log_expectation(
     trace_id=trace_id,
     name="expected_answer",
@@ -59,6 +59,7 @@ mlflow.log_expectation(
         source_id="physics_expert@university.edu",
     ),
 )
+
 ```
 
 ### Structured Expectations[​](#structured-expectations "Direct link to Structured Expectations")
@@ -67,7 +68,7 @@ For complex outputs with multiple components:
 
 python
 
-```
+```python
 mlflow.log_expectation(
     trace_id=trace_id,
     name="expected_extraction",
@@ -81,6 +82,7 @@ mlflow.log_expectation(
         source_type=AssessmentSourceType.HUMAN, source_id="business_analyst@company.com"
     ),
 )
+
 ```
 
 ### Behavioral Expectations[​](#behavioral-expectations "Direct link to Behavioral Expectations")
@@ -89,7 +91,7 @@ For defining how the AI should act:
 
 python
 
-```
+```python
 mlflow.log_expectation(
     trace_id=trace_id,
     name="expected_behavior",
@@ -104,6 +106,7 @@ mlflow.log_expectation(
         source_id="customer_success_lead@company.com",
     ),
 )
+
 ```
 
 ### Span-Level Expectations[​](#span-level-expectations "Direct link to Span-Level Expectations")
@@ -112,7 +115,7 @@ For specific operations within your AI pipeline:
 
 python
 
-```
+```python
 # Expected documents for RAG retrieval
 mlflow.log_expectation(
     trace_id=trace_id,
@@ -124,6 +127,7 @@ mlflow.log_expectation(
         source_id="information_architect@company.com",
     ),
 )
+
 ```
 
 ## Step-by-Step Guides[​](#step-by-step-guides "Direct link to Step-by-Step Guides")
@@ -149,7 +153,7 @@ Programmatically create expectations for systematic ground truth collection:
 
 python
 
-```
+```python
 import mlflow
 from mlflow.entities import AssessmentSource
 from mlflow.entities.assessment_source import AssessmentSourceType
@@ -158,13 +162,14 @@ from mlflow.entities.assessment_source import AssessmentSourceType
 expert_source = AssessmentSource(
     source_type=AssessmentSourceType.HUMAN, source_id="domain_expert@company.com"
 )
+
 ```
 
 **2. Create expectations for different data types:**
 
 python
 
-```
+```python
 def log_factual_expectation(trace_id, question, correct_answer):
     """Log expectation for factual questions."""
     mlflow.log_expectation(
@@ -209,13 +214,14 @@ def log_behavioral_expectation(trace_id, expected_behavior):
             "compliance_requirement": "company_policy_v3",
         },
     )
+
 ```
 
 **3. Use the functions in your annotation workflow:**
 
 python
 
-```
+```python
 # Example: Annotating a customer service interaction
 trace_id = "tr-customer-service-001"
 
@@ -240,6 +246,7 @@ expected_behavior = {
     "escalation_required": False,
 }
 log_behavioral_expectation(trace_id, expected_behavior)
+
 ```
 
 For large-scale ground truth collection, use batch annotation:
@@ -248,7 +255,7 @@ For large-scale ground truth collection, use batch annotation:
 
 python
 
-```
+```python
 def annotate_batch_expectations(annotation_data):
     """Annotate multiple traces with ground truth expectations."""
     for item in annotation_data:
@@ -270,13 +277,14 @@ def annotate_batch_expectations(annotation_data):
             print(f"✓ Annotated {item['trace_id']}")
         except Exception as e:
             print(f"✗ Failed to annotate {item['trace_id']}: {e}")
+
 ```
 
 **2. Prepare your annotation data:**
 
 python
 
-```
+```python
 # Example batch annotation data
 batch_data = [
     {
@@ -296,14 +304,16 @@ batch_data = [
         "session_id": "session_2024_01_15",
     },
 ]
+
 ```
 
 **3. Execute batch annotation:**
 
 python
 
-```
+```python
 annotate_batch_expectations(batch_data)
+
 ```
 
 ## Expectation Annotation Workflows[​](#expectation-annotation-workflows "Direct link to Expectation Annotation Workflows")
@@ -334,7 +344,7 @@ Use metadata to explain why an expectation is defined a certain way:
 
 python
 
-```
+```python
 mlflow.log_expectation(
     trace_id=trace_id,
     name="expected_diagnosis",
@@ -352,6 +362,7 @@ mlflow.log_expectation(
         source_type=AssessmentSourceType.HUMAN, source_id="endocrinologist@hospital.org"
     ),
 )
+
 ```
 
 ### Maintain Consistency[​](#maintain-consistency "Direct link to Maintain Consistency")
@@ -368,7 +379,7 @@ Retrieve specific expectations to analyze your ground truth data:
 
 python
 
-```
+```python
 # Get a specific expectation by ID
 expectation = mlflow.get_assessment(
     trace_id="tr-1234567890abcdef", assessment_id="a-0987654321abcdef"
@@ -379,6 +390,7 @@ name = expectation.name
 value = expectation.value
 source_type = expectation.source.source_type
 metadata = expectation.metadata if hasattr(expectation, "metadata") else None
+
 ```
 
 ### Updating Expectations[​](#updating-expectations "Direct link to Updating Expectations")
@@ -387,7 +399,7 @@ Update existing expectations when ground truth needs refinement:
 
 python
 
-```
+```python
 from mlflow.entities import Expectation
 
 # Update expectation with corrected information
@@ -401,6 +413,7 @@ mlflow.update_assessment(
     assessment_id="a-0987654321abcdef",
     assessment=updated_expectation,
 )
+
 ```
 
 ### Deleting Expectations[​](#deleting-expectations "Direct link to Deleting Expectations")
@@ -409,11 +422,12 @@ Remove expectations that were logged incorrectly:
 
 python
 
-```
+```python
 # Delete specific expectation
 mlflow.delete_assessment(
     trace_id="tr-1234567890abcdef", assessment_id="a-5555666677778888"
 )
+
 ```
 
 ## Integration with Evaluation[​](#integration-with-evaluation "Direct link to Integration with Evaluation")

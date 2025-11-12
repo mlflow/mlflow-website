@@ -12,9 +12,10 @@ This quickstart requires MLflow version 3.0 or higher for full GenAI functionali
 
 bash
 
-```
+```bash
 pip install --upgrade mlflow
 pip install langchain-openai
+
 ```
 
 ### Set OpenAI API Key[​](#set-openai-api-key "Direct link to Set OpenAI API Key")
@@ -23,8 +24,9 @@ Configure your OpenAI API key to authenticate with OpenAI services:
 
 bash
 
-```
+```bash
 export OPENAI_API_KEY=your_api_key_here
+
 ```
 
 ## What You'll Learn[​](#what-youll-learn "Direct link to What You'll Learn")
@@ -55,7 +57,7 @@ Start by creating a versioned prompt template. This enables you to track prompt 
 
 python
 
-```
+```python
 import mlflow
 
 system_prompt = mlflow.genai.register_prompt(
@@ -63,6 +65,7 @@ system_prompt = mlflow.genai.register_prompt(
     template="You are a chatbot that can answer questions about IT. Answer this question: {{question}}",
     commit_message="Initial version of chatbot",
 )
+
 ```
 
 ### View Your Prompt in MLflow UI[​](#view-your-prompt-in-mlflow-ui "Direct link to View Your Prompt in MLflow UI")
@@ -77,7 +80,7 @@ Create a simple chain that combines your prompt template with OpenAI's chat mode
 
 python
 
-```
+```python
 from langchain.schema.output_parser import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
@@ -92,6 +95,7 @@ chain = prompt | ChatOpenAI(temperature=0.7) | StrOutputParser()
 question = "What is MLflow?"
 print(chain.invoke({"question": question}))
 # MLflow is an open-source platform for managing the end-to-end machine learning lifecycle...
+
 ```
 
 ## Step 3: Enable Trace Observability[​](#step-3-enable-trace-observability "Direct link to Step 3: Enable Trace Observability")
@@ -102,12 +106,13 @@ Set up automatic trace logging to monitor your model's behavior during developme
 
 python
 
-```
+```python
 # Set the active model for linking traces
 mlflow.set_active_model(name="langchain_model")
 
 # Enable autologging - all traces will be automatically linked to the active model
 mlflow.langchain.autolog()
+
 ```
 
 ### Generate Test Traces[​](#generate-test-traces "Direct link to Generate Test Traces")
@@ -116,7 +121,7 @@ Run multiple queries to generate traces for analysis:
 
 python
 
-```
+```python
 questions = [
     {"question": "What is MLflow Tracking and how does it work?"},
     {"question": "What is Unity Catalog?"},
@@ -130,6 +135,7 @@ for question in questions:
 # Verify traces are linked to the active model
 active_model_id = mlflow.get_active_model_id()
 mlflow.search_traces(model_id=active_model_id)
+
 ```
 
 ### Explore Traces in the UI[​](#explore-traces-in-the-ui "Direct link to Explore Traces in the UI")
@@ -164,7 +170,7 @@ Evaluate your model outputs by comparing them to expected responses:
 
 python
 
-```
+```python
 import pandas as pd
 
 # Create evaluation dataset
@@ -251,6 +257,7 @@ with mlflow.start_run():
 
     print(f"📊 Average keyword coverage: {avg_coverage:.1%}")
     print(f"📊 Average response length: {avg_length:.0f} words")
+
 ```
 
 ### View Results in MLflow UI[​](#view-results-in-mlflow-ui "Direct link to View Results in MLflow UI")

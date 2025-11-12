@@ -27,7 +27,7 @@ Since FireworksAI is OpenAI SDK compatible, all APIs supported by MLflow's OpenA
 
 python
 
-```
+```python
 import mlflow
 import openai
 import os
@@ -52,6 +52,7 @@ response = openai_client.chat.completions.create(
         {"role": "user", "content": "Why is open source better than closed source?"}
     ],
 )
+
 ```
 
 ## Chat Completion API Examples[​](#chat-completion-api-examples "Direct link to Chat Completion API Examples")
@@ -63,7 +64,7 @@ response = openai_client.chat.completions.create(
 
 python
 
-```
+```python
 import openai
 import mlflow
 import os
@@ -95,13 +96,14 @@ response = openai_client.chat.completions.create(
     messages=messages,
     max_completion_tokens=100,
 )
+
 ```
 
 MLflow Tracing supports streaming API outputs of FireworksAI endpoints through the OpenAI SDK. With the same setup of auto tracing, MLflow automatically traces the streaming response and renders the concatenated output in the span UI. The actual chunks in the response stream can be found in the `Event` tab as well.
 
 python
 
-```
+```python
 import openai
 import mlflow
 import os
@@ -123,13 +125,14 @@ stream = client.chat.completions.create(
 )
 for chunk in stream:
     print(chunk.choices[0].delta.content or "", end="")
+
 ```
 
 MLflow Tracing supports asynchronous API returns of FireworksAI through the OpenAI SDK. The usage is the same as the synchronous API.
 
 python
 
-```
+```python
 import openai
 import mlflow
 import os
@@ -148,6 +151,7 @@ response = await client.chat.completions.create(
     # Async streaming is also supported
     # stream=True
 )
+
 ```
 
 MLflow Tracing automatically captures tool use responses from FireworksAI models. The function instruction in the response will be highlighted in the trace UI. Moreover, you can annotate the tool function with the `@mlflow.trace` decorator to create a span for the tool execution.
@@ -156,7 +160,7 @@ The following example implements a simple tool use agent using FireworksAI and M
 
 python
 
-```
+```python
 import json
 from openai import OpenAI
 import mlflow
@@ -238,6 +242,7 @@ def run_tool_agent(question: str):
 # Run the tool calling agent
 question = "What's the weather like in Paris today?"
 answer = run_tool_agent(question)
+
 ```
 
 ## Token Usage[​](#token-usage "Direct link to Token Usage")
@@ -246,7 +251,7 @@ MLflow supports token usage tracking for FireworksAI. The token usage for each L
 
 python
 
-```
+```python
 import json
 import mlflow
 
@@ -275,11 +280,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 20
   Output tokens: 283
@@ -290,6 +296,7 @@ Completions:
   Input tokens: 20
   Output tokens: 283
   Total tokens: 303
+
 ```
 
 ## Disable auto-tracing[​](#disable-auto-tracing "Direct link to Disable auto-tracing")

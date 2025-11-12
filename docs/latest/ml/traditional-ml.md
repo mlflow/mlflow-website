@@ -197,27 +197,29 @@ Quick Setup Guide
 
 bash
 
-```
+```bash
 pip install mlflow
+
 ```
 
 For specific integrations, install the corresponding packages:
 
 bash
 
-```
+```bash
 # For scikit-learn
 pip install scikit-learn
 
 # For XGBoost
 pip install xgboost
+
 ```
 
 ### 2. Enable Autologging[​](#2-enable-autologging "Direct link to 2. Enable Autologging")
 
 python
 
-```
+```python
 import mlflow
 
 # For scikit-learn
@@ -228,13 +230,14 @@ mlflow.xgboost.autolog()
 
 # For all supported frameworks
 mlflow.autolog()
+
 ```
 
 ### 3. Train Your Model Normally[​](#3-train-your-model-normally "Direct link to 3. Train Your Model Normally")
 
 python
 
-```
+```python
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
@@ -244,6 +247,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 with mlflow.start_run():
     model = RandomForestClassifier(n_estimators=100)
     model.fit(X_train, y_train)
+
 ```
 
 ### 4. View Results[​](#4-view-results "Direct link to 4. View Results")
@@ -252,8 +256,9 @@ Open the MLflow UI to see your tracked experiments:
 
 bash
 
-```
+```bash
 mlflow ui
+
 ```
 
 ## Real-World Applications[​](#real-world-applications "Direct link to Real-World Applications")
@@ -278,7 +283,7 @@ MLflow integrates seamlessly with popular hyperparameter optimization frameworks
 
 python
 
-```
+```python
 import mlflow
 import optuna
 from sklearn.ensemble import RandomForestClassifier
@@ -308,13 +313,14 @@ with mlflow.start_run():
     # Log best results
     mlflow.log_params(study.best_params)
     mlflow.log_metric("best_accuracy", study.best_value)
+
 ```
 
 MLflow provides built-in SHAP integration for automatic model explanations:
 
 python
 
-```
+```python
 import mlflow
 
 with mlflow.start_run():
@@ -333,6 +339,7 @@ with mlflow.start_run():
     )
 
     # SHAP plots and explainers automatically generated
+
 ```
 
 ## Tutorials and Guides[​](#tutorials-and-guides "Direct link to Tutorials and Guides")

@@ -82,19 +82,20 @@ Search for any contents existing in your trace.
 
 python
 
-```
+```python
 # Search for traces containing specific text
 mlflow.search_traces(filter_string="trace.text LIKE '%authentication error%'")
 
 # Search for multiple terms
 mlflow.search_traces(filter_string="trace.text LIKE '%timeout%'")
+
 ```
 
 #### Filter by Name[​](#filter-by-name "Direct link to Filter by Name")
 
 python
 
-```
+```python
 # Exact match
 mlflow.search_traces(filter_string="trace.name = 'predict'")
 
@@ -106,13 +107,14 @@ mlflow.search_traces(filter_string="trace.name ILIKE '%PREDICT%'")
 
 # Regular expression matching with RLIKE
 mlflow.search_traces(filter_string="trace.name RLIKE '^(predict|inference)_[0-9]+'")
+
 ```
 
 #### Filter by Status[​](#filter-by-status "Direct link to Filter by Status")
 
 python
 
-```
+```python
 # Get successful traces
 mlflow.search_traces(filter_string="trace.status = 'OK'")
 
@@ -121,13 +123,14 @@ mlflow.search_traces(filter_string="trace.status = 'ERROR'")
 
 # Get in-progress traces
 mlflow.search_traces(filter_string="trace.status != 'OK'")
+
 ```
 
 #### Filter by Execution Time[​](#filter-by-execution-time "Direct link to Filter by Execution Time")
 
 python
 
-```
+```python
 # Find slow traces (> 1 second)
 mlflow.search_traces(filter_string="trace.execution_time_ms > 1000")
 
@@ -138,13 +141,14 @@ mlflow.search_traces(
 
 # Equal to specific duration
 mlflow.search_traces(filter_string="trace.execution_time_ms = 500")
+
 ```
 
 #### Filter by Timestamp[​](#filter-by-timestamp "Direct link to Filter by Timestamp")
 
 python
 
-```
+```python
 import time
 
 # Get traces from last hour
@@ -158,13 +162,14 @@ mlflow.search_traces(filter_string=f"trace.timestamp_ms = {timestamp}")
 mlflow.search_traces(
     filter_string=f"trace.timestamp_ms >= {timestamp - 7200000} AND trace.timestamp_ms <= {timestamp - 3600000}"
 )
+
 ```
 
 #### Filter by Tags[​](#filter-by-tags "Direct link to Filter by Tags")
 
 python
 
-```
+```python
 # Exact match
 mlflow.search_traces(filter_string="tag.model_name = 'gpt-4'")
 
@@ -176,22 +181,24 @@ mlflow.search_traces(filter_string="tag.environment ILIKE '%prod%'")
 
 # Regular expression matching with RLIKE
 mlflow.search_traces(filter_string="tag.version RLIKE '^v[0-9]+\\.[0-9]+'")
+
 ```
 
 #### Filter by Run Association[​](#filter-by-run-association "Direct link to Filter by Run Association")
 
 python
 
-```
+```python
 # Find traces associated with a specific run
 mlflow.search_traces(filter_string="trace.run_id = 'run_id_123456'")
+
 ```
 
 #### Filter by Span Attributes[​](#filter-by-span-attributes "Direct link to Filter by Span Attributes")
 
 python
 
-```
+```python
 # Filter by span name
 mlflow.search_traces(filter_string="span.name = 'llm_call'")
 
@@ -205,37 +212,40 @@ mlflow.search_traces(filter_string="span.type = 'LLM'")
 mlflow.search_traces(filter_string="span.attributes.model_version LIKE '%v2%'")
 mlflow.search_traces(filter_string="span.attributes.temperature LIKE '%0.7%'")
 mlflow.search_traces(filter_string="span.attributes.model_version ILIKE '%V2%'")
+
 ```
 
 #### Filter by Feedback[​](#filter-by-feedback "Direct link to Filter by Feedback")
 
 python
 
-```
+```python
 # Filter by feedback ratings
 mlflow.search_traces(filter_string="feedback.rating = 'positive'")
 
 # Pattern matching on feedback
 mlflow.search_traces(filter_string="feedback.user_comment LIKE '%helpful%'")
+
 ```
 
 #### Filter by Expectations[​](#filter-by-expectations "Direct link to Filter by Expectations")
 
 python
 
-```
+```python
 # Filter by expectation values
 mlflow.search_traces(filter_string="expectation.accuracy = 'high'")
 
 # Pattern matching on expectations
 mlflow.search_traces(filter_string="expectation.label ILIKE '%success%'")
+
 ```
 
 #### Filter by End Time[​](#filter-by-end-time "Direct link to Filter by End Time")
 
 python
 
-```
+```python
 import time
 
 # Get traces that completed in the last hour
@@ -246,13 +256,14 @@ mlflow.search_traces(filter_string=f"trace.end_time_ms > {end_time - 3600000}")
 mlflow.search_traces(
     filter_string=f"trace.end_time_ms >= {end_time - 7200000} AND trace.end_time_ms <= {end_time - 3600000}"
 )
+
 ```
 
 #### Combine Multiple Conditions[​](#combine-multiple-conditions "Direct link to Combine Multiple Conditions")
 
 python
 
-```
+```python
 # Complex query with tags and status
 mlflow.search_traces(filter_string="trace.status = 'OK' AND tag.importance = 'high'")
 
@@ -282,6 +293,7 @@ mlflow.search_traces(
         AND span.attributes.model_version LIKE '%v2%'
     """
 )
+
 ```
 
 ## Programmatic Search with Python[​](#programmatic-search-with-python "Direct link to Programmatic Search with Python")
@@ -290,7 +302,7 @@ mlflow.search_traces(
 
 python
 
-```
+```python
 import mlflow
 
 # Basic search with default DataFrame output
@@ -300,6 +312,7 @@ traces_df = mlflow.search_traces(filter_string="trace.status = 'OK'")
 traces_list = mlflow.search_traces(
     filter_string="trace.status = 'OK'", return_type="list"
 )
+
 ```
 
 note
@@ -345,9 +358,10 @@ Alternatively, you can specify `return_type="list"` to get a list of [`mlflow.en
 
 python
 
-```
+```python
 traces = mlflow.search_traces(filter_string="trace.status = 'OK'", return_type="list")
 # list[mlflow.entities.Trace]
+
 ```
 
 ### Ordering Results[​](#ordering-results "Direct link to Ordering Results")
@@ -361,12 +375,13 @@ MLflow supports ordering results by the following keys:
 
 python
 
-```
+```python
 # Order by timestamp (most recent first)
 traces = mlflow.search_traces(order_by=["timestamp_ms DESC"])
 
 # Multiple ordering criteria
 traces = mlflow.search_traces(order_by=["timestamp_ms DESC", "status ASC"])
+
 ```
 
 ### Pagination[​](#pagination "Direct link to Pagination")
@@ -375,7 +390,7 @@ traces = mlflow.search_traces(order_by=["timestamp_ms DESC", "status ASC"])
 
 python
 
-```
+```python
 from mlflow import MlflowClient
 
 client = MlflowClient()
@@ -397,6 +412,7 @@ while True:
     page_token = results.token
 
 print(f"Found {len(all_traces)} total traces")
+
 ```
 
 ## Important Notes[​](#important-notes "Direct link to Important Notes")

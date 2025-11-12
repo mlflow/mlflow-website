@@ -36,7 +36,7 @@ Here's an example of a complete tool calling sequence using `ResponsesAgentRespo
 
 python
 
-```
+```python
 from mlflow.pyfunc import ResponsesAgent
 from mlflow.types.responses import ResponsesAgentRequest, ResponsesAgentResponse
 
@@ -63,6 +63,7 @@ class SimpleResponsesAgent(ResponsesAgent):
             ],
             custom_outputs={"key1": "custom-value1"},
         )
+
 ```
 
 ### Streaming agent output[​](#streaming-agent-output "Direct link to Streaming agent output")
@@ -80,7 +81,7 @@ To stream text within the ResponsesAgent interface, you should:
 
 python
 
-```
+```python
 from mlflow.types.responses import ResponsesAgentStreamEvent
 
 
@@ -110,6 +111,7 @@ class SimpleResponsesAgent(ResponsesAgent):
                 id="msg_1",
             ),
         )
+
 ```
 
 #### Tool calling with streaming[​](#tool-calling-with-streaming "Direct link to Tool calling with streaming")
@@ -118,7 +120,7 @@ You can also stream tool calls and their results. Each tool call and its output 
 
 python
 
-```
+```python
 from mlflow.types.responses import ResponsesAgentStreamEvent
 
 
@@ -151,6 +153,7 @@ class SimpleResponsesAgent(ResponsesAgent):
                 id="msg_1",
             ),
         )
+
 ```
 
 ## Log your agent[​](#log-your-agent "Direct link to Log your agent")
@@ -159,12 +162,13 @@ Log your agent using the [Models-from-code](/mlflow-website/docs/latest/ml/model
 
 python
 
-```
+```python
 with mlflow.start_run():
     logged_agent_info = mlflow.pyfunc.log_model(
         python_model="agent.py",  # replace with your relative path to agent code
         name="agent",
     )
+
 ```
 
 For ease of use, MLflow has built in the following features:
@@ -190,7 +194,7 @@ To test out a ResponsesAgent, you can pass a single input dictionary that follow
 
 python
 
-```
+```python
 from mlflow.pyfunc import ResponsesAgent
 
 
@@ -214,6 +218,7 @@ loaded_model.predict(
         "context": {"conversation_id": "123", "user_id": "456"},
     }
 )
+
 ```
 
 ## Migrating from `ChatAgent`[​](#migrating-from-chatagent "Direct link to migrating-from-chatagent")
@@ -231,7 +236,7 @@ The `ResponsesAgent` interface extends all functionality previously available in
 
 json
 
-```
+```json
 {
   "type": "message",
   "id": "",
@@ -245,17 +250,19 @@ json
   "role": "assistant",
   "status": "completed"
 }
+
 ```
 
 #### ChatAgent[​](#chatagent "Direct link to ChatAgent")
 
 json
 
-```
+```json
 {
   "role": "assistant",
   "content": ""
 }
+
 ```
 
 ***
@@ -266,7 +273,7 @@ json
 
 json
 
-```
+```json
 {
   "type": "function_call",
   "id": "fc_1",
@@ -275,13 +282,14 @@ json
   "name": "",
   "status": "completed"
 }
+
 ```
 
 #### ChatAgent[​](#chatagent-1 "Direct link to ChatAgent")
 
 json
 
-```
+```json
 {
   "role": "assistant",
   "content": "",
@@ -296,6 +304,7 @@ json
     }
   ]
 }
+
 ```
 
 ***
@@ -306,24 +315,26 @@ json
 
 json
 
-```
+```json
 {
   "type": "function_call_output",
   "call_id": "call_1",
   "output": ""
 }
+
 ```
 
 #### ChatAgent[​](#chatagent-2 "Direct link to ChatAgent")
 
 json
 
-```
+```json
 {
   "role": "tool",
   "content": "12",
   "tool_call_id": "call_1"
 }
+
 ```
 
 ***
@@ -334,7 +345,7 @@ json
 
 json
 
-```
+```json
 {
   "name": "",
   "parameters": {},
@@ -342,13 +353,14 @@ json
   "type": "function",
   "description": ""
 }
+
 ```
 
 #### ChatAgent[​](#chatagent-3 "Direct link to ChatAgent")
 
 json
 
-```
+```json
 {
   "type": "function",
   "function": {
@@ -358,6 +370,7 @@ json
     "strict": true
   }
 }
+
 ```
 
 ## Examples[​](#examples "Direct link to Examples")
@@ -368,7 +381,7 @@ Here's an example of an agent that calls OpenAI's gpt-5 model with the ChatCompl
 
 python
 
-```
+```python
 import mlflow
 from mlflow.models import set_model
 from mlflow.pyfunc import ResponsesAgent
@@ -411,6 +424,7 @@ class SimpleResponsesAgent(ResponsesAgent):
 mlflow.openai.autolog()
 agent = SimpleResponsesAgent()
 set_model(agent)
+
 ```
 
 ### Simple Chat Example with a Responses API LLM[​](#simple-chat-example-with-a-responses-api-llm "Direct link to Simple Chat Example with a Responses API LLM")
@@ -419,7 +433,7 @@ Here's an example of an agent that calls OpenAI's gpt-4o model with the Response
 
 python
 
-```
+```python
 # uncomment below if running inside a jupyter notebook
 # %%writefile agent.py
 import os
@@ -460,6 +474,7 @@ class SimpleResponsesAgent(ResponsesAgent):
 mlflow.openai.autolog()
 agent = SimpleResponsesAgent(model="gpt-4o")
 set_model(agent)
+
 ```
 
 ### Wrapping a LangGraph Agent[​](#wrapping-a-langgraph-agent "Direct link to Wrapping a LangGraph Agent")
@@ -468,7 +483,7 @@ Here's an example of wrapping a LangGraph agent in a ResponsesAgent:
 
 python
 
-```
+```python
 from typing import Generator
 
 import mlflow
@@ -515,6 +530,7 @@ mlflow.langchain.autolog()
 graph = None  # TODO: replace with your compiled LangGraph agent
 agent = LangGraphResponsesAgent(graph)
 set_model(agent)
+
 ```
 
 ### Tool Calling Example[​](#tool-calling-example "Direct link to Tool Calling Example")
@@ -523,7 +539,7 @@ Here's an example of an agent that calls OpenAI's gpt-4o model with a simple too
 
 python
 
-```
+```python
 # uncomment below if running inside a jupyter notebook
 # %%writefile agent.py
 import json
@@ -695,4 +711,5 @@ SYSTEM_PROMPT = "You are a helpful assistant that can call tools to get informat
 mlflow.openai.autolog()
 AGENT = ToolCallingAgent(model="gpt-4o", tools=tools)
 mlflow.models.set_model(AGENT)
+
 ```

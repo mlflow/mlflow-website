@@ -20,7 +20,7 @@ To request support for additional APIs, please open a [feature request](https://
 
 python
 
-```
+```python
 import os
 
 from mistralai import Mistral
@@ -44,6 +44,7 @@ chat_response = client.chat.complete(
     ],
 )
 print(chat_response.choices[0].message)
+
 ```
 
 ## Token usage[​](#token-usage "Direct link to Token usage")
@@ -52,7 +53,7 @@ MLflow >= 3.2.0 supports token usage tracking for Mistral. The token usage for e
 
 python
 
-```
+```python
 import json
 import mlflow
 
@@ -91,11 +92,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 16
   Output tokens: 25
@@ -106,6 +108,7 @@ Chat.complete:
   Input tokens: 16
   Output tokens: 25
   Total tokens: 41
+
 ```
 
 ## Disable auto-tracing[​](#disable-auto-tracing "Direct link to Disable auto-tracing")

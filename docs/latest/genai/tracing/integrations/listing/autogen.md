@@ -8,10 +8,11 @@
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.autogen.autolog()
+
 ```
 
 note
@@ -38,7 +39,7 @@ MLflow supports automatic tracing for the following AutoGen APIs. It does not su
 
 python
 
-```
+```python
 import os
 
 # Imports of autogen classes should happen before calling autolog.
@@ -67,13 +68,14 @@ agent = AssistantAgent(
 
 result = await agent.run(task="Say 'Hello World!'")
 print(result)
+
 ```
 
 ### Tool Agent[​](#tool-agent "Direct link to Tool Agent")
 
 python
 
-```
+```python
 import os
 
 # Imports of autogen classes should happen before calling autolog.
@@ -108,6 +110,7 @@ agent = AssistantAgent(
 )
 
 await agent.run(task="1+1")
+
 ```
 
 ## Token usage[​](#token-usage "Direct link to Token usage")
@@ -116,7 +119,7 @@ MLflow >= 3.2.0 supports token usage tracking for AutoGen. The token usage for e
 
 python
 
-```
+```python
 import json
 import mlflow
 
@@ -144,11 +147,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 65
   Output tokens: 17
@@ -159,6 +163,7 @@ create:
   Input tokens: 65
   Output tokens: 17
   Total tokens: 82
+
 ```
 
 ### Supported APIs[​](#supported-apis-1 "Direct link to Supported APIs")

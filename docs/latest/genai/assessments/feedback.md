@@ -36,7 +36,7 @@ Using the feedback sources within the Python APIs is done as follows:
 
 python
 
-```
+```python
 from mlflow.entities import AssessmentSource, AssessmentSourceType
 
 # Human expert providing evaluation
@@ -53,6 +53,7 @@ code_source = AssessmentSource(
 llm_judge_source = AssessmentSource(
     source_type=AssessmentSourceType.LLM_JUDGE, source_id="gpt-4-evaluator"
 )
+
 ```
 
 ## Why Collect Feedback?[​](#why-collect-feedback "Direct link to Why Collect Feedback?")
@@ -118,7 +119,7 @@ Implement automated LLM-based evaluation with these steps:
 
 python
 
-```
+```python
 import json
 import mlflow
 from mlflow.entities import AssessmentSource, AssessmentError
@@ -127,13 +128,14 @@ import openai  # or your preferred LLM client
 
 # Configure your LLM client
 client = openai.OpenAI(api_key="your-api-key")
+
 ```
 
 **2. Create your evaluation prompt:**
 
 python
 
-```
+```python
 def create_evaluation_prompt(user_input, ai_response):
     return f"""
     Evaluate the AI response for helpfulness and accuracy.
@@ -148,13 +150,14 @@ def create_evaluation_prompt(user_input, ai_response):
     Respond with only a JSON object:
     {{"helpfulness": 0.0-1.0, "accuracy": 0.0-1.0, "rationale": "explanation"}}
     """
+
 ```
 
 **3. Implement the evaluation function:**
 
 python
 
-```
+```python
 def evaluate_with_llm_judge(trace_id, user_input, ai_response):
     try:
         # Get LLM evaluation
@@ -194,19 +197,21 @@ def evaluate_with_llm_judge(trace_id, user_input, ai_response):
                 source_type=AssessmentSourceType.LLM_JUDGE, source_id="gpt-4-evaluator"
             ),
         )
+
 ```
 
 **4. Use the evaluation function:**
 
 python
 
-```
+```python
 # Example usage
 trace_id = "your-trace-id"
 user_question = "What is the capital of France?"
 ai_answer = "The capital of France is Paris."
 
 evaluate_with_llm_judge(trace_id, user_question, ai_answer)
+
 ```
 
 Implement programmatic rule-based evaluation:
@@ -215,7 +220,7 @@ Implement programmatic rule-based evaluation:
 
 python
 
-```
+```python
 def evaluate_response_compliance(response_text):
     """Evaluate response against business rules."""
     results = {
@@ -249,13 +254,14 @@ def evaluate_response_compliance(response_text):
         results["rationale"].append(f"Contains prohibited terms: {found_terms}")
 
     return results
+
 ```
 
 **2. Implement the logging function:**
 
 python
 
-```
+```python
 def log_compliance_check(trace_id, response_text):
     # Run compliance evaluation
     evaluation = evaluate_response_compliance(response_text)
@@ -282,13 +288,14 @@ def log_compliance_check(trace_id, response_text):
             source_type=AssessmentSourceType.CODE, source_id="compliance_validator_v2.1"
         ),
     )
+
 ```
 
 **3. Use in your application:**
 
 python
 
-```
+```python
 # Example usage after your AI generates a response
 with mlflow.start_span(name="financial_advice") as span:
     ai_response = your_ai_model.generate(user_question)
@@ -296,6 +303,7 @@ with mlflow.start_span(name="financial_advice") as span:
 
     # Run automated compliance check
     log_compliance_check(trace_id, ai_response)
+
 ```
 
 ## Managing Feedback[​](#managing-feedback "Direct link to Managing Feedback")
@@ -308,7 +316,7 @@ Retrieve specific feedback to analyze evaluation results:
 
 python
 
-```
+```python
 # Get a specific feedback by ID
 feedback = mlflow.get_assessment(
     trace_id="tr-1234567890abcdef", assessment_id="a-0987654321abcdef"
@@ -319,6 +327,7 @@ name = feedback.name
 value = feedback.value
 source_type = feedback.source.source_type
 rationale = feedback.rationale if hasattr(feedback, "rationale") else None
+
 ```
 
 ### Updating Feedback[​](#updating-feedback "Direct link to Updating Feedback")
@@ -327,7 +336,7 @@ Update existing feedback when you need to correct or refine evaluations:
 
 python
 
-```
+```python
 from mlflow.entities import Feedback
 
 # Update feedback with new information
@@ -342,6 +351,7 @@ mlflow.update_assessment(
     assessment_id="a-0987654321abcdef",
     assessment=updated_feedback,
 )
+
 ```
 
 ### Deleting Feedback[​](#deleting-feedback "Direct link to Deleting Feedback")
@@ -350,11 +360,12 @@ Remove feedback that was logged incorrectly:
 
 python
 
-```
+```python
 # Delete specific feedback
 mlflow.delete_assessment(
     trace_id="tr-1234567890abcdef", assessment_id="a-5555666677778888"
 )
+
 ```
 
 note
@@ -374,7 +385,7 @@ The `override_feedback` function allows human experts to correct automated evalu
 
 python
 
-```
+```python
 # Step 1: Original automated feedback (logged earlier)
 llm_feedback = mlflow.log_feedback(
     trace_id="tr-1234567890abcdef",
@@ -397,6 +408,7 @@ corrected_feedback = mlflow.override_feedback(
     ),
     metadata={"override_reason": "LLM underestimated relevance", "confidence": "high"},
 )
+
 ```
 
 The override process marks the original feedback as invalid but preserves it for historical analysis and model improvement.
@@ -409,7 +421,7 @@ Use clear, descriptive names that make feedback data easy to analyze:
 
 python
 
-```
+```python
 # Good: Descriptive, specific names
 mlflow.log_feedback(trace_id=trace_id, name="response_accuracy", value=0.95)
 mlflow.log_feedback(trace_id=trace_id, name="sql_syntax_valid", value=True)
@@ -418,6 +430,7 @@ mlflow.log_feedback(trace_id=trace_id, name="execution_time_ms", value=245)
 # Poor: Vague, inconsistent names
 mlflow.log_feedback(trace_id=trace_id, name="good", value=True)
 mlflow.log_feedback(trace_id=trace_id, name="score", value=0.95)
+
 ```
 
 ### Traceable Source Attribution[​](#traceable-source-attribution "Direct link to Traceable Source Attribution")
@@ -426,7 +439,7 @@ Provide specific source information for audit trails:
 
 python
 
-```
+```python
 # Excellent: Version-specific, environment-aware
 source = AssessmentSource(
     source_type=AssessmentSourceType.CODE, source_id="response_validator_v2.1_prod"
@@ -439,6 +452,7 @@ source = AssessmentSource(
 
 # Poor: Generic, untraceable
 source = AssessmentSource(source_type=AssessmentSourceType.CODE, source_id="validator")
+
 ```
 
 ### Rich Metadata[​](#rich-metadata "Direct link to Rich Metadata")
@@ -447,7 +461,7 @@ Include context that helps with analysis:
 
 python
 
-```
+```python
 mlflow.log_feedback(
     trace_id=trace_id,
     name="response_quality",
@@ -461,6 +475,7 @@ mlflow.log_feedback(
         "evaluation_context": "production_review",
     },
 )
+
 ```
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")

@@ -12,29 +12,32 @@ First, install MLflow with:
 
 bash
 
-```
+```bash
 pip install mlflow
+
 ```
 
 Then, start the server with:
 
 bash
 
-```
+```bash
 mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
+
 ```
 
 This will start the server and UI at `http://localhost:5000`. You can connect the client to the server by setting the tracking URI:
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_tracking_uri("http://localhost:5000")
 
 # Start tracking!
 # Open http://localhost:5000 in your browser to view the UI.
+
 ```
 
 Now, you are ready to start your experiment!
@@ -56,11 +59,12 @@ The MLflow repository includes a ready-to-run Compose project under `docker-comp
 
 bash
 
-```
+```bash
 git clone https://github.com/mlflow/mlflow.git
 cd docker-compose
 cp .env.dev.example .env
 docker compose up -d
+
 ```
 
 Read the instructions [here](https://github.com/mlflow/mlflow/tree/master/docker-compose) for more details and configuration options for the docker compose bundle.

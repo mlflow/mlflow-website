@@ -78,7 +78,7 @@ If we were to use each iteration as its own MLflow run, our code might look some
 
 python
 
-```
+```python
 import random
 import mlflow
 from functools import partial
@@ -118,6 +118,7 @@ mlflow.set_experiment("No Child Runs")
 
 # Execute 5 hyperparameter tuning runs
 consume(starmap(execute_tuning, ((x,) for x in range(5))))
+
 ```
 
 After executing this, we can navigate to the MLflow UI to see the results of the iterations and compare each run's error metrics to the parameters that were selected.
@@ -132,11 +133,12 @@ Our code might change in-place with the values being tested:
 
 python
 
-```
+```python
 def log_run(run_name, test_no):
     with mlflow.start_run(run_name=run_name):
         mlflow.log_param("param1", random.choice(["a", "c"]))  # remove 'b'
         # remainder of code ...
+
 ```
 
 When we execute this and navigate back to the UI, it is now significantly more difficult to determine which run results are associated with a particular parameter grouping. For this example, it isn't particularly problematic since the features are identical and the parameter search space is a subset of the original hyperparameter test.
@@ -171,7 +173,7 @@ The code below demonstrates these modifications to our original hyperparameter t
 
 python
 
-```
+```python
 import random
 import mlflow
 from functools import partial
@@ -235,6 +237,7 @@ param_2_values = ["u", "v", "w"]
 consume(
     starmap(execute_tuning, ((x, param_1_values, param_2_values) for x in range(5)))
 )
+
 ```
 
 We can view the results of executing this in the UI:
@@ -243,7 +246,7 @@ The real benefit of this nested architecture becomes much more apparent when we 
 
 python
 
-```
+```python
 # Execute modified hyperparameter tuning runs with custom parameter choices
 param_1_values = ["a", "b"]
 param_2_values = ["u", "v", "w"]
@@ -253,13 +256,14 @@ consume(
         execute_tuning, ((x, param_1_values, param_2_values, ident) for x in range(5))
     )
 )
+
 ```
 
 ... and even more runs ...
 
 python
 
-```
+```python
 param_1_values = ["b", "c"]
 param_2_values = ["d", "f"]
 ident = "params_test_3"
@@ -268,6 +272,7 @@ consume(
         execute_tuning, ((x, param_1_values, param_2_values, ident) for x in range(5))
     )
 )
+
 ```
 
 Once we execute these three tuning run tests, we can view the results in the UI:

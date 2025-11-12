@@ -90,7 +90,7 @@ Here's a simple example that combines OpenAI auto-tracing with manually defined 
 
 python
 
-```
+```python
 import mlflow
 import openai
 from mlflow.entities import SpanType
@@ -124,6 +124,7 @@ def parse_response(response):
 
 
 run("What is MLflow?")
+
 ```
 
 Running this code generates a single trace that combines the manual spans with the automatic OpenAI tracing.
@@ -138,13 +139,14 @@ This example requires installing LangChain in addition to the base requirements:
 
 bash
 
-```
+```bash
 pip install --upgrade langchain langchain-openai
+
 ```
 
 python
 
-```
+```python
 import mlflow
 import openai
 from mlflow.entities import SpanType
@@ -181,6 +183,7 @@ def multi_provider_workflow(query: str):
 
 # Run the function
 result = multi_provider_workflow("Explain quantum computing")
+
 ```
 
 ## Disabling Tracing[​](#disabling-tracing "Direct link to Disabling Tracing")

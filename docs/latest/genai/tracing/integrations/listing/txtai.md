@@ -10,18 +10,20 @@ To get started, install the [MLflow txtai extension](https://github.com/neuml/ml
 
 bash
 
-```
+```bash
 pip install mlflow-txtai
+
 ```
 
 Then, enable autologging in your Python code:
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.txtai.autolog()
+
 ```
 
 ### Examples[​](#examples "Direct link to Examples")
@@ -34,7 +36,7 @@ The simplest example to show the tracing integration is to instrument a [Textrac
 
 python
 
-```
+```python
 import mlflow
 from txtai.pipeline import Textractor
 
@@ -48,6 +50,7 @@ mlflow.set_experiment("txtai")
 # Define and run a simple Textractor pipeline.
 textractor = Textractor()
 textractor("https://github.com/neuml/txtai")
+
 ```
 
 ![txtai Textractor Tracing via autolog](/mlflow-website/docs/latest/assets/images/txtai-textractor-tracing-15f2e1b268fc3fc4921c06e5e9a87cd8.png)
@@ -56,7 +59,7 @@ You can easily trace a [RAG pipeline](https://neuml.github.io/txtai/pipeline/tex
 
 python
 
-```
+```python
 import mlflow
 from txtai import Embeddings, RAG
 
@@ -84,6 +87,7 @@ rag = RAG(
 )
 
 rag("Tell me about the Roman Empire", maxlength=2048)
+
 ```
 
 ![txtai Rag Tracing via autolog](/mlflow-website/docs/latest/assets/images/txtai-rag-tracing-507199b924f1c7ed180e0d940758e2dc.png)
@@ -92,7 +96,7 @@ You can effortlessly trace the internals of a [txtai agent](https://neuml.github
 
 python
 
-```
+```python
 import mlflow
 from txtai import Agent, Embeddings
 
@@ -147,6 +151,7 @@ Write a detailed list with explanations of 10 candidate stars that could potenti
     ),
     maxlength=16000,
 )
+
 ```
 
 ![txtai Agent Tracing via autolog](/mlflow-website/docs/latest/assets/images/txtai-agent-tracing-f69f47a9de38c40814ea985887782850.png)

@@ -12,8 +12,9 @@ We generally recommend using a database-based backend store to get better perfor
 
 bash
 
-```
+```bash
 mlflow server --backend-store-uri sqlite:///mlflow.db
+
 ```
 
 For connecting to different databases such as PostgreSQL, see [backend store documentation](/mlflow-website/docs/latest/self-hosting/architecture/backend-store.md).

@@ -38,7 +38,7 @@ Controls which Host headers the server accepts. This prevents DNS rebinding atta
 
 bash
 
-```
+```bash
 # Specific hosts
 mlflow server --allowed-hosts "mlflow.company.com,192.168.1.100"
 
@@ -47,6 +47,7 @@ mlflow server --allowed-hosts "*.company.com,192.168.*"
 
 # Allow all (not recommended)
 mlflow server --allowed-hosts "*"
+
 ```
 
 ### CORS Origins[​](#cors-origins "Direct link to CORS Origins")
@@ -59,7 +60,7 @@ Specifies which web applications can make API requests from browsers:
 
 bash
 
-```
+```bash
 # Specific origins
 mlflow server --cors-allowed-origins "https://app.company.com,https://notebook.company.com"
 
@@ -68,6 +69,7 @@ mlflow server --cors-allowed-origins "https://*.company.com"
 
 # Allow all origins (development only)
 mlflow server --cors-allowed-origins "*"
+
 ```
 
 ### X-Frame-Options[​](#x-frame-options "Direct link to X-Frame-Options")
@@ -84,9 +86,10 @@ Sets the X-Frame-Options header to control iframe embedding behavior:
 
 bash
 
-```
+```bash
 # Allow cross-origin iframe embedding
 mlflow server --x-frame-options NONE
+
 ```
 
 ### Disable Security Middleware[​](#disable-security-middleware "Direct link to Disable Security Middleware")
@@ -99,8 +102,9 @@ Completely disables security middleware. Use this only when security is handled 
 
 bash
 
-```
+```bash
 mlflow server --disable-security-middleware
+
 ```
 
 ## Common Scenarios[​](#common-scenarios "Direct link to Common Scenarios")
@@ -111,8 +115,9 @@ Default configuration works out of the box:
 
 bash
 
-```
+```bash
 mlflow server
+
 ```
 
 This setup accepts connections from localhost and any private IPs.
@@ -123,15 +128,16 @@ For a shared server accessed by multiple known users, you can configure it to al
 
 bash
 
-```
+```bash
 mlflow server --host 0.0.0.0 --allowed-hosts "mlflow.internal:5000,localhost:*"
+
 ```
 
 Then use MLflow Python SDK to connect to remote tracking servers:
 
 python
 
-```
+```python
 import mlflow
 
 # Connect to remote server
@@ -140,6 +146,7 @@ mlflow.set_tracking_uri("http://mlflow.company.com:5000")
 with mlflow.start_run():
     mlflow.log_param("alpha", 0.5)
     mlflow.log_metric("rmse", 0.1)
+
 ```
 
 Host vs Allowed Hosts
@@ -150,22 +157,24 @@ When notebooks run on a different domain than your MLflow server, configure CORS
 
 bash
 
-```
+```bash
 # Allow embedding from notebook domain
 mlflow server --host 0.0.0.0 \
   --x-frame-options NONE \
   --cors-allowed-origins "https://jupyter.company.com"
+
 ```
 
 Then embed specific MLflow views directly in notebook cells:
 
 python
 
-```
+```python
 from IPython.display import IFrame
 
 # Embed MLflow UI
 IFrame(src="http://mlflow.company.com:5000", width=1000, height=600)
+
 ```
 
 ### Embedding MLflow UI in Web Applications[​](#embedding-mlflow-ui-in-web-applications "Direct link to Embedding MLflow UI in Web Applications")
@@ -174,7 +183,7 @@ Create a component to display MLflow content:
 
 jsx
 
-```
+```jsx
 function MLflowDashboard() {
   return (
     <iframe
@@ -184,23 +193,25 @@ function MLflowDashboard() {
     />
   );
 }
+
 ```
 
 Configure the MLflow server to accept requests from your webapp:
 
 bash
 
-```
+```bash
 mlflow server --host 0.0.0.0 \
   --x-frame-options NONE \
   --cors-allowed-origins "http://localhost:3000,https://app.company.com"
+
 ```
 
 Use this HTML file to verify iframe configuration works correctly:
 
 html
 
-```
+```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -217,4 +228,5 @@ html
     <div id="status">Loading...</div>
 </body>
 </html>
+
 ```

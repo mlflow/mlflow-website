@@ -8,7 +8,7 @@ To log a model with associated prompts, use the `prompts` parameter in the `log_
 
 text
 
-```
+```text
 import mlflow
 
 with mlflow.start_run():
@@ -18,6 +18,7 @@ with mlflow.start_run():
         # Specify a list of prompt URLs or prompt objects.
         prompts=["prompts:/summarization-prompt/2"]
     )
+
 ```
 
 warning
@@ -34,7 +35,7 @@ If you haven't already created a prompt, follow [the instructions in this page](
 
 python
 
-```
+```python
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 
@@ -60,6 +61,7 @@ chain = langchain_prompt | llm
 # Invoke the chain
 response = chain.invoke({"num_sentences": 1, "sentences": "This is a test sentence."})
 print(response)
+
 ```
 
 ### 3. Log the Chain to MLflow[​](#3-log-the-chain-to-mlflow "Direct link to 3. Log the Chain to MLflow")
@@ -68,11 +70,12 @@ Then log the chain to MLflow and specify the prompt URL in the `prompts` paramet
 
 python
 
-```
+```python
 with mlflow.start_run(run_name="summarizer-model"):
     mlflow.langchain.log_model(
         chain, name="model", prompts=["prompts:/summarization-prompt/2"]
     )
+
 ```
 
 Now you can view the associated prompts to the model in MLflow UI:
@@ -95,7 +98,7 @@ In the following example, we use LangGraph to define a very simple chat bot usin
 
 text
 
-```
+```text
 import mlflow
 
 # Register a new prompt
@@ -103,6 +106,7 @@ prompt = mlflow.genai.register_prompt(
     name="chat-prompt",
     template="You are an expert in programming. Please answer the user's question about programming.",
 )
+
 ```
 
 ### 2. Define a Graph using the registered prompt[​](#2-define-a-graph-using-the-registered-prompt "Direct link to 2. Define a Graph using the registered prompt")
@@ -115,7 +119,7 @@ If you are using Jupyter notebook, you can uncomment the `%writefile` magic comm
 
 python
 
-```
+```python
 # %%writefile chatbot.py
 
 import mlflow
@@ -161,6 +165,7 @@ graph_builder.add_edge("chatbot", END)
 graph = graph_builder.compile()
 
 mlflow.models.set_model(graph)
+
 ```
 
 ### 3. Log the Graph to MLflow[​](#3-log-the-graph-to-mlflow "Direct link to 3. Log the Graph to MLflow")
@@ -169,12 +174,13 @@ Specify the file path to the script in the `model` parameter:
 
 python
 
-```
+```python
 with mlflow.start_run():
     model_info = mlflow.langchain.log_model(
         lc_model="./chatbot.py",
         name="graph",
     )
+
 ```
 
 We didn't specify the `prompts` parameter this time, but MLflow automatically logs the prompt loaded within the script to the logged model. Now you can view the associated prompt in MLflow UI:
@@ -187,7 +193,7 @@ Finally, let's load the graph back and invoke it to see the chatbot in action.
 
 python
 
-```
+```python
 # Enable MLflow tracing for LangChain to view the prompt passed to LLM.
 mlflow.langchain.autolog()
 
@@ -204,6 +210,7 @@ graph.invoke(
         ]
     }
 )
+
 ```
 
 ![Chatbot](/mlflow-website/docs/latest/assets/images/prompt-logged-trace-f531e466499e24d2b8541d655237ea91.png)

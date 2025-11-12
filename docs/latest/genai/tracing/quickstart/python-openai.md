@@ -12,8 +12,9 @@ Install the required packages by running the following command:
 
 bash
 
-```
+```bash
 pip install --upgrade mlflow openai>=1.0.0
+
 ```
 
 info
@@ -35,18 +36,20 @@ For the fastest setup, you can install the [mlflow](https://pypi.org/project/mlf
 
 bash
 
-```
+```bash
 mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5000
+
 ```
 
 This will start the server at port 5000 on your local machine. Connect your notebook/IDE to the server by setting the tracking URI. You can also access to the MLflow UI at <http://localhost:5000>.
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_tracking_uri("http://localhost:5000")
+
 ```
 
 You can also brows the MLflow UI at <http://localhost:5000>.
@@ -55,21 +58,23 @@ MLflow provides a Docker Compose file to start a local MLflow server with a post
 
 bash
 
-```
+```bash
 git clone https://github.com/mlflow/mlflow.git
 cd docker-compose
 cp .env.dev.example .env
 docker compose up -d
+
 ```
 
 This will start the server at port 5000 on your local machine. Connect your notebook/IDE to the server by setting the tracking URI. You can also access to the MLflow UI at <http://localhost:5000>.
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_tracking_uri("http://localhost:5000")
+
 ```
 
 Refer to the [instruction](https://github.com/mlflow/mlflow/tree/master/docker-compose/README.md) for more details, e.g., overriding the default environment variables.
@@ -78,7 +83,7 @@ If you have a remote MLflow tracking server, configure the connection:
 
 python
 
-```
+```python
 import os
 import mlflow
 
@@ -86,16 +91,18 @@ import mlflow
 os.environ["MLFLOW_TRACKING_URI"] = "http://your-mlflow-server:5000"
 # Or directly in code
 mlflow.set_tracking_uri("http://your-mlflow-server:5000")
+
 ```
 
 If you have a Databricks account, configure the connection:
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.login()
+
 ```
 
 This will prompt you for your configuration details (Databricks Host url and a PAT).
@@ -108,22 +115,24 @@ If you are unsure about how to set up an MLflow tracking server, you can start w
 
 python
 
-```
+```python
 import mlflow
 
 # This will create a new experiment called "Tracing Quickstart" and set it as active
 mlflow.set_experiment("Tracing Quickstart")
+
 ```
 
 ### Configure OpenAI API Key (or other LLM providers)[​](#configure-openai-api-key-or-other-llm-providers "Direct link to Configure OpenAI API Key (or other LLM providers)")
 
 python
 
-```
+```python
 import os
 
 # Use different env variable when using a different LLM provider
 os.environ["OPENAI_API_KEY"] = "your-api-key-here"  # Replace with your actual API key
+
 ```
 
 ## Step 2: Trace a single LLM call[​](#step-2-trace-a-single-llm-call "Direct link to Step 2: Trace a single LLM call")
@@ -132,7 +141,7 @@ Let's start with a simple example of tracing a single LLM call. We first enable 
 
 python
 
-```
+```python
 import mlflow
 from openai import OpenAI
 
@@ -150,6 +159,7 @@ response = client.chat.completions.create(
         {"role": "user", "content": "What's the weather like in Seattle?"},
     ],
 )
+
 ```
 
 After running the code above, go to the MLflow UI and select the "Traces" tab. It should show the newly created trace.
@@ -170,7 +180,7 @@ Let's define a Python function that fetches the weather information from a weath
 
 python
 
-```
+```python
 import requests
 from mlflow.entities import SpanType
 
@@ -183,13 +193,14 @@ def get_weather(latitude, longitude):
     )
     data = response.json()
     return data["current"]["temperature_2m"]
+
 ```
 
 To pass the function as a tool to the LLM, we need to define the JSON schema for the function.
 
 python
 
-```
+```python
 tools = [
     {
         "type": "function",
@@ -209,13 +220,14 @@ tools = [
         },
     }
 ]
+
 ```
 
 Lastly, define a simple flow that first asks the LLM to get instructions for calling the tool, then invokes the tool function, and lastly returns the result to the LLM.
 
 python
 
-```
+```python
 import json
 from mlflow.entities import SpanType
 
@@ -257,16 +269,18 @@ def run_tool_agent(question: str):
         response = client.chat.completions.create(model="o4-mini", messages=messages)
 
     return response.choices[0].message.content
+
 ```
 
 Now we can run the application.
 
 python
 
-```
+```python
 # Run the tool calling agent
 question = "What's the weather like in Seattle?"
 answer = run_tool_agent(question)
+
 ```
 
 ## Step 4: Explore Traces in the UI[​](#step-4-explore-traces-in-the-ui "Direct link to Step 4: Explore Traces in the UI")

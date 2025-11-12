@@ -49,7 +49,7 @@ Expectations are always created by human experts who understand the correct beha
 
 json
 
-```
+```json
 {
     "name": "expected_answer",
     "value": "The capital of France is Paris. It has been the capital since 987 AD and is home to over 2 million people.",
@@ -62,13 +62,14 @@ json
         "reference": "Company knowledge base v2.1"
     }
 }
+
 ```
 
 **Expected Classification Output**
 
 json
 
-```
+```json
 {
     "name": "expected_classification",
     "value": {
@@ -86,13 +87,14 @@ json
         "based_on": "Historical ticket analysis"
     }
 }
+
 ```
 
 **Expected Document Retrieval for RAG System**
 
 json
 
-```
+```json
 {
     "name": "expected_documents",
     "value": ["policy_doc_2024_v3", "faq_billing_section", "terms_of_service_5.1"],
@@ -105,6 +107,7 @@ json
         "expected_order": "by_relevance"
     }
 }
+
 ```
 
 ## Key Differences from Feedback[​](#key-differences-from-feedback "Direct link to Key Differences from Feedback")

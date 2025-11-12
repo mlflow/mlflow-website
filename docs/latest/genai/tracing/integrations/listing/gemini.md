@@ -9,19 +9,21 @@
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.gemini.autolog()
+
 ```
 
 typescript
 
-```
+```typescript
 import { GoogleGenAI } from "@google/genai";
 import { tracedGemini } from "mlflow-gemini";
 
 const client = tracedGemini(new GoogleGenAI());
+
 ```
 
 note
@@ -67,7 +69,7 @@ To request support for additional APIs, please open a [feature request](https://
 
 python
 
-```
+```python
 import mlflow
 import google.genai as genai
 import os
@@ -87,11 +89,12 @@ client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 response = client.models.generate_content(
     model="gemini-1.5-flash", contents="The opposite of hot is"
 )
+
 ```
 
 typescript
 
-```
+```typescript
 import { GoogleGenAI } from "@google/genai";
 import { tracedGemini } from "mlflow-gemini";
 
@@ -101,6 +104,7 @@ const response = await client.models.generateContent({
     model: "gemini-2.5-flash",
     contents: "What is the capital of France?"
 });
+
 ```
 
 ## Multi-turn chat interactions[​](#multi-turn-chat-interactions "Direct link to Multi-turn chat interactions")
@@ -109,7 +113,7 @@ MLflow support tracing multi-turn conversations with Gemini:
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.gemini.autolog()
@@ -123,6 +127,7 @@ response = chat.send_message(
     "Okay, how about a more detailed explanation to a high schooler?"
 )
 print(response.text)
+
 ```
 
 ## Async[​](#async "Direct link to Async")
@@ -134,7 +139,7 @@ MLflow Tracing supports asynchronous API of the Gemini SDK since MLflow 3.2.0. T
 
 python
 
-```
+```python
 # Configure the SDK with your API key.
 client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
@@ -142,6 +147,7 @@ client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 response = await client.aio.models.generate_content(
     model="gemini-1.5-flash", contents="The opposite of hot is"
 )
+
 ```
 
 Gemini Typescript / Javascript SDK is natively async. See the basic example above.
@@ -152,8 +158,9 @@ MLflow Tracing for Gemini SDK supports embeddings API (Python only):
 
 python
 
-```
+```python
 result = client.models.embed_content(model="text-embedding-004", contents="Hello world")
+
 ```
 
 ## Token usage[​](#token-usage "Direct link to Token usage")
@@ -165,7 +172,7 @@ MLflow >= 3.4.0 supports token usage tracking for Gemini. The token usage for ea
 
 python
 
-```
+```python
 import json
 import mlflow
 
@@ -196,11 +203,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 typescript
 
-```
+```typescript
 import * as mlflow from "mlflow-tracing";
 
 // After your Gemini call completes, flush and fetch the trace
@@ -224,11 +232,12 @@ if (lastTraceId) {
     }
   }
 }
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 5
   Output tokens: 2
@@ -243,6 +252,7 @@ Models._generate_content:
   Input tokens: 5
   Output tokens: 2
   Total tokens: 7
+
 ```
 
 Token usage tracking is supported for both Python and TypeScript/JavaScript implementations.

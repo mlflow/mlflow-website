@@ -44,7 +44,7 @@ MLflow webhooks support the following Model Registry and Prompt Registry events:
 
 python
 
-```
+```python
 from mlflow import MlflowClient
 
 client = MlflowClient()
@@ -59,6 +59,7 @@ webhook = client.create_webhook(
 )
 
 print(f"Created webhook: {webhook.webhook_id}")
+
 ```
 
 ### Testing a Webhook[​](#testing-a-webhook "Direct link to Testing a Webhook")
@@ -67,7 +68,7 @@ Before putting your webhook into production, test it with example payloads using
 
 python
 
-```
+```python
 # Test the webhook with an example payload
 result = client.test_webhook(webhook.webhook_id)
 
@@ -77,15 +78,17 @@ else:
     print(f"Webhook test failed. Status: {result.response_status}")
     if result.error_message:
         print(f"Error: {result.error_message}")
+
 ```
 
 You can also test specific event types:
 
 python
 
-```
+```python
 # Test with a specific event type
 result = client.test_webhook(webhook.webhook_id, event="model_version.created")
+
 ```
 
 When you call `test_webhook()`, MLflow sends example payloads to your webhook URL. These test payloads have the same structure as real event payloads. Click on the payload schema links in the table above to see the exact structure and examples for each event type.
@@ -99,7 +102,7 @@ If your webhook is subscribed to multiple events, `test_webhook()` behavior depe
 
 python
 
-```
+```python
 # Create webhook with multiple events
 webhook = client.create_webhook(
     name="multi-event-webhook",
@@ -120,6 +123,7 @@ result = client.test_webhook(
     webhook.webhook_id,
     event=("model_version_tag.set"),
 )
+
 ```
 
 ## Webhook Management[​](#webhook-management "Direct link to Webhook Management")
@@ -130,7 +134,7 @@ Use [`MlflowClient.list_webhooks()`](/mlflow-website/docs/latest/api_reference/p
 
 python
 
-```
+```python
 # List webhooks with pagination
 webhooks = client.list_webhooks(max_results=10)
 for webhook in webhooks:
@@ -142,13 +146,14 @@ if webhooks.next_page_token:
     next_page = client.list_webhooks(
         max_results=10, page_token=webhooks.next_page_token
     )
+
 ```
 
 To retrieve all webhooks across multiple pages:
 
 python
 
-```
+```python
 # Retrieve all webhooks across pages
 all_webhooks = []
 page_token = None
@@ -162,6 +167,7 @@ while True:
     page_token = page.next_page_token
 
 print(f"Total webhooks: {len(all_webhooks)}")
+
 ```
 
 ### Getting a Specific Webhook[​](#getting-a-specific-webhook "Direct link to Getting a Specific Webhook")
@@ -170,13 +176,14 @@ Use [`MlflowClient.get_webhook()`](/mlflow-website/docs/latest/api_reference/pyt
 
 python
 
-```
+```python
 # Get a specific webhook by ID
 webhook = client.get_webhook(webhook_id)
 print(f"Name: {webhook.name}")
 print(f"URL: {webhook.url}")
 print(f"Status: {webhook.status}")
 print(f"Events: {webhook.events}")
+
 ```
 
 ### Updating a Webhook[​](#updating-a-webhook "Direct link to Updating a Webhook")
@@ -185,7 +192,7 @@ Use [`MlflowClient.update_webhook()`](/mlflow-website/docs/latest/api_reference/
 
 python
 
-```
+```python
 # Update webhook configuration
 client.update_webhook(
     # Unspecified fields will remain unchanged
@@ -196,6 +203,7 @@ client.update_webhook(
         "model_version_tag.set",
     ],
 )
+
 ```
 
 ### Deleting a Webhook[​](#deleting-a-webhook "Direct link to Deleting a Webhook")
@@ -204,9 +212,10 @@ Use [`MlflowClient.delete_webhook()`](/mlflow-website/docs/latest/api_reference/
 
 python
 
-```
+```python
 # Delete a webhook
 client.delete_webhook(webhook.webhook_id)
+
 ```
 
 ## Security[​](#security "Direct link to Security")
@@ -232,7 +241,7 @@ MLflow webhooks send structured JSON payloads with the following format:
 
 json
 
-```
+```json
 {
   "entity": "model_version",
   "action": "created",
@@ -246,6 +255,7 @@ json
     "description": "An example model version"
   }
 }
+
 ```
 
 ### Payload Fields[​](#payload-fields "Direct link to Payload Fields")
@@ -298,7 +308,7 @@ Here's a complete example of a [FastAPI](https://fastapi.tiangolo.com/) applicat
 
 python
 
-```
+```python
 from fastapi import FastAPI, Request, HTTPException, Header
 from typing import Optional
 import hmac
@@ -434,6 +444,7 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
 ```
 
 ### Running the Example[​](#running-the-example "Direct link to Running the Example")
@@ -442,35 +453,38 @@ if __name__ == "__main__":
 
    bash
 
-   ```
+   ```bash
    pip install fastapi uvicorn
+
    ```
 
 2. **Set up MLflow server with webhook encryption:**
 
    bash
 
-   ```
+   ```bash
    # Generate a secure encryption key for webhook secrets
    export MLFLOW_WEBHOOK_SECRET_ENCRYPTION_KEY=$(python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())")
 
    # Start MLflow server with webhook support
    mlflow server --backend-store-uri sqlite:///mlflow.db
+
    ```
 
 3. **Start the webhook receiver:**
 
    bash
 
-   ```
+   ```bash
    python webhook_receiver.py
+
    ```
 
 4. **Configure MLflow webhook:**
 
    python
 
-   ```
+   ```python
    from mlflow import MlflowClient
 
    client = MlflowClient("http://localhost:5000")
@@ -482,13 +496,14 @@ if __name__ == "__main__":
        events=["model_version.created"],
        secret="your-secret-key",
    )
+
    ```
 
 5. **Test the webhook:**
 
    python
 
-   ```
+   ```python
    # Test webhook connectivity
    result = client.test_webhook(webhook.webhook_id)
    print(f"Test result: {result.success}")
@@ -498,6 +513,7 @@ if __name__ == "__main__":
    client.create_model_version(
        name="test-model", source="s3://bucket/model", run_id="abc123"
    )
+
    ```
 
 ## Troubleshooting[​](#troubleshooting "Direct link to Troubleshooting")

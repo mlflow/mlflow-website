@@ -72,7 +72,7 @@ Direct usage of OpenAI's service through MLflow allows for seamless interaction 
 
 python
 
-```
+```python
 import logging
 import os
 
@@ -277,6 +277,7 @@ df = pd.DataFrame(
     }
 )
 print(model.predict(df, params={"temperature": 1}))
+
 ```
 
 ## Azure OpenAI Service Integration[​](#azure-openai-service-integration "Direct link to Azure OpenAI Service Integration")
@@ -303,7 +304,7 @@ Integrating Azure OpenAI models within MLflow follows similar procedures to dire
 
 python
 
-```
+```python
 import openai
 import pandas as pd
 
@@ -369,6 +370,7 @@ list_of_strings = [
 ]
 model = mlflow.pyfunc.load_model(model_info.model_uri)
 print(model.predict(list_of_strings))
+
 ```
 
 ## OpenAI Autologging[​](#openai-autologging "Direct link to OpenAI Autologging")

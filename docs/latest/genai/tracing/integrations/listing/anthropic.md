@@ -9,19 +9,21 @@
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.anthropic.autolog()
+
 ```
 
 typescript
 
-```
+```typescript
 import Anthropic from "@anthropic-ai/sdk";
 import { tracedAnthropic } from "mlflow-anthropic";
 
 const client = tracedAnthropic(new Anthropic());
+
 ```
 
 MLflow trace automatically captures the following information about Anthropic calls:
@@ -63,7 +65,7 @@ To request support for additional APIs, please open a [feature request](https://
 
 python
 
-```
+```python
 import anthropic
 import mlflow
 
@@ -85,11 +87,12 @@ message = client.messages.create(
         {"role": "user", "content": "Hello, Claude"},
     ],
 )
+
 ```
 
 typescript
 
-```
+```typescript
 import Anthropic from "@anthropic-ai/sdk";
 import { tracedAnthropic } from "mlflow-anthropic";
 
@@ -104,6 +107,7 @@ const message = await client.messages.create({
         {"role": "user", "content": "Hello, Claude"},
     ],
 });
+
 ```
 
 ## Async[​](#async "Direct link to Async")
@@ -115,7 +119,7 @@ MLflow Tracing has supported the asynchronous API of the Anthropic SDK since MLf
 
 python
 
-```
+```python
 import anthropic
 
 # Enable trace logging
@@ -130,6 +134,7 @@ response = await client.messages.create(
         {"role": "user", "content": "Hello, Claude"},
     ],
 )
+
 ```
 
 Anthropic Typescript / Javascript SDK is natively async. See the basic example above.
@@ -144,7 +149,7 @@ The following example implements a simple function calling agent using Anthropic
 
 python
 
-```
+```python
 import json
 import anthropic
 import mlflow
@@ -232,6 +237,7 @@ answers = await asyncio.gather(*(run_tool_agent(q) for q in questions))
 
 for city, answer in zip(cities, answers):
     print(f"{city}: {answer}")
+
 ```
 
 ## Token usage[​](#token-usage "Direct link to Token usage")
@@ -243,7 +249,7 @@ MLflow >= 3.2.0 supports token usage tracking for Anthropic. The token usage for
 
 python
 
-```
+```python
 import json
 import mlflow
 
@@ -275,11 +281,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 typescript
 
-```
+```typescript
 import * as mlflow from "mlflow-tracing";
 
 // After your Anthropic call completes, flush and fetch the trace
@@ -303,11 +310,12 @@ if (lastTraceId) {
     }
   }
 }
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 8
   Output tokens: 12
@@ -318,6 +326,7 @@ Messages.create:
   Input tokens: 8
   Output tokens: 12
   Total tokens: 20
+
 ```
 
 ### Supported APIs:[​](#supported-apis-1 "Direct link to Supported APIs:")

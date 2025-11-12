@@ -26,7 +26,7 @@ Create traces for multiple application versions to enable systematic comparison:
 
 python
 
-```
+```python
 import mlflow
 import openai
 
@@ -74,13 +74,14 @@ def empathetic_agent(question: str) -> str:
 
 
 print("✅ Agent functions ready for comparison")
+
 ```
 
 Generate comparable traces by testing both versions on the same inputs:
 
 python
 
-```
+```python
 # Test scenarios for fair comparison
 test_questions = [
     "How can I track my package?",
@@ -106,6 +107,7 @@ for i, question in enumerate(test_questions):
     print(f"  V2 response: {v2_response[:50]}...")
 
 print(f"\n✅ Generated {len(test_questions) * 2} traces for comparison")
+
 ```
 
 ## Systematic Trace-Based Version Analysis[​](#systematic-trace-based-version-analysis "Direct link to Systematic Trace-Based Version Analysis")
@@ -128,7 +130,7 @@ Use `search_traces` to systematically compare version performance:
 
 python
 
-```
+```python
 from datetime import datetime, timedelta
 import pandas as pd
 
@@ -206,6 +208,7 @@ print(
 print(
     f"V2 - Avg Execution: {v2_metrics['avg_execution_time_ms']:.1f}ms, Avg Response: {v2_metrics['avg_response_length']:.0f} chars"
 )
+
 ```
 
 This gives you a clear, data-driven view of how your application versions compare in terms of performance and reliability. You can use these metrics to make informed decisions about which version to deploy or iterate on further.

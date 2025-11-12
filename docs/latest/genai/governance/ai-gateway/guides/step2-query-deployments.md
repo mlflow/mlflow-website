@@ -20,7 +20,7 @@ To query these models via the MLflow AI Gateway, you need to provide a `prompt` 
 
 python
 
-```
+```python
 from mlflow.deployments import get_deploy_client
 
 client = get_deploy_client("http://localhost:5000")
@@ -34,6 +34,7 @@ data = dict(
 
 response = client.predict(endpoint=name, inputs=data)
 print(response)
+
 ```
 
 ## Example 2: Chat[​](#example-2-chat "Direct link to Example 2: Chat")
@@ -48,7 +49,7 @@ For further details, please consult the documentation.
 
 python
 
-```
+```python
 from mlflow.deployments import get_deploy_client
 
 client = get_deploy_client("http://localhost:5000")
@@ -71,6 +72,7 @@ data = dict(
 
 response = client.predict(endpoint=name, inputs=data)
 print(response)
+
 ```
 
 ## Example 3: Embeddings[​](#example-3-embeddings "Direct link to Example 3: Embeddings")
@@ -81,7 +83,7 @@ To use embedding models via the MLflow AI Gateway, supply a `text` parameter, wh
 
 python
 
-```
+```python
 from mlflow.deployments import get_deploy_client
 
 client = get_deploy_client("http://localhost:5000")
@@ -97,6 +99,7 @@ data = dict(
 
 response = client.predict(endpoint=name, inputs=data)
 print(response)
+
 ```
 
 And there you have it! You've successfully set up your first gateway server and served three OpenAI models.

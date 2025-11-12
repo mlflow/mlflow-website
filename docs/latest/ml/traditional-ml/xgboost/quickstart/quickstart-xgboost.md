@@ -14,15 +14,16 @@ Let's install the `mlflow` package.
 
 python
 
-```
+```python
 %pip install mlflow
+
 ```
 
 Then let's import the packages
 
 python
 
-```
+```python
 import numpy as np
 import xgboost as xgb
 from sklearn.datasets import load_iris
@@ -31,6 +32,7 @@ from sklearn.model_selection import train_test_split
 
 import mlflow
 from mlflow.models import infer_signature
+
 ```
 
 ## Load and prepare the dataset[​](#load-and-prepare-the-dataset "Direct link to Load and prepare the dataset")
@@ -41,9 +43,10 @@ Let's load the dataset using `load_iris()` into a pandas Dataframe and take a lo
 
 python
 
-```
+```python
 iris_df = load_iris(as_frame=True).frame
 iris_df
+
 ```
 
 |     | sepal length (cm) | sepal width (cm) | petal length (cm) | petal width (cm) | target |
@@ -66,36 +69,35 @@ Now we'll split our dataset into training and testing sets
 
 python
 
-```
+```python
 # Split into 80% training and 20% testing
 train_df, test_df = train_test_split(iris_df, test_size=0.2, random_state=42)
 train_df.shape, test_df.shape
-```
 
-```
-((120, 5), (30, 5))
 ```
 
 python
 
-```
+```python
 # Separate the target column for the training set
 train_dataset = mlflow.data.from_pandas(train_df, name="train")
 X_train = train_dataset.df.drop(["target"], axis=1)
 y_train = train_dataset.df[["target"]]
 
 dtrain = xgb.DMatrix(X_train, label=y_train)
+
 ```
 
 python
 
-```
+```python
 # Separate the target column for the testing set
 test_dataset = mlflow.data.from_pandas(test_df, name="test")
 X_test = test_dataset.df.drop(["target"], axis=1)
 y_test = test_dataset.df[["target"]]
 
 dtest = xgb.DMatrix(X_test, label=y_test)
+
 ```
 
 ## Connect to MLflow Tracking Server[​](#connect-to-mlflow-tracking-server "Direct link to Connect to MLflow Tracking Server")
@@ -111,8 +113,9 @@ After successfully registering an account on the Databricks Free Trial, let's co
 
 python
 
-```
+```python
 mlflow.login()
+
 ```
 
 Now this notebook is connected to the hosted tracking server. Let's configure some MLflow metadata. Two things to set up:
@@ -122,9 +125,10 @@ Now this notebook is connected to the hosted tracking server. Let's configure so
 
 python
 
-```
+```python
 mlflow.set_tracking_uri("databricks")
 mlflow.set_experiment("/Users/<your email>/mlflow-xgboost-quickstart")
+
 ```
 
 ## Logging with MLflow[​](#logging-with-mlflow "Direct link to Logging with MLflow")
@@ -133,7 +137,7 @@ MLflow has powerful tracking APIs that let's us log runs and models along with t
 
 python
 
-```
+```python
 # Start a training run
 with mlflow.start_run() as run:
   # Define and log the parameters for our model
@@ -195,6 +199,7 @@ with mlflow.start_run() as run:
       input_example=X_train[:5],
       step=model.best_iteration,
   )
+
 ```
 
 ## View results[​](#view-results "Direct link to View results")
@@ -215,8 +220,9 @@ We can also inspect our model using the API
 
 python
 
-```
+```python
 logged_model = mlflow.get_logged_model(model_info.model_id)
 
 logged_model, logged_model.metrics, logged_model.params
+
 ```

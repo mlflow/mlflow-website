@@ -10,7 +10,7 @@ Note that only synchronous calls are supported, and that asynchronous API and st
 
 python
 
-```
+```python
 import groq
 
 import mlflow
@@ -32,6 +32,7 @@ message = client.chat.completions.create(
 )
 
 print(message.choices[0].message.content)
+
 ```
 
 ## Token usage[​](#token-usage "Direct link to Token usage")
@@ -40,7 +41,7 @@ MLflow >= 3.2.0 supports token usage tracking for Groq. The token usage for each
 
 python
 
-```
+```python
 import json
 import mlflow
 
@@ -78,11 +79,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 21
   Output tokens: 628
@@ -92,6 +94,7 @@ bash
 Completions:
   Input tokens: 21
   Output tokens: 628
+
 ```
 
 Currently, groq token usage doesn't support token usage tracking for Audio transcription and Audio translation.

@@ -21,8 +21,9 @@ Before running the script, let's simply start the MLflow UI on a local host.
 
 bash
 
-```
+```bash
 mlflow ui
+
 ```
 
 Let's visit `http://localhost:5000/` in our web browser. After doing so, you'll notice that we don't have any experiments or models. Let's resolve this by creating a few MLflow runs via the script below.
@@ -31,7 +32,7 @@ Note that when you run this script, you'll want to do so from the same directory
 
 python
 
-```
+```python
 import mlflow
 import numpy as np
 
@@ -86,6 +87,7 @@ for i in range(10):
             digest=dataset_digest[i],
         )
         mlflow.log_input(dataset, context=dataset_context[i])
+
 ```
 
 The code above creates 10 MLflow runs with different metrics, params, tags and dataset information. After successful execution, if you return to the MLflow UI in your browser, you should find all of these runs under the experiment "search-run-guide", as shown by the following screenshot:
@@ -102,18 +104,19 @@ To showcase this functionality, let's look at the below code examples.
 
 python
 
-```
+```python
 import mlflow
 
 all_runs = mlflow.search_runs(search_all_experiments=True)
 print(all_runs)
+
 ```
 
 Output
 
 \_
 
-```
+```_
                              run_id  ... tags.mlflow.user
 0  5984a3488161440f92de9847e846b342  ...     michael.berk
 1  41160f238a5841998dda263794b26067  ...     michael.berk
@@ -127,31 +130,34 @@ Output
 9  59853d5f17f946218f63de1dc82de07b  ...     michael.berk
 
 [10 rows x 19 columns]
+
 ```
 
 Second, let's try filtering the runs for our really bad models: `metrics.loss > 0.8`.
 
 python
 
-```
+```python
 import mlflow
 
 bad_runs = mlflow.search_runs(
     filter_string="metrics.loss > 0.8", search_all_experiments=True
 )
 print(bad_runs)
+
 ```
 
 Output
 
 \_
 
-```
+```_
                              run_id  ... tags.mlflow.source.name
 0  67973142b9c0470d8d764ada07c5a988  ...               delete.py
 1  59853d5f17f946218f63de1dc82de07b  ...               delete.py
 
 [2 rows x 19 columns]
+
 ```
 
 You'll notice that we now are displaying 2 runs instead of 10. Pretty easy, right?
@@ -191,16 +197,18 @@ This section describes the syntax formatting, focusing on "left side" and "right
 
    sql
 
-   ```
+   ```sql
    tag.`test` = `abc`
+
    ```
 
    This results in a syntax error as values must be wrapped in double quotes if they are not metrics.
 
    sql
 
-   ```
+   ```sql
    tag.`test` = abc
+
    ```
 
 ### Search Query Syntax Deep Dive[​](#search-query-syntax-deep-dive "Direct link to Search Query Syntax Deep Dive")
@@ -212,21 +220,23 @@ As noted above, MLflow search syntax is similar to SQL with a few notable except
 
 diff
 
-```
+```diff
 - Bad:  metrics.cross-entropy-loss < 0.5
 + Good: metrics.`cross-entropy-loss` < 0.5
 
 - Bad:  params.1st_iteration_timestamp = "2022-01-01"
 + Good: params.`1st_iteration_timestamp` = "2022-01-01"
+
 ```
 
 * For the SQL `IN` keyword, you must surround the values of your list with **single quotes**.
 
 diff
 
-```
+```diff
 - Bad:  attributes.run_id IN ("5984a3488161440f92de9847e846b342", "babe221a676b4fa4b204f8240f2c4f14")
 + Good: attributes.run_id IN ('5984a3488161440f92de9847e846b342', 'babe221a676b4fa4b204f8240f2c4f14')
+
 ```
 
 * For the SQL `IN` keyword, you can only search the following fields:
@@ -248,30 +258,33 @@ Other than the that, the syntax should be intuitive to anyone who has used SQL. 
 
      sql
 
-     ```
+     ```sql
      metrics.accuracy > 0.72
      metrics.loss <= 0.15
      metrics.accuracy != 0.15
+
      ```
 
    * For strings, MLflow supports `=`, `!=`, `LIKE` (case-sensitive) and `ILIKE` (case-insensitive). Examples include:
 
      sql
 
-     ```
+     ```sql
      params.model = "GPT-4o"
      params.model LIKE "GPT%"
      params.model ILIKE "gpt%"
+
      ```
 
    * For sets, MLflow supports `IN`. Examples include:
 
      sql
 
-     ```
+     ```sql
      datasets.name IN ('custom', 'also custom', 'another custom name')
      datasets.digest IN ('s8ds293b', 'jks834s2')
      attributes.run_id IN ('5984a3488161440f92de9847e846b342')
+
      ```
 
 3. **A reference value**: a numeric value, string, or set of strings.
@@ -290,13 +303,14 @@ To search for runs by filtering on metrics, you must include the `metrics` prefi
 
 sql
 
-```
+```sql
 metrics.accuracy > 0.72
 metrics."accuracy" > 0.72
 metrics.loss <= 0.15
 metrics.`log-scale-loss` <= 0
 metrics.`f1 score` >= 0.5
 metrics.accuracy > 0.72 AND metrics.loss <= 0.15
+
 ```
 
 #### 2 - Searching By Params[​](#2---searching-by-params "Direct link to 2 - Searching By Params")
@@ -309,11 +323,12 @@ Note that numeric values stored as parameters are cast to string in the tracking
 
 sql
 
-```
+```sql
 params.batch_size = "2"
 params.model LIKE "GPT%"
 params.model ILIKE "gPt%"
 params.model LIKE "GPT%" AND params.batch_size = "2"
+
 ```
 
 #### 3 - Searching By Tags[​](#mlflow_tags "Direct link to 3 - Searching By Tags")
@@ -324,11 +339,12 @@ To search for runs by filtering on tags, you must include the `tags` or `mlflow`
 
 sql
 
-```
+```sql
 tags."environment" = "notebook"
 tags.environment = "notebook"
 tags.task = "Classification"
 tags.task ILIKE "classif%"
+
 ```
 
 #### 4 - Searching By Dataset Information[​](#4---searching-by-dataset-information "Direct link to 4 - Searching By Dataset Information")
@@ -345,10 +361,11 @@ Note that dataset information is **stored as strings**, so you must use string c
 
 sql
 
-```
+```sql
 datasets.name LIKE "custom"
 datasets.digest IN ('s8ds293b', 'jks834s2')
 datasets.context = "train"
+
 ```
 
 #### 5 - Searching By Run's Metadata[​](#5---searching-by-runs-metadata "Direct link to 5 - Searching By Run's Metadata")
@@ -365,22 +382,24 @@ Examples for Strings
 
 sql
 
-```
+```sql
 attributes.status = "ACTIVE"
 attributes.user_id LIKE "user1"
 attributes.run_name = "my-run"
 attributes.run_id = "a1b2c3d4"
 attributes.run_id IN ('a1b2c3d4', 'e5f6g7h8')
+
 ```
 
 Examples for Numerics
 
 sql
 
-```
+```sql
 attributes.start_time >= 1664067852747
 attributes.end_time < 1664067852747
 attributes.created > 1664067852747
+
 ```
 
 #### 6 - Searching over a Set[​](#6---searching-over-a-set "Direct link to 6 - Searching over a Set")
@@ -392,10 +411,11 @@ You can search for runs by filtering on a set of acceptable values via the `IN` 
 
 sql
 
-```
+```sql
 datasets.name IN ('custom', 'also custom')
 datasets.digest IN ('s8ds293b', 'jks834s2')
 attributes.run_id IN ('a1b2c3d4', 'e5f6g7h8')
+
 ```
 
 #### 7 - Chained Queries[​](#7---chained-queries "Direct link to 7 - Chained Queries")
@@ -404,18 +424,20 @@ You can chain multiple queries together using the `AND` keyword. For example, to
 
 sql
 
-```
+```sql
 metrics.accuracy > 0.72 AND metrics.loss <= 0.15
 metrics.accuracy > 0.72 AND metrics.batch_size != 0
 metrics.accuracy > 0.72 AND metrics.batch_size != 0 AND attributes.run_id IN ('a1b2c3d4', 'e5f6g7h8')
+
 ```
 
 You can also apply multiple conditions on the same field, for example searching for all loss metrics `BETWEEN` 0.1 and 0.15, inclusive:
 
 sql
 
-```
+```sql
 metrics.loss <= 0.15 AND metrics.loss >= 0.1
+
 ```
 
 Finally, before moving on it's important to revisit that that you cannot use the `OR` keyword in your queries.
@@ -426,8 +448,9 @@ To search for runs where a field (only type string is supported) is not null, us
 
 sql
 
-```
+```sql
 params.batch_size != "None"
+
 ```
 
 ## Programmatically Searching Runs[​](#programmatically-searching-runs "Direct link to Programmatically Searching Runs")
@@ -448,7 +471,7 @@ Python provides powerful ways to build these queries programmatically. Some tips
 
 python
 
-```
+```python
 import mlflow
 
 run_ids = ["22db81f070f6413588641c8c343cdd72", "c3680e37d0fa44eb9c9fb7828f6b5481"]
@@ -466,18 +489,20 @@ runs_with_complex_filter = mlflow.search_runs(
     filter_string=complex_filter,
 )
 print(runs_with_complex_filter)
+
 ```
 
 The output will be a pandas DataFrame with the runs that match the specified filters, as shown below.
 
 text
 
-```
+```text
                              run_id  ... tags.mlflow.runName
 0  22db81f070f6413588641c8c343cdd72  ...   orderly-quail-568
 1  c3680e37d0fa44eb9c9fb7828f6b5481  ...    melodic-lynx-301
 
 [2 rows x 19 columns]
+
 ```
 
 #### 2 - `run_view_type`[​](#2---run_view_type "Direct link to 2---run_view_type")
@@ -486,7 +511,7 @@ The `run_view_type` parameter exposes additional filtering options, as noted in 
 
 python
 
-```
+```python
 import mlflow
 from mlflow.entities import ViewType
 
@@ -495,6 +520,7 @@ active_runs = mlflow.search_runs(
     run_view_type=ViewType.ACTIVE_ONLY,
     order_by=["metrics.accuracy DESC"],
 )
+
 ```
 
 #### 3 - Ordering[​](#3---ordering "Direct link to 3 - Ordering")
@@ -503,7 +529,7 @@ Another useful feature that is available in the search API is allowing for order
 
 python
 
-```
+```python
 import mlflow
 from mlflow.entities import ViewType
 
@@ -512,13 +538,14 @@ active_runs_ordered_by_accuracy = mlflow.search_runs(
     run_view_type=ViewType.ACTIVE_ONLY,
     order_by=["metrics.accuracy DESC"],
 )
+
 ```
 
 A common use case is getting the top `n` results, for example, the top 5 runs by accuracy. When combined with the `max_results` parameter, you can get the top `n` that match your query.
 
 python
 
-```
+```python
 import mlflow
 from mlflow.entities import ViewType
 
@@ -528,6 +555,7 @@ highest_accuracy_run = mlflow.search_runs(
     max_results=1,
     order_by=["metrics.accuracy DESC"],
 )[0]
+
 ```
 
 #### 4 - Searching All Experiments[​](#4---searching-all-experiments "Direct link to 4 - Searching All Experiments")
@@ -536,7 +564,7 @@ Now you might be wondering how to search all experiments. It's as simple as spec
 
 python
 
-```
+```python
 import mlflow
 from mlflow.entities import ViewType
 
@@ -546,6 +574,7 @@ gpt_4_runs_global = mlflow.search_runs(
     run_view_type=ViewType.ALL,
     search_all_experiments=True,
 )
+
 ```
 
 Finally, there are additional useful features in the [`mlflow.client.MlflowClient.search_runs()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.client.html#mlflow.client.MlflowClient.search_runs) or [`mlflow.search_runs()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.html#mlflow.search_runs) methods, so be sure to check out the documentation for more details.
@@ -556,13 +585,14 @@ The R API is similar to the Python API, with the exception that the filter condi
 
 r
 
-```
+```r
 library(mlflow)
 mlflow_search_runs(
   filter = "metrics.rmse < 0.9 and tags.production = 'true'",
   experiment_ids = as.character(1:2),
   order_by = "params.lr DESC"
 )
+
 ```
 
 ### Java[​](#java "Direct link to Java")
@@ -571,7 +601,8 @@ The Java API is similar to the Python API with the exception that the entire con
 
 java
 
-```
+```java
 List<Long> experimentIds = Arrays.asList("1", "2", "4", "8");
 List<RunInfo> searchResult = client.searchRuns(experimentIds, "metrics.accuracy_score < 99.90");
+
 ```

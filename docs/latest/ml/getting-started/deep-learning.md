@@ -16,8 +16,9 @@ MLflow is available on PyPI. Install MLflow and Pytorch with:
 
 bash
 
-```
+```bash
 pip install mlflow torch torchvision
+
 ```
 
 Then, follow the instructions in the [Set Up MLflow](/mlflow-website/docs/latest/ml/getting-started/running-notebooks.md) guide to set up MLflow.
@@ -28,7 +29,7 @@ Create a new MLflow experiment for the tutorial and enable system metrics monito
 
 python
 
-```
+```python
 import mlflow
 
 # The set_experiment API creates a new experiment if it doesn't exist.
@@ -37,6 +38,7 @@ mlflow.set_experiment("Deep Learning Experiment")
 # IMPORTANT: Enable system metrics monitoring
 mlflow.config.enable_system_metrics_logging()
 mlflow.config.set_system_metrics_sampling_interval(1)
+
 ```
 
 ## Step 2: Prepare the dataset[​](#step-2-prepare-the-dataset "Direct link to Step 2: Prepare the dataset")
@@ -45,7 +47,7 @@ In this example, we will use the FashionMNIST dataset, which is a collection of 
 
 python
 
-```
+```python
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -65,6 +67,7 @@ train_dataset = datasets.FashionMNIST(
 test_dataset = datasets.FashionMNIST("data", train=False, transform=transform)
 train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=1000)
+
 ```
 
 ## Step 3: Define the model and optimizer[​](#step-3-define-the-model-and-optimizer "Direct link to Step 3: Define the model and optimizer")
@@ -73,7 +76,7 @@ Define a simple MLP model with 2 hidden layers.
 
 python
 
-```
+```python
 import torch.nn as nn
 
 
@@ -96,13 +99,14 @@ class NeuralNetwork(nn.Module):
 
 
 model = NeuralNetwork().to(device)
+
 ```
 
 Then, define the training parameters and optimizer.
 
 python
 
-```
+```python
 # Training parameters
 params = {
     "epochs": 5,
@@ -116,6 +120,7 @@ params = {
 # Define optimizer and loss function
 loss_fn = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=params["learning_rate"])
+
 ```
 
 ## Step 4: Train the model[​](#step-4-train-the-model "Direct link to Step 4: Train the model")
@@ -129,7 +134,7 @@ Now we are ready to train the model. Inside the training loop, we log the metric
 
 python
 
-```
+```python
 with mlflow.start_run() as run:
     # Log training parameters
     mlflow.log_params(params)
@@ -208,6 +213,7 @@ with mlflow.start_run() as run:
 
     # Log the final trained model
     model_info = mlflow.pytorch.log_model(model, name="final_model")
+
 ```
 
 ## Step 5: View the training results in the MLflow UI[​](#step-5-view-the-training-results-in-the-mlflow-ui "Direct link to Step 5: View the training results in the MLflow UI")
@@ -216,8 +222,9 @@ To see the results of training, you can access the MLflow UI by navigating to th
 
 bash
 
-```
+```bash
 mlflow ui --port 5000
+
 ```
 
 When opening the site, you will see a screen similar to the following:
@@ -246,7 +253,7 @@ You can load the final model or checkpoint from MLflow using the `mlflow.pytorch
 
 python
 
-```
+```python
 # Load the final model
 model = mlflow.pytorch.load_model("runs:/<run_id>/final_model")
 # or load a checkpoint
@@ -275,6 +282,7 @@ with mlflow.start_run(run_id=run.info.run_id) as run:
 
     mlflow.log_metrics({"test_loss": test_loss, "test_accuracy": test_acc})
     print(f"Final Test Accuracy: {test_acc:.2f}%")
+
 ```
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")

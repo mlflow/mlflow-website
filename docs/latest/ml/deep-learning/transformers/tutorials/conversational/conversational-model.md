@@ -31,7 +31,7 @@ Integrating MLflow with DialoGPT enhances conversational AI model development:
 
 python
 
-```
+```python
 # Disable tokenizers warnings when constructing pipelines
 %env TOKENIZERS_PARALLELISM=false
 
@@ -39,10 +39,7 @@ import warnings
 
 # Disable a few less-than-useful UserWarnings from setuptools and pydantic
 warnings.filterwarnings("ignore", category=UserWarning)
-```
 
-```
-env: TOKENIZERS_PARALLELISM=false
 ```
 
 ### Setting Up the Conversational Pipeline[​](#setting-up-the-conversational-pipeline "Direct link to Setting Up the Conversational Pipeline")
@@ -63,7 +60,7 @@ This configuration phase sets the stage for a robust conversational AI system, l
 
 python
 
-```
+```python
 import transformers
 
 import mlflow
@@ -76,12 +73,7 @@ signature = mlflow.models.infer_signature(
   "Hi there, chatbot!",
   mlflow.transformers.generate_signature_output(conversational_pipeline, "Hi there, chatbot!"),
 )
-```
 
-```
-The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input's `attention_mask` to obtain reliable results.
-Setting `pad_token_id` to `eos_token_id`:50256 for open-end generation.
-A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
 ```
 
 ### Creating an experiment[​](#creating-an-experiment "Direct link to Creating an experiment")
@@ -90,7 +82,7 @@ We create a new MLflow Experiment so that the run we're going to log our model t
 
 python
 
-```
+```python
 # If you are running this tutorial in local mode, leave the next line commented out.
 # Otherwise, uncomment the following line and set your tracking uri to your local or remote tracking server.
 
@@ -98,10 +90,7 @@ python
 
 # Set a name for the experiment that is indicative of what the runs being created within it are in regards to
 mlflow.set_experiment("Conversational")
-```
 
-```
-<Experiment: artifact_location='file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/transformers/tutorials/conversational/mlruns/370178017237207703', creation_time=1701292102618, experiment_id='370178017237207703', last_update_time=1701292102618, lifecycle_stage='active', name='Conversational', tags={}>
 ```
 
 ### Logging the Model with MLflow[​](#logging-the-model-with-mlflow "Direct link to Logging the Model with MLflow")
@@ -126,7 +115,7 @@ Through this process, MLflow not only tracks our model but also organizes its me
 
 python
 
-```
+```python
 with mlflow.start_run():
   model_info = mlflow.transformers.log_model(
       transformers_model=conversational_pipeline,
@@ -135,6 +124,7 @@ with mlflow.start_run():
       signature=signature,
       input_example="A clever and witty question",
   )
+
 ```
 
 ### Loading and Interacting with the Chatbot Model[​](#loading-and-interacting-with-the-chatbot-model "Direct link to Loading and Interacting with the Chatbot Model")
@@ -156,7 +146,7 @@ This demonstration highlights the practicality and convenience of deploying and 
 
 python
 
-```
+```python
 # Load the model as a generic python function in order to leverage the integrated Conversational Context
 # Note that loading a conversational model with the native flavor (i.e., `mlflow.transformers.load_model()`) will not include anything apart from the
 # pipeline itself; if choosing to load in this way, you will need to manage your own Conversational Context instance to maintain state on the
@@ -165,26 +155,14 @@ chatbot = mlflow.pyfunc.load_model(model_uri=model_info.model_uri)
 
 # Validate that the model is capable of responding to a question
 first = chatbot.predict("What is the best way to get to Antarctica?")
-```
 
-```
-Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]
-```
-
-```
-The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input's `attention_mask` to obtain reliable results.
-Setting `pad_token_id` to `eos_token_id`:50256 for open-end generation.
-A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
 ```
 
 python
 
-```
+```python
 print(f"Response: {first}")
-```
 
-```
-Response: I think you can get there by boat.
 ```
 
 ### Continuing the Conversation with the Chatbot[​](#continuing-the-conversation-with-the-chatbot "Direct link to Continuing the Conversation with the Chatbot")
@@ -205,26 +183,18 @@ This interaction underlines the importance of the training data's source in shap
 
 python
 
-```
+```python
 # Verify that the PyFunc implementation has maintained state on the conversation history by asking a vague follow-up question that requires context
 # in order to answer properly
 second = chatbot.predict("What sort of boat should I use?")
-```
 
-```
-The attention mask and the pad token id were not set. As a consequence, you may observe unexpected behavior. Please pass your input's `attention_mask` to obtain reliable results.
-Setting `pad_token_id` to `eos_token_id`:50256 for open-end generation.
-A decoder-only architecture is being used, but right-padding was detected! For correct generation results, please set `padding_side='left'` when initializing the tokenizer.
 ```
 
 python
 
-```
+```python
 print(f"Response: {second}")
-```
 
-```
-Response: A boat that can go to Antarctica.
 ```
 
 ### Conclusion and Key Takeaways[​](#conclusion-and-key-takeaways "Direct link to Conclusion and Key Takeaways")

@@ -34,7 +34,7 @@ Span attributes are key-value pairs that provide insight into behavioral modific
 
 python
 
-```
+```python
 span.set_attributes(
     {
         "ai.model.name": "o3-mini",
@@ -46,6 +46,7 @@ span.set_attributes(
         "infrastructure.memory.used_mb": 2048,
     }
 )
+
 ```
 
 ## Span Types[​](#span-types "Direct link to Span Types")
@@ -73,7 +74,7 @@ When you are using [automatic tracing](/mlflow-website/docs/latest/genai/tracing
 
 python
 
-```
+```python
 import mlflow
 from mlflow.entities import SpanType
 
@@ -95,6 +96,7 @@ with mlflow.start_span(name="add", span_type=SpanType.TOOL) as span:
 @mlflow.trace(span_type="ROUTER")
 def route_request(request):
     ...
+
 ```
 
 Span type is useful for searching and filtering particular spans in a large trace. MLflow supports both UI and programmatic span search by span type.
@@ -103,12 +105,13 @@ Span type is useful for searching and filtering particular spans in a large trac
 
 python
 
-```
+```python
 import mlflow
 from mlflow.entities import SpanType
 
 trace = mlflow.get_trace("<trace_id>")
 retriever_spans = trace.search_spans(span_type=SpanType.RETRIEVER)
+
 ```
 
 **Searching spans on UI:**
@@ -138,7 +141,7 @@ Each document in the list should be a dictionary with the following structure:
 
 python
 
-```
+```python
 import mlflow
 from mlflow.entities import SpanType, Document
 
@@ -179,4 +182,5 @@ def retrieve_relevant_documents(query: str):
 # Example usage
 user_query = "MLflow Tracing benefits"
 retrieved_docs = retrieve_relevant_documents(user_query)
+
 ```

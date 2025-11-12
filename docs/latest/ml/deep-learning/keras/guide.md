@@ -8,7 +8,7 @@ In this guide we will walk you through how to use Keras with MLflow. We will dem
 
 python
 
-```
+```python
 import os
 
 # You can use 'tensorflow', 'torch', or 'jax' as backend
@@ -18,6 +18,7 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 import keras
 import numpy as np
 import mlflow
+
 ```
 
 backend-selection
@@ -34,7 +35,7 @@ MLflow provides seamless autologging integration with Keras/TensorFlow. To enabl
 
 python
 
-```
+```python
 import mlflow
 import mlflow.tensorflow
 
@@ -43,6 +44,7 @@ mlflow.tensorflow.autolog()
 
 # Your existing Keras training code works unchanged
 model.fit(x_train, y_train, validation_data=(x_val, y_val), epochs=10)
+
 ```
 
 version-support
@@ -90,7 +92,7 @@ Here's an end-to-end example of manually logging a Keras experiment:
 
 python
 
-```
+```python
 import mlflow
 import mlflow.keras
 import tensorflow as tf
@@ -181,6 +183,7 @@ with mlflow.start_run():
     mlflow.keras.log_model(model, name="model")
 
     print(f"Test accuracy: {test_accuracy:.4f}")
+
 ```
 
 If you run this code with a local MLflow server, you'll see comprehensive tracking in the MLflow UI.
@@ -191,7 +194,7 @@ MLflow provides a built-in callback for Keras that simplifies experiment trackin
 
 python
 
-```
+```python
 import mlflow
 import mlflow.keras
 from mlflow.keras import MlflowCallback
@@ -213,6 +216,7 @@ with mlflow.start_run() as run:
         callbacks=[mlflow_callback],
         verbose=1,
     )
+
 ```
 
 ### Advanced Callback Usage[​](#advanced-callback-usage "Direct link to Advanced Callback Usage")
@@ -221,7 +225,7 @@ The MlflowCallback supports various configuration options:
 
 python
 
-```
+```python
 # Log metrics every 5 batches instead of every epoch
 mlflow_callback = MlflowCallback(run, log_every_epoch=False, log_every_n_steps=5)
 
@@ -243,6 +247,7 @@ class CustomMlflowCallback(MlflowCallback):
         weights = self.model.get_weights()
         avg_weight = np.mean([np.mean(w) for w in weights])
         mlflow.log_metric("avg_final_weight", avg_weight)
+
 ```
 
 ## Saving Your Keras Model to MLflow[​](#saving-your-keras-model-to-mlflow "Direct link to Saving Your Keras Model to MLflow")
@@ -253,7 +258,7 @@ Save your trained Keras model using [`mlflow.keras.log_model()`](/mlflow-website
 
 python
 
-```
+```python
 import mlflow
 import mlflow.keras
 import numpy as np
@@ -271,6 +276,7 @@ loaded_model = mlflow.pyfunc.load_model(model_info.model_uri)
 # Make predictions
 predictions = loaded_model.predict(x_test[:5])
 print("Predictions:", predictions)
+
 ```
 
 ### Model Signatures[​](#model-signatures "Direct link to Model Signatures")
@@ -279,7 +285,7 @@ A model signature describes a model's input and output schema. While not require
 
 python
 
-```
+```python
 import mlflow
 from mlflow.models import infer_signature
 import numpy as np
@@ -293,13 +299,14 @@ signature = infer_signature(sample_input, sample_predictions)
 
 # Log model with signature
 model_info = mlflow.keras.log_model(model, name="model", signature=signature)
+
 ```
 
 You can also manually create signatures for more control:
 
 python
 
-```
+```python
 from mlflow.types import Schema, TensorSpec
 from mlflow.models import ModelSignature
 import numpy as np
@@ -310,6 +317,7 @@ output_schema = Schema([TensorSpec(np.dtype(np.float32), (-1, 10))])
 signature = ModelSignature(inputs=input_schema, outputs=output_schema)
 
 model_info = mlflow.keras.log_model(model, name="model", signature=signature)
+
 ```
 
 ## Multi-Backend Support with Keras 3.0[​](#multi-backend-support-with-keras-30 "Direct link to Multi-Backend Support with Keras 3.0")
@@ -318,7 +326,7 @@ As mentioned at the start of this guide, Keras 3.0's multi-backend support is on
 
 python
 
-```
+```python
 import os
 import mlflow
 
@@ -345,6 +353,7 @@ model.compile(
 
 with mlflow.start_run():
     model.fit(x_train, y_train, epochs=5, validation_split=0.2)
+
 ```
 
 This consistency means you can:
@@ -361,7 +370,7 @@ Combine Keras with hyperparameter tuning libraries while tracking everything in 
 
 python
 
-```
+```python
 import mlflow
 import optuna
 from sklearn.model_selection import train_test_split
@@ -426,6 +435,7 @@ with mlflow.start_run():
     # Log best parameters
     mlflow.log_params(study.best_params)
     mlflow.log_metric("best_val_accuracy", study.best_value)
+
 ```
 
 ### Custom Metrics and Artifacts[​](#custom-metrics-and-artifacts "Direct link to Custom Metrics and Artifacts")
@@ -434,7 +444,7 @@ Log custom visualizations and metrics specific to your use case:
 
 python
 
-```
+```python
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix, classification_report
@@ -521,6 +531,7 @@ with mlflow.start_run():
     log_evaluation_metrics(
         model, x_test, y_test, class_names=[str(i) for i in range(10)]
     )
+
 ```
 
 ## Conclusion[​](#conclusion "Direct link to Conclusion")

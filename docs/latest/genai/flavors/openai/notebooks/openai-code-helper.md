@@ -55,16 +55,17 @@ By being mindful of these cost considerations, you can make informed decisions a
 
 python
 
-```
+```python
 import warnings
 
 # Disable a few less-than-useful UserWarnings from setuptools and pydantic
 warnings.filterwarnings("ignore", category=UserWarning)
+
 ```
 
 python
 
-```
+```python
 import functools
 import inspect
 import os
@@ -79,6 +80,7 @@ from mlflow.types.schema import ColSpec, ParamSchema, ParamSpec, Schema
 
 # Run a quick validation that we have an entry for the OPEN_API_KEY within environment variables
 assert "OPENAI_API_KEY" in os.environ, "OPENAI_API_KEY environment variable must be set"
+
 ```
 
 ### Initializing the MLflow Client[​](#initializing-the-mlflow-client "Direct link to Initializing the MLflow Client")
@@ -101,12 +103,9 @@ The use of a unique experiment name like "Code Helper" lays the foundation for e
 
 python
 
-```
+```python
 mlflow.set_experiment("Code Helper")
-```
 
-```
-<Experiment: artifact_location='file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/openai/notebooks/mlruns/703316263508654123', creation_time=1701891935339, experiment_id='703316263508654123', last_update_time=1701891935339, lifecycle_stage='active', name='Code Helper', tags={}>
 ```
 
 ### Defining the Instruction Set for the AI Model[​](#defining-the-instruction-set-for-the-ai-model "Direct link to Defining the Instruction Set for the AI Model")
@@ -128,7 +127,7 @@ This instruction set is crucial for creating an interactive learning experience.
 
 python
 
-```
+```python
 instruction = [
   {
       "role": "system",
@@ -143,6 +142,7 @@ instruction = [
   },
   {"role": "user", "content": "Review my code and suggest improvements: {code}"},
 ]
+
 ```
 
 ### Defining and Utilizing the Model Signature in MLflow[​](#defining-and-utilizing-the-model-signature-in-mlflow "Direct link to Defining and Utilizing the Model Signature in MLflow")
@@ -170,7 +170,7 @@ This dual-purpose signature is vital as it ensures consistency in how the model 
 
 python
 
-```
+```python
 # Define the model signature that will be used for both the base model and the eventual custom pyfunc implementation later.
 signature = ModelSignature(
   inputs=Schema([ColSpec(type="string", name=None)]),
@@ -192,6 +192,7 @@ with mlflow.start_run():
       messages=instruction,
       signature=signature,
   )
+
 ```
 
 ### Our logged model in the MLflow UI[​](#our-logged-model-in-the-mlflow-ui "Direct link to Our logged model in the MLflow UI")
@@ -228,7 +229,7 @@ By implementing this custom `pyfunc`, we enhance the user's interaction with the
 
 python
 
-````
+````python
 # Custom pyfunc implementation that applies text and code formatting to the output results from the OpenAI model
 class CodeHelper(PythonModel):
   def __init__(self):
@@ -271,6 +272,7 @@ class CodeHelper(PythonModel):
 
       # Return the formatted response so that it is easier to read
       return self._format_response(raw_response)
+
 ````
 
 ### Saving the Custom Python Model with MLflow[​](#saving-the-custom-python-model-with-mlflow "Direct link to Saving the Custom Python Model with MLflow")
@@ -294,7 +296,7 @@ This step is crucial for encapsulating the entire functionality of our `CodeHelp
 
 python
 
-```
+```python
 # Define the location of the base model that we'll be using within our custom pyfunc implementation
 artifacts = {"model_path": model_info.model_uri}
 
@@ -306,10 +308,7 @@ with mlflow.start_run():
       signature=signature,
       artifacts=artifacts,
   )
-```
 
-```
-Downloading artifacts:   0%|          | 0/5 [00:00<?, ?it/s]
 ```
 
 ### Load our saved Custom Python Model[​](#load-our-saved-custom-python-model "Direct link to Load our saved Custom Python Model")
@@ -318,8 +317,9 @@ In this next section, we load the model that we just saved so that we can use it
 
 python
 
-```
+```python
 loaded_helper = mlflow.pyfunc.load_model(helper_model.model_uri)
+
 ```
 
 ### Comparing Two Approaches for Code Review with MLflow Models[​](#comparing-two-approaches-for-code-review-with-mlflow-models "Direct link to Comparing Two Approaches for Code Review with MLflow Models")
@@ -358,7 +358,7 @@ After exploring the `review` function, we will delve into the more complex `code
 
 python
 
-```
+```python
 def review(func, model):
   """
   Function to review the source code of a given function using a specified MLflow model.
@@ -380,6 +380,7 @@ def review(func, model):
   except Exception as e:
       # Handling any exceptions that occur and returning an error message
       return f"Error during model prediction or source code inspection: {e}"
+
 ```
 
 ### Explanation and Review of `process_data` Function[​](#explanation-and-review-of-process_data-function "Direct link to explanation-and-review-of-process_data-function")
@@ -394,7 +395,7 @@ The output from GPT-4's analysis provides clear and concise feedback, precisely 
 
 python
 
-```
+```python
 def process_data(lst):
   s = 0
   q = []
@@ -416,56 +417,8 @@ def process_data(lst):
 
 
 review(process_data, loaded_helper)
+
 ```
-
-````
-Your code seems to be trying to find the count of duplicate elements in a list
-and return a sorted list of unique elements in descending order along with the
-count of duplicates. Here are some suggestions to improve your code:
-
-1. **Errors or Bugs**: There are no syntax errors in your code, but the logic is
-flawed. The variable `s` is supposed to count the number of duplicate elements,
-but it only counts the number of times an element is equal to another element in
-the list, which is not the same thing. Also, the way you're trying to get unique
-elements is inefficient and can lead to incorrect results.
-
-2. **Optimizing Code Efficiency and Structure**: You can use Python's built-in
-`set` and `list` data structures to simplify your code and make it more
-efficient. A `set` in Python is an unordered collection of unique elements. You
-can convert your list to a set to remove duplicates, and then convert it back to
-a list. The length of the original list minus the length of the list with
-duplicates removed will give you the number of duplicate elements.
-
-3. **Enhancing Code Readability and Maintainability**: Use meaningful variable
-names to make your code easier to understand. Also, add comments to explain what
-each part of your code does.
-
-4. **Best Practice Advice**: It's a good practice to write a docstring at the
-beginning of your function to explain what it does.
-
-Here's a revised version of your code incorporating these suggestions:
-
-```python
-def process_data(lst):
-  """
-  This function takes a list as input, removes duplicate elements, sorts the remaining elements in descending order,
-  and counts the number of duplicate elements in the original list.
-  It returns a tuple containing the sorted list of unique elements and the count of duplicate elements.
-  """
-  # Convert the list to a set to remove duplicates, then convert it back to a list
-  unique_elements = list(set(lst))
-  
-  # Sort the list of unique elements in descending order
-  sorted_unique_elements = sorted(unique_elements, reverse=True)
-  
-  # Count the number of duplicate elements
-  duplicate_count = len(lst) - len(unique_elements)
-  
-  return sorted_unique_elements, duplicate_count
-```
-This version of the code is simpler, more efficient, and easier to understand.
-It also correctly counts the number of duplicate elements in the list.
-````
 
 ### The `code_inspector` Decorator Function[​](#the-code_inspector-decorator-function "Direct link to the-code_inspector-decorator-function")
 
@@ -473,7 +426,7 @@ The `code_inspector` function is a Python decorator designed to augment function
 
 python
 
-```
+```python
 import functools
 import inspect
 
@@ -510,6 +463,7 @@ def code_inspector(model):
       return wrapper
 
   return decorator_check_my_function
+
 ```
 
 ### First Usage Trial: The `summing_function` with `code_inspector`[​](#first-usage-trial-the-summing_function-with-code_inspector "Direct link to first-usage-trial-the-summing_function-with-code_inspector")
@@ -537,7 +491,7 @@ Before proceeding to see the response from GPT-4, can you identify all of the is
 
 python
 
-```
+```python
 @code_inspector(loaded_helper)
 def summing_function(n):
   sum_result = 0
@@ -553,6 +507,7 @@ def summing_function(n):
   final_sum = sum([intermediate_sums[key] for key in intermediate_sums if int(key) == n])
 
   return int(str(final_sum))
+
 ```
 
 ### Execution and Analysis of `summing_function(1000)`[​](#execution-and-analysis-of-summing_function1000 "Direct link to execution-and-analysis-of-summing_function1000")
@@ -586,46 +541,9 @@ This demonstration highlights how the `code_inspector` decorator, combined with 
 
 python
 
-```
-summing_function(1000)
-```
-
-````
-Here's a detailed review of your code:
-
-1. Errors or bugs: There are no syntax errors in your code, but there is a
-logical error. The summing_function is supposed to calculate the sum of numbers
-from 1 to n, but it's doing more than that. It's calculating the sum of numbers
-from 1 to i for each i in the range 1 to n, storing these sums in a dictionary,
-and then summing these sums again. This is unnecessary and inefficient.
-
-2. Optimizing code efficiency and structure: The function can be simplified
-significantly. The sum of numbers from 1 to n can be calculated directly using
-the formula n*(n+1)/2. This eliminates the need for the loop and the dictionary,
-making the function much more efficient.
-
-3. Enhancing code readability and maintainability: The code can be made more
-readable by simplifying it and removing unnecessary parts. The use of the
-dictionary and the conversion of numbers to strings and back to numbers is
-confusing and unnecessary.
-
-4. Best practice advice: In Python, it's best to keep things simple and
-readable. Avoid unnecessary complexity and use built-in functions and operators
-where possible. Also, avoid unnecessary type conversions.
-
-Here's a simplified version of your function:
-
 ```python
-def summing_function(n):
-  return n * (n + 1) // 2
-```
+summing_function(1000)
 
-This function does exactly the same thing as your original function, but it's
-much simpler, more efficient, and more readable.
-````
-
-```
-500500
 ```
 
 ### Analysis of `one_liner` Function[​](#analysis-of-one_liner-function "Direct link to analysis-of-one_liner-function")
@@ -642,7 +560,7 @@ When reviewed by the `code_inspector` model, these issues are likely to be highl
 
 python
 
-```
+```python
 @code_inspector(loaded_helper)
 def one_liner(n):
   return (
@@ -650,62 +568,14 @@ def one_liner(n):
       if isinstance(n, int) and n >= 0
       else "Invalid input"
   )
+
 ```
 
 python
 
-```
-one_liner(10)
-```
-
-````
-The code you've provided is a one-liner function that calculates the factorial
-of a given number `n`. It uses a lambda function to recursively calculate the
-factorial. Here's a review of your code:
-
-1. Errors or bugs: There are no syntax errors or bugs in your code. It correctly
-checks if the input is a non-negative integer and calculates the factorial. If
-the input is not a non-negative integer, it returns "Invalid input".
-
-2. Optimizing code efficiency and structure: The code is already quite efficient
-as it uses recursion to calculate the factorial. However, the structure of the
-code is quite complex due to the use of a lambda function for recursion. This
-can make the code difficult to understand and maintain.
-
-3. Enhancing code readability and maintainability: The code could be made more
-readable by breaking it down into multiple lines and adding comments to explain
-what each part of the code does. The use of a lambda function for recursion
-makes the code more difficult to understand than necessary. A more
-straightforward recursive function could be used instead.
-
-4. Best practice advice: In Python, it's generally recommended to use clear and
-simple code over complex one-liners. This is because clear code is easier to
-read, understand, and maintain. While one-liners can be fun and clever, they can
-also be difficult to understand and debug.
-
-Here's a revised version of your code that's easier to understand:
-
 ```python
-def factorial(n):
-  # Check if the input is a non-negative integer
-  if not isinstance(n, int) or n < 0:
-      return "Invalid input"
-  
-  # Base case: factorial of 0 is 1
-  if n == 0:
-      return 1
-  
-  # Recursive case: n! = n * (n-1)!
-  return n * factorial(n - 1)
-```
+one_liner(10)
 
-This version of the code does the same thing as your original code, but it's
-much easier to understand because it uses a straightforward recursive function
-instead of a lambda function.
-````
-
-```
-3628800
 ```
 
 ### Reviewing `find_phone_numbers` Function[​](#reviewing-find_phone_numbers-function "Direct link to reviewing-find_phone_numbers-function")
@@ -729,7 +599,7 @@ The `code_inspector` model's review will highlight these coding missteps, emphas
 
 python
 
-```
+```python
 import re
 
 
@@ -744,106 +614,14 @@ def find_phone_numbers(text):
 
   print(f"First found phone number: {first_number}")
   return phone_numbers
+
 ```
 
 python
 
-```
-find_phone_numbers("Give us a call at 888-867-5309")
-```
-
-````
-Here's a detailed review of your code:
-
-1. Errors or Bugs:
- - There's a typo in the `re.compile` function. You've written `re.complie`
-instead of `re.compile`.
-
-2. Suggestions for Optimizing Code Efficiency and Structure:
- - The import statement `import re` is inside the function. It's a good
-practice to keep all import statements at the top of the file. This makes it
-easier to see what modules are being used in the script.
- - The function will throw an error if no phone numbers are found in the text
-because you're trying to access the first element of `phone_numbers` without
-checking if it exists. You should add a check to see if any phone numbers were
-found before trying to access the first one.
-
-3. Recommendations for Enhancing Code Readability and Maintainability:
- - The function name `find_phone_numbers` is clear and descriptive, which is
-good. However, the variable `pattern` could be more descriptive. Consider
-renaming it to `phone_number_pattern` or something similar.
- - You should add docstrings to your function to describe what it does, what
-its parameters are, and what it returns.
-
-4. Best Practice Advice:
- - Use exception handling to catch potential errors and make your program more
-robust.
- - Avoid using print statements in functions that are meant to return a value.
-If you want to debug, consider using logging instead.
-
-Here's how you could improve your code:
-
 ```python
-import re
+find_phone_numbers("Give us a call at 888-867-5309")
 
-def find_phone_numbers(text):
-  """
-  This function finds all phone numbers in the given text.
-
-  Parameters:
-  text (str): The text to search for phone numbers.
-
-  Returns:
-  list: A list of all found phone numbers.
-  """
-  phone_number_pattern = "(d{3})-d{3}-d{4}"
-  compiled_pattern = re.compile(phone_number_pattern)
-
-  phone_numbers = compiled_pattern.findall(text)
-
-  if phone_numbers:
-      print(f"First found phone number: {phone_numbers[0]}")
-
-  return phone_numbers
-```
-
-Remember, the print statement is not recommended in production code. It's there
-for the sake of this example.
-````
-
-```
----------------------------------------------------------------------------
-```
-
-```
-AttributeError                            Traceback (most recent call last)
-```
-
-```
-/var/folders/cd/n8n0rm2x53l_s0xv_j_xklb00000gp/T/ipykernel_38633/78508464.py in <cell line: 1>()
-----> 1 find_phone_numbers("Give us a call at 888-867-5309")
-```
-
-```
-/var/folders/cd/n8n0rm2x53l_s0xv_j_xklb00000gp/T/ipykernel_38633/2021999358.py in wrapper(*args, **kwargs)
-   18             except Exception as e:
-   19                 print("Error during model prediction or formatting:", e)
----> 20             return func(*args, **kwargs)
-   21 
-   22         return wrapper
-```
-
-```
-/var/folders/cd/n8n0rm2x53l_s0xv_j_xklb00000gp/T/ipykernel_38633/773713950.py in find_phone_numbers(text)
-    5     import re
-    6 
-----> 7     compiled_pattern = re.complie(pattern)
-    8 
-    9     phone_numbers = compiled_pattern.findall(text)
-```
-
-```
-AttributeError: module 're' has no attribute 'complie'
 ```
 
 ### Conclusion: Harnessing the Power of MLflow in AI-Assisted Development[​](#conclusion-harnessing-the-power-of-mlflow-in-ai-assisted-development "Direct link to Conclusion: Harnessing the Power of MLflow in AI-Assisted Development")

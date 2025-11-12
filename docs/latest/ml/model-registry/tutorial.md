@@ -10,8 +10,9 @@ Throughout this tutorial we will leverage a local tracking server and model regi
 
 bash
 
-```
+```bash
 pip install --upgrade mlflow
+
 ```
 
 ### Step 1: Register a Model[​](#step-1-register-a-model "Direct link to Step 1: Register a Model")
@@ -25,7 +26,7 @@ MLflow has lots of model flavors. In the below example, we'll leverage scikit-le
 
 python
 
-```
+```python
 from sklearn.datasets import make_regression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
@@ -57,15 +58,17 @@ with mlflow.start_run() as run:
         input_example=X_train,
         registered_model_name="sk-learn-random-forest-reg-model",
     )
+
 ```
 
 Example Output
 
 bash
 
-```
+```bash
 Successfully registered model 'sk-learn-random-forest-reg-model'.
 Created version '1' of model 'sk-learn-random-forest-reg-model'.
+
 ```
 
 Great! We've registered a model.
@@ -87,7 +90,7 @@ Before diving in, it's import to note that MLflow is designed to abstract comple
 
 text
 
-```
+```text
 mlruns/
 ├── 0/                                    # Experiment ID
 │   ├── bc6dc2a4f38d47b4b0c99d154bbc77ad/ # Run ID
@@ -118,6 +121,7 @@ mlruns/
     │   ├── version-1/                    # Model version directory
     │   │   └── meta.yaml
     │   └── meta.yaml
+
 ```
 
 The tracking server is organized by *Experiment ID* and *Run ID* and is responsible for storing our experiment artifacts, parameters, and metrics. The model registry, on the other hand, only stores metadata with pointers to our tracking server.
@@ -134,17 +138,19 @@ In the same directory as your `mlruns` folder, run the below command.
 
 bash
 
-```
+```bash
 mlflow server --host 127.0.0.1 --port 8080
+
 ```
 
 text
 
-```
+```text
 INFO:     Started server process [26393]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+
 ```
 
 ### Step 3: View the Tracking Server[​](#step-3-view-the-tracking-server "Direct link to Step 3: View the Tracking Server")
@@ -170,7 +176,7 @@ To perform inference on a registered model version, we need to load it into memo
 
 python
 
-```
+```python
 import mlflow.sklearn
 from sklearn.datasets import make_regression
 
@@ -186,6 +192,7 @@ X_new, _ = make_regression(n_features=4, n_informative=2, random_state=0, shuffl
 y_pred_new = model.predict(X_new)
 
 print(y_pred_new)
+
 ```
 
 Note that if you're not using sklearn, if your model flavor is supported, you should use the specific model flavor load method e.g. `mlflow.<flavor>.load_model()`. If the model flavor is not supported, you should leverage [`mlflow.pyfunc.load_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_model). Throughout this tutorial we leverage sklearn for demonstration purposes.
@@ -206,8 +213,9 @@ To load a model into memory via the `model_name` and monotonically increasing `m
 
 python
 
-```
+```python
 model = mlflow.sklearn.load_model(f"models:/{model_name}/{model_version}")
+
 ```
 
 While this method is quick and easy, the monotonically increasing model version lacks flexibility. Often, it's more efficient to leverage a model version alias.
@@ -222,7 +230,7 @@ In the prior page, we added a model version alias to our model, but here's a pro
 
 python
 
-```
+```python
 import mlflow.sklearn
 from mlflow import MlflowClient
 
@@ -245,15 +253,17 @@ model_uri = f"models:/{model_name}@{model_version_alias}"
 model = mlflow.sklearn.load_model(model_uri)
 
 print(model)
+
 ```
 
 Output
 
 \_
 
-```
+```_
 {'problem_type': 'regression'}
 RandomForestRegressor(max_depth=2, random_state=42)
+
 ```
 
 Model version alias is highly dynamic and can correspond to anything that is meaningful for your team. The most common example is a deployment state. For instance, let's say we have a `champion` model in production but are developing `challenger` model that will hopefully out-perform our production model. You can use `champion` and `challenger` model version aliases to uniquely identify these model versions for easy access.

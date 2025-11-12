@@ -12,19 +12,21 @@ Starting the tracking server is as simple as running the following command:
 
 bash
 
-```
+```bash
 mlflow server --host 127.0.0.1 --port 8080 --backend-store-uri sqlite:///mlflow.db
+
 ```
 
 Once the server starts running, you should see the following output:
 
 text
 
-```
+```text
 INFO:     Started server process [28550]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+
 ```
 
 There are many options to configure the server, refer to [Configure Server](#configure-server) for more details.
@@ -52,7 +54,7 @@ MLflow APIs like [`mlflow.start_run()`](/mlflow-website/docs/latest/api_referenc
 
 python
 
-```
+```python
 import mlflow
 
 remote_server_uri = "..."  # set to your server URI, e.g. http://127.0.0.1:8080
@@ -68,11 +70,12 @@ with mlflow.start_run():
 with mlflow.start_span(name="test_trace") as span:
     span.set_inputs({"x": 1, "y": 2})
     span.set_outputs(3)
+
 ```
 
 typescript
 
-```
+```typescript
 import * as mlflow from "mlflow-tracing";
 
 mlflow.init({
@@ -87,22 +90,24 @@ const myFunc = mlflow.trace(
     { name: 'my-func' }
 )
 myFunc(1, 2);
+
 ```
 
 r
 
-```
+```r
 library(mlflow)
 install_mlflow()
 remote_server_uri = "..." # set to your server URI
 mlflow_set_tracking_uri(remote_server_uri)
 mlflow_set_experiment("/my-experiment")
 mlflow_log_param("a", "1")
+
 ```
 
 scala
 
-```
+```scala
 import org.mlflow.tracking.MlflowClient
 
 val remoteServerUri = "..." // set to your server URI
@@ -113,6 +118,7 @@ client.setExperiment(experimentId)
 
 val run = client.createRun(experimentId)
 client.logParam(run.getRunId(), "a", "1")
+
 ```
 
 ## Configure Server[​](#configure-server "Direct link to Configure Server")
@@ -127,13 +133,14 @@ Example
 
 bash
 
-```
+```bash
 # Default: local file system
 mlflow server
 # SQLite: create a SQLite database `my.db` in the current directory
 mlflow server --backend-store-uri sqlite:///my.db
 # PostgreSQL: connect to an existing PostgreSQL database
 mlflow server --backend-store-uri postgresql://username:password@host:port/database
+
 ```
 
 We **recommend using a database backend** in general, because it provides better performance and reliability than the default file backend.
@@ -146,11 +153,12 @@ By default, the tracking server stores artifacts in its local filesystem under `
 
 bash
 
-```
+```bash
 mlflow server \
     --host 0.0.0.0 \
     --port 8885 \
     --artifacts-destination s3://my-bucket
+
 ```
 
 With this setting, MLflow server works as a proxy for accessing remote artifacts. The MLflow clients make HTTP request to the server for fetching artifacts.
@@ -177,8 +185,9 @@ In some cases, you may want to directly access remote storage without proxying t
 
 bash
 
-```
+```bash
 mlflow server --no-serve-artifacts --default-artifact-root s3://my-bucket
+
 ```
 
 With this setting, the MLflow client still makes minimum HTTP requests to the tracking server for fetching proper remote storage URI, but can directly upload artifacts to / download artifacts from the remote storage. While this might not be a good practice for access and secury governance, it could be useful when you want to avoid the overhead of proxying artifacts through the tracking server.
@@ -203,26 +212,29 @@ When a tracking server is configured in `--artifacts-only` mode, any tasks apart
 
 bash
 
-```
+```bash
 # Launch the artifact-only server
 mlflow server --artifacts-only ...
+
 ```
 
 python
 
-```
+```python
 import requests
 
 # Attempt to list experiments from the server
 response = requests.get("http://0.0.0.0:8885/api/2.0/mlflow/experiments/list")
+
 ```
 
 Output
 
 \_
 
-```
+```_
 >> HTTPError: Endpoint: /api/2.0/mlflow/experiments/list disabled due to the mlflow server running in `--artifacts-only` mode.
+
 ```
 
 Using an additional MLflow server to handle artifacts exclusively can be useful for large-scale MLOps infrastructure. Decoupling the longer running and more compute-intensive tasks of artifact handling from the faster and higher-volume metadata functionality of the other Tracking API requests can help minimize the burden of an otherwise single MLflow server handling both types of payloads.
@@ -245,10 +257,11 @@ Configure these features with simple command-line options:
 
 bash
 
-```
+```bash
 mlflow server --host 0.0.0.0 \
   --allowed-hosts "mlflow.company.com" \
   --cors-allowed-origins "https://app.company.com"
+
 ```
 
 For detailed configuration options, see [Security Configuration](/mlflow-website/docs/latest/self-hosting/security/network.md).
@@ -276,12 +289,13 @@ The version of MLflow running on the server can be found by querying the `/versi
 
 python
 
-```
+```python
 import requests
 import mlflow
 
 response = requests.get("http://<mlflow-host>:<mlflow-port>/version")
 assert response.text == mlflow.__version__  # Checking for a strict version match
+
 ```
 
 ## Model Version Source Validation[​](#model-version-source-validation "Direct link to Model Version Source Validation")
@@ -294,9 +308,10 @@ Set the `MLFLOW_CREATE_MODEL_VERSION_SOURCE_VALIDATION_REGEX` environment variab
 
 bash
 
-```
+```bash
 export MLFLOW_CREATE_MODEL_VERSION_SOURCE_VALIDATION_REGEX="^mlflow-artifacts:/.*$"
 mlflow server --host 0.0.0.0 --port 5000
+
 ```
 
 When this environment variable is set, the tracking server will validate the `source` parameter in model version creation requests against the specified regular expression pattern. If the source doesn't match the pattern, the request will be rejected with an error.
@@ -307,16 +322,17 @@ To only allow model versions from MLflow artifacts storage:
 
 bash
 
-```
+```bash
 export MLFLOW_CREATE_MODEL_VERSION_SOURCE_VALIDATION_REGEX="^mlflow-artifacts:/.*$"
 mlflow server --host 0.0.0.0 --port 5000
+
 ```
 
 With this configuration:
 
 python
 
-```
+```python
 import mlflow
 from mlflow import MlflowClient
 
@@ -335,6 +351,7 @@ client.create_model_version(
     source="s3://my-bucket/model",
     run_id="def456",
 )  # Raises MlflowException: Invalid model version source
+
 ```
 
 ### Example: Restricting to Specific S3 Buckets[​](#example-restricting-to-specific-s3-buckets "Direct link to Example: Restricting to Specific S3 Buckets")
@@ -343,9 +360,10 @@ To only allow model versions from specific S3 buckets:
 
 bash
 
-```
+```bash
 export MLFLOW_CREATE_MODEL_VERSION_SOURCE_VALIDATION_REGEX="^s3://(production-models|staging-models)/.*$"
 mlflow server --host 0.0.0.0 --port 5000
+
 ```
 
 This pattern would allow sources like:
@@ -371,12 +389,13 @@ The version of MLflow running on the server can be found by querying the `/versi
 
 python
 
-```
+```python
 import requests
 import mlflow
 
 response = requests.get("http://<mlflow-host>:<mlflow-port>/version")
 assert response.text == mlflow.__version__  # Checking for a strict version match
+
 ```
 
 ## Handling timeout when uploading/downloading large artifacts[​](#handling-timeout-when-uploadingdownloading-large-artifacts "Direct link to Handling timeout when uploading/downloading large artifacts")
@@ -387,19 +406,20 @@ Example client code:
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_tracking_uri("<TRACKING_SERVER_URI>")
 with mlflow.start_run():
     mlflow.log_artifact("large.txt")
+
 ```
 
 Client traceback:
 
 text
 
-```
+```text
 Traceback (most recent call last):
   File "/Users/user/python3.10/site-packages/requests/adapters.py", line 486, in send
     resp = conn.urlopen(
@@ -412,13 +432,14 @@ Traceback (most recent call last):
     raise MaxRetryError(_pool, url, error or ResponseError(cause))
 urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='mlflow.example.com', port=443): Max retries exceeded with url: ... (Caused by SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:2426)')))
 During handling of the above exception, another exception occurred:
+
 ```
 
 Tracking server logs:
 
 bash
 
-```
+```bash
 INFO:     Started server process [82]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
@@ -426,22 +447,25 @@ INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
 ...
 WARNING:  Request timeout exceeded
 ERROR:    Exception in ASGI application
+
 ```
 
 To mitigate this issue, the timeout length can be increased by using the `--uvicorn-opts` option when starting the server as shown below:
 
 bash
 
-```
+```bash
 mlflow server --uvicorn-opts "--timeout-keep-alive=120" ...
+
 ```
 
 For users still using gunicorn (via `--gunicorn-opts`), the equivalent command would be:
 
 bash
 
-```
+```bash
 mlflow server --gunicorn-opts "--timeout=120" ...
+
 ```
 
 See the [uvicorn settings documentation](https://www.uvicorn.org/settings/) for more configuration options.

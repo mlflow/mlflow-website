@@ -27,7 +27,7 @@ Integrating MLflow in this process is crucial for:
 
 python
 
-```
+```python
 # Disable tokenizers warnings when constructing pipelines
 %env TOKENIZERS_PARALLELISM=false
 
@@ -35,10 +35,7 @@ import warnings
 
 # Disable a few less-than-useful UserWarnings from setuptools and pydantic
 warnings.filterwarnings("ignore", category=UserWarning)
-```
 
-```
-env: TOKENIZERS_PARALLELISM=false
 ```
 
 ### Preparing the Dataset and Environment for Fine-Tuning[​](#preparing-the-dataset-and-environment-for-fine-tuning "Direct link to Preparing the Dataset and Environment for Fine-Tuning")
@@ -55,7 +52,7 @@ This setup ensures that we have a solid foundation for fine-tuning our model, wi
 
 python
 
-```
+```python
 import evaluate
 import numpy as np
 from datasets import load_dataset
@@ -76,14 +73,7 @@ sms_dataset = load_dataset("sms_spam")
 sms_train_test = sms_dataset["train"].train_test_split(test_size=0.2)
 train_dataset = sms_train_test["train"]
 test_dataset = sms_train_test["test"]
-```
 
-```
-Found cached dataset sms_spam (/Users/benjamin.wilson/.cache/huggingface/datasets/sms_spam/plain_text/1.0.0/53f051d3b5f62d99d61792c91acefe4f1577ad3e4c216fb0ad39e30b9f20019c)
-```
-
-```
-  0%|          | 0/1 [00:00<?, ?it/s]
 ```
 
 ### Tokenization and Dataset Preparation[​](#tokenization-and-dataset-preparation "Direct link to Tokenization and Dataset Preparation")
@@ -102,7 +92,7 @@ Tokenization is a critical step in preparing text data for NLP tasks. It ensures
 
 python
 
-```
+```python
 # Load the tokenizer for "distilbert-base-uncased" model.
 tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
 
@@ -126,14 +116,7 @@ train_tokenized = train_tokenized.remove_columns(["sms"]).shuffle(seed=seed)
 
 test_tokenized = test_dataset.map(tokenize_function)
 test_tokenized = test_tokenized.remove_columns(["sms"]).shuffle(seed=seed)
-```
 
-```
-Map:   0%|          | 0/4459 [00:00<?, ? examples/s]
-```
-
-```
-Map:   0%|          | 0/1115 [00:00<?, ? examples/s]
 ```
 
 ### Model Initialization and Label Mapping[​](#model-initialization-and-label-mapping "Direct link to Model Initialization and Label Mapping")
@@ -155,7 +138,7 @@ Proper model initialization and label mapping are key to ensuring that the model
 
 python
 
-```
+```python
 # Set the mapping between int label and its meaning.
 id2label = {0: "ham", 1: "spam"}
 label2id = {"ham": 0, "spam": 1}
@@ -167,11 +150,7 @@ model = AutoModelForSequenceClassification.from_pretrained(
   label2id=label2id,
   id2label=id2label,
 )
-```
 
-```
-Some weights of DistilBertForSequenceClassification were not initialized from the model checkpoint at distilbert-base-uncased and are newly initialized: ['classifier.weight', 'pre_classifier.bias', 'pre_classifier.weight', 'classifier.bias']
-You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
 ```
 
 ### Setting Up Evaluation Metrics[​](#setting-up-evaluation-metrics "Direct link to Setting Up Evaluation Metrics")
@@ -194,7 +173,7 @@ Properly setting up evaluation metrics allows us to objectively measure the mode
 
 python
 
-```
+```python
 # Define the target optimization metric
 metric = evaluate.load("accuracy")
 
@@ -204,6 +183,7 @@ def compute_metrics(eval_pred):
   logits, labels = eval_pred
   predictions = np.argmax(logits, axis=-1)
   return metric.compute(predictions=predictions, references=labels)
+
 ```
 
 ### Configuring the Training Environment[​](#configuring-the-training-environment "Direct link to Configuring the Training Environment")
@@ -230,7 +210,7 @@ In the following code block, we'll configure our training environment and initia
 
 python
 
-```
+```python
 # Checkpoints will be output to this `training_output_dir`.
 training_output_dir = "/tmp/sms_trainer"
 training_args = TrainingArguments(
@@ -250,15 +230,17 @@ trainer = Trainer(
   eval_dataset=test_tokenized,
   compute_metrics=compute_metrics,
 )
+
 ```
 
 python
 
-```
+```python
 # If you are running this tutorial in local mode, leave the next line commented out.
 # Otherwise, uncomment the following line and set your tracking uri to your local or remote tracking server.
 
 # mlflow.set_tracking_uri("http://127.0.0.1:8080")
+
 ```
 
 ### Integrating MLflow for Experiment Tracking[​](#integrating-mlflow-for-experiment-tracking "Direct link to Integrating MLflow for Experiment Tracking")
@@ -286,13 +268,10 @@ In the next code snippet, we'll set up our MLflow experiment for tracking the tr
 
 python
 
-```
+```python
 # Pick a name that you like and reflects the nature of the runs that you will be recording to the experiment.
 mlflow.set_experiment("Spam Classifier Training")
-```
 
-```
-<Experiment: artifact_location='file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/transformers/tutorials/fine-tuning/mlruns/258758267044147956', creation_time=1701291176206, experiment_id='258758267044147956', last_update_time=1701291176206, lifecycle_stage='active', name='Spam Classifier Training', tags={}>
 ```
 
 ### Starting the Training Process with MLflow[​](#starting-the-training-process-with-mlflow "Direct link to Starting the Training Process with MLflow")
@@ -320,250 +299,10 @@ In the next code block, we will start our MLflow run and begin training our mode
 
 python
 
-```
+```python
 with mlflow.start_run() as run:
   trainer.train()
-```
 
-```
-  0%|          | 0/1674 [00:00<?, ?it/s]
-```
-
-```
-{'loss': 0.4891, 'learning_rate': 4.9761051373954604e-05, 'epoch': 0.01}
-{'loss': 0.2662, 'learning_rate': 4.95221027479092e-05, 'epoch': 0.03}
-{'loss': 0.1756, 'learning_rate': 4.92831541218638e-05, 'epoch': 0.04}
-{'loss': 0.107, 'learning_rate': 4.90442054958184e-05, 'epoch': 0.06}
-{'loss': 0.0831, 'learning_rate': 4.8805256869773e-05, 'epoch': 0.07}
-{'loss': 0.0688, 'learning_rate': 4.8566308243727596e-05, 'epoch': 0.09}
-{'loss': 0.0959, 'learning_rate': 4.83273596176822e-05, 'epoch': 0.1}
-{'loss': 0.0831, 'learning_rate': 4.80884109916368e-05, 'epoch': 0.11}
-{'loss': 0.1653, 'learning_rate': 4.78494623655914e-05, 'epoch': 0.13}
-{'loss': 0.1865, 'learning_rate': 4.7610513739546e-05, 'epoch': 0.14}
-{'loss': 0.0887, 'learning_rate': 4.73715651135006e-05, 'epoch': 0.16}
-{'loss': 0.1009, 'learning_rate': 4.71326164874552e-05, 'epoch': 0.17}
-{'loss': 0.1017, 'learning_rate': 4.6893667861409805e-05, 'epoch': 0.19}
-{'loss': 0.0057, 'learning_rate': 4.66547192353644e-05, 'epoch': 0.2}
-{'loss': 0.0157, 'learning_rate': 4.6415770609319e-05, 'epoch': 0.22}
-{'loss': 0.0302, 'learning_rate': 4.61768219832736e-05, 'epoch': 0.23}
-{'loss': 0.0013, 'learning_rate': 4.59378733572282e-05, 'epoch': 0.24}
-{'loss': 0.0863, 'learning_rate': 4.56989247311828e-05, 'epoch': 0.26}
-{'loss': 0.1122, 'learning_rate': 4.54599761051374e-05, 'epoch': 0.27}
-{'loss': 0.1092, 'learning_rate': 4.5221027479092e-05, 'epoch': 0.29}
-{'loss': 0.0853, 'learning_rate': 4.49820788530466e-05, 'epoch': 0.3}
-{'loss': 0.1852, 'learning_rate': 4.4743130227001195e-05, 'epoch': 0.32}
-{'loss': 0.0913, 'learning_rate': 4.4504181600955796e-05, 'epoch': 0.33}
-{'loss': 0.0232, 'learning_rate': 4.42652329749104e-05, 'epoch': 0.34}
-{'loss': 0.0888, 'learning_rate': 4.402628434886499e-05, 'epoch': 0.36}
-{'loss': 0.195, 'learning_rate': 4.378733572281959e-05, 'epoch': 0.37}
-{'loss': 0.0198, 'learning_rate': 4.3548387096774194e-05, 'epoch': 0.39}
-{'loss': 0.056, 'learning_rate': 4.3309438470728796e-05, 'epoch': 0.4}
-{'loss': 0.1656, 'learning_rate': 4.307048984468339e-05, 'epoch': 0.42}
-{'loss': 0.0032, 'learning_rate': 4.283154121863799e-05, 'epoch': 0.43}
-{'loss': 0.1277, 'learning_rate': 4.259259259259259e-05, 'epoch': 0.44}
-{'loss': 0.0029, 'learning_rate': 4.2353643966547194e-05, 'epoch': 0.46}
-{'loss': 0.1007, 'learning_rate': 4.2114695340501795e-05, 'epoch': 0.47}
-{'loss': 0.0038, 'learning_rate': 4.1875746714456396e-05, 'epoch': 0.49}
-{'loss': 0.0035, 'learning_rate': 4.1636798088411e-05, 'epoch': 0.5}
-{'loss': 0.0015, 'learning_rate': 4.13978494623656e-05, 'epoch': 0.52}
-{'loss': 0.1423, 'learning_rate': 4.115890083632019e-05, 'epoch': 0.53}
-{'loss': 0.0316, 'learning_rate': 4.0919952210274794e-05, 'epoch': 0.54}
-{'loss': 0.0012, 'learning_rate': 4.0681003584229395e-05, 'epoch': 0.56}
-{'loss': 0.0009, 'learning_rate': 4.0442054958183996e-05, 'epoch': 0.57}
-{'loss': 0.1287, 'learning_rate': 4.020310633213859e-05, 'epoch': 0.59}
-{'loss': 0.0893, 'learning_rate': 3.996415770609319e-05, 'epoch': 0.6}
-{'loss': 0.0021, 'learning_rate': 3.972520908004779e-05, 'epoch': 0.62}
-{'loss': 0.0031, 'learning_rate': 3.9486260454002395e-05, 'epoch': 0.63}
-{'loss': 0.0022, 'learning_rate': 3.924731182795699e-05, 'epoch': 0.65}
-{'loss': 0.0008, 'learning_rate': 3.900836320191159e-05, 'epoch': 0.66}
-{'loss': 0.1119, 'learning_rate': 3.876941457586619e-05, 'epoch': 0.67}
-{'loss': 0.0012, 'learning_rate': 3.8530465949820786e-05, 'epoch': 0.69}
-{'loss': 0.2618, 'learning_rate': 3.829151732377539e-05, 'epoch': 0.7}
-{'loss': 0.0018, 'learning_rate': 3.805256869772999e-05, 'epoch': 0.72}
-{'loss': 0.0736, 'learning_rate': 3.781362007168459e-05, 'epoch': 0.73}
-{'loss': 0.0126, 'learning_rate': 3.7574671445639184e-05, 'epoch': 0.75}
-{'loss': 0.2125, 'learning_rate': 3.7335722819593785e-05, 'epoch': 0.76}
-{'loss': 0.0018, 'learning_rate': 3.7096774193548386e-05, 'epoch': 0.77}
-{'loss': 0.1386, 'learning_rate': 3.685782556750299e-05, 'epoch': 0.79}
-{'loss': 0.0024, 'learning_rate': 3.661887694145759e-05, 'epoch': 0.8}
-{'loss': 0.0016, 'learning_rate': 3.637992831541219e-05, 'epoch': 0.82}
-{'loss': 0.0011, 'learning_rate': 3.614097968936679e-05, 'epoch': 0.83}
-{'loss': 0.0307, 'learning_rate': 3.590203106332139e-05, 'epoch': 0.85}
-{'loss': 0.0007, 'learning_rate': 3.566308243727599e-05, 'epoch': 0.86}
-{'loss': 0.005, 'learning_rate': 3.542413381123059e-05, 'epoch': 0.87}
-{'loss': 0.0534, 'learning_rate': 3.518518518518519e-05, 'epoch': 0.89}
-{'loss': 0.0155, 'learning_rate': 3.494623655913979e-05, 'epoch': 0.9}
-{'loss': 0.0136, 'learning_rate': 3.4707287933094385e-05, 'epoch': 0.92}
-{'loss': 0.1108, 'learning_rate': 3.4468339307048986e-05, 'epoch': 0.93}
-{'loss': 0.0017, 'learning_rate': 3.422939068100359e-05, 'epoch': 0.95}
-{'loss': 0.0009, 'learning_rate': 3.399044205495819e-05, 'epoch': 0.96}
-{'loss': 0.0008, 'learning_rate': 3.375149342891278e-05, 'epoch': 0.97}
-{'loss': 0.0846, 'learning_rate': 3.3512544802867384e-05, 'epoch': 0.99}
-```
-
-```
-  0%|          | 0/140 [00:00<?, ?it/s]
-```
-
-```
-{'eval_loss': 0.03877367451786995, 'eval_accuracy': 0.9919282511210762, 'eval_runtime': 5.0257, 'eval_samples_per_second': 221.862, 'eval_steps_per_second': 27.857, 'epoch': 1.0}
-{'loss': 0.109, 'learning_rate': 3.3273596176821985e-05, 'epoch': 1.0}
-{'loss': 0.0084, 'learning_rate': 3.3034647550776586e-05, 'epoch': 1.02}
-{'loss': 0.0014, 'learning_rate': 3.279569892473118e-05, 'epoch': 1.03}
-{'loss': 0.0008, 'learning_rate': 3.255675029868578e-05, 'epoch': 1.05}
-{'loss': 0.0006, 'learning_rate': 3.231780167264038e-05, 'epoch': 1.06}
-{'loss': 0.0005, 'learning_rate': 3.207885304659498e-05, 'epoch': 1.08}
-{'loss': 0.0004, 'learning_rate': 3.183990442054958e-05, 'epoch': 1.09}
-{'loss': 0.0518, 'learning_rate': 3.160095579450418e-05, 'epoch': 1.1}
-{'loss': 0.0005, 'learning_rate': 3.136200716845878e-05, 'epoch': 1.12}
-{'loss': 0.149, 'learning_rate': 3.112305854241338e-05, 'epoch': 1.13}
-{'loss': 0.0022, 'learning_rate': 3.0884109916367984e-05, 'epoch': 1.15}
-{'loss': 0.0013, 'learning_rate': 3.0645161290322585e-05, 'epoch': 1.16}
-{'loss': 0.0051, 'learning_rate': 3.0406212664277183e-05, 'epoch': 1.18}
-{'loss': 0.0005, 'learning_rate': 3.016726403823178e-05, 'epoch': 1.19}
-{'loss': 0.0026, 'learning_rate': 2.9928315412186382e-05, 'epoch': 1.2}
-{'loss': 0.0005, 'learning_rate': 2.9689366786140983e-05, 'epoch': 1.22}
-{'loss': 0.0871, 'learning_rate': 2.9450418160095584e-05, 'epoch': 1.23}
-{'loss': 0.0004, 'learning_rate': 2.921146953405018e-05, 'epoch': 1.25}
-{'loss': 0.0004, 'learning_rate': 2.897252090800478e-05, 'epoch': 1.26}
-{'loss': 0.0003, 'learning_rate': 2.873357228195938e-05, 'epoch': 1.28}
-{'loss': 0.0003, 'learning_rate': 2.8494623655913982e-05, 'epoch': 1.29}
-{'loss': 0.0003, 'learning_rate': 2.8255675029868577e-05, 'epoch': 1.3}
-{'loss': 0.0478, 'learning_rate': 2.8016726403823178e-05, 'epoch': 1.32}
-{'loss': 0.0002, 'learning_rate': 2.777777777777778e-05, 'epoch': 1.33}
-{'loss': 0.0002, 'learning_rate': 2.753882915173238e-05, 'epoch': 1.35}
-{'loss': 0.0003, 'learning_rate': 2.7299880525686978e-05, 'epoch': 1.36}
-{'loss': 0.0002, 'learning_rate': 2.706093189964158e-05, 'epoch': 1.38}
-{'loss': 0.0005, 'learning_rate': 2.682198327359618e-05, 'epoch': 1.39}
-{'loss': 0.0002, 'learning_rate': 2.6583034647550775e-05, 'epoch': 1.41}
-{'loss': 0.0003, 'learning_rate': 2.6344086021505376e-05, 'epoch': 1.42}
-{'loss': 0.0002, 'learning_rate': 2.6105137395459977e-05, 'epoch': 1.43}
-{'loss': 0.0002, 'learning_rate': 2.586618876941458e-05, 'epoch': 1.45}
-{'loss': 0.0002, 'learning_rate': 2.5627240143369173e-05, 'epoch': 1.46}
-{'loss': 0.0007, 'learning_rate': 2.5388291517323774e-05, 'epoch': 1.48}
-{'loss': 0.1336, 'learning_rate': 2.5149342891278375e-05, 'epoch': 1.49}
-{'loss': 0.0004, 'learning_rate': 2.4910394265232977e-05, 'epoch': 1.51}
-{'loss': 0.0671, 'learning_rate': 2.4671445639187578e-05, 'epoch': 1.52}
-{'loss': 0.0004, 'learning_rate': 2.4432497013142176e-05, 'epoch': 1.53}
-{'loss': 0.1246, 'learning_rate': 2.4193548387096777e-05, 'epoch': 1.55}
-{'loss': 0.1142, 'learning_rate': 2.3954599761051375e-05, 'epoch': 1.56}
-{'loss': 0.002, 'learning_rate': 2.3715651135005976e-05, 'epoch': 1.58}
-{'loss': 0.002, 'learning_rate': 2.3476702508960574e-05, 'epoch': 1.59}
-{'loss': 0.0009, 'learning_rate': 2.3237753882915175e-05, 'epoch': 1.61}
-{'loss': 0.0778, 'learning_rate': 2.2998805256869773e-05, 'epoch': 1.62}
-{'loss': 0.0007, 'learning_rate': 2.2759856630824374e-05, 'epoch': 1.63}
-{'loss': 0.0008, 'learning_rate': 2.2520908004778972e-05, 'epoch': 1.65}
-{'loss': 0.0009, 'learning_rate': 2.2281959378733573e-05, 'epoch': 1.66}
-{'loss': 0.1032, 'learning_rate': 2.2043010752688174e-05, 'epoch': 1.68}
-{'loss': 0.0014, 'learning_rate': 2.1804062126642775e-05, 'epoch': 1.69}
-{'loss': 0.001, 'learning_rate': 2.1565113500597373e-05, 'epoch': 1.71}
-{'loss': 0.1199, 'learning_rate': 2.132616487455197e-05, 'epoch': 1.72}
-{'loss': 0.0009, 'learning_rate': 2.1087216248506572e-05, 'epoch': 1.73}
-{'loss': 0.0011, 'learning_rate': 2.084826762246117e-05, 'epoch': 1.75}
-{'loss': 0.0007, 'learning_rate': 2.060931899641577e-05, 'epoch': 1.76}
-{'loss': 0.0006, 'learning_rate': 2.037037037037037e-05, 'epoch': 1.78}
-{'loss': 0.0004, 'learning_rate': 2.013142174432497e-05, 'epoch': 1.79}
-{'loss': 0.0005, 'learning_rate': 1.989247311827957e-05, 'epoch': 1.81}
-{'loss': 0.1246, 'learning_rate': 1.9653524492234173e-05, 'epoch': 1.82}
-{'loss': 0.0974, 'learning_rate': 1.941457586618877e-05, 'epoch': 1.84}
-{'loss': 0.0003, 'learning_rate': 1.9175627240143372e-05, 'epoch': 1.85}
-{'loss': 0.0007, 'learning_rate': 1.893667861409797e-05, 'epoch': 1.86}
-{'loss': 0.1998, 'learning_rate': 1.869772998805257e-05, 'epoch': 1.88}
-{'loss': 0.0426, 'learning_rate': 1.845878136200717e-05, 'epoch': 1.89}
-{'loss': 0.002, 'learning_rate': 1.821983273596177e-05, 'epoch': 1.91}
-{'loss': 0.0009, 'learning_rate': 1.7980884109916368e-05, 'epoch': 1.92}
-{'loss': 0.0027, 'learning_rate': 1.774193548387097e-05, 'epoch': 1.94}
-{'loss': 0.0004, 'learning_rate': 1.7502986857825567e-05, 'epoch': 1.95}
-{'loss': 0.0003, 'learning_rate': 1.7264038231780168e-05, 'epoch': 1.96}
-{'loss': 0.1081, 'learning_rate': 1.702508960573477e-05, 'epoch': 1.98}
-{'loss': 0.0005, 'learning_rate': 1.678614097968937e-05, 'epoch': 1.99}
-```
-
-```
-  0%|          | 0/140 [00:00<?, ?it/s]
-```
-
-```
-{'eval_loss': 0.014878345653414726, 'eval_accuracy': 0.9973094170403587, 'eval_runtime': 4.0209, 'eval_samples_per_second': 277.3, 'eval_steps_per_second': 34.818, 'epoch': 2.0}
-{'loss': 0.0005, 'learning_rate': 1.6547192353643968e-05, 'epoch': 2.01}
-{'loss': 0.0005, 'learning_rate': 1.630824372759857e-05, 'epoch': 2.02}
-{'loss': 0.0004, 'learning_rate': 1.6069295101553167e-05, 'epoch': 2.04}
-{'loss': 0.0005, 'learning_rate': 1.5830346475507768e-05, 'epoch': 2.05}
-{'loss': 0.0004, 'learning_rate': 1.5591397849462366e-05, 'epoch': 2.06}
-{'loss': 0.0135, 'learning_rate': 1.5352449223416964e-05, 'epoch': 2.08}
-{'loss': 0.0014, 'learning_rate': 1.5113500597371565e-05, 'epoch': 2.09}
-{'loss': 0.0003, 'learning_rate': 1.4874551971326165e-05, 'epoch': 2.11}
-{'loss': 0.0003, 'learning_rate': 1.4635603345280766e-05, 'epoch': 2.12}
-{'loss': 0.0002, 'learning_rate': 1.4396654719235364e-05, 'epoch': 2.14}
-{'loss': 0.0002, 'learning_rate': 1.4157706093189965e-05, 'epoch': 2.15}
-{'loss': 0.0003, 'learning_rate': 1.3918757467144564e-05, 'epoch': 2.16}
-{'loss': 0.0008, 'learning_rate': 1.3679808841099166e-05, 'epoch': 2.18}
-{'loss': 0.0002, 'learning_rate': 1.3440860215053763e-05, 'epoch': 2.19}
-{'loss': 0.0002, 'learning_rate': 1.3201911589008365e-05, 'epoch': 2.21}
-{'loss': 0.0003, 'learning_rate': 1.2962962962962962e-05, 'epoch': 2.22}
-{'loss': 0.0002, 'learning_rate': 1.2724014336917564e-05, 'epoch': 2.24}
-{'loss': 0.0002, 'learning_rate': 1.2485065710872163e-05, 'epoch': 2.25}
-{'loss': 0.0002, 'learning_rate': 1.2246117084826763e-05, 'epoch': 2.27}
-{'loss': 0.0006, 'learning_rate': 1.2007168458781362e-05, 'epoch': 2.28}
-{'loss': 0.0875, 'learning_rate': 1.1768219832735962e-05, 'epoch': 2.29}
-{'loss': 0.0002, 'learning_rate': 1.1529271206690561e-05, 'epoch': 2.31}
-{'loss': 0.0003, 'learning_rate': 1.129032258064516e-05, 'epoch': 2.32}
-{'loss': 0.0002, 'learning_rate': 1.1051373954599762e-05, 'epoch': 2.34}
-{'loss': 0.0002, 'learning_rate': 1.0812425328554361e-05, 'epoch': 2.35}
-{'loss': 0.0003, 'learning_rate': 1.0573476702508961e-05, 'epoch': 2.37}
-{'loss': 0.0006, 'learning_rate': 1.033452807646356e-05, 'epoch': 2.38}
-{'loss': 0.0002, 'learning_rate': 1.009557945041816e-05, 'epoch': 2.39}
-{'loss': 0.0002, 'learning_rate': 9.856630824372761e-06, 'epoch': 2.41}
-{'loss': 0.0002, 'learning_rate': 9.61768219832736e-06, 'epoch': 2.42}
-{'loss': 0.0002, 'learning_rate': 9.37873357228196e-06, 'epoch': 2.44}
-{'loss': 0.0002, 'learning_rate': 9.13978494623656e-06, 'epoch': 2.45}
-{'loss': 0.0002, 'learning_rate': 8.90083632019116e-06, 'epoch': 2.47}
-{'loss': 0.0002, 'learning_rate': 8.661887694145759e-06, 'epoch': 2.48}
-{'loss': 0.0002, 'learning_rate': 8.42293906810036e-06, 'epoch': 2.49}
-{'loss': 0.0909, 'learning_rate': 8.18399044205496e-06, 'epoch': 2.51}
-{'loss': 0.0002, 'learning_rate': 7.945041816009559e-06, 'epoch': 2.52}
-{'loss': 0.0788, 'learning_rate': 7.706093189964159e-06, 'epoch': 2.54}
-{'loss': 0.0003, 'learning_rate': 7.467144563918758e-06, 'epoch': 2.55}
-{'loss': 0.0002, 'learning_rate': 7.228195937873358e-06, 'epoch': 2.57}
-{'loss': 0.0011, 'learning_rate': 6.989247311827957e-06, 'epoch': 2.58}
-{'loss': 0.0003, 'learning_rate': 6.7502986857825566e-06, 'epoch': 2.59}
-{'loss': 0.0002, 'learning_rate': 6.511350059737156e-06, 'epoch': 2.61}
-{'loss': 0.0002, 'learning_rate': 6.2724014336917564e-06, 'epoch': 2.62}
-{'loss': 0.0003, 'learning_rate': 6.033452807646357e-06, 'epoch': 2.64}
-{'loss': 0.0003, 'learning_rate': 5.794504181600956e-06, 'epoch': 2.65}
-{'loss': 0.0002, 'learning_rate': 5.555555555555556e-06, 'epoch': 2.67}
-{'loss': 0.0002, 'learning_rate': 5.316606929510155e-06, 'epoch': 2.68}
-{'loss': 0.0002, 'learning_rate': 5.077658303464755e-06, 'epoch': 2.7}
-{'loss': 0.0002, 'learning_rate': 4.838709677419355e-06, 'epoch': 2.71}
-{'loss': 0.0002, 'learning_rate': 4.599761051373955e-06, 'epoch': 2.72}
-{'loss': 0.0002, 'learning_rate': 4.360812425328554e-06, 'epoch': 2.74}
-{'loss': 0.0002, 'learning_rate': 4.121863799283155e-06, 'epoch': 2.75}
-{'loss': 0.0002, 'learning_rate': 3.882915173237754e-06, 'epoch': 2.77}
-{'loss': 0.0002, 'learning_rate': 3.643966547192354e-06, 'epoch': 2.78}
-{'loss': 0.0002, 'learning_rate': 3.405017921146954e-06, 'epoch': 2.8}
-{'loss': 0.0429, 'learning_rate': 3.1660692951015535e-06, 'epoch': 2.81}
-{'loss': 0.0002, 'learning_rate': 2.927120669056153e-06, 'epoch': 2.82}
-{'loss': 0.0002, 'learning_rate': 2.688172043010753e-06, 'epoch': 2.84}
-{'loss': 0.0002, 'learning_rate': 2.449223416965353e-06, 'epoch': 2.85}
-{'loss': 0.0761, 'learning_rate': 2.2102747909199524e-06, 'epoch': 2.87}
-{'loss': 0.0007, 'learning_rate': 1.971326164874552e-06, 'epoch': 2.88}
-{'loss': 0.0002, 'learning_rate': 1.7323775388291518e-06, 'epoch': 2.9}
-{'loss': 0.0002, 'learning_rate': 1.4934289127837516e-06, 'epoch': 2.91}
-{'loss': 0.0003, 'learning_rate': 1.2544802867383513e-06, 'epoch': 2.92}
-{'loss': 0.0003, 'learning_rate': 1.015531660692951e-06, 'epoch': 2.94}
-{'loss': 0.0144, 'learning_rate': 7.765830346475508e-07, 'epoch': 2.95}
-{'loss': 0.0568, 'learning_rate': 5.376344086021506e-07, 'epoch': 2.97}
-{'loss': 0.0001, 'learning_rate': 2.9868578255675034e-07, 'epoch': 2.98}
-{'loss': 0.0002, 'learning_rate': 5.973715651135006e-08, 'epoch': 3.0}
-```
-
-```
-  0%|          | 0/140 [00:00<?, ?it/s]
-```
-
-```
-{'eval_loss': 0.026208847761154175, 'eval_accuracy': 0.9937219730941704, 'eval_runtime': 4.0835, 'eval_samples_per_second': 273.052, 'eval_steps_per_second': 34.285, 'epoch': 3.0}
-{'train_runtime': 244.4781, 'train_samples_per_second': 54.717, 'train_steps_per_second': 6.847, 'train_loss': 0.0351541918909871, 'epoch': 3.0}
 ```
 
 ### Creating a Pipeline with the Fine-Tuned Model[​](#creating-a-pipeline-with-the-fine-tuned-model "Direct link to Creating a Pipeline with the Fine-Tuned Model")
@@ -591,7 +330,7 @@ In the following code block, we'll set up our pipeline with the fine-tuned model
 
 python
 
-```
+```python
 # If you're going to run this on something other than a Macbook Pro, change the device to the applicable type. "mps" is for Apple Silicon architecture in torch.
 
 tuned_pipeline = pipeline(
@@ -601,6 +340,7 @@ tuned_pipeline = pipeline(
   tokenizer=tokenizer,
   device="mps",
 )
+
 ```
 
 ### Validating the Fine-Tuned Model[​](#validating-the-fine-tuned-model "Direct link to Validating the Fine-Tuned Model")
@@ -629,7 +369,7 @@ In the next code block, we will run a test query through our fine-tuned model to
 
 python
 
-```
+```python
 # Perform a validation of our assembled pipeline that contains our fine-tuned model.
 quick_check = (
   "I have a question regarding the project development timeline and allocated resources; "
@@ -638,10 +378,7 @@ quick_check = (
 )
 
 tuned_pipeline(quick_check)
-```
 
-```
-[{'label': 'ham', 'score': 0.9985793828964233}]
 ```
 
 ### Model Configuration and Signature Inference[​](#model-configuration-and-signature-inference "Direct link to Model Configuration and Signature Inference")
@@ -668,7 +405,7 @@ With the model configuration set and its signature inferred, we are now ready to
 
 python
 
-```
+```python
 # Define a set of parameters that we would like to be able to flexibly override at inference time, along with their default values
 model_config = {"batch_size": 8}
 
@@ -680,6 +417,7 @@ signature = mlflow.models.infer_signature(
   ),
   params=model_config,
 )
+
 ```
 
 ### Logging the Fine-Tuned Model to MLflow[​](#logging-the-fine-tuned-model-to-mlflow "Direct link to Logging the Fine-Tuned Model to MLflow")
@@ -716,7 +454,7 @@ By logging our model in MLflow, we ensure that it is well-documented, versioned,
 
 python
 
-```
+```python
 # Log the pipeline to the existing training run
 with mlflow.start_run(run_id=run.info.run_id):
   model_info = mlflow.transformers.log_model(
@@ -726,10 +464,7 @@ with mlflow.start_run(run_id=run.info.run_id):
       input_example=["Pass in a string", "And have it mark as spam or not."],
       model_config=model_config,
   )
-```
 
-```
-2023/11/30 12:17:11 WARNING mlflow.utils.environment: Encountered an unexpected error while inferring pip requirements (model URI: /var/folders/cd/n8n0rm2x53l_s0xv_j_xklb00000gp/T/tmp77_imuy9/model, flavor: transformers), fall back to return ['transformers==4.34.1', 'torch==2.1.0', 'torchvision==0.16.0', 'accelerate==0.21.0']. Set logging level to DEBUG to see the full traceback.
 ```
 
 ### Loading and Testing the Model from MLflow[​](#loading-and-testing-the-model-from-mlflow "Direct link to Loading and Testing the Model from MLflow")
@@ -756,7 +491,7 @@ In the next code block, we'll load our model from MLflow and test it with a vali
 
 python
 
-```
+```python
 # Load our saved model in the native transformers format
 loaded = mlflow.transformers.load_model(model_uri=model_info.model_uri)
 
@@ -768,15 +503,7 @@ validation_text = (
 
 # validate the performance of our fine-tuning
 loaded(validation_text)
-```
 
-```
-2023/11/30 12:17:11 INFO mlflow.transformers: 'runs:/e3260e8511c94c38aafb7124509240a4/fine_tuned' resolved as 'file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/transformers/tutorials/fine-tuning/mlruns/258758267044147956/e3260e8511c94c38aafb7124509240a4/artifacts/fine_tuned'
-2023/11/30 12:17:11 WARNING mlflow.transformers: Could not specify device parameter for this pipeline type
-```
-
-```
-[{'label': 'spam', 'score': 0.9873914122581482}]
 ```
 
 ### Conclusion: Mastering Fine-Tuning and MLflow Integration[​](#conclusion-mastering-fine-tuning-and-mlflow-integration "Direct link to Conclusion: Mastering Fine-Tuning and MLflow Integration")

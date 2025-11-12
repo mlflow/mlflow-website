@@ -11,15 +11,16 @@
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.langchain.autolog()
+
 ```
 
 typescript
 
-```
+```typescript
 import { MlflowCallback } from "mlflow-langchain";
 
 const tracer = new MlflowCallback();
@@ -28,6 +29,7 @@ await agent.invoke(
   { messages: [{ role: "user", content: "What is MLflow?" }] },
   { callbacks: [tracer] }
 );
+
 ```
 
 tip
@@ -41,7 +43,7 @@ MLflow LangChain integration is not only about tracing. MLflow offers full track
 
 python
 
-```
+```python
 import mlflow
 import os
 
@@ -74,11 +76,12 @@ chain.invoke(
         "question": "Can I just set everyone's access to sudo to make things easier?",
     }
 )
+
 ```
 
 typescript
 
-```
+```typescript
 import * as mlflow from "mlflow-tracing";
 import { MlflowCallback } from "mlflow-langchain";
 import { ChatOpenAI } from "@langchain/openai";
@@ -108,6 +111,7 @@ await chain.invoke(
   },
   { callbacks: [tracer] }
 );
+
 ```
 
 note
@@ -116,8 +120,9 @@ This example above has been confirmed working with the following requirement ver
 
 shell
 
-```
+```shell
 pip install openai==1.30.5 langchain==0.2.1 langchain-openai==0.1.8 langchain-community==0.2.1 mlflow==2.14.0 tiktoken==0.7.0
+
 ```
 
 ### Supported APIs[​](#supported-apis "Direct link to Supported APIs")
@@ -142,7 +147,7 @@ MLflow >= 3.1.0 supports token usage tracking for LangChain. The token usage for
 
 python
 
-```
+```python
 import json
 import mlflow
 
@@ -175,11 +180,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 typescript
 
-```
+```typescript
 import * as mlflow from "mlflow-tracing";
 
 // After your LangChain call completes, flush and fetch the trace
@@ -203,11 +209,12 @@ if (lastTraceId) {
     }
   }
 }
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 81
   Output tokens: 257
@@ -218,6 +225,7 @@ ChatOpenAI:
   Input tokens: 81
   Output tokens: 257
   Total tokens: 338
+
 ```
 
 ### Customize Tracing Behavior[​](#customize-tracing-behavior "Direct link to Customize Tracing Behavior")
@@ -228,7 +236,7 @@ The following example demonstrates how to record an additional attribute to the 
 
 python
 
-```
+```python
 from mlflow.langchain.langchain_tracer import MlflowLangchainTracer
 
 
@@ -263,6 +271,7 @@ class CustomLangchainTracer(MlflowLangchainTracer):
             inputs=messages,
             attributes=kwargs,
         )
+
 ```
 
 ### Disable auto-tracing[​](#disable-auto-tracing "Direct link to Disable auto-tracing")

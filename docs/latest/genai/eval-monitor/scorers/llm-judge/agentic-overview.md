@@ -54,7 +54,7 @@ To create an Agent-as-a-Judge, simply call the `make_judge` API and pass an inst
 
 python
 
-```
+```python
 import mlflow
 from mlflow.genai.judges import make_judge
 from typing import Literal
@@ -75,6 +75,7 @@ performance_judge = make_judge(
     model="openai:/gpt-5",
     # model="anthropic:/claude-opus-4-1-20250805",
 )
+
 ```
 
 note
@@ -85,7 +86,7 @@ Then, generate a trace from your application and pass it to the scorer:
 
 python
 
-```
+```python
 @mlflow.trace
 def slow_data_processor(query: str):
     """Example application with performance bottlenecks."""
@@ -111,11 +112,12 @@ feedback = performance_judge(trace=trace)
 
 print(f"Performance Rating: {feedback.value}")
 print(f"Analysis: {feedback.rationale}")
+
 ```
 
 text
 
-```
+```text
 Performance Rating: needs_improvement
 Analysis: Found critical performance issues:
 1. The 'fetch_data' span took 2.5 seconds, exceeding the 2-second threshold
@@ -123,6 +125,7 @@ Analysis: Found critical performance issues:
    redundant_api_call_2) that appear to be duplicate operations
 3. Total execution time of 4 seconds could be optimized by parallelizing
    the redundant operations or implementing caching
+
 ```
 
 ![Agent-as-a-Judge Evaluation Results](/mlflow-website/docs/latest/images/mlflow-3/eval-monitor/scorers/agentic-judge-result.png)
@@ -133,7 +136,7 @@ To apply the scorer to a batch of traces, use the [mlflow.genai.evaluate](/mlflo
 
 python
 
-```
+```python
 import mlflow
 
 # Retrieve traces from MLflow
@@ -144,6 +147,7 @@ results = mlflow.genai.evaluate(
     data=traces,
     scorers=[performance_judge],
 )
+
 ```
 
 ## Advanced Examples[​](#advanced-examples "Direct link to Advanced Examples")
@@ -156,7 +160,7 @@ results = mlflow.genai.evaluate(
 
 python
 
-```
+```python
 tool_optimization_judge = make_judge(
     name="tool_optimizer",
     instructions=(
@@ -172,11 +176,12 @@ tool_optimization_judge = make_judge(
     feedback_value_type=Literal["optimal", "good", "suboptimal", "poor"],
     model="anthropic:/claude-opus-4-1-20250805",
 )
+
 ```
 
 python
 
-```
+```python
 loop_detector_judge = make_judge(
     name="loop_detector",
     instructions=(
@@ -192,11 +197,12 @@ loop_detector_judge = make_judge(
     feedback_value_type=Literal["clean", "warning", "critical"],
     model="anthropic:/claude-opus-4-1-20250805",
 )
+
 ```
 
 python
 
-```
+```python
 reasoning_judge = make_judge(
     name="reasoning_validator",
     instructions=(
@@ -212,11 +218,12 @@ reasoning_judge = make_judge(
     feedback_value_type=int,
     model="anthropic:/claude-opus-4-1-20250805",
 )
+
 ```
 
 python
 
-```
+```python
 rag_judge = make_judge(
     name="rag_evaluator",
     instructions=(
@@ -243,11 +250,12 @@ def rag_pipeline(query):
 result = rag_pipeline("What is MLflow?")
 trace = mlflow.get_last_active_trace()
 evaluation = rag_judge(trace=trace)
+
 ```
 
 python
 
-```
+```python
 error_handling_judge = make_judge(
     name="error_handler_checker",
     instructions=(
@@ -263,6 +271,7 @@ error_handling_judge = make_judge(
     feedback_value_type=Literal["robust", "adequate", "fragile"],
     model="anthropic:/claude-opus-4-1-20250805",
 )
+
 ```
 
 ## Debugging Agent Judges[​](#debugging-agent-judges "Direct link to Debugging Agent Judges")
@@ -271,7 +280,7 @@ To see the actual MCP tool calls that the Agent-as-a-Judge makes while analyzing
 
 python
 
-```
+```python
 import logging
 
 # Enable debug logging to see agent tool calls
@@ -281,19 +290,21 @@ logger.setLevel(logging.DEBUG)
 
 # Now when you run the judge, you'll see detailed tool usage
 feedback = performance_judge(trace=trace)
+
 ```
 
 With debug logging enabled, you'll see output like:
 
 text
 
-```
+```text
 DEBUG:mlflow.genai.judges:Calling tool: GetTraceInfo
 DEBUG:mlflow.genai.judges:Tool response: {"trace_id": "abc123", "duration_ms": 4000, ...}
 DEBUG:mlflow.genai.judges:Calling tool: ListSpans
 DEBUG:mlflow.genai.judges:Tool response: [{"span_id": "def456", "name": "fetch_data", ...}]
 DEBUG:mlflow.genai.judges:Calling tool: GetSpan with span_id=def456
 DEBUG:mlflow.genai.judges:Tool response: {"duration_ms": 2500, "inputs": {"query": "SELECT * FROM users"}, ...}
+
 ```
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")

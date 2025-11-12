@@ -12,18 +12,19 @@ First, create a simple agent to evaluate:
 
 python
 
-```
+```python
 # Create a toy agent that responds to questions
 def my_agent(question):
     # Simple toy agent that echoes back
     return f"You asked about: {question}"
+
 ```
 
 Then create a judge to evaluate the agent's responses:
 
 python
 
-```
+```python
 from mlflow.genai.judges import make_judge
 from typing import Literal
 
@@ -39,13 +40,14 @@ coherence_judge = make_judge(
     feedback_value_type=Literal["coherent", "somewhat coherent", "incoherent"],
     model="anthropic:/claude-opus-4-1-20250805",
 )
+
 ```
 
 Now evaluate the single agent's response:
 
 python
 
-```
+```python
 # Get agent response
 question = "What is machine learning?"
 response = my_agent(question)
@@ -57,13 +59,14 @@ feedback = coherence_judge(
 )
 print(f"Score: {feedback.value}")
 print(f"Rationale: {feedback.rationale}")
+
 ```
 
 To evaluate a batch of responses and track results in MLflow, use the [mlflow.genai.evaluate](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.evaluate) function.
 
 python
 
-```
+```python
 test_data = [
     {"inputs": {"question": "What is machine learning?"}},
     {"inputs": {"question": "What is distributed computing?"}},
@@ -75,6 +78,7 @@ results = mlflow.genai.evaluate(
     predict_fn=my_agent,
     scorers=[coherence_judge],
 )
+
 ```
 
 Navigate to the link displayed in the console to view the evaluation results.
@@ -90,7 +94,7 @@ Navigate to the link displayed in the console to view the evaluation results.
 
 python
 
-```
+```python
 from typing import Literal
 
 completeness_judge = make_judge(
@@ -103,11 +107,12 @@ completeness_judge = make_judge(
     feedback_value_type=Literal["complete", "incomplete"],
     model="anthropic:/claude-opus-4-1-20250805",
 )
+
 ```
 
 python
 
-```
+```python
 from typing import Literal
 
 safety_judge = make_judge(
@@ -120,11 +125,12 @@ safety_judge = make_judge(
     feedback_value_type=Literal["safe", "unsafe"],
     model="anthropic:/claude-opus-4-1-20250805",
 )
+
 ```
 
 python
 
-```
+```python
 from typing import Literal
 
 grounded_judge = make_judge(
@@ -136,11 +142,12 @@ grounded_judge = make_judge(
     feedback_value_type=Literal["fully", "partially", "not"],
     model="anthropic:/claude-opus-4-1-20250805",
 )
+
 ```
 
 python
 
-```
+```python
 from typing import Literal
 
 conditional_judge = make_judge(
@@ -160,6 +167,7 @@ conditional_judge = make_judge(
     feedback_value_type=Literal["appropriate", "inappropriate"],
     model="anthropic:/claude-opus-4-1-20250805",
 )
+
 ```
 
 ## Template Format[​](#template-format "Direct link to Template Format")

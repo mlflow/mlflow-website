@@ -32,31 +32,9 @@ Please ensure your GPU has at least 20GB of VRAM available. This notebook has be
 
 python
 
-```
+```python
 %sh nvidia-smi
-```
 
-```
-Wed Feb 21 07:16:13 2024       
-+---------------------------------------------------------------------------------------+
-| NVIDIA-SMI 535.54.03              Driver Version: 535.54.03    CUDA Version: 12.2     |
-|-----------------------------------------+----------------------+----------------------+
-| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
-| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
-|                                         |                      |               MIG M. |
-|=========================================+======================+======================|
-|   0  NVIDIA A10G                    Off | 00000000:00:1E.0 Off |                    0 |
-|  0%   15C    P8              16W / 300W |      4MiB / 23028MiB |      0%      Default |
-|                                         |                      |                  N/A |
-+-----------------------------------------+----------------------+----------------------+
-                                                                                       
-+---------------------------------------------------------------------------------------+
-| Processes:                                                                            |
-|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
-|        ID   ID                                                             Usage      |
-|=======================================================================================|
-|  No running processes found                                                           |
-+---------------------------------------------------------------------------------------+
 ```
 
 ### Install Python Libraries[​](#install-python-libraries "Direct link to Install Python Libraries")
@@ -76,9 +54,10 @@ The notebook has been tested with `mlflow==2.11.0`, `transformers==4.35.2`, `pef
 
 python
 
-```
+```python
 %pip install mlflow>=2.11.0
 %pip install transformers peft accelerate bitsandbytes datasets -q -U
+
 ```
 
 ## 2. Dataset Preparation[​](#2-dataset-preparation "Direct link to 2. Dataset Preparation")
@@ -93,7 +72,7 @@ We will use the `b-mc2/sql-create-context` dataset from the [Hugging Face Hub](h
 
 python
 
-```
+```python
 import pandas as pd
 from datasets import load_dataset
 from IPython.display import HTML, display
@@ -119,6 +98,7 @@ def display_table(dataset_or_sample):
 
 
 display_table(dataset.select(range(3)))
+
 ```
 
 |   | question                                                                      | context                                                                                | answer                                                      |
@@ -133,18 +113,14 @@ The `b-mc2/sql-create-context` dataset consists of a single split, "train". We w
 
 python
 
-```
+```python
 split_dataset = dataset.train_test_split(test_size=0.2, seed=42)
 train_dataset = split_dataset["train"]
 test_dataset = split_dataset["test"]
 
 print(f"Training dataset contains {len(train_dataset)} text-to-SQL pairs")
 print(f"Test dataset contains {len(test_dataset)} text-to-SQL pairs")
-```
 
-```
-Training dataset contains 62861 text-to-SQL pairs
-Test dataset contains 15716 text-to-SQL pairs
 ```
 
 ### Define Prompt Template[​](#define-prompt-template "Direct link to Define Prompt Template")
@@ -153,7 +129,7 @@ The Mistral 7B model is a text comprehension model, so we have to construct a te
 
 python
 
-```
+```python
 PROMPT_TEMPLATE = """You are a powerful text-to-SQL model. Given the SQL tables and natural language question, your job is to write SQL query that answers the question.
 
 ### Table:
@@ -177,6 +153,7 @@ def apply_prompt_template(row):
 
 train_dataset = train_dataset.map(apply_prompt_template)
 display_table(train_dataset.select(range(1)))
+
 ```
 
 |   | question                                                                     | context                                                                                                                | answer                                                                                                                    | prompt                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
@@ -193,23 +170,25 @@ A crucial point to note is the need to *add padding to the left*. This approach 
 
 text
 
-```
+```text
 Today |  is  |   a    |  cold  |  <pad>  ==generate=>  "Today is a cold <pad> day"
  How  |  to  | become |  <pad> |  <pad>  ==generate=>  "How to become a <pad> <pad> great engineer".
+
 ```
 
 * Padding to left:
 
 text
 
-```
+```text
 <pad> |  Today  |  is  |  a   |  cold     ==generate=>  "<pad> Today is a cold day"
 <pad> |  <pad>  |  How |  to  |  become   ==generate=>  "<pad> <pad> How to become a great engineer".
+
 ```
 
 python
 
-```
+```python
 from transformers import AutoTokenizer
 
 base_model_id = "mistralai/Mistral-7B-v0.1"
@@ -242,6 +221,7 @@ tokenized_train_dataset = train_dataset.map(tokenize_and_pad_to_fixed_length)
 assert all(len(x["input_ids"]) == MAX_LENGTH for x in tokenized_train_dataset)
 
 display_table(tokenized_train_dataset.select(range(1)))
+
 ```
 
 ## 3. Load the Base Model (with 4-bit quantization)[​](#3-load-the-base-model-with-4-bit-quantization "Direct link to 3. Load the Base Model (with 4-bit quantization)")
@@ -264,7 +244,7 @@ Moreover, QLoRA introduces additional techniques to optimize resource usage with
 
 python
 
-```
+```python
 import torch
 from transformers import AutoModelForCausalLM, BitsAndBytesConfig
 
@@ -280,6 +260,7 @@ quantization_config = BitsAndBytesConfig(
 )
 
 model = AutoModelForCausalLM.from_pretrained(base_model_id, quantization_config=quantization_config)
+
 ```
 
 ### How Does the Base Model Perform?[​](#how-does-the-base-model-perform "Direct link to How Does the Base Model Perform?")
@@ -288,7 +269,7 @@ First, let's assess the performance of the vanilla Mistral model on the SQL gene
 
 python
 
-```
+```python
 import transformers
 
 tokenizer = AutoTokenizer.from_pretrained(base_model_id)
@@ -303,6 +284,7 @@ with torch.no_grad():
   response = pipeline(prompt, max_new_tokens=256, repetition_penalty=1.15, return_full_text=False)
 
 display_table({"prompt": prompt, "generated_query": response[0]["generated_text"]})
+
 ```
 
 |   | prompt                                                                                                                                                                                                                                                                                                                                                                                             | generated\_query                                                                                                                                                                                                                                                                                                                                                                      |
@@ -319,7 +301,7 @@ At the end of the cell, we display the number of trainable parameters during fin
 
 python
 
-```
+```python
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 
 # Enabling gradient checkpointing, to make the training further efficient
@@ -352,10 +334,7 @@ peft_config = LoraConfig(
 
 peft_model = get_peft_model(model, peft_config)
 peft_model.print_trainable_parameters()
-```
 
-```
-trainable params: 85,041,152 || all params: 7,326,773,248 || trainable%: 1.1606903765339511
 ```
 
 **That's it!!!** PEFT has made the LoRA setup super easy.
@@ -370,7 +349,7 @@ To enable MLflow logging, you can specify `report_to="mlflow"` and name your tra
 
 python
 
-```
+```python
 from datetime import datetime
 
 import transformers
@@ -413,14 +392,16 @@ trainer = transformers.Trainer(
 
 # use_cache=True is incompatible with gradient checkpointing.
 peft_model.config.use_cache = False
+
 ```
 
 The training duration may span several hours, contingent upon your hardware specifications. Nonetheless, the primary objective of this tutorial is to acquaint you with the process of fine-tuning using PEFT and MLflow, rather than to cultivate a highly performant SQL generator. If you don't care much about the model performance, you may specify a smaller number of steps or interrupt the following cell to proceed with the rest of the notebook.
 
 python
 
-```
+```python
 trainer.train()
+
 ```
 
 \[500/500 45:41, Epoch 0/1]
@@ -432,10 +413,6 @@ trainer.train()
 | 300  | 0.507300      |
 | 400  | 0.494800      |
 | 500  | 0.474600      |
-
-```
-TrainOutput(global_step=500, training_loss=0.5361956100463867, metrics={'train_runtime': 2747.9223, 'train_samples_per_second': 1.456, 'train_steps_per_second': 0.182, 'total_flos': 4.421038813216768e+16, 'train_loss': 0.5361956100463867, 'epoch': 0.06})
-```
 
 ## 6. Save the PEFT Model to MLflow[​](#6-save-the-peft-model-to-mlflow "Direct link to 6. Save the PEFT Model to MLflow")
 
@@ -451,7 +428,7 @@ The user prompt itself is free text, but you can harness the input by applying a
 
 python
 
-```
+```python
 # Basically the same format as we applied to the dataset. However, the template only accepts {prompt} variable so both table and question need to be fed in there.
 prompt_template = """You are a powerful text-to-SQL model. Given the SQL tables and natural language question, your job is to write SQL query that answers the question.
 
@@ -459,6 +436,7 @@ prompt_template = """You are a powerful text-to-SQL model. Given the SQL tables 
 
 ### Response:
 """
+
 ```
 
 #### Inference Parameters[​](#inference-parameters "Direct link to Inference Parameters")
@@ -467,7 +445,7 @@ Inference parameters can be saved with MLflow model as a part of [Model Signatur
 
 python
 
-```
+```python
 from mlflow.models import infer_signature
 
 sample = train_dataset[1]
@@ -480,15 +458,7 @@ signature = infer_signature(
   params={"max_new_tokens": 256, "repetition_penalty": 1.15, "return_full_text": False},
 )
 signature
-```
 
-```
-inputs: 
-[string (required)]
-outputs: 
-[string (required)]
-params: 
-['max_new_tokens': long (default: 256), 'repetition_penalty': double (default: 1.15), 'return_full_text': boolean (default: False)]
 ```
 
 ### Save the PEFT Model to MLflow[​](#save-the-peft-model-to-mlflow "Direct link to Save the PEFT Model to MLflow")
@@ -503,7 +473,7 @@ Finally, we will call [mlflow.transformers.log\_model](https://mlflow.org/docs/l
 
 python
 
-```
+```python
 import mlflow
 
 # Get the ID of the MLflow Run that was automatically created above
@@ -523,6 +493,7 @@ with mlflow.start_run(run_id=last_run_id):
       signature=signature,
       name="model",  # This is a relative path to save model files within MLflow run
   )
+
 ```
 
 ### What's Logged to MLflow?[​](#whats-logged-to-mlflow "Direct link to What's Logged to MLflow?")
@@ -543,7 +514,7 @@ The `Artifacts` section displays the files/directories saved in MLflow as a resu
 
 text
 
-```
+```text
 
     model/
       ├─ peft/
@@ -558,6 +529,8 @@ text
       ├─ model_card_data.yaml         # Model card data for the base model
       ├─ python_env.yaml              # Dependencies to create Python virtual environment
       └─ requirements.txt             # Pip requirements for model inference
+
+
 ```
 
 #### Model Metadata[​](#model-metadata "Direct link to Model Metadata")
@@ -566,7 +539,7 @@ In the MLModel file, you can see the many detailed metadata are saved about the 
 
 text
 
-```
+```text
 flavors:
   transformers:
     peft_adaptor: peft                                 # Points the location of the saved PEFT model
@@ -596,6 +569,7 @@ signature:
   params: '[{"name": "max_new_tokens", "type": "long", "default": 256, "shape": null},
     {"name": "repetition_penalty", "type": "double", "default": 1.15, "shape": null},
     {"name": "return_full_text", "type": "boolean", "default": false, "shape": null}]'
+
 ```
 
 ## 7. Load the Saved PEFT Model from MLflow[​](#7-load-the-saved-peft-model-from-mlflow "Direct link to 7. Load the Saved PEFT Model from MLflow")
@@ -613,14 +587,15 @@ The first option is preferable if you wish to use the model via the native Trans
 
 python
 
-```
+```python
 # You can find the ID of run in the Run detail page on MLflow UI
 mlflow_model = mlflow.pyfunc.load_model("runs:/YOUR_RUN_ID/model")
+
 ```
 
 python
 
-```
+```python
 # We only input table and question, since system prompt is adeed in the prompt template.
 test_prompt = """
 ### Table:
@@ -633,6 +608,7 @@ When Essendon played away; where did they play?
 # Inference parameters like max_tokens_length are set to default values specified in the Model Signature
 generated_query = mlflow_model.predict(test_prompt)[0]
 display_table({"prompt": test_prompt, "generated_query": generated_query})
+
 ```
 
 |   | prompt                                                                                                                                                                     | generated\_query                                                |

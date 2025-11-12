@@ -18,7 +18,7 @@ To use the predefined LLM scorers, select the scorer class from the [available s
 
 python
 
-```
+```python
 import mlflow
 from mlflow.genai.scorers import Correctness, RelevanceToQuery, Guidelines
 
@@ -56,6 +56,7 @@ results = mlflow.genai.evaluate(
         ),
     ],
 )
+
 ```
 
 ![Predefined LLM scorers result](/mlflow-website/docs/latest/images/mlflow-3/eval-monitor/scorers/predefined-scorers-results.png)
@@ -86,7 +87,7 @@ All built-in scorers, such as Guidelines, RelevanceToQuery, Safety, Correctness,
 
 python
 
-```
+```python
 from mlflow.genai.scorers import Correctness
 
 trace = mlflow.get_trace("<your-trace-id>")
@@ -97,6 +98,7 @@ result = scorer(trace=trace)
 
 # Override specific fields as needed
 result = scorer(trace=trace, expectations={"expected_facts": ["Custom fact"]})
+
 ```
 
 ### Automatic Fallback for Complex Traces[​](#automatic-fallback-for-complex-traces "Direct link to Automatic Fallback for Complex Traces")
@@ -144,13 +146,14 @@ Predefined LLM-based scorers in MLflow return structured assessments with three 
 
 text
 
-```
+```text
 score: "yes"  # or "no"
 rationale: "The response accurately addresses the user's question about machine learning concepts, providing clear definitions and relevant examples. The information is factually correct and well-structured."
 source: AssessmentSource(
     source_type="LLM_JUDGE",
     source_id="openai:/gpt-4o-mini"
 )
+
 ```
 
 Why Binary Scores?

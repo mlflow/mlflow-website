@@ -58,9 +58,9 @@ Before starting the migration, we highly recommend you to visit the [GenAI Evalu
 
 The old evaluation API accepts MLflow model URI as an evaluation target. The new evaluation API accepts a callable function as `predict_fn` argument instead, to provide more flexibility and control. This also eliminates the need of logging the model in MLflow before evaluation.
 
-| Old Format                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | New Format                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ```python
+| Old Format                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | New Format                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ```
 # Log the model first before evaluation
 with mlflow.start_run() as run:
     logged_model_info = mlflow.openai.log_model(
@@ -75,7 +75,8 @@ with mlflow.start_run() as run:
 
 # Pass the model URI to the evaluation API.
 mlflow.evaluate(model=logged_model_info.model_uri, ...)
-``` | ```python
+
+``` | ```
 # Define a function that runs predictions.
 def predict_fn(question: str) -> str:
   response = openai.OpenAI().chat.completions.create(
@@ -88,13 +89,14 @@ def predict_fn(question: str) -> str:
   return response.choices[0].message.content
 
 mlflow.genai.evaluate(predict_fn=predict_fn, ...)
+
 ``` |
 
 If you want to evaluate a pre-logged model with the new evaluation API, simply call the loaded model in the function.
 
 python
 
-```
+```python
 # IMPORTANT: Load the model outside the predict_fn function. Otherwise the model will be loaded
 # for each input in the dataset and significantly slow down the evaluation.
 model = mlflow.pyfunc.load_model(model_uri)
@@ -102,6 +104,7 @@ model = mlflow.pyfunc.load_model(model_uri)
 
 def predict_fn(question: str) -> str:
     return model.predict([question])[0]
+
 ```
 
 ### 2. Update the Dataset Format[​](#2-update-the-dataset-format "Direct link to 2. Update the Dataset Format")
@@ -112,9 +115,9 @@ The dataset format has been changed to be more flexible and consistent. The new 
 * `expectations`: The expected output from the predict\_fn function, namely, ground truth for the answer.
 * Optionally, you can pass `outputs` column or `trace` column to evaluate pre-generated outputs and traces.
 
-| Old Format                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | New Format                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ```python
+| Old Format                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | New Format                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ```
 eval_data = pd.DataFrame(
   {
       "inputs": [
@@ -138,7 +141,8 @@ mlflow.evaluate(
   predictions="predictions",
   ...
 )
-``` | ```python
+
+``` | ```
 eval_data = [
   {
       "inputs": {"question": "What is MLflow?"},
@@ -156,6 +160,7 @@ mlflow.genai.evaluate(
   data=eval_data,
   ...
 )
+
 ``` |
 
 ### 3. Migrate Metrics[​](#3-migrate-metrics "Direct link to 3. Migrate Metrics")
@@ -177,7 +182,7 @@ The new evaluation API supports defining custom LLM-as-a-Judge metrics from a cu
 
 python
 
-```
+```python
 from mlflow.genai import make_judge
 
 answer_similarity = make_judge(
@@ -192,6 +197,7 @@ answer_similarity = make_judge(
 
 # Pass the scorer to the evaluation API.
 mlflow.genai.evaluate(scorers=[answer_similarity, ...])
+
 ```
 
 See the [LLM-as-a-Judge Scorers](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge.md) guide for more details.
@@ -202,7 +208,7 @@ Implementing a custom scorer for heuristic metrics is straightforward. You just 
 
 python
 
-```
+```python
 @scorer
 def exact_match(outputs: dict, expectations: dict) -> bool:
     return outputs == expectations["expected_response"]
@@ -210,6 +216,7 @@ def exact_match(outputs: dict, expectations: dict) -> bool:
 
 # Pass the scorer to the evaluation API.
 mlflow.genai.evaluate(scorers=[exact_match, ...])
+
 ```
 
 See the [Code-based Scorers](/mlflow-website/docs/latest/genai/eval-monitor/scorers/custom.md) guide for more details.
@@ -220,12 +227,13 @@ Now you have migrated all components of the legacy evaluation API and are ready 
 
 python
 
-```
+```python
 mlflow.genai.evaluate(
     data=eval_data,
     predict_fn=predict_fn,
     scorers=[answer_similarity, exact_match, ...],
 )
+
 ```
 
 To view the evaluation results, click the link in the console output, or navigate to the **Evaluations** tab in the MLflow UI.

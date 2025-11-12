@@ -10,9 +10,10 @@ To download the files required for this example, clone the MLflow repository:
 
 bash
 
-```
+```bash
 git clone --depth=1 https://github.com/mlflow/mlflow.git
 cd mlflow
+
 ```
 
 If you don't have `git`, you can download the repository as a zip file from <https://github.com/mlflow/mlflow/archive/refs/heads/master.zip>.
@@ -21,15 +22,16 @@ If you don't have `git`, you can download the repository as a zip file from <htt
 
 bash
 
-```
+```bash
 pip install mlflow>=2.14.0 openai databricks-sdk
+
 ```
 
 3. Create the UC function used in [the example script](https://github.com/mlflow/mlflow/blob/master/examples/gateway/uc_functions/run.py) in your Databricks workspace by running the following SQL command:
 
 sql
 
-```
+```sql
 CREATE OR REPLACE FUNCTION
 my.uc_func.add (
   x INTEGER COMMENT 'The first number to add.',
@@ -38,6 +40,7 @@ my.uc_func.add (
 RETURNS INTEGER
 LANGUAGE SQL
 RETURN x + y
+
 ```
 
 To define your own function, see <https://docs.databricks.com/en/sql/language-manual/sql-ref-syntax-ddl-create-sql-function.html#create-function-sql-and-python>.
@@ -50,7 +53,7 @@ Once you have completed the pre-requisites, you can start the gateway server:
 
 bash
 
-```
+```bash
 # Required to authenticate with Databricks. See https://docs.databricks.com/en/dev-tools/auth/index.html#supported-authentication-types-by-databricks-tool-or-sdk for other authentication methods.
 export DATABRICKS_HOST="..."
 export DATABRICKS_TOKEN="..."
@@ -71,6 +74,7 @@ export MLFLOW_ENABLE_UC_FUNCTIONS=true
 
 # Run the server
 mlflow gateway start --config-path examples/gateway/deployments_server/openai/config.yaml --port 7000
+
 ```
 
 ## Query the Endpoint with UC Function[​](#query-the-endpoint-with-uc-function "Direct link to Query the Endpoint with UC Function")
@@ -79,7 +83,7 @@ Once the server is running, you can run the example script:
 
 bash
 
-```
+```bash
 # `run.py` uses the `openai.OpenAI` client to query the gateway server,
 # but it throws an error if the `OPENAI_API_KEY` environment variable is not set.
 # To avoid this error, use a dummy API key.
@@ -87,6 +91,7 @@ export OPENAI_API_KEY="test"
 
 # Replace `my.uc_func.add` if your UC function has a different name
 python examples/gateway/uc_functions/run.py  --uc-function-name my.uc_func.add
+
 ```
 
 ## What's happening under the hood?[​](#whats-happening-under-the-hood "Direct link to What's happening under the hood?")
@@ -95,7 +100,7 @@ When MLflow AI Gateway receives a request with `tools` containing `uc_function`,
 
 python
 
-```
+```python
 uc_function = {
     "type": "uc_function",
     "uc_function": {
@@ -115,13 +120,14 @@ resp = client.chat.completions.create(
 )
 
 print(resp.choices[0].message.content)  # -> The result of 1 + 2 is 3
+
 ```
 
 The code above is equivalent to the following:
 
 python
 
-```
+```python
 # Function tool schema:
 # https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools
 function = {
@@ -180,4 +186,5 @@ final_resp = client.chat.messages.create(
 )
 
 print(final_resp.choices[0].message.content)  # -> The result of 1 + 2 is 3
+
 ```

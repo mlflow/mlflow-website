@@ -12,7 +12,7 @@ Build REST APIs that proxy requests to the AI Gateway, adding your own business 
 
 python
 
-```
+```python
 from fastapi import FastAPI, HTTPException
 from mlflow.deployments import get_deploy_client
 
@@ -38,6 +38,7 @@ async def embed_endpoint(text: str):
         return {"embedding": response["data"][0]["embedding"]}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 ```
 
 ### Flask Integration[​](#flask-integration "Direct link to Flask Integration")
@@ -46,7 +47,7 @@ Create Flask applications that integrate AI capabilities using familiar request/
 
 python
 
-```
+```python
 from flask import Flask, request, jsonify
 from mlflow.deployments import get_deploy_client
 
@@ -69,6 +70,7 @@ def chat():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 ```
 
 ### Async/Await Support[​](#asyncawait-support "Direct link to Async/Await Support")
@@ -77,7 +79,7 @@ Handle multiple concurrent requests efficiently using asyncio for high-throughpu
 
 python
 
-```
+```python
 import asyncio
 import aiohttp
 import json
@@ -109,6 +111,7 @@ async def main():
 
 # Run async example
 asyncio.run(main())
+
 ```
 
 ## LangChain Integration[​](#langchain-integration "Direct link to LangChain Integration")
@@ -119,13 +122,14 @@ LangChain provides pre-built components that work directly with the AI Gateway, 
 
 python
 
-```
+```python
 from langchain_community.llms import MLflowAIGateway
 from langchain_community.embeddings import MlflowAIGatewayEmbeddings
 from langchain_community.chat_models import ChatMLflowAIGateway
 
 # Configure LangChain to use your gateway
 gateway_uri = "http://localhost:5000"
+
 ```
 
 ### Chat Models[​](#chat-models "Direct link to Chat Models")
@@ -134,7 +138,7 @@ Create LangChain chat models that route through your gateway, allowing you to sw
 
 python
 
-```
+```python
 # Chat model
 chat = ChatMLflowAIGateway(
     gateway_uri=gateway_uri,
@@ -155,6 +159,7 @@ messages = [
 
 response = chat(messages)
 print(response.content)
+
 ```
 
 ### Embeddings[​](#embeddings "Direct link to Embeddings")
@@ -163,7 +168,7 @@ Use gateway-powered embeddings for vector search, semantic similarity, and RAG a
 
 python
 
-```
+```python
 # Embeddings
 embeddings = MlflowAIGatewayEmbeddings(gateway_uri=gateway_uri, route="embeddings")
 
@@ -173,6 +178,7 @@ text_embeddings = embeddings.embed_documents(
 )
 
 query_embedding = embeddings.embed_query("This is a query")
+
 ```
 
 ### Complete RAG Example[​](#complete-rag-example "Direct link to Complete RAG Example")
@@ -181,7 +187,7 @@ Build a complete Retrieval-Augmented Generation (RAG) system using the gateway f
 
 python
 
-```
+```python
 from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
@@ -207,6 +213,7 @@ qa_chain = RetrievalQA.from_chain_type(
 question = "What is the main topic of the document?"
 result = qa_chain.run(question)
 print(result)
+
 ```
 
 ## OpenAI Compatibility[​](#openai-compatibility "Direct link to OpenAI Compatibility")
@@ -215,7 +222,7 @@ The AI Gateway provides OpenAI-compatible endpoints, allowing you to migrate exi
 
 python
 
-```
+```python
 import openai
 
 # Configure OpenAI client to use the gateway
@@ -229,6 +236,7 @@ response = openai.ChatCompletion.create(
 )
 
 print(response.choices[0].message.content)
+
 ```
 
 ## MLflow Models Integration[​](#mlflow-models-integration "Direct link to MLflow Models Integration")
@@ -241,7 +249,7 @@ Train and register your models using MLflow's standard workflow, then expose the
 
 python
 
-```
+```python
 import mlflow
 import mlflow.pyfunc
 
@@ -256,11 +264,12 @@ with mlflow.start_run():
 
 # Deploy the model
 # Then configure it in your gateway config.yaml:
+
 ```
 
 yaml
 
-```
+```yaml
 endpoints:
   - name: custom-model
     endpoint_type: llm/v1/chat
@@ -269,6 +278,7 @@ endpoints:
       name: custom-chat-model
       config:
         model_server_url: http://localhost:5001
+
 ```
 
 ## Production Best Practices[​](#production-best-practices "Direct link to Production Best Practices")
@@ -284,7 +294,7 @@ endpoints:
 
 python
 
-```
+```python
 import time
 from mlflow.deployments import get_deploy_client
 from mlflow.exceptions import MlflowException
@@ -306,6 +316,7 @@ client = get_deploy_client("http://localhost:5000")
 response = robust_query(
     client, "chat", {"messages": [{"role": "user", "content": "Hello"}]}
 )
+
 ```
 
 ### Security[​](#security "Direct link to Security")
@@ -319,7 +330,7 @@ response = robust_query(
 
 python
 
-```
+```python
 import logging
 from mlflow.deployments import get_deploy_client
 
@@ -340,6 +351,7 @@ def monitored_query(client, endpoint, inputs):
         duration = time.time() - start_time
         logger.error(f"Query failed after {duration:.2f}s: {e}")
         raise
+
 ```
 
 ### Load Balancing[​](#load-balancing "Direct link to Load Balancing")
@@ -348,7 +360,7 @@ For high-availability setups, consider running multiple gateway instances:
 
 python
 
-```
+```python
 import random
 from mlflow.deployments import get_deploy_client
 
@@ -371,13 +383,14 @@ def resilient_query(endpoint, inputs, max_retries=3):
             if attempt < max_retries - 1:
                 continue
             raise e
+
 ```
 
 ## Health and Monitoring[​](#health-and-monitoring "Direct link to Health and Monitoring")
 
 python
 
-```
+```python
 # Check gateway health via HTTP
 import requests
 
@@ -397,6 +410,7 @@ def check_gateway_health(gateway_url):
 # Example usage
 health = check_gateway_health("http://localhost:5000")
 print(f"Gateway Health: {health}")
+
 ```
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")

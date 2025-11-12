@@ -36,8 +36,9 @@ To install the `openai` SDK library that is compatible with this notebook to try
 
 bash
 
-```
+```bash
 pip install 'openai<1' tiktoken
+
 ```
 
 ### API Key Security Overview[​](#api-key-security-overview "Direct link to API Key Security Overview")
@@ -75,16 +76,17 @@ If you encounter an Exception stating that the `OPENAI_API_KEY` environment vari
 
 python
 
-```
+```python
 import warnings
 
 # Disable a few less-than-useful UserWarnings from setuptools and pydantic
 warnings.filterwarnings("ignore", category=UserWarning)
+
 ```
 
 python
 
-```
+```python
 import os
 
 import openai
@@ -97,6 +99,7 @@ from mlflow.types.schema import ColSpec, ParamSchema, ParamSpec, Schema
 
 # Run a quick validation that we have an entry for the OPEN_API_KEY within environment variables
 assert "OPENAI_API_KEY" in os.environ, "OPENAI_API_KEY environment variable must be set"
+
 ```
 
 ### Understanding Prompts and Their Engineering[​](#understanding-prompts-and-their-engineering "Direct link to Understanding Prompts and Their Engineering")
@@ -130,8 +133,9 @@ To leverage the LLM effectively, we craft a specialized prompt for our Lyrics Co
 
 text
 
-```
+```text
 "Here's a misheard lyric: {lyric}. What's the actual lyric, which song does it come from, which artist performed it, and can you give a funny explanation as to why the misheard version doesn't make sense? Also, rate the creativity of the lyric on a scale of 1 to 3, where 3 is good."
+
 ```
 
 In this prompt, `{lyric}` is a placeholder for various misheard lyrics. This setup not only showcases the model's ability to process and correct information but also to engage in a more creative, human-like manner.
@@ -140,11 +144,12 @@ Through this fun and simple example, we explore the potential of LLMs in real-wo
 
 python
 
-```
+```python
 lyrics_prompt = (
   "Here's a misheard lyric: {lyric}. What's the actual lyric, which song does it come from, which artist performed it, and can you give a funny "
   "explanation as to why the misheard version doesn't make sense? Also, rate the creativity of the lyric on a scale of 1 to 3, where 3 is good."
 )
+
 ```
 
 ### Setting Up and Logging the Model in MLflow[​](#setting-up-and-logging-the-model-in-mlflow "Direct link to Setting Up and Logging the Model in MLflow")
@@ -163,7 +168,7 @@ This setup not only establishes our Lyrics Corrector model but also demonstrates
 
 python
 
-```
+```python
 # Create a new experiment (or reuse the existing one if we've run this cell more than once)
 mlflow.set_experiment("Lyrics Corrector")
 
@@ -189,6 +194,7 @@ with mlflow.start_run():
 
 # Load the model as a generic python function that can be used for completions
 model = mlflow.pyfunc.load_model(model_info.model_uri)
+
 ```
 
 ### Generating and Correcting Misheard Lyrics[​](#generating-and-correcting-misheard-lyrics "Direct link to Generating and Correcting Misheard Lyrics")
@@ -221,7 +227,7 @@ Let's see what amusing corrections and explanations our Lyrics Corrector comes u
 
 python
 
-```
+```python
 # Generate some questionable lyrics
 bad_lyrics = pd.DataFrame(
   {
@@ -245,6 +251,7 @@ formatted_output = "<br>".join(
   [f"<p><strong>{line.strip()}</strong></p>" for line in fix_my_lyrics]
 )
 display(HTML(formatted_output))
+
 ```
 
 **The actual lyric is "We built this city on rock and roll" from the song "We Built This City" by Starship. The misheard version doesn't make sense because sausage rolls are a type of food, not a building material. Perhaps someone misheard the word "rock" as "roll" and their mind automatically went to food. The creativity of the misheard lyric is a 2, as it is a common mistake to mix up similar sounding words.**
@@ -295,7 +302,7 @@ In the next cell, you'll see an improved prompt that is designed to elicit more 
 
 python
 
-```
+```python
 # Define our prompt
 improved_lyrics_prompt = (
   "Here's a misheard lyric: {lyric}. What's the actual lyric, which song does it come from, which artist performed it, and can "
@@ -306,11 +313,12 @@ improved_lyrics_prompt = (
   "might be a 1, as it's a simple word swap with minimal humor. Conversely, 'I want to hold your hand' misheard as 'I want to steal your land' "
   "could be a 3, as it significantly changes the meaning in a humorous and unexpected way."
 )
+
 ```
 
 python
 
-```
+```python
 # Create a new experiment for the Improved Version (or reuse the existing one if we've run this cell more than once)
 mlflow.set_experiment("Improved Lyrics Corrector")
 
@@ -336,11 +344,12 @@ with mlflow.start_run():
 
 # Load the model as a generic python function that can be used for completions
 improved_model = mlflow.pyfunc.load_model(model_info.model_uri)
+
 ```
 
 python
 
-```
+```python
 # Submit our faulty lyrics to the model
 fix_my_lyrics_improved = improved_model.predict(
   bad_lyrics, params={"max_tokens": 500, "temperature": 0.1}
@@ -351,6 +360,7 @@ formatted_output = "<br>".join(
   [f"<p><strong>{line.strip()}</strong></p>" for line in fix_my_lyrics_improved]
 )
 display(HTML(formatted_output))
+
 ```
 
 **The actual lyric is "We built this city on rock and roll" from the song "We Built This City" by Starship. The misheard version is a 3 on the scale, as it completely changes the meaning of the song and adds a humorous twist. The misheard version doesn't make sense because it replaces the iconic rock and roll genre with a food item, sausage rolls. This could be interpreted as a commentary on the current state of the music industry, where popular songs are often criticized for being shallow and lacking substance. The misheard version could also be seen as a nod to the British culture, where sausage rolls are a popular snack. Overall, the misheard lyric adds a playful and unexpected element to the song.**

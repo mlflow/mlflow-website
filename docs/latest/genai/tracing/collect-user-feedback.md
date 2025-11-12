@@ -28,7 +28,7 @@ First, create a simple application that automatically generates traces using MLf
 
 python
 
-```
+```python
 import mlflow
 from mlflow.entities import AssessmentSource, AssessmentSourceType
 import openai
@@ -67,6 +67,7 @@ print(f"Answer: {answer}")
 
 # You can get the trace ID from the MLflow UI or search API
 # For this example, we'll show how to collect feedback programmatically
+
 ```
 
 ### 2. Collect Simple Thumbs Up/Down Feedback[​](#2-collect-simple-thumbs-updown-feedback "Direct link to 2. Collect Simple Thumbs Up/Down Feedback")
@@ -75,7 +76,7 @@ Implement basic boolean feedback collection. In a real application, you'd get th
 
 python
 
-```
+```python
 def collect_thumbs_feedback(trace_id, is_helpful, user_id):
     """Collect simple thumbs up/down feedback from users."""
     mlflow.log_feedback(
@@ -95,6 +96,7 @@ def collect_thumbs_feedback(trace_id, is_helpful, user_id):
 # Example: Collect feedback on a trace
 trace_id = mlflow.get_last_active_trace_id()
 collect_thumbs_feedback(trace_id, True, "user_123")
+
 ```
 
 ### 3. View Feedback in MLflow UI[​](#3-view-feedback-in-mlflow-ui "Direct link to 3. View Feedback in MLflow UI")

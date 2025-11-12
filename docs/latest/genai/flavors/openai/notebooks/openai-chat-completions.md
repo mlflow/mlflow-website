@@ -34,16 +34,17 @@ Let's embark on this journey to harness the synergy of MLflow and GPT-4's Chat C
 
 python
 
-```
+```python
 import warnings
 
 # Disable a few less-than-useful UserWarnings from setuptools and pydantic
 warnings.filterwarnings("ignore", category=UserWarning)
+
 ```
 
 python
 
-```
+```python
 import os
 
 import openai
@@ -56,6 +57,7 @@ from mlflow.types.schema import ColSpec, ParamSchema, ParamSpec, Schema
 
 # Run a quick validation that we have an entry for the OPEN_API_KEY within environment variables
 assert "OPENAI_API_KEY" in os.environ, "OPENAI_API_KEY environment variable must be set"
+
 ```
 
 ### Implementing the Text Message Angel with GPT-4 and Chat Completions[​](#implementing-the-text-message-angel-with-gpt-4-and-chat-completions "Direct link to Implementing the Text Message Angel with GPT-4 and Chat Completions")
@@ -82,7 +84,7 @@ This setup not only demonstrates the advanced capabilities of GPT-4 in understan
 
 python
 
-```
+```python
 mlflow.set_experiment("Text Message Angel")
 
 messages = [
@@ -98,6 +100,7 @@ messages = [
       ),
   }
 ]
+
 ```
 
 ### Integrating GPT-4 with MLflow for the Text Message Angel[​](#integrating-gpt-4-with-mlflow-for-the-text-message-angel "Direct link to Integrating GPT-4 with MLflow for the Text Message Angel")
@@ -120,7 +123,7 @@ Within this run, we log our GPT-4 model using `mlflow.openai.log_model`. This fu
 
 python
 
-```
+```python
 with mlflow.start_run():
   model_info = mlflow.openai.log_model(
       model="gpt-4",
@@ -138,6 +141,7 @@ with mlflow.start_run():
           ),
       ),
   )
+
 ```
 
 #### Loading the Model for Use[​](#loading-the-model-for-use "Direct link to Loading the Model for Use")
@@ -146,8 +150,9 @@ After logging the model in MLflow, we load it as a generic Python function using
 
 python
 
-```
+```python
 model = mlflow.pyfunc.load_model(model_info.model_uri)
+
 ```
 
 ### Testing the Text Message Angel[​](#testing-the-text-message-angel "Direct link to Testing the Text Message Angel")
@@ -186,7 +191,7 @@ These responses showcase the model's nuanced understanding of social communicati
 
 python
 
-```
+```python
 validation_data = pd.DataFrame(
   {
       "text": [
@@ -208,6 +213,7 @@ formatted_output = "<br>".join(
   [f"<p><strong>{line.strip()}</strong></p>" for line in chat_completions_response]
 )
 display(HTML(formatted_output))
+
 ```
 
 **You might want to read that again before pressing send. Suggested response: "Wow, dinner last night was certainly unique! Who knew meatloaf could be so... adventurous?"**

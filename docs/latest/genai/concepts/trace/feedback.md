@@ -86,12 +86,13 @@ Example feedback:
 
 json
 
-```
+```json
 {
   "name": "factual_accuracy",
   "value": 0.85,
   "rationale": "The response correctly identifies 3 out of 4 key facts about MLflow, but incorrectly states the founding year."
 }
+
 ```
 
 **Query Relevance**: How well the response addresses the specific user question
@@ -104,12 +105,13 @@ Example feedback:
 
 json
 
-```
+```json
 {
   "name": "relevance_to_query",
   "value": "HIGH",
   "rationale": "Response directly answers the user's question about MLflow features and provides relevant examples."
 }
+
 ```
 
 **Content Safety**: Detecting harmful, inappropriate, or toxic content
@@ -122,12 +124,13 @@ Example feedback:
 
 json
 
-```
+```json
 {
   "name": "is_safe",
   "value": true,
   "rationale": "Content contains no harmful, toxic, or inappropriate material."
 }
+
 ```
 
 **Writing Quality**: Grammar, clarity, and coherence of the response
@@ -140,12 +143,13 @@ Example feedback:
 
 json
 
-```
+```json
 {
   "name": "helpfulness",
   "value": 4,
   "rationale": "Response provides clear, actionable information but could include more specific examples."
 }
+
 ```
 
 ## Feedback Lifecycle[​](#feedback-lifecycle "Direct link to Feedback Lifecycle")
@@ -222,7 +226,7 @@ MLflow supports different types of feedback to accommodate various evaluation ne
 
 json
 
-```
+```json
 {
   "name": "comprehensive_quality",
   "value": {
@@ -232,6 +236,7 @@ json
     "confidence": 0.75
   }
 }
+
 ```
 
 ## Evaluation Methods[​](#evaluation-methods "Direct link to Evaluation Methods")

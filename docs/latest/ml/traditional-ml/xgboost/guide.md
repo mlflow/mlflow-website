@@ -8,7 +8,7 @@ The fastest way to get started is with MLflow's XGBoost autologging. Enable comp
 
 python
 
-```
+```python
 import mlflow
 import mlflow.xgboost
 import xgboost as xgb
@@ -51,6 +51,7 @@ with mlflow.start_run():
 
     print(f"Best iteration: {model.best_iteration}")
     print(f"Best score: {model.best_score}")
+
 ```
 
 This simple example automatically logs all XGBoost parameters and training configuration, training and validation metrics for each boosting round, feature importance plots and JSON artifacts, the trained model with proper serialization, and early stopping metrics and best iteration information.
@@ -75,7 +76,7 @@ XGBoost offers two main interfaces, and MLflow supports both seamlessly:
 
 python
 
-```
+```python
 # Native XGBoost API - Maximum control and performance
 import xgboost as xgb
 
@@ -91,6 +92,7 @@ mlflow.sklearn.autolog()  # Note: Use sklearn autolog for XGBoost sklearn API
 
 model = XGBClassifier(n_estimators=100, max_depth=6)
 model.fit(X_train, y_train)
+
 ```
 
 **Choosing the Right API:**
@@ -108,7 +110,7 @@ For complete control over experiment tracking, you can manually instrument your 
 
 python
 
-```
+```python
 import mlflow
 import mlflow.xgboost
 import xgboost as xgb
@@ -198,13 +200,14 @@ with mlflow.start_run():
         signature=signature,
         input_example=X_train[:5],
     )
+
 ```
 
 XGBoost's scikit-learn compatible estimators work seamlessly with MLflow's sklearn autologging:
 
 python
 
-```
+```python
 import mlflow
 import mlflow.sklearn
 from xgboost import XGBClassifier, XGBRegressor
@@ -241,13 +244,14 @@ with mlflow.start_run(run_name="XGBoost Sklearn API"):
     # Cross-validation scores are automatically logged
     cv_scores = cross_val_score(model, X_train, y_train, cv=5)
     print(f"CV Score: {cv_scores.mean():.3f} (+/- {cv_scores.std() * 2:.3f})")
+
 ```
 
 **Pipeline Integration:**
 
 python
 
-```
+```python
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
 
@@ -274,6 +278,7 @@ with mlflow.start_run():
     # Pipeline scoring is automatically captured
     train_score = pipeline.score(X_train, y_train)
     test_score = pipeline.score(X_test, y_test)
+
 ```
 
 ## Hyperparameter Optimization[​](#hyperparameter-optimization "Direct link to Hyperparameter Optimization")
@@ -285,7 +290,7 @@ MLflow provides exceptional support for XGBoost hyperparameter optimization, aut
 
 python
 
-```
+```python
 import mlflow
 from sklearn.model_selection import GridSearchCV
 from xgboost import XGBClassifier
@@ -320,6 +325,7 @@ with mlflow.start_run(run_name="XGBoost Grid Search"):
     # Evaluate on test set
     test_score = grid_search.score(X_test, y_test)
     print(f"Test score: {test_score:.3f}")
+
 ```
 
 MLflow automatically creates a parent run containing the overall search results and child runs for each parameter combination, making it easy to analyze which parameters work best.
@@ -328,7 +334,7 @@ For more efficient hyperparameter exploration, especially with large parameter s
 
 python
 
-```
+```python
 from sklearn.model_selection import RandomizedSearchCV
 from scipy.stats import randint, uniform
 
@@ -361,6 +367,7 @@ with mlflow.start_run(run_name="XGBoost Randomized Search"):
 
     # MLflow automatically creates child runs for parameter combinations
     # The parent run contains the best model and overall results
+
 ```
 
 The `max_tuning_runs` parameter in autolog controls how many of the best parameter combinations get their own child runs, helping you focus on the most promising results.
@@ -374,7 +381,7 @@ XGBoost provides multiple types of feature importance, and MLflow captures them 
 
 python
 
-```
+```python
 import json
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -427,13 +434,14 @@ def comprehensive_feature_importance_analysis(model, feature_names=None):
 # Usage
 model = xgb.train(params, dtrain, num_boost_round=100)
 comprehensive_feature_importance_analysis(model, feature_names=wine.feature_names)
+
 ```
 
 Use XGBoost feature importance for automated feature selection:
 
 python
 
-```
+```python
 from sklearn.feature_selection import SelectFromModel
 
 
@@ -490,6 +498,7 @@ def feature_selection_pipeline(X_train, y_train, X_test, y_test):
         mlflow.sklearn.log_model(selector, name="feature_selector")
 
         return final_model, selector
+
 ```
 
 ## Model Management[​](#model-management "Direct link to Model Management")
@@ -502,7 +511,7 @@ XGBoost supports various serialization formats, each optimized for different dep
 
 python
 
-```
+```python
 import mlflow.xgboost
 
 # Train model
@@ -517,6 +526,7 @@ with mlflow.start_run():
 
     # Legacy XGBoost format (deprecated but sometimes needed)
     mlflow.xgboost.log_model(xgb_model=model, name="model_xgb", model_format="xgb")
+
 ```
 
 **JSON format** is recommended for production as it's human-readable and version-stable. **UBJ format** provides more compact binary serialization. The legacy **XGBoost format** is deprecated but sometimes needed for compatibility.
@@ -525,7 +535,7 @@ Model signatures describe input and output schemas, providing crucial validation
 
 python
 
-```
+```python
 from mlflow.models import infer_signature
 import pandas as pd
 
@@ -548,6 +558,7 @@ with mlflow.start_run():
         input_example=X_sample[:5],  # Sample input for documentation
         model_format="json",
     )
+
 ```
 
 Model signatures are automatically inferred when autologging is enabled, but you can also create them manually for more control over the schema validation process.
@@ -556,7 +567,7 @@ MLflow provides flexible ways to load and use your saved XGBoost models:
 
 python
 
-```
+```python
 # Load model in different ways
 run_id = "your_run_id_here"
 
@@ -570,6 +581,7 @@ predictions = pyfunc_model.predict(pd.DataFrame(X_test))
 
 # Load from model registry (production deployment)
 registered_model = mlflow.pyfunc.load_model("models:/XGBoostModel@champion")
+
 ```
 
 The PyFunc format is particularly useful for deployment scenarios where you need a consistent interface across different model types and frameworks.
@@ -583,7 +595,7 @@ The Model Registry provides centralized model management with version control an
 
 python
 
-```
+```python
 from mlflow import MlflowClient
 
 client = MlflowClient()
@@ -635,6 +647,7 @@ client.set_model_version_tag(
     key="feature_importance_type",
     value="gain",
 )
+
 ```
 
 **Modern Model Registry Features:**
@@ -647,19 +660,20 @@ client.set_model_version_tag(
 
 python
 
-```
+```python
 # Promote model from staging to production environment
 client.copy_model_version(
     src_model_uri="models:/staging.XGBoostChurnModel@candidate",
     dst_name="prod.XGBoostChurnModel",
 )
+
 ```
 
 MLflow provides built-in model serving capabilities that make it easy to deploy your XGBoost models as REST APIs:
 
 bash
 
-```
+```bash
 # Serve model using alias for production deployment
 mlflow models serve \
     -m "models:/XGBoostChurnModel@champion" \
@@ -671,6 +685,7 @@ mlflow models serve \
     -m "models:/XGBoostChurnModel/3" \
     -p 5000 \
     --no-conda
+
 ```
 
 **Deployment Best Practices:**
@@ -681,7 +696,7 @@ Once your model is served, you can make predictions by sending POST requests:
 
 python
 
-```
+```python
 import requests
 import json
 
@@ -695,6 +710,7 @@ response = requests.post(
 )
 
 predictions = response.json()
+
 ```
 
 For larger production deployments, you can also deploy MLflow models to cloud platforms like AWS SageMaker, Azure ML, or deploy them as Docker containers for Kubernetes orchestration.
@@ -709,7 +725,7 @@ XGBoost allows custom objective functions and evaluation metrics, which MLflow c
 
 python
 
-```
+```python
 def custom_objective_function(y_pred, y_true):
     """Custom objective function for XGBoost."""
     # Example: Focal loss for imbalanced classification
@@ -761,13 +777,14 @@ with mlflow.start_run():
         evals=[(dtrain, "train"), (dtest, "test")],
         verbose_eval=10,
     )
+
 ```
 
 MLflow's XGBoost autologging behavior can be customized to fit your specific workflow needs:
 
 python
 
-```
+```python
 # Fine-tune autologging behavior
 mlflow.xgboost.autolog(
     importance_types=["weight", "gain", "cover"],  # Types of importance to log
@@ -779,6 +796,7 @@ mlflow.xgboost.autolog(
     registered_model_name="XGBoostModel",  # Auto-register models
     extra_tags={"team": "data-science", "project": "customer-churn"},
 )
+
 ```
 
 These configuration options give you fine-grained control over the autologging behavior. **Importance types** controls which feature importance metrics are captured. **Dataset logging** tracks the data used for training and evaluation. **Input examples** and **signatures** are crucial for production deployment. **Extra tags** help organize experiments across teams and projects.
@@ -787,7 +805,7 @@ XGBoost offers several performance optimization options that MLflow can track:
 
 python
 
-```
+```python
 # GPU-accelerated training
 def gpu_accelerated_training(X_train, y_train, X_test, y_test):
     """GPU-accelerated XGBoost training."""
@@ -846,6 +864,7 @@ def memory_efficient_training():
         )
 
         return model
+
 ```
 
 ## Model Evaluation with MLflow[​](#model-evaluation-with-mlflow "Direct link to Model Evaluation with MLflow")
@@ -859,7 +878,7 @@ MLflow provides a comprehensive evaluation API that automatically generates metr
 
 python
 
-```
+```python
 import mlflow
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
@@ -896,6 +915,7 @@ with mlflow.start_run():
     print("Generated artifacts:")
     for artifact_name, path in result.artifacts.items():
         print(f"  {artifact_name}: {path}")
+
 ```
 
 **Automatic Generation Includes:**
@@ -906,7 +926,7 @@ For XGBoost regression models, MLflow automatically provides regression-specific
 
 python
 
-```
+```python
 from sklearn.datasets import fetch_california_housing
 
 # Load regression dataset
@@ -940,6 +960,7 @@ with mlflow.start_run():
     print(f"MAE: {result.metrics['mean_absolute_error']:.3f}")
     print(f"RMSE: {result.metrics['root_mean_squared_error']:.3f}")
     print(f"R² Score: {result.metrics['r2_score']:.3f}")
+
 ```
 
 **Automatic Regression Metrics:**
@@ -950,7 +971,7 @@ Extend MLflow evaluation with custom metrics and visualizations:
 
 python
 
-```
+```python
 from mlflow.models import make_metric
 import matplotlib.pyplot as plt
 import numpy as np
@@ -1015,13 +1036,14 @@ result = mlflow.evaluate(
 )
 
 print(f"Custom Profit Score: ${result.metrics['profit_score']:.2f}")
+
 ```
 
 For cases where you need more control or custom evaluation logic, you can still implement manual evaluation:
 
 python
 
-```
+```python
 import numpy as np
 from sklearn.metrics import (
     accuracy_score,
@@ -1127,6 +1149,7 @@ def comprehensive_xgboost_evaluation(model, X_test, y_test, X_train=None, y_trai
         plt.close()
 
         mlflow.log_metric("average_precision", avg_precision)
+
 ```
 
 ## Model Comparison and Selection[​](#model-comparison-and-selection "Direct link to Model Comparison and Selection")
@@ -1138,7 +1161,7 @@ Use MLflow evaluate to systematically compare multiple XGBoost configurations:
 
 python
 
-```
+```python
 from sklearn.ensemble import RandomForestClassifier
 
 # Define XGBoost variants to compare
@@ -1199,13 +1222,14 @@ print(comparison_df[["accuracy_score", "f1_score", "roc_auc"]].round(3))
 # Identify best model
 best_model = comparison_df["f1_score"].idxmax()
 print(f"\nBest model by F1 score: {best_model}")
+
 ```
 
 Combine hyperparameter tuning with MLflow evaluation:
 
 python
 
-```
+```python
 from sklearn.model_selection import ParameterGrid
 
 # Define parameter grid for XGBoost
@@ -1258,6 +1282,7 @@ for params in ParameterGrid(param_grid):
 # Find best parameters
 best_result = max(grid_results, key=lambda x: x["f1_score"])
 print(f"Best parameters: {best_result}")
+
 ```
 
 ## Model Validation and Quality Gates[​](#model-validation-and-quality-gates "Direct link to Model Validation and Quality Gates")
@@ -1266,7 +1291,7 @@ Use MLflow's validation API to ensure model quality:
 
 python
 
-```
+```python
 from mlflow.models import MetricThreshold
 
 # First, evaluate your XGBoost model
@@ -1310,6 +1335,7 @@ try:
     print("✅ New XGBoost model improves over baseline")
 except mlflow.exceptions.ModelValidationFailedException as e:
     print(f"❌ Model doesn't improve sufficiently: {e}")
+
 ```
 
 ## Advanced XGBoost Features[​](#advanced-xgboost-features "Direct link to Advanced XGBoost Features")
@@ -1321,7 +1347,7 @@ XGBoost naturally handles multi-class classification with MLflow tracking:
 
 python
 
-```
+```python
 from sklearn.datasets import load_digits
 from sklearn.metrics import classification_report
 
@@ -1360,13 +1386,14 @@ with mlflow.start_run(run_name="Multi-class XGBoost"):
                     f"class_{class_label}_f1": metrics["f1-score"],
                 }
             )
+
 ```
 
 Implement custom callbacks for advanced monitoring and control:
 
 python
 
-```
+```python
 class MLflowCallback(xgb.callback.TrainingCallback):
     def __init__(self):
         self.metrics_history = []
@@ -1395,6 +1422,7 @@ class MLflowCallback(xgb.callback.TrainingCallback):
 with mlflow.start_run():
     callback = MLflowCallback()
     model = xgb.train(params, dtrain, callbacks=[callback], num_boost_round=1000)
+
 ```
 
 ## Best Practices and Organization[​](#best-practices-and-organization "Direct link to Best Practices and Organization")
@@ -1406,7 +1434,7 @@ Ensure reproducible XGBoost experiments with comprehensive environment tracking:
 
 python
 
-```
+```python
 import platform
 import random
 import xgboost
@@ -1462,13 +1490,14 @@ def reproducible_xgboost_experiment(experiment_name, random_state=42):
 
 # Usage
 model = reproducible_xgboost_experiment("Customer_Churn_Analysis_v2")
+
 ```
 
 Organize XGBoost experiments effectively for team collaboration:
 
 python
 
-```
+```python
 # Organize experiments with descriptive names and tags
 experiment_name = "XGBoost Customer Churn - Q4 2024"
 mlflow.set_experiment(experiment_name)
@@ -1492,6 +1521,7 @@ with mlflow.start_run(run_name="Baseline XGBoost Model"):
         n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42
     )
     model.fit(X_train, y_train)
+
 ```
 
 Consistent tagging and naming conventions make it much easier to find, compare, and understand XGBoost experiments later. Consider establishing team-wide conventions for experiment names, tags, and run organization.

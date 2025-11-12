@@ -62,7 +62,7 @@ Configure the following environment variables in your production environment. Se
 
 bash
 
-```
+```bash
 # Required: Set MLflow Tracking URI
 export MLFLOW_TRACKING_URI="http://your-mlflow-server:5000"
 
@@ -76,6 +76,7 @@ export MLFLOW_ASYNC_TRACE_LOGGING_MAX_QUEUE_SIZE=1000
 
 # Optional: Configure trace sampling ratio (default is 1.0)
 export MLFLOW_TRACE_SAMPLING_RATIO=0.1
+
 ```
 
 ## Self-Hosted Tracking Server[​](#self-hosted-tracking-server "Direct link to Self-Hosted Tracking Server")
@@ -107,7 +108,7 @@ When deploying with Docker, pass environment variables through your container co
 
 dockerfile
 
-```
+```dockerfile
 # Dockerfile
 FROM python:3.9-slim
 
@@ -125,19 +126,21 @@ ENV MLFLOW_EXPERIMENT_NAME="production-genai-app"
 ENV MLFLOW_ENABLE_ASYNC_TRACE_LOGGING=true
 
 CMD ["python", "app.py"]
+
 ```
 
 Run the container with environment variables:
 
 bash
 
-```
+```bash
 docker run -d \
   -e MLFLOW_TRACKING_URI="http://your-mlflow-server:5000" \
   -e MLFLOW_EXPERIMENT_NAME="production-genai-app" \
   -e MLFLOW_ENABLE_ASYNC_TRACE_LOGGING=true \
   -e APP_VERSION="1.0.0" \
   your-app:latest
+
 ```
 
 ### Kubernetes Deployment Example[​](#kubernetes-deployment-example "Direct link to Kubernetes Deployment Example")
@@ -146,7 +149,7 @@ For Kubernetes deployments, use ConfigMaps and Secrets:
 
 yaml
 
-```
+```yaml
 # configmap.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -175,6 +178,7 @@ spec:
           env:
             - name: APP_VERSION
               value: '1.0.0'
+
 ```
 
 ## OpenTelemetry Backends[​](#opentelemetry-backends "Direct link to OpenTelemetry Backends")
@@ -212,11 +216,12 @@ Example configuration for high-volume applications:
 
 bash
 
-```
+```bash
 export MLFLOW_ENABLE_ASYNC_TRACE_LOGGING=true
 export MLFLOW_ASYNC_TRACE_LOGGING_MAX_WORKERS=20
 export MLFLOW_ASYNC_TRACE_LOGGING_MAX_QUEUE_SIZE=2000
 export MLFLOW_ASYNC_TRACE_LOGGING_RETRY_TIMEOUT=600
+
 ```
 
 ### Sampling Traces[​](#sampling-traces "Direct link to Sampling Traces")
@@ -239,7 +244,7 @@ Production applications need to track multiple pieces of context simultaneously.
 
 python
 
-```
+```python
 import mlflow
 import os
 from fastapi import FastAPI, Request, HTTPException
@@ -281,6 +286,7 @@ def handle_chat(request: Request, chat_request: ChatRequest):
     response_text = f"Processed message: '{chat_request.message}'"
 
     return {"response": response_text}
+
 ```
 
 ### Feedback Collection[​](#feedback-collection "Direct link to Feedback Collection")
@@ -289,7 +295,7 @@ Capturing user feedback on specific interactions is essential for understanding 
 
 python
 
-```
+```python
 import mlflow
 from mlflow.client import MlflowClient
 from fastapi import FastAPI, Query, Request
@@ -346,6 +352,7 @@ def handle_chat_feedback(
         "message": "Feedback recorded successfully",
         "trace_id": traces[0].info.trace_id,
     }
+
 ```
 
 ### Querying Traces with Context[​](#querying-traces-with-context "Direct link to Querying Traces with Context")
@@ -354,7 +361,7 @@ Use the contextual information to analyze production behavior:
 
 python
 
-```
+```python
 import mlflow
 
 # Query traces by user
@@ -377,6 +384,7 @@ production_traces = mlflow.search_traces(
     filter_string="tags.environment = 'production'",
     max_results=100,
 )
+
 ```
 
 ## Summary[​](#summary "Direct link to Summary")

@@ -18,9 +18,10 @@ A filtering function must take a single argument, which is a [`Span`](/mlflow-we
 
 python
 
-```
+```python
 def filter_function(span: Span) -> None:
     ...
+
 ```
 
 ## Example 1: Redacting E-mail Address[​](#example-1-redacting-e-mail-address "Direct link to Example 1: Redacting E-mail Address")
@@ -29,7 +30,7 @@ In this example, we'll redact the e-mail address from the user inputs using a si
 
 python
 
-```
+```python
 import re
 import mlflow
 from mlflow.entities.span import Span
@@ -57,6 +58,7 @@ mlflow.tracing.configure(span_processors=[redact_email])
 
 # Run the application
 predict("My e-mail address is test@example.com")
+
 ```
 
 The generated trace will have the e-mail address redacted in the inputs:
@@ -73,7 +75,7 @@ First, let's define a simple tool calling agent.
 
 python
 
-```
+```python
 import mlflow
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
@@ -92,13 +94,14 @@ def get_bank_account_number(user_name: str):
 llm = ChatOpenAI(model="o4-mini")
 tools = [get_bank_account_number]
 graph = create_react_agent(llm, tools)
+
 ```
 
 Then, let's define a filtering function. By checking the `span_type` field, we can apply different filtering logic to different span types.
 
 python
 
-```
+```python
 import re
 from typing import Union
 from mlflow.entities.span import Span, SpanType
@@ -127,13 +130,14 @@ def redact_messages(messages: list[dict]):
         {**msg, "content": ACCOUNT_NUMBER_PATTERN.sub("[REDACTED]", msg["content"])}
         for msg in messages
     ]
+
 ```
 
 Now, let's register the filter function and run the application.
 
 python
 
-```
+```python
 # Register the filter function
 mlflow.tracing.configure(span_processors=[filter_bank_account_number])
 
@@ -145,6 +149,7 @@ result = graph.invoke(
         ]
     }
 )
+
 ```
 
 The generated trace will have the bank account number redacted from all messages:
@@ -159,7 +164,7 @@ In this example, we run a dummy custom support agent that takes user request suc
 
 python
 
-```
+```python
 import mlflow
 from mlflow.entities.span import Span, SpanType
 
@@ -168,6 +173,7 @@ from mlflow.entities.span import Span, SpanType
 @mlflow.trace(span_type=SpanType.AGENT)
 def customer_support_agent(request: str):
     return "Yes"
+
 ```
 
 With MLflow, plugging in Presidio for filtering sensitive data from traces is straightforward.
@@ -176,16 +182,17 @@ First, install Presidio and download the classifier:
 
 bash
 
-```
+```bash
 pip install presidio_analyzer presidio_anonymizer
 python -m spacy download en_core_web_lg
+
 ```
 
 Then, define a filter function that runs Presidio's analyzer and anonymizer on the span input.
 
 python
 
-```
+```python
 from presidio_anonymizer import AnonymizerEngine
 from presidio_anonymizer.entities import RecognizerResult, OperatorConfig
 
@@ -207,13 +214,14 @@ def filter_pii(span: Span) -> None:
     anonymized_text = anonymizer.anonymize(text=text, analyzer_results=results)
 
     span.set_inputs({"request": anonymized_text.text})
+
 ```
 
 Finally, let's register the filter function and run the application.
 
 python
 
-```
+```python
 # Register the filter function
 mlflow.tracing.configure(span_processors=[filter_pii])
 
@@ -222,6 +230,7 @@ customer_support_agent(
     "Please cancel my credit card effective September 19th. My name is John Doe and my credit "
     "card number is 4095-2609-9393-4932. My email is john.doe@example.com and I live in Amsterdam."
 )
+
 ```
 
 The generated trace will have the PII redacted:
@@ -234,14 +243,16 @@ To reset the filter, call [`mlflow.tracing.configure`](/mlflow-website/docs/late
 
 python
 
-```
+```python
 mlflow.tracing.configure(span_processors=[])
+
 ```
 
 Alternatively, you can call [`mlflow.tracing.reset`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.tracing.html#mlflow.tracing.reset) to reset the entire tracing configuration.
 
 python
 
-```
+```python
 mlflow.tracing.reset()
+
 ```

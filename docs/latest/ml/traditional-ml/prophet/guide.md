@@ -8,7 +8,7 @@ Prophet works seamlessly with MLflow to track your forecasting experiments:
 
 python
 
-```
+```python
 import mlflow
 import mlflow.prophet
 import pandas as pd
@@ -80,6 +80,7 @@ with mlflow.start_run(run_name="Basic Prophet Forecast"):
 
     print(f"Model trained and logged successfully!")
     print(f"Average MAPE: {avg_metrics['mape']:.2f}%")
+
 ```
 
 This example automatically captures:
@@ -97,7 +98,7 @@ Prophet has specific data format requirements that are important to understand:
 
 python
 
-```
+```python
 import pandas as pd
 from datetime import datetime, timedelta
 
@@ -143,6 +144,7 @@ def prepare_prophet_data(data, date_col, value_col, freq="D"):
 # Example usage
 # Assuming you have a DataFrame with 'date' and 'sales' columns
 # df_prepared = prepare_prophet_data(raw_data, 'date', 'sales', freq='D')
+
 ```
 
 ### Handling Different Time Series Patterns[​](#handling-different-time-series-patterns "Direct link to Handling Different Time Series Patterns")
@@ -153,7 +155,7 @@ Data Preparation Patterns
 
 python
 
-```
+```python
 def prepare_multiple_series(data, date_col, value_col, series_col):
     """Prepare multiple time series for separate Prophet models."""
 
@@ -189,13 +191,14 @@ def train_multiple_prophet_models(series_dict):
                 mlflow.prophet.log_model(pr_model=model, name=f"model_{series_name}")
 
     return models
+
 ```
 
 #### Irregular Time Series[​](#irregular-time-series "Direct link to Irregular Time Series")
 
 python
 
-```
+```python
 def handle_irregular_timeseries(df, min_frequency="W"):
     """Handle irregular time series data."""
 
@@ -229,6 +232,7 @@ def handle_irregular_timeseries(df, min_frequency="W"):
     df_regular = df_regular.dropna()
 
     return df_regular
+
 ```
 
 ## Advanced Prophet Configuration[​](#advanced-prophet-configuration "Direct link to Advanced Prophet Configuration")
@@ -237,7 +241,7 @@ def handle_irregular_timeseries(df, min_frequency="W"):
 
 python
 
-```
+```python
 def advanced_prophet_configuration():
     """Demonstrate advanced Prophet configuration options."""
 
@@ -289,13 +293,14 @@ def advanced_prophet_configuration():
 
 # Usage
 advanced_model = advanced_prophet_configuration()
+
 ```
 
 ### Custom Seasonalities and Events[​](#custom-seasonalities-and-events "Direct link to Custom Seasonalities and Events")
 
 python
 
-```
+```python
 def add_custom_components(model, df):
     """Add custom seasonalities and regressors to Prophet model."""
 
@@ -353,6 +358,7 @@ def add_custom_components(model, df):
 # Usage
 model_with_custom = Prophet()
 model_with_custom, enhanced_df = add_custom_components(model_with_custom, df.copy())
+
 ```
 
 Holiday and Event Modeling
@@ -361,7 +367,7 @@ Holiday and Event Modeling
 
 python
 
-```
+```python
 from prophet.make_holidays import make_holidays_df
 
 
@@ -409,13 +415,14 @@ def add_holiday_effects():
         )
 
         return model
+
 ```
 
 #### Business Calendar Integration[​](#business-calendar-integration "Direct link to Business Calendar Integration")
 
 python
 
-```
+```python
 def create_business_calendar(start_date, end_date):
     """Create business-specific calendar events."""
 
@@ -454,6 +461,7 @@ def create_business_calendar(start_date, end_date):
         )
 
     return pd.DataFrame(business_events)
+
 ```
 
 ## Model Validation and Performance Assessment[​](#model-validation-and-performance-assessment "Direct link to Model Validation and Performance Assessment")
@@ -462,7 +470,7 @@ def create_business_calendar(start_date, end_date):
 
 python
 
-```
+```python
 def comprehensive_model_validation(model, df):
     """Perform comprehensive Prophet model validation."""
 
@@ -529,13 +537,14 @@ def comprehensive_model_validation(model, df):
 
 # Usage
 validation_metrics = comprehensive_model_validation(model, df)
+
 ```
 
 ### Forecast Quality Assessment[​](#forecast-quality-assessment "Direct link to Forecast Quality Assessment")
 
 python
 
-```
+```python
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -624,6 +633,7 @@ def analyze_forecast_quality(model, df):
 
 # Usage
 forecast_analysis, residual_stats = analyze_forecast_quality(model, df)
+
 ```
 
 ## Hyperparameter Optimization[​](#hyperparameter-optimization "Direct link to Hyperparameter Optimization")
@@ -632,7 +642,7 @@ forecast_analysis, residual_stats = analyze_forecast_quality(model, df)
 
 python
 
-```
+```python
 import itertools
 from sklearn.metrics import mean_absolute_percentage_error
 
@@ -730,6 +740,7 @@ def optimize_prophet_hyperparameters(df, param_grid=None):
 
 # Usage
 best_model, best_config, all_results = optimize_prophet_hyperparameters(df)
+
 ```
 
 ### Advanced Optimization with Optuna[​](#advanced-optimization-with-optuna "Direct link to Advanced Optimization with Optuna")
@@ -738,7 +749,7 @@ Bayesian Hyperparameter Optimization
 
 python
 
-```
+```python
 import optuna
 
 
@@ -833,6 +844,7 @@ def optuna_prophet_optimization(df, n_trials=100):
 
 # Usage
 # optimized_model, study = optuna_prophet_optimization(df, n_trials=50)
+
 ```
 
 ## Model Deployment and Serving[​](#model-deployment-and-serving "Direct link to Model Deployment and Serving")
@@ -841,7 +853,7 @@ def optuna_prophet_optimization(df, n_trials=100):
 
 python
 
-```
+```python
 def load_and_predict_prophet_model(model_uri, future_periods=30):
     """Load Prophet model and generate predictions."""
 
@@ -871,13 +883,14 @@ def load_and_predict_prophet_model(model_uri, future_periods=30):
 # run_id = "your_run_id_here"
 # model_uri = f"runs:/{run_id}/prophet_model"
 # predictions = load_and_predict_prophet_model(model_uri, future_periods=365)
+
 ```
 
 ### Production Deployment Patterns[​](#production-deployment-patterns "Direct link to Production Deployment Patterns")
 
 python
 
-```
+```python
 class ProphetForecaster:
     """Production-ready Prophet forecaster class."""
 
@@ -960,13 +973,14 @@ forecaster = ProphetForecaster("models:/ProphetForecastModel/Production")
 predictions = forecaster.predict(periods=90)
 components = forecaster.get_components(periods=90)
 is_fresh, message = forecaster.check_model_freshness()
+
 ```
 
 Batch Prediction Pipeline
 
 python
 
-```
+```python
 def batch_prophet_predictions(model_registry_name, stage="Production"):
     """Run batch predictions for multiple time series."""
 
@@ -1015,6 +1029,7 @@ def batch_prophet_predictions(model_registry_name, stage="Production"):
         )
 
         return predictions
+
 ```
 
 ## Model Monitoring and Maintenance[​](#model-monitoring-and-maintenance "Direct link to Model Monitoring and Maintenance")
@@ -1023,7 +1038,7 @@ def batch_prophet_predictions(model_registry_name, stage="Production"):
 
 python
 
-```
+```python
 def monitor_forecast_accuracy(model_uri, actuals_df, prediction_horizon_days=30):
     """Monitor Prophet model accuracy against actual values."""
 
@@ -1114,6 +1129,7 @@ def monitor_forecast_accuracy(model_uri, actuals_df, prediction_horizon_days=30)
 
 # Usage
 # accuracy_metrics = monitor_forecast_accuracy(model_uri, new_actuals_df, prediction_horizon_days=30)
+
 ```
 
 ### Automated Model Retraining[​](#automated-model-retraining "Direct link to Automated Model Retraining")
@@ -1122,7 +1138,7 @@ Production Model Update Pipeline
 
 python
 
-```
+```python
 def automated_prophet_retraining(
     current_model_name, new_data, performance_threshold_mape=10.0, min_data_points=100
 ):
@@ -1261,6 +1277,7 @@ def automated_prophet_retraining(
             )
 
         return new_model, should_deploy
+
 ```
 
 ## Best Practices and Tips[​](#best-practices-and-tips "Direct link to Best Practices and Tips")
@@ -1269,7 +1286,7 @@ def automated_prophet_retraining(
 
 python
 
-```
+```python
 def prophet_data_best_practices():
     """Demonstrate Prophet data preparation best practices."""
 
@@ -1342,6 +1359,7 @@ def validate_prophet_data(df):
 # Usage
 validation_results = validate_prophet_data(df)
 print("Validation Results:", validation_results)
+
 ```
 
 ### Performance Optimization[​](#performance-optimization "Direct link to Performance Optimization")
@@ -1350,7 +1368,7 @@ Prophet Performance Tips
 
 python
 
-```
+```python
 def optimize_prophet_performance():
     """Tips for optimizing Prophet performance."""
 
@@ -1401,6 +1419,7 @@ def parallel_prophet_evaluation(models_dict, df):
     )
 
     return dict(results)
+
 ```
 
 ## Conclusion[​](#conclusion "Direct link to Conclusion")

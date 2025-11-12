@@ -164,32 +164,35 @@ Quick Setup Guide
 
 bash
 
-```
+```bash
 pip install mlflow
+
 ```
 
 Ensure that you have the appropriate DL integration package installed. For example, for PyTorch with image model support:
 
 bash
 
-```
+```bash
 pip install torch torchvision
+
 ```
 
 ### 2. Start Tracking Server (Optional)[​](#2-start-tracking-server-optional "Direct link to 2. Start Tracking Server (Optional)")
 
 bash
 
-```
+```bash
 # Start a local tracking server
 mlflow server --host 0.0.0.0 --port 5000
+
 ```
 
 ### 3. Enable Autologging[​](#3-enable-autologging "Direct link to 3. Enable Autologging")
 
 python
 
-```
+```python
 import mlflow
 
 # For TensorFlow/Keras
@@ -200,15 +203,17 @@ mlflow.pytorch.autolog()
 
 # For all supported frameworks
 mlflow.autolog()
+
 ```
 
 ### 4. Train Your Model Normally[​](#4-train-your-model-normally "Direct link to 4. Train Your Model Normally")
 
 python
 
-```
+```python
 # Your existing training code works unchanged!
 model.fit(train_data, train_labels, epochs=10, validation_data=(val_data, val_labels))
+
 ```
 
 ### 5. View Results[​](#5-view-results "Direct link to 5. View Results")
@@ -217,16 +222,18 @@ Open the MLflow UI to see your tracked experiments:
 
 bash
 
-```
+```bash
 mlflow ui
+
 ```
 
 Or if using a tracking server:
 
 text
 
-```
+```text
 http://localhost:5000
+
 ```
 
 ## Real-World Applications[​](#real-world-applications "Direct link to Real-World Applications")
@@ -257,7 +264,7 @@ Example with PyTorch DDP:
 
 python
 
-```
+```python
 import mlflow
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel
@@ -273,6 +280,7 @@ model = DistributedDataParallel(model.to(rank))
 # MLflow tracking works normally with DDP
 with mlflow.start_run():
     trainer.fit(model)
+
 ```
 
 Hyperparameter Optimization
@@ -288,7 +296,7 @@ Example with Optuna:
 
 python
 
-```
+```python
 import mlflow
 import optuna
 
@@ -320,6 +328,7 @@ with mlflow.start_run():
     # Log best parameters
     mlflow.log_params({f"best_{k}": v for k, v in study.best_params.items()})
     mlflow.log_metric("best_accuracy", study.best_value)
+
 ```
 
 Transfer Learning Workflows
@@ -335,7 +344,7 @@ Example tracking a fine-tuning run:
 
 python
 
-```
+```python
 import mlflow
 import torch
 from transformers import AutoModelForSequenceClassification
@@ -369,6 +378,7 @@ with mlflow.start_run():
     )
 
     # Fine-tune and track results...
+
 ```
 
 ## Learn More[​](#learn-more "Direct link to Learn More")

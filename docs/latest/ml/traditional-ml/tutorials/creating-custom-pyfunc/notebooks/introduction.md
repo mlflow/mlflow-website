@@ -8,7 +8,7 @@ We begin by defining a Python class for our model. This class should inherit fro
 
 python
 
-```
+```python
 import mlflow.pyfunc
 
 
@@ -54,6 +54,7 @@ class AddN(mlflow.pyfunc.PythonModel):
           The input DataFrame with `n` added to all columns.
       """
       return model_input.apply(lambda column: column + self.n)
+
 ```
 
 #### Step 2: Save the Model[​](#step-2-save-the-model "Direct link to Step 2: Save the Model")
@@ -62,7 +63,7 @@ Now that our model class is defined, we can instantiate it and save it using MLf
 
 python
 
-```
+```python
 # Define the path to save the model
 model_path = "/tmp/add_n_model"
 
@@ -71,11 +72,7 @@ add5_model = AddN(n=5)
 
 # Save the model using MLflow
 mlflow.pyfunc.save_model(path=model_path, python_model=add5_model)
-```
 
-```
-/Users/benjamin.wilson/miniconda3/envs/mlflow-dev-env/lib/python3.8/site-packages/_distutils_hack/__init__.py:30: UserWarning: Setuptools is replacing distutils.
-warnings.warn("Setuptools is replacing distutils.")
 ```
 
 #### Step 3: Load the Model[​](#step-3-load-the-model "Direct link to Step 3: Load the Model")
@@ -84,9 +81,10 @@ With our model saved, we can load it back using MLflow and then use it for predi
 
 python
 
-```
+```python
 # Load the saved model
 loaded_model = mlflow.pyfunc.load_model(model_path)
+
 ```
 
 #### Step 4: Evaluate the Model[​](#step-4-evaluate-the-model "Direct link to Step 4: Evaluate the Model")
@@ -95,7 +93,7 @@ Let's now use our loaded model to perform predictions on a sample input and veri
 
 python
 
-```
+```python
 import pandas as pd
 
 # Define a sample input DataFrame
@@ -103,12 +101,14 @@ model_input = pd.DataFrame([range(10)])
 
 # Use the loaded model to make predictions
 model_output = loaded_model.predict(model_input)
+
 ```
 
 python
 
-```
+```python
 model_output
+
 ```
 
 |   | 0 | 1 | 2 | 3 | 4 | 5  | 6  | 7  | 8  | 9  |

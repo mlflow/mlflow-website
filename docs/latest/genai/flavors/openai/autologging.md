@@ -30,7 +30,7 @@ The only element that is **enabled by default** when autologging is activated is
 
 python
 
-```
+```python
 import os
 import openai
 import mlflow
@@ -53,6 +53,7 @@ answer = openai_client.chat.completions.create(
     messages=messages,
     temperature=0.99,
 )
+
 ```
 
 note
@@ -63,7 +64,7 @@ When using the OpenAI SDK, ensure that your access token is assigned to the envi
 
 python
 
-```
+```python
 import os
 
 import mlflow
@@ -93,6 +94,7 @@ openai_client.chat.completions.create(
     messages=messages,
     temperature=0.95,
 )
+
 ```
 
 Viewing the logged model and the trace used when invoking the OpenAI client within the UI can be seen in the image below:
@@ -113,7 +115,7 @@ If you would like to log trace events for an async OpenAI API, below is a simpli
 
 python
 
-```
+```python
 import openai
 import mlflow
 import asyncio
@@ -166,4 +168,5 @@ messages = [
 ]
 
 await fetch_openai_response(messages)
+
 ```

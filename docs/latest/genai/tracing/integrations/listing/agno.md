@@ -8,10 +8,11 @@
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.agno.autolog()
+
 ```
 
 MLflow trace automatically captures the following information about Agentic calls:
@@ -29,15 +30,16 @@ Install the dependencies for the example:
 
 bash
 
-```
+```bash
 pip install 'mlflow>=3.3' agno anthropic yfinance
+
 ```
 
 Run a simple agent with `mlflow.agno.autolog()` enabled:
 
 python
 
-```
+```python
 from agno.agent import Agent
 from agno.models.anthropic import Claude
 from agno.tools.yfinance import YFinanceTools
@@ -49,6 +51,7 @@ agent = Agent(
     markdown=True,
 )
 agent.print_response("What is the stock price of Apple?", stream=False)
+
 ```
 
 ## Multi Agentic(Agents to Agents) Interaction[​](#multi-agenticagents-to-agents-interaction "Direct link to Multi Agentic(Agents to Agents) Interaction")
@@ -59,7 +62,7 @@ MLflow now makes it easier to track how multiple AI agents work together when us
 
 python
 
-```
+```python
 import mlflow
 
 from agno.agent import Agent
@@ -131,6 +134,7 @@ reasoning_finance_team.print_response(
     4. Recommend portfolio allocation weights""",
     show_full_reasoning=True,
 )
+
 ```
 
 ![Agno Tracing via autolog](/mlflow-website/docs/latest/images/llms/agno/agno-tracing.png)
@@ -141,7 +145,7 @@ MLflow >= 3.3.0 supports token usage tracking for Agno. The token usage for each
 
 python
 
-```
+```python
 # Get the trace object just created
 last_trace_id = mlflow.get_last_active_trace_id()
 trace = mlflow.get_trace(trace_id=last_trace_id)
@@ -161,11 +165,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 45710
   Output tokens: 3844
@@ -178,6 +183,7 @@ Team.run:
   Total tokens: 49554
 
 ... (other modules)
+
 ```
 
 ### Disable auto-tracing[​](#disable-auto-tracing "Direct link to Disable auto-tracing")

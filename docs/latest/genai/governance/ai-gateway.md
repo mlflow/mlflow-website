@@ -73,23 +73,25 @@ Install MLflow with gateway dependencies:
 
 bash
 
-```
+```bash
 pip install 'mlflow[gateway]'
+
 ```
 
 Set your OpenAI API key:
 
 bash
 
-```
+```bash
 export OPENAI_API_KEY=your_api_key_here
+
 ```
 
 Create a simple configuration file `config.yaml`:
 
 yaml
 
-```
+```yaml
 endpoints:
   - name: chat
     endpoint_type: llm/v1/chat
@@ -98,14 +100,16 @@ endpoints:
       name: gpt-3.5-turbo
       config:
         openai_api_key: $OPENAI_API_KEY
+
 ```
 
 Start the gateway server:
 
 bash
 
-```
+```bash
 mlflow gateway start --config-path config.yaml --port 5000
+
 ```
 
 Your gateway is now running at `http://localhost:5000`
@@ -114,12 +118,13 @@ Test your endpoint:
 
 bash
 
-```
+```bash
 curl -X POST http://localhost:5000/gateway/chat/invocations \
   -H "Content-Type: application/json" \
   -d '{
     "messages": [{"role": "user", "content": "Hello!"}]
   }'
+
 ```
 
 ## Supported Providers[​](#supported-providers "Direct link to Supported Providers")

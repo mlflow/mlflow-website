@@ -22,10 +22,11 @@ MLflow's integration with LlamaIndex's Workflow API is available in MLflow >= 2.
 
 python
 
-```
+```python
 %pip install mlflow>=2.17.0 llama-index>=0.11.16 -qqqU
 # Workflow util is required for rendering Workflow as HTML
 %pip install llama-index-utils-workflow -qqqU
+
 ```
 
 ## Choose your favorite LLM[​](#choose-your-favorite-llm "Direct link to Choose your favorite LLM")
@@ -38,10 +39,11 @@ LlamaIndex by default uses OpenAI APIs for LLMs and embeddings models. To procee
 
 python
 
-```
+```python
 import os
 
 os.environ["OPENAI_API_KEY"] = "<YOUR_OPENAI_API_KEY>"
+
 ```
 
 #### Option 2: Other Hosted LLMs[​](#option-2-other-hosted-llms "Direct link to Option 2: Other Hosted LLMs")
@@ -56,27 +58,30 @@ The following cells show an example for using Databricks hosted LLMs (Llama3.1 7
 
 python
 
-```
+```python
 %pip install llama-index-llms-databricks
+
 ```
 
 python
 
-```
+```python
 import os
 
 os.environ["DATABRICKS_TOKEN"] = "<YOUR_DATABRICKS_API_TOKEN>"
 os.environ["DATABRICKS_SERVING_ENDPOINT"] = "https://YOUR_DATABRICKS_HOST/serving-endpoints/"
+
 ```
 
 python
 
-```
+```python
 from llama_index.core import Settings
 from llama_index.llms.databricks import Databricks
 
 llm = Databricks(model="databricks-meta-llama-3-1-70b-instruct")
 Settings.llm = llm
+
 ```
 
 #### Option 3: Local LLM[​](#option-3-local-llm "Direct link to Option 3: Local LLM")
@@ -89,10 +94,11 @@ LlamaIndex also support locally hosted LLMs. Please refer to the [Starter Tutori
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_experiment("MLflow LlamaIndex Workflow Tutorial")
+
 ```
 
 ## Define tools[​](#define-tools "Direct link to Define tools")
@@ -103,7 +109,7 @@ Please ignore the `### [USE IN MODEL]` comment at the beginning of some cells li
 
 python
 
-```
+```python
 # [USE IN MODEL]
 from llama_index.core.tools import FunctionTool
 
@@ -122,6 +128,7 @@ tools = [
   FunctionTool.from_defaults(add),
   FunctionTool.from_defaults(multiply),
 ]
+
 ```
 
 ## Define Workflow[​](#define-workflow "Direct link to Define Workflow")
@@ -137,11 +144,12 @@ Each step specifies its input and output events through its function signature.
 
 python
 
-```
+```python
 @step
 async def my_step(self, event: StartEvent) -> FooEvent:
     # This method triggers when a StartEvent is emitted at the workflow's start,
     # and then dispatches a FooEvent.
+
 ```
 
 Based on each step's signature and defined events, LlamaIndex automatically constructs the workflow's execution flow.
@@ -156,7 +164,7 @@ The Workflow definition below models a ReAct Agent that utilizes the simple math
 
 python
 
-```
+```python
 # [USE IN MODEL]
 
 # Event definitions
@@ -191,11 +199,12 @@ class ToolOutputEvent(Event):
   """An event to handle the results of tool calls, if any"""
 
   output: ToolOutput
+
 ```
 
 python
 
-```
+```python
 # [USE IN MODEL]
 
 # Workflow definition
@@ -310,6 +319,7 @@ class ReActAgent(Workflow):
 
       # prep the next iteration
       return PrepEvent()
+
 ```
 
 #### Check the Workflow Visually[​](#check-the-workflow-visually "Direct link to Check the Workflow Visually")
@@ -322,7 +332,7 @@ To check that, we can render the graphical representation of the workflow by usi
 
 python
 
-```
+```python
 from IPython.display import HTML
 from llama_index.utils.workflow import draw_all_possible_flows
 
@@ -331,13 +341,15 @@ draw_all_possible_flows(ReActAgent, filename="workflow.html")
 with open("workflow.html") as file:
   html_content = file.read()
 HTML(html_content)
+
 ```
 
 python
 
-```
+```python
 # [USE IN MODEL]
 agent = ReActAgent(timeout=180)
+
 ```
 
 ## Run the Workflow (with Trace)[​](#run-the-workflow-with-trace "Direct link to Run the Workflow (with Trace)")
@@ -348,21 +360,19 @@ Mlflow supports automatic tracing for LlamaIndex Workflow. To enable it, you jus
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.llama_index.autolog()
+
 ```
 
 python
 
-```
+```python
 # Run the workflow
 await agent.run(input="What is (123 + 456) * 789?")
-```
 
-```
-'The result of (123 + 456) * 789 is 579,027.'
 ```
 
 ## Review the Trace[​](#review-the-trace "Direct link to Review the Trace")
@@ -400,7 +410,7 @@ You could manually create a separate Python file by copying the code from this n
 
 python
 
-```
+```python
 def generate_model_script(output_path, notebook_path="llama_index_workflow_tutorial.ipynb"):
   """
   A utility function to generate a ready-to-log .py script that
@@ -442,17 +452,14 @@ mlflow.models.set_model(agent)"
 
 # Pass `notebook_path` argument if you changed the notebook name
 generate_model_script(output_path="react_agent.py")
-```
 
-```
-Model code saved to react_agent.py
 ```
 
 #### Logging the Model[​](#logging-the-model "Direct link to Logging the Model")
 
 python
 
-```
+```python
 import mlflow
 
 with mlflow.start_run(run_name="react-agent-workflow"):
@@ -462,6 +469,7 @@ with mlflow.start_run(run_name="react-agent-workflow"):
       # Logging with an input example help MLflow to record dependency and signature information accurately.
       input_example={"input": "What is (123 + 456) * 789?"},
   )
+
 ```
 
 ## Explore the MLflow UI[​](#explore-the-mlflow-ui "Direct link to Explore the MLflow UI")
@@ -485,16 +493,13 @@ To simulate a different environment, we'll remove the `llm` configuration from t
 
 python
 
-```
+```python
 from llama_index.core.llms import MockLLM
 
 Settings.llm = MockLLM(max_tokens=1)
 
 await agent.run(input="What is (123 + 456) * 789?")
-```
 
-```
-'text'
 ```
 
 Since the dummy LLM is configured, the workflow could not generate the correct output but just returns "text".
@@ -503,17 +508,10 @@ Now try loading the model back from the MLflow Experiment by calling `mlflow.lla
 
 python
 
-```
+```python
 loaded_model = mlflow.llama_index.load_model("runs:/f8e0a0d2dd5546d5ac93ce126358c444/model")
 await loaded_model.run(input="What is (123 + 456) * 789?")
-```
 
-```
-Downloading artifacts:   0%|          | 0/12 [00:00<?, ?it/s]
-```
-
-```
-'(123 + 456) * 789 = 456831'
 ```
 
 This time, the output is computed correctly, because MLflow automatically restores the original LLM setting at the time of logging.

@@ -19,7 +19,7 @@ To create a new prompt programmatically, use the [`mlflow.genai.register_prompt(
 
 python
 
-```
+```python
 import mlflow
 
 # Use double curly braces for variables in the template
@@ -42,7 +42,7 @@ initial_template = [
 from pydantic import BaseModel, Field
 
 
-class ResponseFormat:
+class ResponseFormat(BaseModel):
     summary: str = Field(..., description="Summary of the content")
 
 
@@ -64,6 +64,7 @@ prompt = mlflow.genai.register_prompt(
 
 # The prompt object contains information about the registered prompt
 print(f"Created prompt '{prompt.name}' (version {prompt.version})")
+
 ```
 
 ## Editing an Existing Prompt (Creating New Versions)[​](#editing-an-existing-prompt-creating-new-versions "Direct link to Editing an Existing Prompt (Creating New Versions)")
@@ -85,7 +86,7 @@ To create a new version of an existing prompt, you again use the [`mlflow.genai.
 
 python
 
-```
+```python
 import mlflow
 
 new_template = """\
@@ -109,6 +110,7 @@ updated_prompt = mlflow.genai.register_prompt(
         "author": "author@example.com",
     },
 )
+
 ```
 
 ## Understanding Immutability[​](#understanding-immutability "Direct link to Understanding Immutability")

@@ -28,16 +28,17 @@ Let's dive into the world of embeddings and explore their transformative impact 
 
 python
 
-```
+```python
 import warnings
 
 # Disable a few less-than-useful UserWarnings from setuptools and pydantic
 warnings.filterwarnings("ignore", category=UserWarning)
+
 ```
 
 python
 
-```
+```python
 import os
 
 import numpy as np
@@ -51,6 +52,7 @@ from mlflow.models.signature import ModelSignature
 from mlflow.types.schema import ColSpec, ParamSchema, ParamSpec, Schema, TensorSpec
 
 assert "OPENAI_API_KEY" in os.environ, " OPENAI_API_KEY environment variable must be set"
+
 ```
 
 ### Integrating OpenAI Model with MLflow for Document Similarity[​](#integrating-openai-model-with-mlflow-for-document-similarity "Direct link to Integrating OpenAI Model with MLflow for Document Similarity")
@@ -69,7 +71,7 @@ These steps are essential for integrating access to OpenAI's embedding model int
 
 python
 
-```
+```python
 mlflow.set_experiment("Documenatation Similarity")
 
 with mlflow.start_run():
@@ -86,6 +88,7 @@ with mlflow.start_run():
 
 # Load the model in pyfunc format
 model = mlflow.pyfunc.load_model(model_info.model_uri)
+
 ```
 
 ### Webpage Text Extraction for Embedding Analysis[​](#webpage-text-extraction-for-embedding-analysis "Direct link to Webpage Text Extraction for Embedding Analysis")
@@ -106,7 +109,7 @@ These functions are integral to preprocessing web content, ensuring that the tex
 
 python
 
-```
+```python
 def insert_space_after_tags(soup, tags):
   """
   Insert a space after each tag specified in the provided BeautifulSoup object.
@@ -150,6 +153,7 @@ def extract_text_from_url(url, id):
 
   return "
 ".join(tag.get_text(separator=" ", strip=True) for tag in filtered_tags)
+
 ```
 
 #### Detailed Workflow:[​](#detailed-workflow "Direct link to Detailed Workflow:")
@@ -211,7 +215,7 @@ By leveraging the power of embeddings and similarity metrics, `compare_pages` pr
 
 python
 
-```
+```python
 def compare_pages(url1, url2, id1, id2):
   """
   Compare two webpages and return the similarity score.
@@ -238,6 +242,7 @@ def compare_pages(url1, url2, id1, id2):
       )
   else:
       return "Failed to retrieve content."
+
 ```
 
 ### Similarity Analysis Between MLflow Documentation Pages[​](#similarity-analysis-between-mlflow-documentation-pages "Direct link to Similarity Analysis Between MLflow Documentation Pages")
@@ -276,7 +281,7 @@ This analysis highlights the effectiveness of using embeddings and similarity me
 
 python
 
-```
+```python
 # Get the similarity between the main LLMs page in the MLflow Docs and the LLM Evaluation page for the 2.8.1 release of MLflow
 
 llm_cosine, llm_euclid = compare_pages(
@@ -289,10 +294,7 @@ llm_cosine, llm_euclid = compare_pages(
 print(
   f"The cosine similarity between the LLMs page and the LLM Evaluation page is: {llm_cosine} and the euclidean distance is: {llm_euclid}"
 )
-```
 
-```
-The cosine similarity between the LLMs page and the LLM Evaluation page is: [[0.879243]] and the euclidean distance is: [[0.49144073]]
 ```
 
 ### Brief Overview of Similarity Between MLflow LLMs and Plugins Pages[​](#brief-overview-of-similarity-between-mlflow-llms-and-plugins-pages "Direct link to Brief Overview of Similarity Between MLflow LLMs and Plugins Pages")
@@ -321,7 +323,7 @@ The results reflect a moderate level of similarity between the LLMs and Plugins 
 
 python
 
-```
+```python
 # Get the similarity between the main LLMs page in the MLflow Docs and the Plugins page for the 2.8.1 release of MLflow
 
 plugins_cosine, plugins_euclid = compare_pages(
@@ -334,10 +336,7 @@ plugins_cosine, plugins_euclid = compare_pages(
 print(
   f"The cosine similarity between the LLMs page and the MLflow Projects page is: {plugins_cosine} and the euclidean distance is: {plugins_euclid}"
 )
-```
 
-```
-The cosine similarity between the LLMs page and the MLflow Projects page is: [[0.68062298]] and the euclidean distance is: [[0.79922088]]
 ```
 
 ### Tutorial Recap: Leveraging OpenAI Embeddings in MLflow[​](#tutorial-recap-leveraging-openai-embeddings-in-mlflow "Direct link to Tutorial Recap: Leveraging OpenAI Embeddings in MLflow")

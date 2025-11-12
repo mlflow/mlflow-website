@@ -20,21 +20,19 @@ First, let's set up the environment. We'll need the OpenAI Python SDK, as well a
 
 python
 
-```
+```python
 %pip install 'mlflow>=2.17.0' 'openai>=1.0' -qq
-```
 
-```
-Note: you may need to restart the kernel to use updated packages.
 ```
 
 python
 
-```
+```python
 import os
 from getpass import getpass
 
 os.environ["OPENAI_API_KEY"] = getpass("Enter your OpenAI API key: ")
+
 ```
 
 ### Step 1: Creating the tool definition[​](#step-1-creating-the-tool-definition "Direct link to Step 1: Creating the tool definition")
@@ -45,7 +43,7 @@ The first step is to create a tool definition that we can pass to OpenAI. We do 
 
 python
 
-```
+```python
 import mlflow
 from mlflow.types.llm import (
   FunctionToolDefinition,
@@ -78,6 +76,7 @@ class WeatherModel(mlflow.pyfunc.ChatModel):
 
       # OpenAI expects tools to be provided as a list of dictionaries
       self.tools = [weather_tool.to_dict()]
+
 ```
 
 ### Step 2: Implementing the tool[​](#step-2-implementing-the-tool "Direct link to Step 2: Implementing the tool")
@@ -86,7 +85,7 @@ Now that we have a definition for the tool, we need to actually implement it. Fo
 
 python
 
-```
+```python
 class WeatherModel(mlflow.pyfunc.ChatModel):
   def __init__(self):
       weather_tool = FunctionToolDefinition(
@@ -107,6 +106,7 @@ class WeatherModel(mlflow.pyfunc.ChatModel):
       def get_weather(self, city: str) -> str:
           # in a real-world scenario, the implementation might be more complex
           return f"It's sunny in {city}, with a temperature of 20C"
+
 ```
 
 ### Step 3: Implementing the `predict` method[​](#step-3-implementing-the-predict-method "Direct link to step-3-implementing-the-predict-method")
@@ -123,7 +123,7 @@ For the implementation, we'll simply forward the user's input to OpenAI, and pro
 
 python
 
-```
+```python
 import json
 
 from openai import OpenAI
@@ -204,6 +204,7 @@ class WeatherModel(mlflow.pyfunc.ChatModel):
       # return the result as a ChatResponse, as this
       # is the expected output of the predict method
       return ChatResponse.from_dict(response.to_dict())
+
 ```
 
 ### Step 4 (optional, but recommended): Enable tracing for the model[​](#step-4-optional-but-recommended-enable-tracing-for-the-model "Direct link to Step 4 (optional, but recommended): Enable tracing for the model")
@@ -216,7 +217,7 @@ To view the traces in the UI, run `mlflow ui` in a separate terminal shell, and 
 
 python
 
-```
+```python
 from mlflow.entities.span import (
   SpanType,
 )
@@ -278,6 +279,7 @@ class WeatherModel(mlflow.pyfunc.ChatModel):
           )
 
       return ChatResponse.from_dict(response.to_dict())
+
 ```
 
 ### Step 5: Logging the model[​](#step-5-logging-the-model "Direct link to Step 5: Logging the model")
@@ -296,7 +298,7 @@ Take note of the Model URI printed out at the end of the cell—we'll need it wh
 
 python
 
-```
+```python
 # messages to use as input examples
 messages = [
   {"role": "system", "content": "Please use the provided tools to answer user queries."},
@@ -319,23 +321,7 @@ with mlflow.start_run():
   )
 
   print("Successfully logged the model at the following URI: ", model_info.model_uri)
-```
 
-```
-2024/10/29 09:30:14 INFO mlflow.pyfunc: Predicting on input example to validate output
-```
-
-```
-Received a tool call, calling the weather tool...
-```
-
-```
-Downloading artifacts:   0%|          | 0/7 [00:00<?, ?it/s]
-```
-
-```
-Received a tool call, calling the weather tool...
-Successfully logged the model at the following URI:  runs:/8051850efa194a3b8b2450c4c9f4d42f/weather-model
 ```
 
 ### Using the model for inference[​](#using-the-model-for-inference "Direct link to Using the model for inference")
@@ -344,7 +330,7 @@ Now that the model is logged, our work is more or less done! In order to use the
 
 python
 
-```
+```python
 import mlflow
 
 # Load the previously logged ChatModel
@@ -372,17 +358,7 @@ messages = [
 # Generating another response
 response = tool_model.predict({"messages": messages})
 print(response["choices"][0]["message"]["content"])
-```
 
-```
-2024/10/29 09:30:27 WARNING mlflow.tracing.processor.mlflow: Creating a trace within the default experiment with id '0'. It is strongly recommended to not use the default experiment to log traces due to ambiguous search results and probable performance issues over time due to directory table listing performance degradation with high volumes of directories within a specific path. To avoid performance and disambiguation issues, set the experiment for your environment using `mlflow.set_experiment()` API.
-```
-
-```
-Received a tool call, calling the weather tool...
-The weather in Singapore is sunny, with a temperature of 20°C.
-Received a tool call, calling the weather tool...
-The weather in San Francisco is sunny, with a temperature of 20°C.
 ```
 
 ### Serving the model[​](#serving-the-model "Direct link to Serving the model")
@@ -391,16 +367,17 @@ MLflow also allows you to serve models, using the `mlflow models serve` CLI tool
 
 sh
 
-```
+```sh
 $ export OPENAI_API_KEY=<YOUR OPENAI API KEY>
 $ mlflow models serve -m <MODEL_URI>
+
 ```
 
 This will start serving the model on `http://127.0.0.1:5000`, and the model can be queried via POST request to the `/invocations` route.
 
 python
 
-```
+```python
 import requests
 
 messages = [
@@ -411,18 +388,7 @@ messages = [
 response = requests.post("http://127.0.0.1:5000/invocations", json={"messages": messages})
 response.raise_for_status()
 response.json()
-```
 
-```
-{'choices': [{'index': 0,
- 'message': {'role': 'assistant',
-  'content': 'The weather in Tokyo is sunny, with a temperature of 20°C.'},
- 'finish_reason': 'stop'}],
-'usage': {'prompt_tokens': 100, 'completion_tokens': 16, 'total_tokens': 116},
-'id': 'chatcmpl-ANVOhWssEiyYNFwrBPxp1gmQvZKsy',
-'model': 'gpt-4o-mini-2024-07-18',
-'object': 'chat.completion',
-'created': 1730165599}
 ```
 
 ### Conclusion[​](#conclusion "Direct link to Conclusion")

@@ -27,11 +27,12 @@ Join us to develop a nuanced understanding of paraphrase mining and master the a
 
 python
 
-```
+```python
 import warnings
 
 # Disable a few less-than-useful UserWarnings from setuptools and pydantic
 warnings.filterwarnings("ignore", category=UserWarning)
+
 ```
 
 ### Introduction to the Paraphrase Mining Model[​](#introduction-to-the-paraphrase-mining-model "Direct link to Introduction to the Paraphrase Mining Model")
@@ -58,7 +59,7 @@ This model provides a powerful tool for paraphrase detection in diverse applicat
 
 python
 
-```
+```python
 import warnings
 
 import pandas as pd
@@ -148,6 +149,7 @@ class ParaphraseMiningModel(PythonModel):
           warnings.warn("No paraphrases found above the similarity threshold.", UserWarning)
 
       return {sentence[0]: str(sentence[1]) for sentence in sorted_paraphrases}
+
 ```
 
 ### Preparing the Corpus for Paraphrase Mining[​](#preparing-the-corpus-for-paraphrase-mining "Direct link to Preparing the Corpus for Paraphrase Mining")
@@ -169,7 +171,7 @@ The corpus serves as the key dataset for the model to find semantically similar 
 
 python
 
-```
+```python
 corpus = [
   "Exploring ancient cities in Europe offers a glimpse into history.",
   "Modern AI technologies are revolutionizing industries.",
@@ -250,6 +252,7 @@ with open(corpus_file, "w") as file:
   for sentence in corpus:
       file.write(sentence + "
 ")
+
 ```
 
 ### Setting Up the Paraphrase Mining Model[​](#setting-up-the-paraphrase-mining-model "Direct link to Setting Up the Paraphrase Mining Model")
@@ -282,7 +285,7 @@ Prepare the Sentence Transformer model for integration with MLflow to harness it
 
 python
 
-```
+```python
 # Load a pre-trained sentence transformer model
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
@@ -312,15 +315,7 @@ signature = infer_signature(
 
 # Visualize the signature, showing our overridden inference parameter and its default.
 signature
-```
 
-```
-inputs: 
-['query': string]
-outputs: 
-['This product is satisfactory and functions as expected.': string]
-params: 
-['similarity_threshold': double (default: 0.5)]
 ```
 
 ### Creating an experiment[​](#creating-an-experiment "Direct link to Creating an experiment")
@@ -329,17 +324,14 @@ We create a new MLflow Experiment so that the run we're going to log our model t
 
 python
 
-```
+```python
 # If you are running this tutorial in local mode, leave the next line commented out.
 # Otherwise, uncomment the following line and set your tracking uri to your local or remote tracking server.
 
 # mlflow.set_tracking_uri("http://127.0.0.1:8080")
 
 mlflow.set_experiment("Paraphrase Mining")
-```
 
-```
-<Experiment: artifact_location='file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/sentence-transformers/tutorials/paraphrase-mining/mlruns/380691166097743403', creation_time=1701282619556, experiment_id='380691166097743403', last_update_time=1701282619556, lifecycle_stage='active', name='Paraphrase Mining', tags={}>
 ```
 
 ### Logging the Paraphrase Mining Model with MLflow[​](#logging-the-paraphrase-mining-model-with-mlflow "Direct link to Logging the Paraphrase Mining Model with MLflow")
@@ -363,7 +355,7 @@ Log the custom Paraphrase Mining Model with MLflow, a key step for model managem
 
 python
 
-```
+```python
 with mlflow.start_run() as run:
   model_info = mlflow.pyfunc.log_model(
       name="paraphrase_model",
@@ -373,18 +365,7 @@ with mlflow.start_run() as run:
       artifacts=artifacts,
       pip_requirements=["sentence_transformers"],
   )
-```
 
-```
-Downloading artifacts:   0%|          | 0/11 [00:00<?, ?it/s]
-```
-
-```
-2023/11/30 15:41:39 INFO mlflow.store.artifact.artifact_repo: The progress bar can be disabled by setting the environment variable MLFLOW_ENABLE_ARTIFACTS_PROGRESS_BAR to false
-```
-
-```
-Downloading artifacts:   0%|          | 0/1 [00:00<?, ?it/s]
 ```
 
 ### Model Loading and Paraphrase Mining Prediction[​](#model-loading-and-paraphrase-mining-prediction "Direct link to Model Loading and Paraphrase Mining Prediction")
@@ -412,7 +393,7 @@ This demonstration validates the Paraphrase Mining Model's effectiveness in real
 
 python
 
-```
+```python
 # Load our model by supplying the uri that was used to save the model artifacts
 loaded_dynamic = mlflow.pyfunc.load_model(model_info.model_uri)
 
@@ -420,16 +401,7 @@ loaded_dynamic = mlflow.pyfunc.load_model(model_info.model_uri)
 loaded_dynamic.predict(
   {"query": "Space exploration is fascinating."}, params={"similarity_threshold": 0.65}
 )
-```
 
-```
-{'Studying the stars helps us understand our universe.': '0.8207424879074097',
-'The history of space exploration is filled with remarkable achievements.': '0.7770636677742004',
-'Exploring ancient cities in Europe offers a glimpse into history.': '0.7461957335472107',
-'Space travel advancements could lead to interplanetary exploration.': '0.7090306282043457',
-'Space exploration continues to push the boundaries of human knowledge.': '0.6893945932388306',
-'The mysteries of the universe are unveiled through space missions.': '0.6830739974975586',
-'The study of celestial bodies helps us understand the cosmos.': '0.671358048915863'}
 ```
 
 ### Conclusion: Insights and Potential Enhancements[​](#conclusion-insights-and-potential-enhancements "Direct link to Conclusion: Insights and Potential Enhancements")

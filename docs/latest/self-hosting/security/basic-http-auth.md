@@ -15,8 +15,9 @@ First, install all dependencies required for the basic auth app:
 
 bash
 
-```
+```bash
 pip install mlflow[auth]
+
 ```
 
 note
@@ -25,8 +26,9 @@ The basic auth app requires a secret key for CSRF protection. Please set the `ML
 
 text
 
-```
+```text
 export MLFLOW_FLASK_SERVER_SECRET_KEY="my-secret-key"
+
 ```
 
 If your setup uses multiple servers, please make sure that this key is consistent between them. Otherwise, you may run into unexpected validation errors.
@@ -35,8 +37,9 @@ To enable MLflow authentication, launch the MLflow UI with the following command
 
 bash
 
-```
+```bash
 mlflow server --app-name basic-auth
+
 ```
 
 Server admin can choose to disable this feature anytime by restarting the server without the `app-name` flag. Any users and permissions created will be persisted on a SQL database and will be back in service once the feature is re-enabled.
@@ -151,8 +154,9 @@ All users and permissions are stored in a database in `basic_auth.db`, relative 
 
 bash
 
-```
+```bash
 python -m mlflow.server.auth db upgrade --url <database_url>
+
 ```
 
 ### Admin Users[​](#admin-users "Direct link to Admin Users")
@@ -177,15 +181,16 @@ Example
 
 bash
 
-```
+```bash
 # authenticate as built-in admin user
 export MLFLOW_TRACKING_USERNAME=admin
 export MLFLOW_TRACKING_PASSWORD=password
+
 ```
 
 python
 
-```
+```python
 from mlflow.server import get_app_client
 
 tracking_uri = "http://localhost:5000/"
@@ -193,6 +198,7 @@ tracking_uri = "http://localhost:5000/"
 auth_client = get_app_client("basic-auth", tracking_uri=tracking_uri)
 auth_client.create_user(username="user1", password="pw1")
 auth_client.update_user_admin(username="user1", is_admin=True)
+
 ```
 
 ### Managing Permissions[​](#managing-permissions "Direct link to Managing Permissions")
@@ -203,14 +209,15 @@ Example
 
 bash
 
-```
+```bash
 export MLFLOW_TRACKING_USERNAME=admin
 export MLFLOW_TRACKING_PASSWORD=password
+
 ```
 
 python
 
-```
+```python
 from mlflow import MlflowClient
 from mlflow.server import get_app_client
 
@@ -226,6 +233,7 @@ experiment_id = client.create_experiment(name="experiment")
 auth_client.create_experiment_permission(
     experiment_id=experiment_id, username="user2", permission="MANAGE"
 )
+
 ```
 
 ## Authenticating to MLflow[​](#authenticating-to-mlflow "Direct link to Authenticating to MLflow")
@@ -244,19 +252,21 @@ MLflow provides two environment variables for authentication: `MLFLOW_TRACKING_U
 
 bash
 
-```
+```bash
 export MLFLOW_TRACKING_USERNAME=username
 export MLFLOW_TRACKING_PASSWORD=password
+
 ```
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_tracking_uri("https://<mlflow_tracking_uri>/")
 with mlflow.start_run():
     ...
+
 ```
 
 ### Using Credentials File[​](#using-credentials-file "Direct link to Using Credentials File")
@@ -269,10 +279,11 @@ Credentials file format
 
 ini
 
-```
+```ini
 [mlflow]
 mlflow_tracking_username = username
 mlflow_tracking_password = password
+
 ```
 
 ### Using REST API[​](#using-rest-api "Direct link to Using REST API")
@@ -283,13 +294,14 @@ In Python, you can use the `requests` library:
 
 python
 
-```
+```python
 import requests
 
 response = requests.get(
     "https://<mlflow_tracking_uri>/",
     auth=("username", "password"),
 )
+
 ```
 
 ## Creating a New User[​](#creating-a-new-user "Direct link to Creating a New User")
@@ -312,7 +324,7 @@ In Python, you can use the `requests` library:
 
 python
 
-```
+```python
 import requests
 
 response = requests.post(
@@ -322,6 +334,7 @@ response = requests.post(
         "password": "password",
     },
 )
+
 ```
 
 ### Using MLflow AuthServiceClient[​](#using-mlflow-authserviceclient "Direct link to Using MLflow AuthServiceClient")
@@ -330,13 +343,14 @@ MLflow [`AuthServiceClient`](/mlflow-website/docs/latest/api_reference/auth/pyth
 
 python
 
-```
+```python
 import mlflow
 
 auth_client = mlflow.server.get_app_client(
     "basic-auth", tracking_uri="https://<mlflow_tracking_uri>/"
 )
 auth_client.create_user(username="username", password="password")
+
 ```
 
 ## Configuration[​](#configuration "Direct link to Configuration")
@@ -357,9 +371,10 @@ The `authorization_function` setting supports pluggable authentication methods i
 
 python
 
-```
+```python
 def authenticate_request() -> Union[Authorization, Response]:
     ...
+
 ```
 
 The function should return a `werkzeug.datastructures.Authorization` object if the request is authenticated, or a `Response` object (typically `401: Unauthorized`) if the request is not authenticated. For an example of how to implement a custom authentication method, see `tests/server/auth/jwt_auth.py`. **NOTE:** This example is not intended for production use.
@@ -374,17 +389,19 @@ Example: /path/to/my\_auth\_config.ini
 
 ini
 
-```
+```ini
 [mlflow]
 database_uri = postgresql://username:password@hostname:port/database
+
 ```
 
 Then, start the MLflow server with the `MLFLOW_AUTH_CONFIG_PATH` environment variable set to the path of your configuration file.
 
 bash
 
-```
+```bash
 MLFLOW_AUTH_CONFIG_PATH=/path/to/my_auth_config.ini mlflow server --app-name basic-auth
+
 ```
 
 The database must be created before starting the MLflow server. The database schema will be created automatically when the server starts.

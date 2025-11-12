@@ -8,7 +8,7 @@ The simplest dataset evaluation involves a DataFrame with predictions and target
 
 python
 
-```
+```python
 import mlflow
 import pandas as pd
 import numpy as np
@@ -55,6 +55,7 @@ with mlflow.start_run():
     print(f"Accuracy: {result.metrics['accuracy_score']:.3f}")
     print(f"F1 Score: {result.metrics['f1_score']:.3f}")
     print(f"ROC AUC: {result.metrics['roc_auc']:.3f}")
+
 ```
 
 This approach is perfect when:
@@ -73,7 +74,7 @@ For more structured dataset management, use MLflow's PandasDataset:
 
 python
 
-```
+```python
 import mlflow.data
 
 # Create MLflow dataset with prediction column specified
@@ -96,13 +97,14 @@ with mlflow.start_run():
     )
 
     print("Evaluation completed using MLflow PandasDataset")
+
 ```
 
 When your model produces multiple outputs, you can evaluate different output columns:
 
 python
 
-```
+```python
 # Simulate multi-output model results
 multi_output_data = pd.DataFrame(
     {
@@ -136,6 +138,7 @@ with mlflow.start_run():
             "avg_auxiliary": auxiliary_outputs.mean(),
         }
     )
+
 ```
 
 ## Batch Evaluation Workflows[​](#batch-evaluation-workflows "Direct link to Batch Evaluation Workflows")
@@ -148,7 +151,7 @@ For production batch inference results:
 
 python
 
-```
+```python
 def evaluate_batch_predictions(batch_results_path, batch_size=10000):
     """Evaluate large batch prediction results efficiently."""
 
@@ -194,13 +197,14 @@ def evaluate_batch_predictions(batch_results_path, batch_size=10000):
 
 # Usage
 # result = evaluate_batch_predictions("s3://my-bucket/batch-predictions/2024-01-15.parquet")
+
 ```
 
 Analyze model performance trends over time:
 
 python
 
-```
+```python
 def analyze_historical_performance(historical_data, time_column="prediction_date"):
     """Analyze model performance trends over time."""
 
@@ -266,13 +270,14 @@ def analyze_historical_performance(historical_data, time_column="prediction_date
 
 # Usage example
 # historical_result, trends = analyze_historical_performance(historical_predictions_df)
+
 ```
 
 Compare model performance across different datasets or data slices:
 
 python
 
-```
+```python
 def compare_datasets(datasets_dict, model_type="classifier"):
     """Compare model performance across multiple datasets."""
 
@@ -326,6 +331,7 @@ datasets = {
 }
 
 comparison = compare_datasets(datasets)
+
 ```
 
 ## Working with Large Datasets[​](#working-with-large-datasets "Direct link to Working with Large Datasets")
@@ -338,7 +344,7 @@ For datasets too large to fit in memory:
 
 python
 
-```
+```python
 def evaluate_large_dataset_in_chunks(data_path, chunk_size=50000):
     """Evaluate very large datasets by processing in chunks."""
 
@@ -408,13 +414,14 @@ def evaluate_large_dataset_in_chunks(data_path, chunk_size=50000):
 
 # Usage
 # results = evaluate_large_dataset_in_chunks("large_predictions.parquet")
+
 ```
 
 For extremely large datasets, use statistical sampling:
 
 python
 
-```
+```python
 def evaluate_with_sampling(large_dataset, sample_size=10000, n_samples=5):
     """Evaluate large dataset using multiple random samples."""
 
@@ -483,13 +490,14 @@ def evaluate_with_sampling(large_dataset, sample_size=10000, n_samples=5):
 
 # Usage
 # samples, stats = evaluate_with_sampling(very_large_dataset, sample_size=5000, n_samples=10)
+
 ```
 
 Best practices for memory-efficient evaluation:
 
 python
 
-```
+```python
 def memory_efficient_evaluation(large_dataset_path, chunk_size=10000):
     """Memory-efficient evaluation of large datasets."""
 
@@ -542,6 +550,7 @@ def memory_efficient_evaluation(large_dataset_path, chunk_size=10000):
 
 # Usage
 # accuracy, metrics = memory_efficient_evaluation("very_large_predictions.parquet")
+
 ```
 
 **Memory Management Tips:**

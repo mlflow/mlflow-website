@@ -22,7 +22,7 @@ To get started with vendor-neutral tracing quickly, you can use the OpenTelemetr
 
 python
 
-```
+```python
 import mlflow
 from openai import OpenAI
 
@@ -30,6 +30,7 @@ mlflow.openai.autolog()
 
 client = OpenAI()
 response = client.responses.create(model="gpt-5", input="Hello, world!")
+
 ```
 
 The MLflow Tracing SDK also works seamlessly with applications already instrumented with OpenTelemetry. Enhance your existing telemetry for HTTP frameworks, databases, network calls, etc., with MLflow's AI tracing capabilities.

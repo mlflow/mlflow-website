@@ -43,7 +43,7 @@ To create a new prompt using the Python API, use [`mlflow.genai.register_prompt(
 
 python
 
-```
+```python
 import mlflow
 
 # Use double curly braces for variables in the template
@@ -69,6 +69,7 @@ prompt = mlflow.genai.register_prompt(
 
 # The prompt object contains information about the registered prompt
 print(f"Created prompt '{prompt.name}' (version {prompt.version})")
+
 ```
 
 This creates a new prompt with the specified template text and metadata. The prompt is now available in the MLflow UI for further management.
@@ -91,7 +92,7 @@ To update an existing prompt with a new version, use the [`mlflow.genai.register
 
 python
 
-```
+```python
 import mlflow
 
 new_template = """\
@@ -115,6 +116,7 @@ updated_prompt = mlflow.genai.register_prompt(
         "author": "author@example.com",
     },
 )
+
 ```
 
 ### 3. Compare the Prompt Versions[​](#3-compare-the-prompt-versions "Direct link to 3. Compare the Prompt Versions")
@@ -130,7 +132,7 @@ To use a prompt in your GenAI application, you can load it with the [`mlflow.gen
 
 python
 
-```
+```python
 import mlflow
 import openai
 
@@ -158,6 +160,7 @@ response = client.chat.completions.create(
 )
 
 print(response.choices[0].message.content)
+
 ```
 
 ### 5. Search Prompts[​](#5-search-prompts "Direct link to 5. Search Prompts")
@@ -166,7 +169,7 @@ You can discover prompts by name, tag or other registry fields:
 
 python
 
-```
+```python
 import mlflow
 
 # Fluent API: returns a flat list of all matching prompts
@@ -190,6 +193,7 @@ while True:
     if not token:
         break
 print(f"Total prompts across pages: {len(all_prompts)}")
+
 ```
 
 ## Prompt Object[​](#prompt-object "Direct link to Prompt Object")
@@ -227,8 +231,9 @@ Text prompts use a simple string template with variables enclosed in double curl
 
 python
 
-```
+```python
 text_template = "Hello {{ name }}, how are you today?"
+
 ```
 
 #### Chat Prompts[​](#chat-prompts "Direct link to Chat Prompts")
@@ -237,11 +242,12 @@ Chat prompts use a list of message dictionaries, each with 'role' and 'content' 
 
 python
 
-```
+```python
 chat_template = [
     {"role": "system", "content": "You are a helpful {{ style }} assistant."},
     {"role": "user", "content": "{{ question }}"},
 ]
+
 ```
 
 ### Response Format[​](#response-format "Direct link to Response Format")
@@ -250,7 +256,7 @@ The `response_format` property allows you to specify the expected structure of r
 
 python
 
-```
+```python
 from pydantic import BaseModel
 
 
@@ -269,6 +275,7 @@ response_format_dict = {
         "word_count": {"type": "integer"},
     },
 }
+
 ```
 
 ### Manage Prompt and Version Tags[​](#manage-prompt-and-version-tags "Direct link to Manage Prompt and Version Tags")
@@ -277,7 +284,7 @@ MLflow lets you modify and inspect tags after a prompt has been registered. Tags
 
 python
 
-```
+```python
 import mlflow
 
 # Prompt-level tag operations
@@ -289,6 +296,7 @@ mlflow.genai.delete_prompt_tag("summarization-prompt", "language")
 mlflow.genai.set_prompt_version_tag("summarization-prompt", 1, "author", "alice")
 mlflow.genai.load_prompt("prompts:/summarization-prompt/1").tags
 mlflow.genai.delete_prompt_version_tag("summarization-prompt", 1, "author")
+
 ```
 
 ## FAQ[​](#faq "Direct link to FAQ")
@@ -299,12 +307,13 @@ A: You can delete a prompt version using the MLflow UI or Python API:
 
 python
 
-```
+```python
 import mlflow
 
 # Delete a prompt version
 client = mlflow.MlflowClient()
 client.delete_prompt_version("summarization-prompt", version=2)
+
 ```
 
 To avoid accidental deletion, you can only delete one version at a time via API. If you delete the all versions of a prompt, the prompt itself will be deleted.
@@ -319,10 +328,11 @@ A: You can load the latest version of a prompt by passing the name only, or usin
 
 python
 
-```
+```python
 prompt = mlflow.genai.load_prompt("summarization-prompt")
 # or
 prompt = mlflow.genai.load_prompt("prompts:/summarization-prompt@latest")
+
 ```
 
 #### Q: Can I use prompt templates with frameworks like LangChain or LlamaIndex?[​](#q-can-i-use-prompt-templates-with-frameworks-like-langchain-or-llamaindex "Direct link to Q: Can I use prompt templates with frameworks like LangChain or LlamaIndex?")
@@ -331,7 +341,7 @@ A: Yes, you can load prompts from MLflow and use them with any framework. For ex
 
 python
 
-```
+```python
 import mlflow
 from langchain.prompts import PromptTemplate
 
@@ -343,6 +353,7 @@ prompt = mlflow.genai.load_prompt("question_answering")
 langchain_prompt = PromptTemplate.from_template(prompt.to_single_brace_format())
 print(langchain_prompt.input_variables)
 # Output: ['num_sentences', 'sentences']
+
 ```
 
 #### Q: Is Prompt Registry integrated with the Prompt Engineering UI?[​](#q-is-prompt-registry-integrated-with-the-prompt-engineering-ui "Direct link to Q: Is Prompt Registry integrated with the Prompt Engineering UI?")

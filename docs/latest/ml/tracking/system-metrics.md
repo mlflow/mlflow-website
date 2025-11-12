@@ -8,24 +8,27 @@ To log system metrics in MLflow, please install `psutil`. We explicitly don't in
 
 bash
 
-```
+```bash
 pip install psutil
+
 ```
 
 If you want to catch Nvidia GPU metrics, you also need to install `nvidia-ml-py`:
 
 bash
 
-```
+```bash
 pip install nvidia-ml-py
+
 ```
 
 If you are using AMD/HIP GPUs, install [pyrsmi](https://github.com/ROCm/pyrsmi) instead of `nvidia-ml-py`:
 
 bash
 
-```
+```bash
 pip install pyrsmi
+
 ```
 
 ## Turn on/off System Metrics Logging[​](#turn-onoff-system-metrics-logging "Direct link to Turn on/off System Metrics Logging")
@@ -42,25 +45,27 @@ You can set the environment variable `MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING` to `
 
 bash
 
-```
+```bash
 export MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING=true
+
 ```
 
 However, if you are executing the command above from within Ipython notebook (Jupyter, Databricks notebook, Google Colab), the `export` command will not work due to the segregated state of the ephemeral shell. Instead you can use the following code:
 
 python
 
-```
+```python
 import os
 
 os.environ["MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING"] = "true"
+
 ```
 
 After setting the environment variable, you will see that starting an MLflow run will automatically collect and log the default system metrics. Try running the following code in your favorite environment and you should see system metrics existing in the logged run data. Please note that you don't necessarilty need to start an MLflow server, as the metrics are logged locally.
 
 python
 
-```
+```python
 import mlflow
 import time
 
@@ -68,13 +73,14 @@ with mlflow.start_run() as run:
     time.sleep(15)
 
 print(mlflow.MlflowClient().get_run(run.info.run_id).data)
+
 ```
 
 Your output should look like this:
 
 text
 
-```
+```text
 <RunData: metrics={'system/cpu_utilization_percentage': 12.4,
 'system/disk_available_megabytes': 213744.0,
 'system/disk_usage_megabytes': 28725.3,
@@ -86,22 +92,25 @@ text
 'mlflow.source.name': '/usr/local/lib/python3.10/dist-packages/colab_kernel_launcher.py',
 'mlflow.source.type': 'LOCAL',
 'mlflow.user': 'root'}>
+
 ```
 
 To disable system metrics logging, you can use either of the following commands:
 
 bash
 
-```
+```bash
 export MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING="false"
+
 ```
 
 python
 
-```
+```python
 import os
 
 del os.environ["MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING"]
+
 ```
 
 Rerunning the MLflow code above will not log system metrics.
@@ -112,7 +121,7 @@ We also provide a pair of APIs `mlflow.enable_system_metrics_logging()` and `mlf
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.enable_system_metrics_logging()
@@ -121,6 +130,7 @@ with mlflow.start_run() as run:
     time.sleep(15)
 
 print(mlflow.MlflowClient().get_run(run.info.run_id).data)
+
 ```
 
 ### Enabling System Metrics Logging for a Single Run[​](#enabling-system-metrics-logging-for-a-single-run "Direct link to Enabling System Metrics Logging for a Single Run")
@@ -129,11 +139,12 @@ In addition to controlling system metrics logging globally, you can also control
 
 python
 
-```
+```python
 with mlflow.start_run(log_system_metrics=True) as run:
     time.sleep(15)
 
 print(mlflow.MlflowClient().get_run(run.info.run_id).data)
+
 ```
 
 Please also note that using `log_system_metrics` will ignore the global status of system metrics logging. In other words, the above code will log system metrics for the specific run even if you have disabled system metrics logging by setting `MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING` to `false` or calling `mlflow.disable_system_metrics_logging()`.
@@ -165,19 +176,21 @@ System metrics are available within the MLflow UI under the metrics section. In 
 
 bash
 
-```
+```bash
 mlflow ui
+
 ```
 
 python
 
-```
+```python
 import mlflow
 import time
 
 mlflow.set_tracking_uri("http://127.0.0.1:5000")
 with mlflow.start_run() as run:
     time.sleep(15)
+
 ```
 
 Navigate to `http://127.0.0.1:5000` in your browser and open your run. You should see system metrics under the metrics section, similar as shown by the screenshot below:
@@ -192,7 +205,7 @@ By default, system metrics are sampled every 10 seconds and are directly logged 
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_system_metrics_sampling_interval(1)
@@ -206,6 +219,7 @@ metric_history = mlflow.MlflowClient().get_metric_history(
     "system/cpu_utilization_percentage",
 )
 print(metric_history)
+
 ```
 
 You will see `system/cpu_utilization_percentage` logged a few times.

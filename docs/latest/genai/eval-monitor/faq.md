@@ -16,8 +16,9 @@ MLflow uses a thread pool to run the predict function and scorers in parallel. C
 
 bash
 
-```
+```bash
 export MLFLOW_GENAI_EVAL_MAX_WORKERS=5
+
 ```
 
 ## Why does MLflow make N+1 predictions during evaluation?[​](#why-does-mlflow-make-n1-predictions-during-evaluation "Direct link to Why does MLflow make N+1 predictions during evaluation?")
@@ -28,8 +29,9 @@ If you are confident the predict function already generates traces, skip this va
 
 bash
 
-```
+```bash
 export MLFLOW_GENAI_EVAL_SKIP_TRACE_VALIDATION=true
+
 ```
 
 ## How do I change the name of the evaluation run?[​](#how-do-i-change-the-name-of-the-evaluation-run "Direct link to How do I change the name of the evaluation run?")
@@ -38,9 +40,10 @@ By default, `mlflow.genai.evaluate` generates a random run name. Set a custom na
 
 python
 
-```
+```python
 with mlflow.start_run(run_name="My Evaluation Run") as run:
     mlflow.genai.evaluate(...)
+
 ```
 
 ## How do I use Databricks Model Serving endpoints as the predict function?[​](#how-do-i-use-databricks-model-serving-endpoints-as-the-predict-function "Direct link to How do I use Databricks Model Serving endpoints as the predict function?")
@@ -55,7 +58,7 @@ The wrapper:
 
 python
 
-```
+```python
 import mlflow
 from mlflow.genai.scorers import Correctness
 
@@ -66,6 +69,7 @@ mlflow.genai.evaluate(
     predict_fn=mlflow.genai.to_predict_fn("endpoints:/chat"),
     scorers=[Correctness()],
 )
+
 ```
 
 ## How to migrate from MLflow 2 LLM Evaluation?[​](#how-to-migrate-from-mlflow-2-llm-evaluation "Direct link to How to migrate from MLflow 2 LLM Evaluation?")
@@ -86,8 +90,9 @@ To debug your scorers, you can enable tracing for the scorer functions by settin
 
 bash
 
-```
+```bash
 export MLFLOW_GENAI_EVAL_ENABLE_SCORER_TRACING=true
+
 ```
 
 When this is set to `true`, MLflow will trace scorer executions during the evaluation and allow you to inspect the input, output, and internal steps during the scorer execution.

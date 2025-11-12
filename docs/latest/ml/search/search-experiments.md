@@ -48,7 +48,7 @@ Comparators for numeric attributes:
 
 python
 
-```
+```python
 # Matches experiments with name equal to 'x'
 "attributes.name = 'x'"  # or "name = 'x'"
 
@@ -63,4 +63,5 @@ python
 
 # Matches experiments with name starting with 'x' and 'group' tag value equal to 'y'
 "attributes.name LIKE 'x%' AND tags.group = 'y'"
+
 ```

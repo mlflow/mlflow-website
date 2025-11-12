@@ -8,7 +8,7 @@ The simplest way to evaluate a model is with MLflow's unified evaluation API:
 
 python
 
-```
+```python
 import mlflow
 import xgboost as xgb
 import shap
@@ -45,6 +45,7 @@ with mlflow.start_run():
     print(f"Accuracy: {result.metrics['accuracy_score']:.3f}")
     print(f"F1 Score: {result.metrics['f1_score']:.3f}")
     print(f"ROC AUC: {result.metrics['roc_auc']:.3f}")
+
 ```
 
 This single call automatically generates:
@@ -68,7 +69,7 @@ For classification tasks, MLflow automatically computes comprehensive metrics:
 
 python
 
-```
+```python
 # Binary Classification
 result = mlflow.models.evaluate(
     model_uri,
@@ -84,6 +85,7 @@ print(f"Precision: {metrics['precision_score']:.3f}")
 print(f"Recall: {metrics['recall_score']:.3f}")
 print(f"F1 Score: {metrics['f1_score']:.3f}")
 print(f"ROC AUC: {metrics['roc_auc']:.3f}")
+
 ```
 
 **Automatic Classification Metrics:**
@@ -97,7 +99,7 @@ For regression tasks, MLflow provides comprehensive error analysis:
 
 python
 
-```
+```python
 from sklearn.datasets import fetch_california_housing
 from sklearn.linear_model import LinearRegression
 
@@ -131,6 +133,7 @@ with mlflow.start_run():
     print(f"MAE: {result.metrics['mean_absolute_error']:.3f}")
     print(f"RMSE: {result.metrics['root_mean_squared_error']:.3f}")
     print(f"R² Score: {result.metrics['r2_score']:.3f}")
+
 ```
 
 **Automatic Regression Metrics:**
@@ -149,7 +152,7 @@ Control which evaluators run during assessment:
 
 python
 
-```
+```python
 # Run only default metrics (fastest)
 result = mlflow.models.evaluate(
     model_uri,
@@ -168,6 +171,7 @@ result = mlflow.models.evaluate(
     evaluators=["default"],
     evaluator_config={"log_explainer": True},
 )
+
 ```
 
 Configuration Options Reference
@@ -201,7 +205,7 @@ MLflow provides a powerful framework for defining custom evaluation metrics usin
 
 python
 
-```
+```python
 import mlflow
 import numpy as np
 from mlflow.models import make_metric
@@ -229,13 +233,14 @@ result = mlflow.models.evaluate(
     model_type="classifier",
     extra_metrics=[custom_accuracy],
 )
+
 ```
 
 Create custom visualization and analysis artifacts:
 
 python
 
-```
+```python
 import matplotlib.pyplot as plt
 import os
 
@@ -267,6 +272,7 @@ result = mlflow.models.evaluate(
     model_type="regressor",
     custom_artifacts=[create_residual_plot],
 )
+
 ```
 
 ## Working with Evaluation Results[​](#working-with-evaluation-results "Direct link to Working with Evaluation Results")
@@ -275,7 +281,7 @@ The evaluation result object provides comprehensive access to all generated metr
 
 python
 
-```
+```python
 # Run evaluation
 result = mlflow.models.evaluate(
     model_uri, eval_data, targets="label", model_type="classifier"
@@ -295,6 +301,7 @@ for artifact_name, path in result.artifacts.items():
 eval_table = result.tables["eval_results_table"]
 print(f"\nEvaluation table shape: {eval_table.shape}")
 print(f"Columns: {list(eval_table.columns)}")
+
 ```
 
 ## Model Comparison and Advanced Workflows[​](#model-comparison-and-advanced-workflows "Direct link to Model Comparison and Advanced Workflows")
@@ -307,7 +314,7 @@ Compare multiple models systematically:
 
 python
 
-```
+```python
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
@@ -352,13 +359,14 @@ for model_name, model in models.items():
 comparison_df = pd.DataFrame(results).T
 print("Model Comparison:")
 print(comparison_df[["accuracy_score", "f1_score", "roc_auc"]].round(3))
+
 ```
 
 Combine MLflow evaluation with cross-validation:
 
 python
 
-```
+```python
 from sklearn.model_selection import cross_val_score, StratifiedKFold
 
 
@@ -408,13 +416,14 @@ result = evaluate_with_cv(
     y_train,
     eval_data,
 )
+
 ```
 
 Automated model selection based on evaluation metrics:
 
 python
 
-```
+```python
 def evaluate_and_select_best_model(
     models, X_train, y_train, eval_data, metric="f1_score"
 ):
@@ -458,6 +467,7 @@ def evaluate_and_select_best_model(
 best_model, all_scores = evaluate_and_select_best_model(
     models, X_train, y_train, eval_data, metric="f1_score"
 )
+
 ```
 
 ## Model Validation and Quality Gates[​](#model-validation-and-quality-gates "Direct link to Model Validation and Quality Gates")
@@ -470,7 +480,7 @@ With the [`mlflow.validate_evaluation_results()`](/mlflow-website/docs/latest/ap
 
 python
 
-```
+```python
 from mlflow.models import MetricThreshold
 
 # Evaluate your model first
@@ -501,6 +511,7 @@ try:
     print("✅ Model meets all static performance thresholds.")
 except mlflow.exceptions.ModelValidationFailedException as e:
     print(f"❌ Model failed static validation: {e}")
+
 ```
 
 More information on model validation behavior and outputs can be found in the [`mlflow.validate_evaluation_results()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.html#mlflow.validate_evaluation_results) API documentation.
@@ -514,7 +525,7 @@ Analyze model errors in detail:
 
 python
 
-```
+```python
 def analyze_model_errors(result, eval_data, targets, top_n=20):
     """Analyze model errors in detail."""
 
@@ -544,13 +555,14 @@ def analyze_model_errors(result, eval_data, targets, top_n=20):
 
 # Usage
 errors = analyze_model_errors(result, eval_data, "label")
+
 ```
 
 Analyze how model errors relate to input features:
 
 python
 
-```
+```python
 def analyze_errors_by_features(model_uri, eval_data, targets, feature_columns):
     """Analyze how model errors relate to input features."""
 
@@ -603,6 +615,7 @@ feature_stats, analysis = analyze_errors_by_features(
     "label",
     feature_columns=eval_data.drop(columns=["label"]).columns.tolist(),
 )
+
 ```
 
 ## Best Practices and Optimization[​](#best-practices-and-optimization "Direct link to Best Practices and Optimization")
@@ -615,7 +628,7 @@ Complete evaluation workflow with best practices:
 
 python
 
-```
+```python
 def comprehensive_model_evaluation(
     model, X_train, y_train, eval_data, targets, model_type
 ):
@@ -650,13 +663,14 @@ def comprehensive_model_evaluation(
         )
 
         return result
+
 ```
 
 Optimize evaluation for large datasets and complex models:
 
 python
 
-```
+```python
 # Optimize evaluation performance
 result = mlflow.models.evaluate(
     model_uri,
@@ -702,13 +716,14 @@ def evaluate_in_batches(model_uri, large_eval_data, targets, batch_size=1000):
     )
 
     return result
+
 ```
 
 Ensure consistent evaluation results:
 
 python
 
-```
+```python
 def reproducible_evaluation(model, eval_data, targets, random_seed=42):
     """Ensure reproducible evaluation results."""
 
@@ -740,6 +755,7 @@ def reproducible_evaluation(model, eval_data, targets, random_seed=42):
         )
 
         return result
+
 ```
 
 ## Conclusion[​](#conclusion "Direct link to Conclusion")

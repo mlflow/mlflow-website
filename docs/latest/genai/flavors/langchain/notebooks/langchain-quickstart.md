@@ -61,8 +61,9 @@ To install the dependent packages simply run:
 
 bash
 
-```
+```bash
 pip install openai==1.12.0 tiktoken==0.6.0 langchain==0.1.16 langchain-openai==0.0.33 langchain-community==0.0.33 mlflow==2.12.1
+
 ```
 
 > NOTE: This tutorial does not support openai<1 and is not guaranteed to work with versions of langchain<1.16.0
@@ -89,7 +90,7 @@ For secure usage, set API keys as environment variables.
 
 python
 
-```
+```python
 import os
 
 from langchain.chains import LLMChain
@@ -99,13 +100,14 @@ from langchain_openai import OpenAI
 import mlflow
 
 assert "OPENAI_API_KEY" in os.environ, "Please set the OPENAI_API_KEY environment variable."
+
 ```
 
 > **NOTE: If you'd like to use Azure OpenAI with LangChain, you need to install `openai>=1.10.0` and `langchain-openai>=0.0.6`, as well as to specify the following credentials and parameters:**
 
 python
 
-```
+```python
 # NOTE: Only run this cell if you are using Azure interfaces with OpenAI. If you have a direct account with
 # OpenAI, ignore this cell.
 
@@ -129,6 +131,7 @@ azure_openai_llm = AzureOpenAI(
 azure_openai_embeddings = AzureOpenAIEmbeddings(
   azure_deployment="<your-deployment-name>",
 )
+
 ```
 
 ### Configuring the OpenAI Completions Model in LangChain[​](#configuring-the-openai-completions-model-in-langchain "Direct link to Configuring the OpenAI Completions Model in LangChain")
@@ -147,8 +150,9 @@ In this tutorial, we use the Completions model for its simplicity and effectiven
 
 python
 
-```
+```python
 llm = OpenAI(temperature=0.1, max_tokens=1000)
+
 ```
 
 ### Explanation of the Template Instruction for Sous Chef Simulation[​](#explanation-of-the-template-instruction-for-sous-chef-simulation "Direct link to Explanation of the Template Instruction for Sous Chef Simulation")
@@ -174,7 +178,7 @@ This template instruction is a key component of the tutorial, demonstrating how 
 
 python
 
-```
+```python
 template_instruction = (
   "Imagine you are a fine dining sous chef. Your task is to meticulously prepare for a dish, focusing on the mise-en-place process."
   "Given a recipe, your responsibilities are: "
@@ -190,6 +194,7 @@ template_instruction = (
   "Your goal is to set the stage flawlessly for the chef to execute the cooking seamlessly."
   "The recipe you are given is for: {recipe} for {customer_count} people. "
 )
+
 ```
 
 ### Constructing the LangChain Chain[​](#constructing-the-langchain-chain "Direct link to Constructing the LangChain Chain")
@@ -202,7 +207,7 @@ With the chain ready, we proceed to log it in MLflow. This is done within an MLf
 
 python
 
-```
+```python
 prompt = PromptTemplate(
   input_variables=["recipe", "customer_count"],
   template=template_instruction,
@@ -213,6 +218,7 @@ mlflow.set_experiment("Cooking Assistant")
 
 with mlflow.start_run():
   model_info = mlflow.langchain.log_model(chain, name="langchain_model")
+
 ```
 
 If we navigate to the MLflow UI, we'll see our logged LangChain model.
@@ -242,125 +248,22 @@ This example demonstrates the power and utility of combining LangChain and MLflo
 
 python
 
-```
+```python
 loaded_model = mlflow.pyfunc.load_model(model_info.model_uri)
 
 dish1 = loaded_model.predict({"recipe": "boeuf bourginon", "customer_count": "4"})
 
 print(dish1[0])
-```
 
-```
-
-1. Ingredients:
-- 2 pounds beef chuck, cut into 1-inch cubes
-- 6 slices of bacon, diced
-- 2 tablespoons olive oil
-- 1 onion, diced
-- 2 carrots, diced
-- 2 cloves of garlic, minced
-- 1 tablespoon tomato paste
-- 1 bottle of red wine
-- 2 cups beef broth
-- 1 bouquet garni (thyme, bay leaf, parsley)
-- 1 pound pearl onions, peeled
-- 1 pound mushrooms, quartered
-- Salt and pepper to taste
-- Chopped parsley for garnish
-
-2. Preparation Techniques:
-- Cut the beef chuck into 1-inch cubes and set aside.
-- Dice the bacon and set aside.
-- Peel and dice the onion and carrots.
-- Mince the garlic cloves.
-- Prepare the bouquet garni by tying together a few sprigs of thyme, a bay leaf, and a few sprigs of parsley with kitchen twine.
-- Peel the pearl onions and quarter the mushrooms.
-
-3. Ingredient Staging:
-- Place the beef cubes in a bowl and season with salt and pepper.
-- In a large Dutch oven, heat the olive oil over medium-high heat.
-- Add the diced bacon and cook until crispy.
-- Remove the bacon from the pot and set aside.
-- In the same pot, add the seasoned beef cubes and cook until browned on all sides.
-- Remove the beef from the pot and set aside.
-- In the same pot, add the diced onion and carrots and cook until softened.
-- Add the minced garlic and cook for an additional minute.
-- Stir in the tomato paste and cook for another minute.
-- Add the beef and bacon back into the pot.
-- Pour in the red wine and beef broth.
-- Add the bouquet garni and bring to a simmer.
-- Cover the pot and let it simmer for 2 hours, stirring occasionally.
-- After 2 hours, add the pearl onions and mushrooms to the pot.
-- Continue to simmer for an additional hour, or until the beef is tender.
-- Remove the bouquet garni and discard.
-- Taste and adjust seasoning with salt and pepper if needed.
-- Garnish with chopped parsley before serving.
-
-4. Cooking Implements Preparation:
-- Large Dutch oven or heavy-bottomed pot
-- Kitchen twine
-- Cutting board
-- Chef's knife
-- Wooden spoon
-- Measuring cups and spoons
-- Bowls for prepped ingredients
-- Tongs for handling meat
-- Ladle for serving
-- Serving dishes for the final dish.
 ```
 
 python
 
-```
+```python
 dish2 = loaded_model.predict({"recipe": "Okonomiyaki", "customer_count": "12"})
 
 print(dish2[0])
-```
 
-```
-
-
-Ingredients:
-- 2 cups all-purpose flour
-- 2 teaspoons baking powder
-- 1/2 teaspoon salt
-- 2 eggs
-- 1 1/2 cups water
-- 1/2 head cabbage, thinly sliced
-- 1/2 cup green onions, thinly sliced
-- 1/2 cup carrots, grated
-- 1/2 cup red bell pepper, thinly sliced
-- 1/2 cup cooked shrimp, chopped
-- 1/2 cup cooked bacon, chopped
-- 1/2 cup pickled ginger, chopped
-- 1/2 cup tenkasu (tempura flakes)
-- 1/2 cup mayonnaise
-- 1/4 cup okonomiyaki sauce
-- 1/4 cup katsuobushi (dried bonito flakes)
-- Vegetable oil for cooking
-
-Preparation Techniques:
-1. In a large mixing bowl, combine the flour, baking powder, and salt.
-2. In a separate bowl, beat the eggs and water together.
-3. Slowly pour the egg mixture into the flour mixture, stirring until well combined.
-4. Set the batter aside to rest for 10 minutes.
-5. Thinly slice the cabbage, green onions, and red bell pepper.
-6. Grate the carrots.
-7. Chop the cooked shrimp, bacon, and pickled ginger.
-8. Prepare the tenkasu, mayonnaise, okonomiyaki sauce, and katsuobushi.
-
-Ingredient Staging:
-1. Place the sliced cabbage, green onions, carrots, red bell pepper, shrimp, bacon, and pickled ginger in separate bowls.
-2. Arrange the tenkasu, mayonnaise, okonomiyaki sauce, and katsuobushi in small dishes.
-3. Set up a large griddle or non-stick pan for cooking the okonomiyaki.
-
-Cooking Implements Preparation:
-1. Make sure the griddle or pan is clean and dry.
-2. Heat the griddle or pan over medium heat.
-3. Have a spatula, tongs, and a large plate ready for flipping and serving the okonomiyaki.
-4. Prepare a large plate or platter for serving the finished okonomiyaki.
-
-Remember, mise-en-place is key to a successful dish. Make sure all ingredients are prepped and ready to go before starting the cooking process. Happy cooking!
 ```
 
 ### Conclusion[​](#conclusion "Direct link to Conclusion")

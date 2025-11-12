@@ -34,8 +34,9 @@ First, please install mlflow to your local machine using the following command:
 
 bash
 
-```
+```bash
 pip install mlflow[mlserver]
+
 ```
 
 `[extras]` will install additional dependencies required for this tutorial including [mlserver](https://mlserver.readthedocs.io/en/latest) and [scikit-learn](https://scikit-learn.org/stable). Note that scikit-learn is not required for deployment, just for training the example model used in this tutorial.
@@ -44,8 +45,9 @@ You can check if MLflow is installed correctly by running:
 
 bash
 
-```
+```bash
 mlflow --version
+
 ```
 
 ## Step 2: Setting Up a Kubernetes Cluster[​](#step-2-setting-up-a-kubernetes-cluster "Direct link to Step 2: Setting Up a Kubernetes Cluster")
@@ -71,7 +73,7 @@ For the sake of convenience, we use the [`mlflow.sklearn.autolog()`](/mlflow-web
 
 python
 
-```
+```python
 import mlflow
 
 import numpy as np
@@ -104,14 +106,16 @@ with mlflow.start_run(run_name="default-params"):
 
     y_pred = lr.predict(X_test)
     rmse, mae, r2 = eval_metrics(y_pred, y_test)
+
 ```
 
 Now you have trained a model, let's check if the parameters and metrics are logged correctly, via the MLflow UI. You can start the MLflow UI by running the following command in your terminal:
 
 bash
 
-```
+```bash
 mlflow ui --port 5000
+
 ```
 
 Then visit <http://localhost:5000> to open the UI.
@@ -126,7 +130,7 @@ Now that we have established a baseline model, let's attempt to improve its perf
 
 python
 
-```
+```python
 from scipy.stats import uniform
 from sklearn.model_selection import RandomizedSearchCV
 
@@ -164,6 +168,7 @@ with mlflow.start_run(run_name="hyperparameter-tuning"):
             "r2_score_X_test": r2,
         }
     )
+
 ```
 
 When you reopen the MLflow UI, you should notice that the run "hyperparameter-tuning" contains 5 child runs. MLflow utilizes parent-child relationship, which is particularly useful for grouping a set of runs, such as those in hyper parameter tuning. Here the auto-logging is enabled and MLflow automatically create child runs for the top 5 runs based on the `scoring` metric, which is negative mean absolute error in this example.
@@ -195,13 +200,14 @@ Let's take a brief look at how this format appears. You can view the logged mode
 
 text
 
-```
+```text
 model
 ├── MLmodel
 ├── model.pkl
 ├── conda.yaml
 ├── python_env.yaml
 └── requirements.txt
+
 ```
 
 `model.pkl` is the file containing the serialized model weight. `MLmodel` includes general metadata that instructs MLflow on how to load the model. The other files specify the dependencies required to run the model.
@@ -212,8 +218,9 @@ If you opt for manual logging, you will need to log the model explicitly using t
 
 python
 
-```
+```python
 mlflow.sklearn.log_model(lr, name="model")
+
 ```
 
 ## Step 6: Testing Model Serving Locally[​](#step-6-test-model-serving-locally "Direct link to Step 6: Testing Model Serving Locally")
@@ -222,18 +229,20 @@ Before deploying the model, let's first test that the model can be served locall
 
 bash
 
-```
+```bash
 mlflow models serve -m models:/<model_id_for_your_best_iteration> -p 1234 --enable-mlserver
+
 ```
 
 This command starts a local server listening on port 1234. You can send a request to the server using `curl` command:
 
 bash
 
-```
+```bash
 $ curl -X POST -H "Content-Type:application/json" --data '{"inputs": [[14.23, 1.71, 2.43, 15.6, 127.0, 2.8, 3.06, 0.28, 2.29, 5.64, 1.04, 3.92, 1065.0]]}' http://127.0.0.1:1234/invocations
 
 {"predictions": [-0.03416275504140387]}
+
 ```
 
 For more information about the request format and response formats, refer to the [Inference Server Specification](/mlflow-website/docs/latest/ml/deployment/deploy-model-locally.md#local-inference-server-spec).
@@ -248,8 +257,9 @@ First, create a test namespace for deploying KServe resources and your model:
 
 bash
 
-```
+```bash
 kubectl create namespace mlflow-kserve-test
+
 ```
 
 ### Create Deployment Configuration[​](#create-deployment-configuration "Direct link to Create Deployment Configuration")
@@ -278,8 +288,9 @@ Build a ready-to-deploy Docker image with the `mlflow models build-docker` comma
 
 bash
 
-```
+```bash
 mlflow models build-docker -m runs:/<run_id_for_your_best_run>/model -n <your_dockerhub_user_name>/mlflow-wine-classifier --enable-mlserver
+
 ```
 
 This command builds a Docker image with the model and dependencies, tagging it as `mlflow-wine-classifier:latest`.
@@ -290,8 +301,9 @@ After building the image, push it to Docker Hub (or to another registry using th
 
 bash
 
-```
+```bash
 docker push <your_dockerhub_user_name>/mlflow-wine-classifier
+
 ```
 
 #### Write Deployment Configuration[​](#write-deployment-configuration "Direct link to Write Deployment Configuration")
@@ -300,7 +312,7 @@ Then create a YAML file like this:
 
 yaml
 
-```
+```yaml
 apiVersion: "serving.kserve.io/v1beta1"
 kind: "InferenceService"
 metadata:
@@ -317,6 +329,7 @@ spec:
         env:
           - name: PROTOCOL
             value: "v2"
+
 ```
 
 #### Get Remote Model URI[​](#get-remote-model-uri "Direct link to Get Remote Model URI")
@@ -331,7 +344,7 @@ With the remote model URI, create a YAML file:
 
 yaml
 
-```
+```yaml
 apiVersion: "serving.kserve.io/v1beta1"
 kind: "InferenceService"
 metadata:
@@ -344,6 +357,7 @@ spec:
         name: mlflow
       protocolVersion: v2
       storageUri: "<your_model_uri>"
+
 ```
 
 ### Deploy Inference Service[​](#deploy-inference-service "Direct link to Deploy Inference Service")
@@ -352,21 +366,23 @@ Run the following `kubectl` command to deploy a new `InferenceService` to your K
 
 bash
 
-```
+```bash
 $ kubectl apply -f YOUR_CONFIG_FILE.yaml
 
 inferenceservice.serving.kserve.io/mlflow-wine-classifier created
+
 ```
 
 You can check the status of the deployment by running:
 
 bash
 
-```
+```bash
 $ kubectl get inferenceservice mlflow-wine-classifier
 
 NAME                     URL                                                     READY   PREV   LATEST   PREVROLLEDOUTREVISION   LATESTREADYREVISION
 mlflow-wine-classifier   http://mlflow-wine-classifier.mlflow-kserve-test.local   True             100                    mlflow-wine-classifier-100
+
 ```
 
 note
@@ -381,7 +397,7 @@ First, create a JSON file with test data and save it as `test-input.json`. Ensur
 
 json
 
-```
+```json
 {
   "inputs": [
     {
@@ -392,6 +408,7 @@ json
     }
   ]
 }
+
 ```
 
 Then send the request to your inference service:
@@ -403,13 +420,14 @@ Assuming your cluster is exposed via LoadBalancer, follow [these instructions](h
 
 bash
 
-```
+```bash
 $ SERVICE_HOSTNAME=$(kubectl get inferenceservice mlflow-wine-classifier -n mlflow-kserve-test -o jsonpath='{.status.url}' | cut -d "/" -f 3)
 $ curl -v \
   -H "Host: ${SERVICE_HOSTNAME}" \
   -H "Content-Type: application/json" \
   -d @./test-input.json \
   http://${INGRESS_HOST}:${INGRESS_PORT}/v2/models/mlflow-wine-classifier/infer
+
 ```
 
 Typically, Kubernetes clusters expose services via LoadBalancer, but a local cluster created by `kind` doesn't have one. In this case, you can access the inference service via port-forwarding.
@@ -418,25 +436,27 @@ Open a new terminal and run the following command to forward the port:
 
 bash
 
-```
+```bash
 $ INGRESS_GATEWAY_SERVICE=$(kubectl get svc -n istio-system --selector="app=istio-ingressgateway" -o jsonpath='{.items[0].metadata.name}')
 $ kubectl port-forward -n istio-system svc/${INGRESS_GATEWAY_SERVICE} 8080:80
 
 Forwarding from 127.0.0.1:8080 -> 8080
 Forwarding from [::1]:8080 -> 8080
+
 ```
 
 Then, in the original terminal, send a test request to the server:
 
 bash
 
-```
+```bash
 $ SERVICE_HOSTNAME=$(kubectl get inferenceservice mlflow-wine-classifier -n mlflow-kserve-test -o jsonpath='{.status.url}' | cut -d "/" -f 3)
 $ curl -v \
   -H "Host: ${SERVICE_HOSTNAME}" \
   -H "Content-Type: application/json" \
   -d @./test-input.json \
   http://localhost:8080/v2/models/mlflow-wine-classifier/infer
+
 ```
 
 ## Troubleshooting[​](#troubleshooting "Direct link to Troubleshooting")

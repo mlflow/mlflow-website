@@ -4,7 +4,7 @@ Auto logging is a powerful feature that allows you to log metrics, parameters, a
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.autolog()
@@ -12,6 +12,7 @@ mlflow.autolog()
 with mlflow.start_run():
     # your training code goes here
     ...
+
 ```
 
 This will enable MLflow to automatically log various information about your run, including:
@@ -30,8 +31,9 @@ MLflow is available on PyPI. If you don't already have it installed on your syst
 
 bash
 
-```
+```bash
 pip install mlflow
+
 ```
 
 ### Step 2 - Insert `mlflow.autolog` in Your Code[​](#step-2---insert-mlflowautolog-in-your-code "Direct link to step-2---insert-mlflowautolog-in-your-code")
@@ -40,7 +42,7 @@ For example, following code snippet shows how to enable autologging for a scikit
 
 python
 
-```
+```python
 import mlflow
 
 from sklearn.model_selection import train_test_split
@@ -55,14 +57,16 @@ X_train, X_test, y_train, y_test = train_test_split(db.data, db.target)
 rf = RandomForestRegressor(n_estimators=100, max_depth=6, max_features=3)
 # MLflow triggers logging automatically upon model fitting
 rf.fit(X_train, y_train)
+
 ```
 
 ### Step 3 - Execute Your Code[​](#step-3---execute-your-code "Direct link to Step 3 - Execute Your Code")
 
 bash
 
-```
+```bash
 python YOUR_ML_CODE.py
+
 ```
 
 ### Step 4 - View Your Results in the MLflow UI[​](#step-4---view-your-results-in-the-mlflow-ui "Direct link to Step 4 - View Your Results in the MLflow UI")
@@ -71,8 +75,9 @@ Once your training job finishes, you can run following command to launch the MLf
 
 bash
 
-```
+```bash
 mlflow ui --port 8080
+
 ```
 
 Then, navigate to [`http://localhost:8080`](http://localhost:8080) in your browser to view the results.
@@ -83,13 +88,14 @@ You can also control the behavior of autologging by passing arguments to [`mlflo
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.autolog(
     log_model_signatures=False,
     extra_tags={"YOUR_TAG": "VALUE"},
 )
+
 ```
 
 See [`mlflow.autolog()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.html#mlflow.autolog) for the full set of arguments you can use.
@@ -100,7 +106,7 @@ One common use case is to enable/disable autologging for a specific library. For
 
 python
 
-```
+```python
 import mlflow
 
 # Option 1: Enable autologging only for PyTorch
@@ -109,6 +115,7 @@ mlflow.pytorch.autolog()
 # Option 2: Disable autologging for scikit-learn, but enable it for other libraries
 mlflow.sklearn.autolog(disable=True)
 mlflow.autolog()
+
 ```
 
 ## Supported Libraries[​](#supported-libraries "Direct link to Supported Libraries")
@@ -218,11 +225,12 @@ Autologging for parameter search estimators (e.g. [GridSearchCV](https://scikit-
 
 text
 
-```
+```text
 - Parent run
   - Child run 1
   - Child run 2
   - ...
+
 ```
 
 containing the following data:

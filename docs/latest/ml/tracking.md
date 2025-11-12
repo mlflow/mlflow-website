@@ -34,7 +34,7 @@ An experiment groups together runs and models for a specific task. You can creat
 
 python
 
-```
+```python
 import mlflow
 
 with mlflow.start_run():
@@ -42,18 +42,20 @@ with mlflow.start_run():
     # Your ml code
     ...
     mlflow.log_metric("val_loss", val_loss)
+
 ```
 
 Alternatively, [Auto-logging](/mlflow-website/docs/latest/ml/tracking/autolog.md) offers an ultra-quick setup for starting MLflow tracking. This powerful feature allows you to log metrics, parameters, and models without the need for explicit log statements - all you need to do is call [`mlflow.autolog()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.html#mlflow.autolog) before your training code. Auto-logging supports popular libraries such as [Scikit-learn](/mlflow-website/docs/latest/ml/tracking/autolog.md#autolog-sklearn), [XGBoost](/mlflow-website/docs/latest/ml/tracking/autolog.md#autolog-xgboost), [PyTorch](/mlflow-website/docs/latest/ml/tracking/autolog.md#autolog-pytorch), [Keras](/mlflow-website/docs/latest/ml/tracking/autolog.md#autolog-keras), [Spark](/mlflow-website/docs/latest/ml/tracking/autolog.md#autolog-spark), and more. See [Automatic Logging Documentation](/mlflow-website/docs/latest/ml/tracking/autolog.md) for supported libraries and how to use auto-logging APIs with each of them.
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.autolog()
 
 # Your training code...
+
 ```
 
 note
@@ -66,7 +68,7 @@ MLflow 3 introduces powerful model search capabilities through [`mlflow.search_l
 
 python
 
-```
+```python
 import mlflow
 
 # Find high-performing models across experiments
@@ -88,6 +90,7 @@ best_model = mlflow.search_logged_models(
 
 # Load the best model directly
 loaded_model = mlflow.pyfunc.load_model(f"models:/{best_model.model_id}")
+
 ```
 
 **Key Features:**
@@ -107,7 +110,7 @@ For example, the following code snippet search for runs that has the best valida
 
 python
 
-```
+```python
 client = mlflow.tracking.MlflowClient()
 experiment_id = "0"
 best_run = client.search_runs(
@@ -115,6 +118,7 @@ best_run = client.search_runs(
 )[0]
 print(best_run.info)
 # {'run_id': '...', 'metrics': {'val_loss': 0.123}, ...}
+
 ```
 
 ## Tracking Models[​](#tracking-models "Direct link to Tracking Models")
@@ -127,7 +131,7 @@ You can log model checkpoints at different steps during training using the `step
 
 python
 
-```
+```python
 import mlflow
 import mlflow.pytorch
 
@@ -154,6 +158,7 @@ with mlflow.start_run() as run:
                 model_id=model_info.model_id,  # Link metric to specific model
                 dataset=validation_dataset,
             )
+
 ```
 
 ### Linking Metrics to Models and Datasets[​](#linking-metrics-to-models-and-datasets "Direct link to Linking Metrics to Models and Datasets")
@@ -162,7 +167,7 @@ MLflow 3 allows you to link metrics to specific model checkpoints and datasets, 
 
 python
 
-```
+```python
 # Create a dataset reference
 train_dataset = mlflow.data.from_pandas(train_df, name="training_data")
 
@@ -174,6 +179,7 @@ mlflow.log_metric(
     model_id=model_info.model_id,  # Links to specific model checkpoint
     dataset=train_dataset,  # Links to specific dataset
 )
+
 ```
 
 ### Searching and Ranking Model Checkpoints[​](#searching-and-ranking-model-checkpoints "Direct link to Searching and Ranking Model Checkpoints")
@@ -182,7 +188,7 @@ Use [`mlflow.search_logged_models()`](/mlflow-website/docs/latest/api_reference/
 
 python
 
-```
+```python
 # Search for all models in a run, ordered by accuracy
 ranked_models = mlflow.search_logged_models(
     filter_string=f"source_run_id='{run.info.run_id}'",
@@ -197,6 +203,7 @@ print(f"Accuracy: {best_model.metrics[0].value}")
 
 # Load the best model for inference
 loaded_model = mlflow.pyfunc.load_model(f"models:/{best_model.model_id}")
+
 ```
 
 ### Model URIs in MLflow 3[​](#model-uris-in-mlflow-3 "Direct link to Model URIs in MLflow 3")
@@ -205,13 +212,14 @@ MLflow 3 introduces a new model URI format that uses model IDs instead of run ID
 
 python
 
-```
+```python
 # New MLflow 3 model URI format
 model_uri = f"models:/{model_info.model_id}"
 loaded_model = mlflow.pyfunc.load_model(model_uri)
 
 # This replaces the older run-based URI format:
 # model_uri = f"runs:/{run_id}/model_path"
+
 ```
 
 This new approach provides several advantages:
@@ -246,8 +254,9 @@ If you log runs to a local `mlruns` directory, run the following command in the 
 
 bash
 
-```
+```bash
 mlflow ui --port 5000
+
 ```
 
 Alternatively, the [MLflow Tracking Server](#tracking_server) serves the same UI and enables remote storage of run artifacts. In that case, you can view the UI at `http://<IP address of your MLflow tracking server>:5000` from any machine that can connect to your tracking server.
@@ -345,10 +354,11 @@ Yes, while it is best practice to have the MLflow Tracking Server as a proxy for
 
 python
 
-```
+```python
 experiment_name = "your_experiment_name"
 mlflow.create_experiment(experiment_name, artifact_location="s3://your-bucket")
 mlflow.set_experiment(experiment_name)
+
 ```
 
 Your runs under this experiment will log artifacts to the remote storage directly.

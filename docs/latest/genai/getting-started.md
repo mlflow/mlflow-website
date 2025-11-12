@@ -52,7 +52,7 @@ Transform any GenAI application into a fully observable system:
 
 python
 
-```
+```python
 import mlflow
 
 # Enable automatic tracing for your framework
@@ -70,6 +70,7 @@ response = client.chat.completions.create(
     messages=[{"role": "user", "content": "Explain quantum computing"}],
 )
 # ✅ Automatically traced: tokens, latency, cost, full request/response
+
 ```
 
 No code changes required. Every LLM call, tool interaction, and prompt execution is automatically captured with detailed metrics.
@@ -80,7 +81,7 @@ Register prompts and automatically optimize them with data-driven techniques. Se
 
 python
 
-```
+```python
 import mlflow
 import openai
 from mlflow.genai.optimize import GepaPromptOptimizer
@@ -134,6 +135,7 @@ optimized_prompt = result.optimized_prompts[0]
 print(f"Optimized prompt registered as version {optimized_prompt.version}")
 print(f"Template: {optimized_prompt.template}")
 print(f"Score: {result.final_eval_score}")
+
 ```
 
 Transform manual prompt engineering into systematic, data-driven optimization with automatic performance tracking. Learn more in the [Optimize Prompts](/mlflow-website/docs/latest/genai/prompt-registry/optimize-prompts.md) guide.

@@ -39,13 +39,14 @@ The easiest way to get started with MLflow and Keras is through **autologging** 
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.tensorflow.autolog()  # That's it! 🎉
 
 # Your existing Keras code works unchanged
 model.fit(x_train, y_train, validation_data=(x_val, y_val), epochs=10)
+
 ```
 
 What Gets Automatically Logged
@@ -93,9 +94,10 @@ Run the same MLflow tracking code across different Keras backends:
 
 python
 
-```
+```python
 # Switch backends without changing your MLflow code
 os.environ["KERAS_BACKEND"] = "tensorflow"  # or "jax" or "torch"
+
 ```
 
 ### Advanced Experiment Management[​](#advanced-experiment-management "Direct link to Advanced Experiment Management")

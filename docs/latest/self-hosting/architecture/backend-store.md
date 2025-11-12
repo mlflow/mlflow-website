@@ -85,7 +85,7 @@ When connecting to a MySQL database that requires SSL certificates, you can set 
 
 bash
 
-```
+```bash
 # Path to SSL CA certificate file
 export MLFLOW_MYSQL_SSL_CA=/path/to/ca.pem
 
@@ -94,14 +94,16 @@ export MLFLOW_MYSQL_SSL_CERT=/path/to/client-cert.pem
 
 # Path to SSL client key file (if needed)
 export MLFLOW_MYSQL_SSL_KEY=/path/to/client-key.pem
+
 ```
 
 Then start the MLflow server with your MySQL URI:
 
 bash
 
-```
+```bash
 mlflow server --backend-store-uri="mysql+pymysql://username@hostname:port/database" --default-artifact-root=s3://your-bucket --host=0.0.0.0 --port=5000
+
 ```
 
 These environment variables will be used to configure the SSL connection to the MySQL server.
@@ -112,21 +114,23 @@ MLflow will automatically try to use [LibYAML](https://pyyaml.org/wiki/LibYAML) 
 
 bash
 
-```
+```bash
 # On Ubuntu/Debian
 apt-get install libyaml-cpp-dev libyaml-dev
 
 # On macOS using Homebrew
 brew install yaml-cpp libyaml
+
 ```
 
 After installing LibYAML, you need to reinstall PyYAML:
 
 bash
 
-```
+```bash
 # Reinstall PyYAML
 pip --no-cache-dir install --force-reinstall -I pyyaml
+
 ```
 
 note

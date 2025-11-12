@@ -8,20 +8,21 @@ To define a custom scorer, you can define a function that takes in the [input ar
 
 python
 
-```
+```python
 from mlflow.genai import scorer
 
 
 @scorer
 def exact_match(outputs: dict, expectations: dict) -> bool:
     return outputs == expectations["expected_response"]
+
 ```
 
 To return richer information beyond primitive values, you can return a [Feedback](/mlflow-website/docs/latest/api_reference/python_api/mlflow.entities.html#mlflow.entities.Feedback) object.
 
 python
 
-```
+```python
 from mlflow.entities import Feedback
 
 
@@ -34,13 +35,14 @@ def is_short(outputs: dict) -> Feedback:
         else f"The response is not short enough because it has ({len(outputs.split())} words)."
     )
     return Feedback(value=score, rationale=rationale)
+
 ```
 
 Then you can pass the functions directly to the [mlflow.genai.evaluate](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.evaluate) function, just like other predefined or LLM-based scorers.
 
 python
 
-```
+```python
 import mlflow
 
 eval_dataset = [
@@ -60,6 +62,7 @@ mlflow.genai.evaluate(
     data=eval_dataset,
     scorers=[exact_match, is_short],
 )
+
 ```
 
 ![Code-based Scorers](/mlflow-website/docs/latest/images/mlflow-3/eval-monitor/scorers/code-scorers-results.png)
@@ -75,7 +78,7 @@ As input, custom scorers have access to:
 
 python
 
-```
+```python
 @scorer
 def my_scorer(
     *,
@@ -86,13 +89,14 @@ def my_scorer(
 ) -> float | bool | str | Feedback | list[Feedback]:
     # Your evaluation logic here
     ...
+
 ```
 
 All parameters are **optional**; declare only what your scorer needs:
 
 text
 
-```
+```text
 # ✔️ All of these signatures are valid for scorers
 def my_scorer(inputs, outputs, expectations, trace) -> bool:
 def my_scorer(inputs, outputs) -> str:
@@ -101,6 +105,7 @@ def my_scorer(trace) -> list[Feedback]:
 
 # 🔴 Additional parameters are not allowed
 def my_scorer(inputs, outputs, expectations, trace, additional_param) -> float
+
 ```
 
 Where do these values come from?
@@ -135,7 +140,7 @@ Return [Feedback](/mlflow-website/docs/latest/api_reference/python_api/mlflow.en
 
 python
 
-```
+```python
 from mlflow.entities import Feedback, AssessmentSource
 
 
@@ -152,13 +157,14 @@ def content_quality(outputs):
             "annotator": "me@example.com",
         },
     )
+
 ```
 
 Multiple feedback objects can be returned as a list. Each feedback object will be displayed as a separate metric in the evaluation results.
 
 text
 
-```
+```text
 @scorer
 def comprehensive_check(inputs, outputs):
     return [
@@ -166,6 +172,7 @@ def comprehensive_check(inputs, outputs):
         Feedback(name="tone", value="professional", rationale="Appropriate for audience"),
         Feedback(name="length", value=150, rationale="Word count within limits")
     ]
+
 ```
 
 ## Parsing Traces for Scoring[​](#parsing-traces-for-scoring "Direct link to Parsing Traces for Scoring")
@@ -188,7 +195,7 @@ Open the tabs below to see examples of custom scorers that evaluate the detailed
 
 python
 
-```
+```python
 from mlflow.entities import SpanType, Trace
 from mlflow.genai import scorer
 
@@ -220,13 +227,14 @@ def retrieved_document_recall(trace: Trace, expectations: dict) -> Feedback:
         value=recall,
         rationale=f"Retrieved {true_positives} relevant documents out of {expected_positives} expected.",
     )
+
 ```
 
 ### Example 2: Evaluating Tool Call Trajectory[​](#example-2-evaluating-tool-call-trajectory "Direct link to Example 2: Evaluating Tool Call Trajectory")
 
 python
 
-```
+```python
 from mlflow.entities import SpanType, Trace
 from mlflow.genai import scorer
 
@@ -251,13 +259,14 @@ def tool_call_trajectory(trace: Trace, expectations: dict) -> Feedback:
                 f"Actual: {actual_trajectory}."
             ),
         )
+
 ```
 
 ### Example 3: Evaluating Sub-Agents Routing[​](#example-3-evaluating-sub-agents-routing "Direct link to Example 3: Evaluating Sub-Agents Routing")
 
 python
 
-```
+```python
 from mlflow.entities import SpanType, Trace
 from mlflow.genai import scorer
 
@@ -281,6 +290,7 @@ def is_routing_correct(trace: Trace, expectations: dict) -> Feedback:
                 f"Actual: {invoked_agents}."
             ),
         )
+
 ```
 
 ## Error handling[​](#error-handling "Direct link to Error handling")
@@ -293,7 +303,7 @@ The simplest approach is to let exceptions throw naturally. MLflow automatically
 
 python
 
-```
+```python
 import json
 import mlflow
 from mlflow.entities import Feedback
@@ -332,6 +342,7 @@ mlflow.genai.evaluate(
     data=invalid_data,
     scorers=[is_valid_response],
 )
+
 ```
 
 When an exception occurs, MLflow creates a [Feedback](/mlflow-website/docs/latest/api_reference/python_api/mlflow.entities.html#mlflow.entities.Feedback) with:
@@ -349,7 +360,7 @@ For custom error handling or to provide specific error messages, catch exception
 
 python
 
-```
+```python
 import json
 from mlflow.entities import AssessmentError, Feedback
 
@@ -375,6 +386,7 @@ def is_valid_response(outputs):
     except json.JSONDecodeError as e:
         # Can pass exception object directly to the error parameter as well
         return Feedback(error=e)
+
 ```
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")

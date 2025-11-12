@@ -60,7 +60,7 @@ Here's how to get started with basic dataset tracking:
 
 python
 
-```
+```python
 import mlflow.data
 import pandas as pd
 
@@ -80,13 +80,14 @@ with mlflow.start_run():
     # Your training code here
     # model = train_model(raw_data)
     # mlflow.sklearn.log_model(model, "model")
+
 ```
 
 For cases where you only want to log dataset metadata without the actual data:
 
 python
 
-```
+```python
 import mlflow.data
 from mlflow.data.meta_dataset import MetaDataset
 from mlflow.data.http_dataset_source import HTTPDatasetSource
@@ -119,6 +120,7 @@ with mlflow.start_run():
     # The dataset reference and schema are logged, but not the data itself
     print(f"Logged dataset: {meta_dataset_with_schema.name}")
     print(f"Data source: {meta_dataset_with_schema.source}")
+
 ```
 
 **Use Cases for MetaDataset:** Reference datasets hosted on external servers or cloud storage, large datasets where you only want to track metadata and lineage, datasets with restricted access where actual data cannot be stored, and public datasets available via URLs that don't need to be duplicated.
@@ -127,7 +129,7 @@ Track training, validation, and test splits separately:
 
 python
 
-```
+```python
 import mlflow.data
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -164,13 +166,14 @@ with mlflow.start_run():
     mlflow.log_input(train_dataset, context="training")
     mlflow.log_input(val_dataset, context="validation")
     mlflow.log_input(test_dataset, context="testing")
+
 ```
 
 Track datasets that include model predictions for evaluation:
 
 python
 
-```
+```python
 import mlflow.data
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
@@ -203,6 +206,7 @@ with mlflow.start_run():
 
     # This dataset can now be used directly with mlflow.evaluate()
     result = mlflow.evaluate(data=eval_dataset, model_type="classifier")
+
 ```
 
 ## Dataset Information and Metadata[​](#dataset-information-and-metadata "Direct link to Dataset Information and Metadata")
@@ -211,7 +215,7 @@ When you create a dataset, MLflow automatically captures rich metadata:
 
 python
 
-```
+```python
 # Access dataset metadata
 print(f"Dataset name: {dataset.name}")  # Defaults to "dataset" if not specified
 print(
@@ -222,13 +226,14 @@ print(
     f"Dataset profile: {dataset.profile}"
 )  # Optional: implementation-specific statistics
 print(f"Dataset schema: {dataset.schema}")  # Optional: implementation-specific schema
+
 ```
 
 Example output:
 
 text
 
-```
+```text
 Dataset name: wine-quality-white
 Dataset digest: 2a1e42c4
 Dataset profile: {"num_rows": 4898, "num_elements": 58776}
@@ -239,6 +244,7 @@ Dataset schema: {"mlflow_colspec": [
     {"type": "long", "name": "quality"}
 ]}
 Dataset source: <DatasetSource object>
+
 ```
 
 Dataset Properties
@@ -255,7 +261,7 @@ MLflow supports datasets from various sources:
 
 python
 
-```
+```python
 # From local file
 local_dataset = mlflow.data.from_pandas(
     df, source="/path/to/local/file.csv", name="local-data"
@@ -275,13 +281,14 @@ db_dataset = mlflow.data.from_pandas(
 url_dataset = mlflow.data.from_pandas(
     df, source="https://example.com/data.csv", name="web-data"
 )
+
 ```
 
 You can retrieve and reload data from logged datasets:
 
 python
 
-```
+```python
 # After logging a dataset, retrieve it later
 with mlflow.start_run() as run:
     mlflow.log_input(dataset, context="training")
@@ -297,13 +304,14 @@ local_path = dataset_source.load()  # Downloads to local temp file
 # Reload the data
 reloaded_data = pd.read_csv(local_path, delimiter=";")
 print(f"Reloaded {len(reloaded_data)} rows from {local_path}")
+
 ```
 
 Special support for Delta Lake tables:
 
 python
 
-```
+```python
 # For Delta tables (requires delta-lake package)
 delta_dataset = mlflow.data.from_spark(
     spark_df, source="delta://path/to/delta/table", name="delta-table-data"
@@ -313,6 +321,7 @@ delta_dataset = mlflow.data.from_spark(
 versioned_delta_dataset = mlflow.data.from_spark(
     spark_df, source="delta://path/to/delta/table@v1", name="delta-table-v1"
 )
+
 ```
 
 ## Dataset Tracking in MLflow UI[​](#dataset-tracking-in-mlflow-ui "Direct link to Dataset Tracking in MLflow UI")
@@ -345,7 +354,7 @@ Use datasets directly with MLflow evaluate:
 
 python
 
-```
+```python
 import mlflow
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
@@ -381,13 +390,14 @@ with mlflow.start_run():
     )
 
     print(f"Accuracy: {result.metrics['accuracy_score']:.3f}")
+
 ```
 
 Evaluate pre-computed predictions without re-running the model:
 
 python
 
-```
+```python
 # Load previously computed predictions
 batch_predictions = pd.read_parquet("batch_predictions.parquet")
 
@@ -406,13 +416,14 @@ with mlflow.start_run():
 
     # Dataset is automatically logged to the run
     print("Evaluation completed on static predictions")
+
 ```
 
 Compare multiple models or datasets:
 
 python
 
-```
+```python
 def compare_model_performance(datasets_dict):
     """Compare model performance across multiple evaluation datasets."""
 
@@ -442,6 +453,7 @@ evaluation_datasets = {
 }
 
 comparison_results = compare_model_performance(evaluation_datasets)
+
 ```
 
 ## MLflow Evaluate Integration Example[​](#mlflow-evaluate-integration-example "Direct link to MLflow Evaluate Integration Example")
@@ -462,7 +474,7 @@ Track dataset versions as they evolve:
 
 python
 
-```
+```python
 def create_versioned_dataset(data, version, base_name="customer-data"):
     """Create a versioned dataset with metadata."""
 
@@ -502,13 +514,14 @@ def create_versioned_dataset(data, version, base_name="customer-data"):
 v1_dataset = create_versioned_dataset(data_v1, "1.0")
 v2_dataset = create_versioned_dataset(data_v2, "2.0")
 v3_dataset = create_versioned_dataset(data_v3, "3.0")
+
 ```
 
 Monitor data quality and drift over time:
 
 python
 
-```
+```python
 def monitor_dataset_quality(dataset, reference_dataset=None):
     """Monitor dataset quality and compare against reference if provided."""
 
@@ -563,13 +576,14 @@ def monitor_dataset_quality(dataset, reference_dataset=None):
 
 # Usage
 quality_report = monitor_dataset_quality(current_dataset, reference_dataset)
+
 ```
 
 Set up automated dataset tracking in your ML pipelines:
 
 python
 
-```
+```python
 class DatasetTracker:
     """Automated dataset tracking for ML pipelines."""
 
@@ -638,6 +652,7 @@ features_dataset = tracker.track_dataset(
 # Compare stages
 tracker.compare_stages("raw", "cleaned")
 tracker.compare_stages("cleaned", "features")
+
 ```
 
 ## Production Use Cases[​](#production-use-cases "Direct link to Production Use Cases")
@@ -649,7 +664,7 @@ Monitor datasets used in production batch prediction:
 
 python
 
-```
+```python
 def monitor_batch_predictions(batch_data, model_version, date):
     """Monitor production batch prediction datasets."""
 
@@ -694,13 +709,14 @@ def monitor_batch_predictions(batch_data, model_version, date):
 
 # Usage
 batch_dataset = monitor_batch_predictions(daily_batch_data, "v2.1", "2024-01-15")
+
 ```
 
 Track datasets used in A/B testing scenarios:
 
 python
 
-```
+```python
 def track_ab_test_data(control_data, treatment_data, test_name, test_date):
     """Track datasets for A/B testing experiments."""
 
@@ -759,6 +775,7 @@ def track_ab_test_data(control_data, treatment_data, test_name, test_date):
 control_ds, treatment_ds = track_ab_test_data(
     control_group_data, treatment_group_data, "new_recommendation_model", "2024-01-15"
 )
+
 ```
 
 ## Best Practices[​](#best-practices "Direct link to Best Practices")

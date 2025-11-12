@@ -27,11 +27,12 @@ Join us in this tutorial to master advanced semantic search techniques and disco
 
 python
 
-```
+```python
 import warnings
 
 # Disable a few less-than-useful UserWarnings from setuptools and pydantic
 warnings.filterwarnings("ignore", category=UserWarning)
+
 ```
 
 ### Understanding the Semantic Search Model with MLflow and Sentence Transformers[​](#understanding-the-semantic-search-model-with-mlflow-and-sentence-transformers "Direct link to Understanding the Semantic Search Model with MLflow and Sentence Transformers")
@@ -62,7 +63,7 @@ This semantic search model exemplifies the integration of NLP with MLflow, showc
 
 python
 
-```
+```python
 import warnings
 
 import numpy as np
@@ -142,6 +143,7 @@ class SemanticSearchModel(PythonModel):
           return [initial_results[0]]
       else:
           return filtered_results
+
 ```
 
 ### Building and Preparing the Semantic Search Corpus[​](#building-and-preparing-the-semantic-search-corpus "Direct link to Building and Preparing the Semantic Search Corpus")
@@ -173,7 +175,7 @@ This setup, while simplified, reflects the essential steps for developing a robu
 
 python
 
-```
+```python
 corpus = [
   "Perfecting a Sourdough Bread Recipe: The Joy of Baking. Baking sourdough bread "
   "requires patience, skill, and a good understanding of yeast fermentation. Each "
@@ -277,6 +279,7 @@ with open(corpus_file, "w") as file:
   for sentence in corpus:
       file.write(sentence + "
 ")
+
 ```
 
 ### Model Preparation and Configuration in MLflow[​](#model-preparation-and-configuration-in-mlflow "Direct link to Model Preparation and Configuration in MLflow")
@@ -304,7 +307,7 @@ This comprehensive preparation process guarantees the model is deployment-ready,
 
 python
 
-```
+```python
 # Load a pre-trained sentence transformer model
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
@@ -327,15 +330,7 @@ signature = infer_signature(
 
 # Visualize the signature
 signature
-```
 
-```
-inputs: 
-[string]
-outputs: 
-[string]
-params: 
-['top_k': long (default: 3), 'minimum_relevancy': double (default: 0.2)]
 ```
 
 ### Creating an experiment[​](#creating-an-experiment "Direct link to Creating an experiment")
@@ -344,17 +339,14 @@ We create a new MLflow Experiment so that the run we're going to log our model t
 
 python
 
-```
+```python
 # If you are running this tutorial in local mode, leave the next line commented out.
 # Otherwise, uncomment the following line and set your tracking uri to your local or remote tracking server.
 
 # mlflow.set_tracking_uri("http://127.0.0.1:8080")
 
 mlflow.set_experiment("Semantic Similarity")
-```
 
-```
-<Experiment: artifact_location='file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/sentence-transformers/tutorials/semantic-search/mlruns/405641275158666585', creation_time=1701278766302, experiment_id='405641275158666585', last_update_time=1701278766302, lifecycle_stage='active', name='Semantic Similarity', tags={}>
 ```
 
 ### Logging the Model with MLflow[​](#logging-the-model-with-mlflow "Direct link to Logging the Model with MLflow")
@@ -380,7 +372,7 @@ Completing this critical step transitions the model from development to a deploy
 
 python
 
-```
+```python
 with mlflow.start_run() as run:
   model_info = mlflow.pyfunc.log_model(
       name="semantic_search",
@@ -390,18 +382,7 @@ with mlflow.start_run() as run:
       artifacts=artifacts,
       pip_requirements=["sentence_transformers", "numpy"],
   )
-```
 
-```
-Downloading artifacts:   0%|          | 0/11 [00:00<?, ?it/s]
-```
-
-```
-2023/11/30 15:57:53 INFO mlflow.store.artifact.artifact_repo: The progress bar can be disabled by setting the environment variable MLFLOW_ENABLE_ARTIFACTS_PROGRESS_BAR to false
-```
-
-```
-Downloading artifacts:   0%|          | 0/1 [00:00<?, ?it/s]
 ```
 
 ### Model Inference and Prediction Demonstration[​](#model-inference-and-prediction-demonstration "Direct link to Model Inference and Prediction Demonstration")
@@ -427,7 +408,7 @@ This demonstration underscores the model's efficacy in semantic search, highligh
 
 python
 
-```
+```python
 # Load our model as a PyFuncModel.
 # Note that unlike the example shown in the Introductory Tutorial, there is no 'native' flavor for PyFunc models.
 # This model cannot be loaded with `mlflow.sentence_transformers.load_model()` because it is not in the native model format.
@@ -435,15 +416,7 @@ loaded_dynamic = mlflow.pyfunc.load_model(model_info.model_uri)
 
 # Make sure that it generates a reasonable output
 loaded_dynamic.predict(["I'd like some ideas for a meal to cook."])
-```
 
-```
-[('Exploring International Cuisines: A Culinary Adventure. Discovering international cuisines is an adventure for the palate. Each dish offers a glimpse into the culture and traditions of its origin.',
-0.43857115507125854),
-('Vegan Cuisine: A World of Flavor. Exploring vegan cuisine reveals a world of nutritious and delicious possibilities. From hearty soups to delectable desserts, plant-based dishes are diverse and satisfying.',
-0.34688490629196167),
-("The Art of Growing Herbs: Enhancing Your Culinary Skills. Growing your own herbs can transform your cooking, adding fresh and vibrant flavors. Whether it's basil, thyme, or rosemary, each herb has its own unique characteristics.",
-0.22686949372291565)]
 ```
 
 ### Advanced Query Handling with Customizable Parameters and Warning Mechanism[​](#advanced-query-handling-with-customizable-parameters-and-warning-mechanism "Direct link to Advanced Query Handling with Customizable Parameters and Warning Mechanism")
@@ -470,22 +443,13 @@ This advanced feature set demonstrates the model's adaptability and the importan
 
 python
 
-```
+```python
 # Verify that the fallback logic works correctly by returning the 'best, closest' result, even though the parameters submitted should return no results.
 # We are also validating that the warning is issued, alerting us to the fact that this behavior is occurring.
 loaded_dynamic.predict(
   ["Latest stories on computing"], params={"top_k": 10, "minimum_relevancy": 0.4}
 )
-```
 
-```
-/var/folders/cd/n8n0rm2x53l_s0xv_j_xklb00000gp/T/ipykernel_55915/1325605132.py:71: RuntimeWarning: All top results are below the minimum relevancy threshold. Returning the highest match instead.
-warnings.warn(
-```
-
-```
-[('AI in Software Development: Transforming the Tech Landscape. The rapid advancements in artificial intelligence are reshaping how we approach software development. From automation to machine learning, the possibilities are endless.',
-0.2533860206604004)]
 ```
 
 ### Conclusion: Crafting Custom Logic with MLflow's PythonModel[​](#conclusion-crafting-custom-logic-with-mlflows-pythonmodel "Direct link to Conclusion: Crafting Custom Logic with MLflow's PythonModel")

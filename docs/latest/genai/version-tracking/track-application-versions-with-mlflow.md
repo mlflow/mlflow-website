@@ -65,16 +65,18 @@ Install MLflow and required packages:
 
 bash
 
-```
+```bash
 pip install "mlflow>=3.4" openai
+
 ```
 
 Set your OpenAI API key:
 
 bash
 
-```
+```bash
 export OPENAI_API_KEY="your-api-key-here"
+
 ```
 
 Create an MLflow experiment by following the [getting started guide](/mlflow-website/docs/latest/ml/getting-started.md).
@@ -85,7 +87,7 @@ The simplest way to enable Git-based version tracking is to call [`mlflow.genai.
 
 python
 
-```
+```python
 import mlflow
 
 # Enable Git-based version tracking
@@ -97,19 +99,21 @@ print(
     f"Active version - Branch: {context.info.branch}, Commit: {context.info.commit[:8]}"
 )
 print(f"Repository dirty: {context.info.dirty}")
+
 ```
 
 You can also use it as a context manager for scoped versioning:
 
 python
 
-```
+```python
 with mlflow.genai.enable_git_model_versioning() as context:
     # All traces within this block are linked to the Git-based version
     # Your application code here
     ...
 
 # Version tracking is automatically disabled when exiting the context
+
 ```
 
 ## Step 2: Create your application[​](#step-2-create-your-application "Direct link to Step 2: Create your application")
@@ -118,7 +122,7 @@ Now let's create a simple application that will be automatically versioned:
 
 python
 
-```
+```python
 import mlflow
 import openai
 
@@ -152,6 +156,7 @@ def my_app(input: str) -> str:
 # Test the application - traces are automatically linked to the Git version
 result = my_app(input="What is MLflow?")
 print(result)
+
 ```
 
 note
@@ -169,7 +174,7 @@ Run your application and observe how versions are tracked:
 
 python
 
-```
+```python
 # Initial run - creates a LoggedModel for current Git state
 result = my_app(input="What is MLflow?")
 print(result)
@@ -177,13 +182,14 @@ print(result)
 result = my_app(input="What is Databricks?")
 print(result)
 # Both traces are linked to the same version since Git state hasn't changed
+
 ```
 
 To see how MLflow tracks changes, modify your code (without committing) and run again:
 
 python
 
-```
+```python
 # Make a change to your application code (e.g., modify temperature)
 # The repository is now "dirty" with uncommitted changes
 
@@ -194,6 +200,7 @@ print(f"Repository dirty: {context.info.dirty}")  # Will show True
 # This trace will be linked to a different version (same commit but dirty=True)
 result = my_app(input="What is GenAI?")
 print(result)
+
 ```
 
 tip
@@ -220,7 +227,7 @@ You can use [`mlflow.search_traces()`](/mlflow-website/docs/latest/api_reference
 
 python
 
-```
+```python
 import mlflow
 
 # Using the context from enable_git_model_versioning()
@@ -228,13 +235,14 @@ context = mlflow.genai.enable_git_model_versioning()
 
 traces = mlflow.search_traces(model_id=context.active_model.model_id)
 print(traces)
+
 ```
 
 You can use [`mlflow.get_logged_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.html#mlflow.get_logged_model) to get details of the LoggedModel including Git metadata:
 
 python
 
-```
+```python
 import mlflow
 import datetime
 
@@ -256,6 +264,7 @@ for tag_key, tag_value in git_tags.items():
         print(f"{tag_key}: <diff with {len(tag_value)} characters>")
     else:
         print(f"{tag_key}: {tag_value}")
+
 ```
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")

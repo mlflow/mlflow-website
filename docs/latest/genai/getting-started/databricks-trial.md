@@ -70,8 +70,9 @@ Run the following command in your dev environment to install dependencies.
 
 bash
 
-```
+```bash
 %pip install -q mlflow
+
 ```
 
 #### Set Up Authentication to a Databricks Workspace[​](#set-up-authentication-to-a-databricks-workspace "Direct link to Set Up Authentication to a Databricks Workspace")
@@ -85,19 +86,21 @@ If the authentication succeeds, you should see a message "Successfully signed in
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.login()
+
 ```
 
 text
 
-```
+```text
 2025/02/19 12:25:04 INFO mlflow.utils.credentials: No valid Databricks credentials found, please enter your credentials...
 Databricks Host (should begin with https://):  https://<your workspace host>.cloud.databricks.com/
 Token:  ········
 2025/02/19 12:26:24 INFO mlflow.utils.credentials: Successfully connected to MLflow hosted tracking server! Host: https://<your workspace host>.cloud.databricks.com.
+
 ```
 
 #### Connect MLflow Session to Databricks Workspace[​](#connect-mlflow-session-to-databricks-workspace "Direct link to Connect MLflow Session to Databricks Workspace")
@@ -106,8 +109,9 @@ We have set up the credentials, now we need to tell MLflow to send the data into
 
 python
 
-```
+```python
 mlflow.set_tracking_uri("databricks")
+
 ```
 
 Now you are ready to go! Let's try starting an MLflow experiment and log some dummy metrics and view it in the UI.
@@ -118,7 +122,7 @@ In order to keep all of your artifacts within a single place, you can opt to use
 
 python
 
-```
+```python
 mlflow.create_experiment(
     "/Users/<your email>/check-databricks-connection",
     artifact_location="dbfs:/Volumes/test/mlflow/check-databricks-connection",
@@ -128,12 +132,14 @@ mlflow.set_experiment("/Users/<your email>/check-databricks-connection")
 with mlflow.start_run():
     mlflow.log_metric("foo", 1)
     mlflow.log_metric("bar", 2)
+
 ```
 
 text
 
-```
+```text
 2025/02/19 12:26:33 INFO mlflow.tracking.fluent: Experiment with name '/Users/<your email>/check-databricks-connection' does not exist. Creating a new experiment.
+
 ```
 
 #### View Your Experiment on your Databricks Workspace[​](#view-your-experiment-on-your-databricks-workspace "Direct link to View Your Experiment on your Databricks Workspace")

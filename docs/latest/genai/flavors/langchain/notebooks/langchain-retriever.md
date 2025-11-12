@@ -57,15 +57,16 @@ Before proceeding with the tutorial, ensure that you have FAISS and [Beautiful S
 
 bash
 
-```
+```bash
     pip install beautifulsoup4 faiss-cpu==1.7.4 langchain==0.1.16 langchain-community==0.0.33 langchain-openai==0.0.8 openai==1.12.0 tiktoken==0.6.0
+
 ```
 
 > NOTE: If you'd like to run this using your GPU, you can install `faiss-gpu` instead.
 
 python
 
-```
+```python
 import os
 import shutil
 import tempfile
@@ -81,13 +82,14 @@ from langchain_openai import OpenAI, OpenAIEmbeddings
 import mlflow
 
 assert "OPENAI_API_KEY" in os.environ, "Please set the OPENAI_API_KEY environment variable."
+
 ```
 
 > **NOTE: If you'd like to use Azure OpenAI with LangChain, you need to install `openai>=1.10.0` and `langchain-openai>=0.0.6`, as well as to specify the following credentials and parameters:**
 
 python
 
-```
+```python
 from langchain_openai import AzureOpenAI, AzureOpenAIEmbeddings
 
 # Set this to `azure`
@@ -108,6 +110,7 @@ azure_openai_llm = AzureOpenAI(
 azure_openai_embeddings = AzureOpenAIEmbeddings(
   azure_deployment="<your-deployment-name>",
 )
+
 ```
 
 ## Scraping Federal Documents for RAG Processing[​](#scraping-federal-documents-for-rag-processing "Direct link to Scraping Federal Documents for RAG Processing")
@@ -126,7 +129,7 @@ This step is integral to building a RAG system that relies on external, context-
 
 python
 
-```
+```python
 def fetch_federal_document(url, div_class):
   """
   Scrapes the transcript of the Act Establishing Yellowstone National Park from the given URL.
@@ -153,6 +156,7 @@ def fetch_federal_document(url, div_class):
           return "Transcript section not found."
   else:
       return f"Failed to retrieve the webpage. Status code: {response.status_code}"
+
 ```
 
 ## Document Fetching and FAISS Database Creation[​](#document-fetching-and-faiss-database-creation "Direct link to Document Fetching and FAISS Database Creation")
@@ -175,7 +179,7 @@ These functions streamline the process of gathering relevant documents and setti
 
 python
 
-```
+```python
 def fetch_and_save_documents(url_list, doc_path):
   """
   Fetches documents from given URLs and saves them to a specified file path.
@@ -219,6 +223,7 @@ def create_faiss_database(document_path, database_save_directory, chunk_size=500
   faiss_database.save_local(database_save_directory)
 
   return faiss_database
+
 ```
 
 ## Setting Up the Working Environment and FAISS Database[​](#setting-up-the-working-environment-and-faiss-database "Direct link to Setting Up the Working Environment and FAISS Database")
@@ -247,7 +252,7 @@ By the end of this process, we have all documents consolidated in a single locat
 
 python
 
-```
+```python
 temporary_directory = tempfile.mkdtemp()
 
 doc_path = os.path.join(temporary_directory, "docs.txt")
@@ -261,6 +266,7 @@ url_listings = [
 fetch_and_save_documents(url_listings, doc_path)
 
 vector_db = create_faiss_database(doc_path, persist_dir)
+
 ```
 
 ## Establishing RetrievalQA Chain and Logging with MLflow[​](#establishing-retrievalqa-chain-and-logging-with-mlflow "Direct link to Establishing RetrievalQA Chain and Logging with MLflow")
@@ -287,7 +293,7 @@ Through these steps, we successfully integrate a complex RAG application with ML
 
 python
 
-```
+```python
 mlflow.set_experiment("Legal RAG")
 
 retrievalQA = RetrievalQA.from_llm(llm=OpenAI(), retriever=vector_db.as_retriever())
@@ -311,6 +317,7 @@ with mlflow.start_run() as run:
       loader_fn=load_retriever,
       persist_dir=persist_dir,
   )
+
 ```
 
 > **IMPORTANT**: In order to load a stored vectorstore instance such as our FAISS instance above, we need to specify within the load function the argument `allow_dangeous_deserialization` to `True` in order for the load to succeed. This is due to a safety warning that was introduced in `langchain` for loading objects that have been serialized using `pickle` or `cloudpickle`. While this issue of remote code execution is not a risk with using MLflow, as the serialization and deserialization happens entirely via API and within your environment, the argument must be set in order to prevent an Exception from being thrown at load time.
@@ -325,13 +332,14 @@ Now that we have the model stored in MLflow, we can load it back as a `pyfunc` a
 
 python
 
-```
+```python
 loaded_model = mlflow.pyfunc.load_model(model_info.model_uri)
+
 ```
 
 python
 
-```
+```python
 def print_formatted_response(response_list, max_line_length=80):
   """
   Formats and prints responses with a maximum line length for better readability.
@@ -350,6 +358,7 @@ def print_formatted_response(response_list, max_line_length=80):
               print(line)
               line = word + " "
       print(line)
+
 ```
 
 ## Let's make sure that this thing works[​](#lets-make-sure-that-this-thing-works "Direct link to Let's make sure that this thing works")
@@ -358,16 +367,11 @@ Let's try out our Retriever model by sending it a fairly simple but purposefully
 
 python
 
-```
+```python
 answer1 = loaded_model.predict([{"query": "What does the document say about trespassers?"}])
 
 print_formatted_response(answer1)
-```
 
-```
-The document states that all persons who shall locate or settle upon or occupy 
-the land reserved for the public park, except as provided, shall be considered 
-trespassers and removed from the park.
 ```
 
 ## Understanding the RetrievalQA Response[​](#understanding-the-retrievalqa-response "Direct link to Understanding the RetrievalQA Response")
@@ -425,19 +429,13 @@ This section of the tutorial showcases an interesting aspect of the RetrievalQA 
 
 python
 
-```
+```python
 answer2 = loaded_model.predict(
   [{"query": "What is a bridle-path and can I use one at Yellowstone?"}]
 )
 
 print_formatted_response(answer2)
-```
 
-```
-A bridle-path is a narrow path or trail designed for horseback riding. Yes, you 
-can use a bridle-path at Yellowstone as it is designated for the enjoyment and 
-benefit of the people visiting the park. However, it may be subject to certain 
-regulations and restrictions set by the Secretary of the Interior.
 ```
 
 ## A most serious question[​](#a-most-serious-question "Direct link to A most serious question")
@@ -474,7 +472,7 @@ So, while you can't buy Yellowstone for your buffalo-themed spa dreams, you can 
 
 python
 
-```
+```python
 answer3 = loaded_model.predict(
   [
       {
@@ -484,24 +482,7 @@ answer3 = loaded_model.predict(
 )
 
 print_formatted_response(answer3)
-```
 
-```
-No, you cannot buy Yellowstone from the Federal Government to set up a 
-buffalo-themed day spa. The land near the headwaters of the Yellowstone River 
-has been reserved and withdrawn from settlement, occupancy, or sale under the 
-laws of the United States and dedicated and set apart as a public park for the 
-benefit and enjoyment of the people. The Secretary of the Interior has control 
-over the park and is responsible for making and publishing rules and 
-regulations for its management. Leases for building purposes are only granted 
-for small parcels of ground for the accommodation of visitors, and the proceeds 
-are used for the management of the park and the construction of roads and 
-bridle-paths. Additionally, the wanton destruction of fish and game within the 
-park is prohibited. Furthermore, the Act to protect trade and commerce against 
-unlawful restraints and monopolies (approved July 2, 1890) states that any 
-contract, combination, or conspiracy in restraint of trade or commerce in any 
-Territory or the District of Columbia is illegal. Thus, buying land to set up a 
-buffalo-themed day spa would likely be considered a violation of this act.
 ```
 
 ## Maintaining Composure: Answering Another Whimsical Query[​](#maintaining-composure-answering-another-whimsical-query "Direct link to Maintaining Composure: Answering Another Whimsical Query")
@@ -529,7 +510,7 @@ In conclusion, while our model firmly closes the door on the buffalo-themed day 
 
 python
 
-```
+```python
 answer4 = loaded_model.predict(
   [
       {
@@ -540,13 +521,7 @@ answer4 = loaded_model.predict(
 )
 
 print_formatted_response(answer4)
-```
 
-```
-No, according to the context provided, the Secretary of the Interior may grant 
-leases for building purposes for terms not exceeding ten years, but only for 
-the accommodation of visitors. It does not specifically mention a 
-buffalo-themed day spa as a possible use for the leased land.
 ```
 
 ## Another Attempt at the Buffalo-Themed Day Spa Dream[​](#another-attempt-at-the-buffalo-themed-day-spa-dream "Direct link to Another Attempt at the Buffalo-Themed Day Spa Dream")
@@ -561,7 +536,7 @@ Once more, we pose an imaginative question to our model, this time adding a hote
 
 python
 
-```
+```python
 answer5 = loaded_model.predict(
   [
       {
@@ -571,15 +546,7 @@ answer5 = loaded_model.predict(
   ]
 )
 print_formatted_response(answer5)
-```
 
-```
-No, it is not possible to lease land from the Federal Government for a 
-commercial purpose within the designated park area. The Secretary of the 
-Interior may grant leases for building purposes for terms not exceeding ten 
-years, but only for small parcels of ground for the accommodation of visitors. 
-Additionally, all proceeds from leases and other revenues must be used for the 
-management of the park and the construction of roads and bridle-paths.
 ```
 
 ## Well, what can I do then?[​](#well-what-can-i-do-then "Direct link to Well, what can I do then?")
@@ -591,22 +558,13 @@ management of the park and the construction of roads and bridle-paths.
 
 python
 
-```
+```python
 answer6 = loaded_model.predict(
   [{"query": "Can I just go to the park and peacefully enjoy the natural splendor?"}]
 )
 
 print_formatted_response(answer6)
-```
 
-```
-Yes, according to the context, the park was set apart as a public park or 
-pleasuring-ground for the benefit and enjoyment of the people. However, the 
-park is under the exclusive control of the Secretary of the Interior who has 
-the authority to make and publish rules and regulations for the care and 
-management of the park. Therefore, it is important to follow any rules or 
-regulations set by the Secretary to ensure the preservation and protection of 
-the park for future enjoyment.
 ```
 
 ## Evaluating the RetrievalQA Model's Legal Context Integration[​](#evaluating-the-retrievalqa-models-legal-context-integration "Direct link to Evaluating the RetrievalQA Model's Legal Context Integration")
@@ -623,7 +581,7 @@ This evaluation provides a clear example of the model's potential in handling in
 
 python
 
-```
+```python
 answer7 = loaded_model.predict(
   [
       {
@@ -633,17 +591,7 @@ answer7 = loaded_model.predict(
 )
 
 print_formatted_response(answer7)
-```
 
-```
-No, according to the context, any attempt to monopolize trade or commerce in 
-the Yellowstone area or in any territory of the United States is considered 
-illegal. Additionally, the park is under the exclusive control of the Secretary 
-of the Interior, who may grant leases for building purposes but is expected to 
-prevent the destruction of natural resources and the exploitation of fish and 
-game for profit. Therefore, it would not be possible to start a buffalo themed 
-day spa outside of Yellowstone National Park and stifle competition without 
-violating the law and risking consequences from the Secretary of the Interior.
 ```
 
 **Cleanup: Removing Temporary Directory**:
@@ -652,9 +600,10 @@ violating the law and risking consequences from the Secretary of the Interior.
 
 python
 
-```
+```python
 # Clean up our temporary directory that we created with our FAISS instance
 shutil.rmtree(temporary_directory)
+
 ```
 
 ## Conclusion: Mastering RAG with MLflow[​](#conclusion-mastering-rag-with-mlflow "Direct link to Conclusion: Mastering RAG with MLflow")

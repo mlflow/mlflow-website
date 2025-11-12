@@ -42,7 +42,7 @@ MLflow's scikit-learn integration offers the most comprehensive autologging expe
 
 python
 
-```
+```python
 import mlflow
 import mlflow.sklearn
 from sklearn.ensemble import RandomForestClassifier
@@ -55,6 +55,7 @@ mlflow.sklearn.autolog()
 iris = load_iris()
 model = RandomForestClassifier(n_estimators=100, max_depth=3)
 model.fit(iris.data, iris.target)
+
 ```
 
 What Gets Automatically Captured

@@ -16,7 +16,7 @@ All of the flavors that a particular model supports are defined in its `MLmodel`
 
 text
 
-```
+```text
 # Directory written by mlflow.sklearn.save_model(model, "model", input_example=...)
 model/
 ├── MLmodel
@@ -27,13 +27,14 @@ model/
 ├── input_example.json (optional, only logged when input example is provided and valid during model logging)
 ├── serving_input_example.json (optional, only logged when input example is provided and valid during model logging)
 └── environment_variables.txt (optional, only logged when environment variables are used during model inference)
+
 ```
 
 And its `MLmodel` file describes two flavors:
 
 yaml
 
-```
+```yaml
 time_created: 2018-05-25T17:28:53.35
 
 flavors:
@@ -42,6 +43,7 @@ flavors:
     pickled_model: model.pkl
   python_function:
     loader_module: mlflow.sklearn
+
 ```
 
 Apart from a **flavors** field listing the model flavors, the MLmodel YAML format can contain the following fields:
@@ -81,7 +83,7 @@ Currently MLflow only logs the environment variables whose name contains any of 
 
 python
 
-```
+```python
 RECORD_ENV_VAR_ALLOWLIST = {
     # api key related
     "API_KEY",  # e.g. OPENAI_API_KEY
@@ -97,13 +99,14 @@ RECORD_ENV_VAR_ALLOWLIST = {
     "_DATABRICKS_WORKSPACE_HOST",
     "_DATABRICKS_WORKSPACE_ID",
 }
+
 ```
 
 Example of a pyfunc model that uses environment variables:
 
 python
 
-```
+```python
 import mlflow
 import os
 
@@ -121,17 +124,19 @@ with mlflow.start_run():
     model_info = mlflow.pyfunc.log_model(
         name="model", python_model=MyModel(), input_example="data"
     )
+
 ```
 
 Environment variable `TEST_API_KEY` is logged in the environment\_variables.txt file like below
 
 text
 
-```
+```text
 # This file records environment variable names that are used during model inference.
 # They might need to be set when creating a serving endpoint from this model.
 # Note: it is not guaranteed that all environment variables listed here are required
 TEST_API_KEY
+
 ```
 
 attention
@@ -195,7 +200,7 @@ For example, defining a model in a separate file named `my_model.py`:
 
 python
 
-```
+```python
 import mlflow
 from mlflow.models import set_model
 
@@ -207,6 +212,7 @@ class MyModel(mlflow.pyfunc.PythonModel):
 
 # Define the custom PythonModel instance that will be used for inference
 set_model(MyModel())
+
 ```
 
 note
@@ -221,7 +227,7 @@ Then, logging the model from the file path in a different python script:
 
 python
 
-```
+```python
 import mlflow
 
 model_path = "my_model.py"
@@ -234,6 +240,7 @@ with mlflow.start_run():
 
 # Loading the model behaves exactly as if an instance of MyModel had been logged
 my_model = mlflow.pyfunc.load_model(model_info.model_uri)
+
 ```
 
 warning
@@ -291,9 +298,10 @@ Once a model is loaded, it can be scored in two primary ways:
 
    text
 
-   ```
+   ```text
    predict(data: Union[pandas.Series, pandas.DataFrame, numpy.ndarray, csc_matrix, csr_matrix, List[Any], Dict[str, Any], str],
            params: Optional[Dict[str, Any]] = None) → Union[pandas.Series, pandas.DataFrame, numpy.ndarray, list, str]
+
    ```
 
 2. **Synchronous Streaming Scoring**
@@ -306,8 +314,9 @@ Once a model is loaded, it can be scored in two primary ways:
 
    text
 
-   ```
+   ```text
    predict_stream(data: Any, params: Optional[Dict[str, Any]] = None) → GeneratorType
+
    ```
 
 ##### Demonstrating `predict_stream()`[​](#demonstrating-predict_stream "Direct link to demonstrating-predict_stream")
@@ -316,7 +325,7 @@ Below is an example demonstrating how to define, save, load, and use a streamabl
 
 python
 
-```
+```python
 import mlflow
 import os
 
@@ -352,6 +361,7 @@ print(next(stream_output))  # Output: 'b'
 # Alternatively, consuming the generator using a for-loop
 for response in stream_output:
     print(response)  # This will print 'c', 'd', 'e'
+
 ```
 
 #### Python Function Model Interfaces[​](#python-function-model-interfaces "Direct link to Python Function Model Interfaces")
@@ -370,26 +380,29 @@ Some PyFunc models may accept model load configuration, which controls how the m
 
 python
 
-```
+```python
 model_info = mlflow.models.get_model_info(model_uri)
 model_info.flavors[mlflow.pyfunc.FLAVOR_NAME][mlflow.pyfunc.MODEL_CONFIG]
+
 ```
 
 Alternatively, you can load the PyFunc model and inspect the `model_config` property:
 
 python
 
-```
+```python
 pyfunc_model = mlflow.pyfunc.load_model(model_uri)
 pyfunc_model.model_config
+
 ```
 
 Model configuration can be changed at loading time by indicating `model_config` parameter in the [`mlflow.pyfunc.load_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_model) method:
 
 python
 
-```
+```python
 pyfunc_model = mlflow.pyfunc.load_model(model_uri, model_config=dict(temperature=0.93))
+
 ```
 
 When a model configuration value is changed, those values the configuration the model was saved with. Indicating an invalid model configuration key for a model results in that configuration being ignored. A warning is displayed mentioning the ignored entries.
@@ -410,7 +423,7 @@ For a minimal crate model, an example configuration for the predict function is:
 
 r
 
-```
+```r
 library(mlflow)
 library(carrier)
 # Load iris dataset
@@ -437,6 +450,7 @@ mlflow_model <- mlflow_load_model(model_uri = model_uri,
 
 prediction <- mlflow_predict(model = mlflow_model, data = 5)
 print(prediction)
+
 ```
 
 ### H2O (`h2o`)[​](#h2o-h2o "Direct link to h2o-h2o")
@@ -455,7 +469,7 @@ For a minimal h2o model, here is an example of the pyfunc predict() method in a 
 
 python
 
-```
+```python
 import mlflow
 import h2o
 
@@ -507,6 +521,7 @@ print(predictions)
 
 # h2o_model = mlflow.h2o.load_model(model_info.model_uri)
 # predictions = h2o_model.predict(test)
+
 ```
 
 ### Keras (`keras`)[​](#tf-keras-example "Direct link to tf-keras-example")
@@ -551,7 +566,7 @@ For an ONNX model, an example configuration that uses pytorch to train a dummy m
 
 python
 
-```
+```python
 import numpy as np
 import mlflow
 from mlflow.models import infer_signature
@@ -592,6 +607,7 @@ onnx_pyfunc = mlflow.pyfunc.load_model(model_info.model_uri)
 
 predictions = onnx_pyfunc.predict(X.numpy())
 print(predictions)
+
 ```
 
 ### XGBoost (`xgboost`)[​](#xgboost-xgboost "Direct link to xgboost-xgboost")
@@ -617,7 +633,7 @@ The example below
 
 python
 
-```
+```python
 from lightgbm import LGBMClassifier
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
@@ -661,6 +677,7 @@ with mlflow.start_run():
 lgb_classifier_saved = mlflow.pyfunc.load_model(model_info.model_uri)
 y_pred = lgb_classifier_saved.predict(X_test)
 print(y_pred)
+
 ```
 
 ### CatBoost (`catboost`)[​](#catboost-catboost "Direct link to catboost-catboost")
@@ -675,7 +692,7 @@ For a CatBoost Classifier model, an example configuration for the pyfunc predict
 
 python
 
-```
+```python
 import mlflow
 from mlflow.models import infer_signature
 from catboost import CatBoostClassifier
@@ -703,6 +720,7 @@ with mlflow.start_run():
 # load the logged model and make a prediction
 catboost_pyfunc = mlflow.pyfunc.load_model(model_uri=model_info.model_uri)
 print(catboost_pyfunc.predict(X[:5]))
+
 ```
 
 ### Spacy(`spaCy`)[​](#spacyspacy "Direct link to spacyspacy")
@@ -723,7 +741,7 @@ For a minimal statsmodels regression model, here is an example of the pyfunc pre
 
 python
 
-```
+```python
 import mlflow
 import pandas as pd
 from sklearn.datasets import load_diabetes
@@ -763,13 +781,14 @@ statsmodels_pyfunc = mlflow.pyfunc.load_model(model_uri=model_info.model_uri)
 # generate predictions
 predictions = statsmodels_pyfunc.predict(X)
 print(predictions)
+
 ```
 
 For a minimal time series ARIMA model, here is an example of the pyfunc predict() method :
 
 python
 
-```
+```python
 import mlflow
 import numpy as np
 import pandas as pd
@@ -837,6 +856,7 @@ end = pd.to_datetime("2024-01-07")
 prediction_data = pd.DataFrame({"start": start, "end": end}, index=[0])
 predictions = statsmodels_pyfunc.predict(prediction_data)
 print(predictions)
+
 ```
 
 For more information, see [`mlflow.statsmodels`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.statsmodels.html#mlflow.statsmodels).
@@ -876,7 +896,7 @@ Example usage of pmdarima artifact loaded as a pyfunc with confidence intervals 
 
 python
 
-```
+```python
 import pmdarima
 import mlflow
 import pandas as pd
@@ -894,6 +914,7 @@ prediction_conf = pd.DataFrame(
 )
 
 predictions = loaded_pyfunc.predict(prediction_conf)
+
 ```
 
 Output (`Pandas DataFrame`):
@@ -925,7 +946,7 @@ Example: Export a John Snow Labs to MLflow format
 
 python
 
-```
+```python
 import json
 import os
 
@@ -978,6 +999,7 @@ new_df = spark_df.withColumn("prediction", pyfunc_udf(*pandas_df.columns))
 # 9) You can now use the mlflow models serve command to serve the model see next section
 
 # 10)  You can also use x command to deploy model inside of a container see next section
+
 ```
 
 #### To deploy the John Snow Labs model as a container[​](#to-deploy-the-john-snow-labs-model-as-a-container "Direct link to To deploy the John Snow Labs model as a container")
@@ -986,21 +1008,23 @@ new_df = spark_df.withColumn("prediction", pyfunc_udf(*pandas_df.columns))
 
 bash
 
-```
+```bash
 docker run -p 5001:8080 -e JOHNSNOWLABS_LICENSE_JSON=your_json_string "mlflow-pyfunc"
+
 ```
 
 2. Query server
 
 bash
 
-```
+```bash
 curl http://127.0.0.1:5001/invocations -H 'Content-Type: application/json' -d '{
   "dataframe_split": {
       "columns": ["text"],
       "data": [["I hate covid"], ["I love covid"]]
   }
 }'
+
 ```
 
 #### To deploy the John Snow Labs model without a container[​](#to-deploy-the-john-snow-labs-model-without-a-container "Direct link to To deploy the John Snow Labs model without a container")
@@ -1009,22 +1033,24 @@ curl http://127.0.0.1:5001/invocations -H 'Content-Type: application/json' -d '{
 
 bash
 
-```
+```bash
 export JOHNSNOWLABS_LICENSE_JSON=your_json_string
 mlflow models serve -m <model_uri>
+
 ```
 
 2. Query server
 
 bash
 
-```
+```bash
 curl http://127.0.0.1:5000/invocations -H 'Content-Type: application/json' -d '{
   "dataframe_split": {
       "columns": ["text"],
       "data": [["I hate covid"], ["I love covid"]]
   }
 }'
+
 ```
 
 ### Diviner (`diviner`)[​](#diviner-diviner "Direct link to diviner-diviner")
@@ -1056,16 +1082,18 @@ If we were to `fit` a model on this data, supplying the grouping keys as:
 
 python
 
-```
+```python
 grouping_keys = ["country", "city"]
+
 ```
 
 We will have a model generated for each of the grouping keys that have been supplied:
 
 python
 
-```
+```python
 [("US", "NewYork"), ("US", "Boston"), ("CA", "Toronto"), ("MX", "MexicoCity")]
+
 ```
 
 With a model constructed for each of these, entering each of their metrics and parameters wouldn't be an issue for the MLflow tracking server. What would become a problem, however, is if we modeled each major city on the planet and ran this forecasting scenario every day. If we were to adhere to the conditions of the World Bank, that would mean just over 10,000 models as of 2022. After a mere few weeks of running this forecasting every day we would have a very large metrics table.
@@ -1085,7 +1113,7 @@ There are two recommended means of logging the metrics and parameters from a `di
 
 python
 
-```
+```python
 import os
 import mlflow
 import tempfile
@@ -1104,6 +1132,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
     metrics.to_csv(f"{tmpdir}/metrics.csv", index=False, header=True)
 
     mlflow.log_artifacts(tmpdir, artifact_path="data")
+
 ```
 
 * Writing directly as a JSON artifact using [`mlflow.log_dict()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.html#mlflow.log_dict)
@@ -1114,7 +1143,7 @@ The parameters extract from `diviner` models *may require* casting (or dropping 
 
 python
 
-```
+```python
 import mlflow
 
 params = model.extract_model_params()
@@ -1132,6 +1161,7 @@ params = params.drop("stan_backend", axis=1)
 
 mlflow.log_dict(params.to_dict(), "params.json")
 mlflow.log_dict(metrics.to_dict(), "metrics.json")
+
 ```
 
 Logging of the model artifact is shown in the `pyfunc` example below.
@@ -1150,7 +1180,7 @@ For a `GroupedPmdarima` model, an example configuration for the `pyfunc` `predic
 
 python
 
-```
+```python
 import mlflow
 import pandas as pd
 from pmdarima.arima.auto import AutoARIMA
@@ -1187,6 +1217,7 @@ predict_conf = pd.DataFrame(
 )
 
 subset_forecasts = diviner_pyfunc.predict(predict_conf)
+
 ```
 
 note
@@ -1245,7 +1276,7 @@ PythonModel with type hints supports data validation starting from MLflow versio
 
 python
 
-```
+```python
 import pydantic
 import mlflow
 from mlflow.pyfunc import PythonModel
@@ -1292,6 +1323,7 @@ with mlflow.start_run():
 # Load the model as pyfunc
 pyfunc_model = mlflow.pyfunc.load_model(model_info.model_uri)
 assert pyfunc_model.predict(input_example) == ["Hello", "Hi"]
+
 ```
 
 #### Example: Creating a custom "add n" model[​](#example-creating-a-custom-add-n-model "Direct link to Example: Creating a custom \"add n\" model")
@@ -1300,7 +1332,7 @@ This example defines a class for a custom model that adds a specified numeric va
 
 python
 
-```
+```python
 import mlflow.pyfunc
 
 
@@ -1327,6 +1359,7 @@ import pandas as pd
 model_input = pd.DataFrame([range(10)])
 model_output = loaded_model.predict(model_input)
 assert model_output.equals(pd.DataFrame([range(5, 15)]))
+
 ```
 
 #### Example: Saving an XGBoost model in MLflow format[​](#example-saving-an-xgboost-model-in-mlflow-format "Direct link to Example: Saving an XGBoost model in MLflow format")
@@ -1335,7 +1368,7 @@ This example begins by training and saving a gradient boosted tree model using t
 
 python
 
-```
+```python
 # Load training and test datasets
 from sys import version_info
 import xgboost as xgb
@@ -1411,6 +1444,7 @@ import pandas as pd
 
 test_predictions = loaded_model.predict(pd.DataFrame(x_test))
 print(test_predictions)
+
 ```
 
 #### Example: Logging a transformers model with hf:/ schema to avoid copying large files[​](#example-logging-a-transformers-model-with-hf-schema-to-avoid-copying-large-files "Direct link to Example: Logging a transformers model with hf:/ schema to avoid copying large files")
@@ -1419,7 +1453,7 @@ This example shows how to use a special schema `hf:/` to log a transformers mode
 
 python
 
-```
+```python
 import mlflow
 from mlflow.models import infer_signature
 import numpy as np
@@ -1463,6 +1497,7 @@ with mlflow.start_run() as run:
         signature=infer_signature(data, ["Run"]),
         extra_pip_requirements=["torch", "accelerate", "transformers", "numpy"],
     )
+
 ```
 
 ### Custom Flavors[​](#custom-flavors "Direct link to Custom Flavors")
@@ -1479,7 +1514,7 @@ After logging your model with MLflow Tracking, it is highly recommended to valid
 
 python
 
-```
+```python
 import mlflow
 
 
@@ -1501,18 +1536,20 @@ mlflow.models.predict(
     pip_requirements_override=["..."],
     extra_envs={"MY_ENV_VAR": "my_value"},
 )
+
 ```
 
 If your model dependencies (see the model artifact's requirements.txt) include **pre-release packages** (e.g., mlflow==3.2.0rc0), set the environment variable `UV_PRERELEASE=allow` via the `extra_envs` field.
 
 python
 
-```
+```python
 mlflow.models.predict(
     model_uri=model_info.model_uri,
     input_data=["a", "b", "c"],
     extra_envs={"UV_PRERELEASE": "allow"},
 )
+
 ```
 
 ### Environment managers[​](#environment-managers "Direct link to Environment managers")
@@ -1532,7 +1569,7 @@ Example of using `uv` to create a virtual environment for prediction:
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.models.predict(
@@ -1540,6 +1577,7 @@ mlflow.models.predict(
     input_data="your_data",
     env_manager="uv",
 )
+
 ```
 
 ## Built-In Deployment Tools[​](#built-in-deployment "Direct link to Built-In Deployment Tools")
@@ -1558,13 +1596,14 @@ Example
 
 python
 
-```
+```python
 from pyspark.sql.functions import struct
 from pyspark.sql import SparkSession
 
 spark = SparkSession.builder.getOrCreate()
 pyfunc_udf = mlflow.pyfunc.spark_udf(spark, "<path-to-model>")
 df = spark_df.withColumn("prediction", pyfunc_udf(struct([...])))
+
 ```
 
 If a model contains a signature, the UDF can be called without specifying column name arguments. In this case, the UDF will be called with column names from signature, so the evaluation dataframe's column names must match the model signature's column names.
@@ -1573,12 +1612,13 @@ Example
 
 python
 
-```
+```python
 from pyspark.sql import SparkSession
 
 spark = SparkSession.builder.getOrCreate()
 pyfunc_udf = mlflow.pyfunc.spark_udf(spark, "<path-to-model-with-signature>")
 df = spark_df.withColumn("prediction", pyfunc_udf())
+
 ```
 
 If a model contains a signature with tensor spec inputs, you will need to pass a column of array type as a corresponding UDF argument. The values in this column must be comprised of one-dimensional arrays. The UDF will reshape the array values to the required shape with 'C' order (i.e. read / write the elements using C-like index order) and cast the values as the required tensor spec type. For example, assuming a model requires input 'a' of shape (-1, 2, 3) and input 'b' of shape (-1, 4, 5). In order to perform inference on this data, we need to prepare a Spark DataFrame with column 'a' containing arrays of length 6 and column 'b' containing arrays of length 20. We can then invoke the UDF like following example code:
@@ -1587,7 +1627,7 @@ Example
 
 python
 
-```
+```python
 from pyspark.sql import SparkSession
 
 spark = SparkSession.builder.getOrCreate()
@@ -1597,6 +1637,7 @@ pyfunc_udf = mlflow.pyfunc.spark_udf(spark, model_path)
 # The `spark_df` has column 'a' containing arrays of length 6 and
 # column 'b' containing arrays of length 20
 df = spark_df.withColumn("prediction", pyfunc_udf(struct("a", "b")))
+
 ```
 
 The resulting UDF is based on Spark's Pandas UDF and is currently limited to producing either a single value, an array of values, or a struct containing multiple field values of the same type per observation. By default, we return the first numeric column as a double. You can control what result is returned by supplying `result_type` argument. The following values are supported:
@@ -1616,7 +1657,7 @@ Example
 
 python
 
-```
+```python
 from pyspark.sql import SparkSession
 
 spark = SparkSession.builder.getOrCreate()
@@ -1628,13 +1669,14 @@ pyfunc_udf = mlflow.pyfunc.spark_udf(
     spark, "<path-to-model>", result_type="prediction float, probability: array<float>"
 )
 df = spark_df.withColumn("prediction", pyfunc_udf())
+
 ```
 
 Example
 
 python
 
-```
+```python
 from pyspark.sql.types import ArrayType, FloatType
 from pyspark.sql.functions import struct
 from pyspark.sql import SparkSession
@@ -1645,6 +1687,7 @@ pyfunc_udf = mlflow.pyfunc.spark_udf(
 )
 # The prediction column will contain all the numeric columns returned by the model as floats
 df = spark_df.withColumn("prediction", pyfunc_udf(struct("name", "age")))
+
 ```
 
 If you want to use conda to restore the python environment that was used to train the model, set the `env_manager` argument when calling [`mlflow.pyfunc.spark_udf()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.spark_udf).
@@ -1653,7 +1696,7 @@ Example
 
 python
 
-```
+```python
 from pyspark.sql.types import ArrayType, FloatType
 from pyspark.sql.functions import struct
 from pyspark.sql import SparkSession
@@ -1666,6 +1709,7 @@ pyfunc_udf = mlflow.pyfunc.spark_udf(
     env_manager="conda",  # Use conda to restore the environment used in training
 )
 df = spark_df.withColumn("prediction", pyfunc_udf(struct("name", "age")))
+
 ```
 
 If you want to call [`mlflow.pyfunc.spark_udf()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.spark_udf) through Databricks connect in remote client, you need to build the model environment in Databricks runtime first.
@@ -1674,7 +1718,7 @@ Example
 
 python
 
-```
+```python
 from mlflow.pyfunc import build_model_env
 
 # Build the model env and save it as an archive file to the provided UC volume directory
@@ -1683,6 +1727,7 @@ print(build_model_env(model_uri, "/Volumes/..."))
 
 # print the cluster id. Databricks Connect client needs to use the cluster id.
 print(spark.conf.get("spark.databricks.clusterUsageTags.clusterId"))
+
 ```
 
 Once you have pre-built the model environment, you can run [`mlflow.pyfunc.spark_udf()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.spark_udf) with 'prebuilt\_model\_env' parameter through Databricks connect in remote client,
@@ -1691,7 +1736,7 @@ Example
 
 python
 
-```
+```python
 from databricks.connect import DatabricksSession
 
 spark = DatabricksSession.builder.remote(
@@ -1705,6 +1750,7 @@ model_env_uc_uri = "dbfs:/Volumes/.../.../XXXXX.tar.gz"
 pyfunc_udf = mlflow.pyfunc.spark_udf(
     spark, model_uri, prebuilt_env_uri=model_env_uc_uri
 )
+
 ```
 
 ## Deployment to Custom Targets[​](#deployment_plugin "Direct link to Deployment to Custom Targets")
@@ -1727,7 +1773,7 @@ For more info, see:
 
 bash
 
-```
+```bash
 mlflow deployments --help
 mlflow deployments create --help
 mlflow deployments delete --help
@@ -1736,6 +1782,7 @@ mlflow deployments list --help
 mlflow deployments get --help
 mlflow deployments run-local --help
 mlflow deployments help --help
+
 ```
 
 ## Community Model Flavors[​](#community-model-flavors "Direct link to Community Model Flavors")

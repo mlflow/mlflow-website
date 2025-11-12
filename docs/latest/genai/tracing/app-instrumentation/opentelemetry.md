@@ -8,7 +8,7 @@ The MLflow Tracing SDK is built on top of the OpenTelemetry SDK. If you want to 
 
 python
 
-```
+```python
 import mlflow
 from openai import OpenAI
 
@@ -16,6 +16,7 @@ mlflow.openai.autolog()
 
 client = OpenAI()
 response = client.responses.create(model="gpt-4o-mini", input="Hello, world!")
+
 ```
 
 ## Using Other OpenTelemetry Libraries[​](#using-other-opentelemetry-libraries "Direct link to Using Other OpenTelemetry Libraries")
@@ -26,9 +27,10 @@ MLflow Server exposes an OTLP endpoint at `/v1/traces` ([OTLP](https://opentelem
 
 bash
 
-```
+```bash
 export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:5000/v1/traces
 export OTEL_EXPORTER_OTLP_TRACES_HEADERS=x-mlflow-experiment-id=123
+
 ```
 
 For more details about the MLflow OpenTelemetry integration, see [Collect OpenTelemetry Traces into MLflow](/mlflow-website/docs/latest/genai/tracing/opentelemetry/ingest.md).
@@ -41,7 +43,7 @@ The following example shows how to combine MLflow's OpenAI auto-tracing with Ope
 
 python
 
-```
+```python
 import os
 import mlflow
 from contextlib import asynccontextmanager
@@ -71,6 +73,7 @@ FastAPIInstrumentor.instrument_app(app)
 @mlflow.trace
 async def answer_question(query: Request) -> Response:
     return ...
+
 ```
 
 Spans generated from both SDKs will be merged into a single trace.

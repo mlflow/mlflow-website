@@ -59,18 +59,20 @@ The `index` object is the centerpiece of the LlamaIndex and MLflow integration. 
 
 shell
 
-```
+```shell
 mkdir -p data
 curl -L https://raw.githubusercontent.com/run-llama/llama_index/main/docs/docs/examples/data/paul_graham/paul_graham_essay.txt -o ./data/paul_graham_essay.txt
+
 ```
 
 python
 
-```
+```python
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 
 documents = SimpleDirectoryReader("data").load_data()
 index = VectorStoreIndex.from_documents(documents)
+
 ```
 
 #### Logging the Index to MLflow[​](#logging-the-index-to-mlflow "Direct link to Logging the Index to MLflow")
@@ -87,7 +89,7 @@ The following code is an example of logging an index to MLflow with the `chat` e
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_experiment("llama-index-demo")
@@ -99,6 +101,7 @@ with mlflow.start_run():
         engine_type="chat",
         input_example="What did the author do growing up?",
     )
+
 ```
 
 note
@@ -117,7 +120,7 @@ The saved index can be loaded back for inference using the [`mlflow.pyfunc.load_
 
 python
 
-```
+```python
 import mlflow
 
 model = mlflow.pyfunc.load_model(model_info.model_uri)
@@ -130,6 +133,7 @@ print(response)
 response = model.predict("How did the author feel about it?")
 print(response)
 # >> The author felt puzzled by the first program ...
+
 ```
 
 tip
@@ -138,8 +142,9 @@ To load the index itself back instead of the engine, use the [`mlflow.llama_inde
 
 python
 
-```
+```python
 index = mlflow.llama_index.load_model("runs:/<run_id>/index")
+
 ```
 
 ### Enable Tracing[​](#enable-tracing "Direct link to Enable Tracing")
@@ -148,13 +153,14 @@ You can enable tracing for your LlamaIndex code by calling the [`mlflow.llama_in
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.llama_index.autolog()
 
 chat_engine = index.as_chat_engine()
 response = chat_engine.chat("What was the first program the author wrote?")
+
 ```
 
 Then you can navigate to the MLflow UI, select the experiment, and open the "Traces" tab to find the logged trace for the prediction made by the engine. It is impressive to see how the chat engine coordinates and executes a number of tasks to answer your question!
@@ -165,8 +171,9 @@ You can disable tracing by running the same function with the `disable` paramete
 
 python
 
-```
+```python
 mlflow.llama_index.autolog(disable=True)
+
 ```
 
 note
@@ -185,7 +192,7 @@ To use model-from-code logging, you first need to create a separate Python file 
 
 python
 
-```
+```python
 # %%writefile index.py
 
 # Create Qdrant client with your own settings.
@@ -204,13 +211,14 @@ index = VectorStoreIndex.from_vector_store(vector_store=vector_store)
 
 # IMPORTANT: call set_model() method to tell MLflow to log this index
 mlflow.models.set_model(index)
+
 ```
 
 Then you can log the index by passing the Python file path to the [`mlflow.llama_index.log_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.llama_index.html#mlflow.llama_index.log_model) function. The global [Settings](https://docs.llamaindex.ai/en/stable/module_guides/supporting_modules/settings) object is saved normally as part of the model.
 
 python
 
-```
+```python
 import mlflow
 
 with mlflow.start_run():
@@ -219,15 +227,17 @@ with mlflow.start_run():
         name="index",
         engine_type="query",
     )
+
 ```
 
 The logged index can be loaded back using the [`mlflow.llama_index.load_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.llama_index.html#mlflow.llama_index.load_model) or [`mlflow.pyfunc.load_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_model) function, in the same way as with the local index.
 
 python
 
-```
+```python
 index = mlflow.llama_index.load_model(model_info.model_uri)
 index.as_query_engine().query("What is MLflow?")
+
 ```
 
 note
@@ -240,7 +250,7 @@ Mlflow supports logging and loading a LlamaIndex Workflow via the [Model-from-Co
 
 python
 
-```
+```python
 import mlflow
 
 with mlflow.start_run():
@@ -249,13 +259,14 @@ with mlflow.start_run():
         name="model",
         input_example={"input": "What is MLflow?"},
     )
+
 ```
 
 The logged workflow can be loaded back using the [`mlflow.llama_index.load_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.llama_index.html#mlflow.llama_index.load_model) or [`mlflow.pyfunc.load_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_model) function.
 
 python
 
-```
+```python
 # Use mlflow.llama_index.load_model to load the workflow object as is
 workflow = mlflow.llama_index.load_model(model_info.model_uri)
 await workflow.run(input="What is MLflow?")
@@ -264,6 +275,7 @@ await workflow.run(input="What is MLflow?")
 # with standard inference APIs for deployment and evaluation.
 pyfunc = mlflow.pyfunc.load_model(model_info.model_uri)
 pyfunc.predict({"input": "What is MLflow?"})
+
 ```
 
 warning
@@ -276,7 +288,7 @@ While it is not possible to update the engine type of the logged model in-place,
 
 python
 
-```
+```python
 import mlflow
 
 # Log the index with the query engine type first
@@ -296,6 +308,7 @@ with mlflow.start_run():
         # Specify the chat engine type this time
         engine_type="chat",
     )
+
 ```
 
 Alternatively, you can leverage their standard inference APIs on the loaded LlamaIndex native index object, specifically:
@@ -310,7 +323,7 @@ When saving the index to MLflow, it persists the global [Settings](https://docs.
 
 python
 
-```
+```python
 import mlflow
 from llama_index.core import Settings
 from llama_index.llms.openai import OpenAI
@@ -320,6 +333,7 @@ Settings.llm = OpenAI("gpt-4o-mini")
 # MLflow saves GPT-4o-Mini as the LLM to use for inference
 with mlflow.start_run():
     model_info = mlflow.llama_index.log_model(index, name="index", engine_type="chat")
+
 ```
 
 Then later when you load the index back, the persisted settings are also applied globally. This means that the loaded engine will use the same LLM as when it was logged.
@@ -328,7 +342,7 @@ However, sometimes you may want to use a different LLM for inference. In such ca
 
 python
 
-```
+```python
 import mlflow
 
 # Load the index back
@@ -341,4 +355,5 @@ assert Settings.llm.model == "gpt-4o-mini"
 Settings.llm = OpenAI("gpt-4")
 query_engine = loaded_index.as_query_engine()
 response = query_engine.query("What is the capital of France?")
+
 ```

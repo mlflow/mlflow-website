@@ -46,7 +46,7 @@ Transform your sentence transformer workflows with MLflow's powerful integration
 
 python
 
-```
+```python
 import mlflow
 from sentence_transformers import SentenceTransformer
 
@@ -59,6 +59,7 @@ with mlflow.start_run():
         name="semantic_encoder",
         task="llm/v1/embeddings",  # Standardized MLflow embedding task
     )
+
 ```
 
 What You Can Capture
@@ -108,7 +109,7 @@ Perfect integration with the complete sentence transformer development cycle:
 
 python
 
-```
+```python
 # Fine-tune for your domain
 from sentence_transformers import SentenceTransformer, InputExample, losses
 from torch.utils.data import DataLoader
@@ -136,6 +137,7 @@ with mlflow.start_run():
         signature=signature,
         input_example=sample_texts,
     )
+
 ```
 
 ### Production-Ready Deployment[​](#production-ready-deployment "Direct link to Production-Ready Deployment")

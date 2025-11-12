@@ -8,17 +8,14 @@ In this notebook, learn how to deploy a custom MLflow PyFunc model to a serving 
 
 python
 
-```
+```python
 %pip install --upgrade mlflow scikit-learn -q
-```
 
-```
-213.32s - pydevd: Sending message related to process being replaced timed-out after 5 seconds
 ```
 
 python
 
-```
+```python
 import json
 import warnings
 
@@ -31,13 +28,15 @@ import mlflow
 from mlflow.models import infer_signature
 
 warnings.filterwarnings("ignore")
+
 ```
 
 python
 
-```
+```python
 DOW_MODEL_NAME_PREFIX = "DOW_model_"
 MME_MODEL_NAME = "MME_DOW_model"
+
 ```
 
 ## 1 - Create Some Sample Models[​](#1---create-some-sample-models "Direct link to 1 - Create Some Sample Models")
@@ -46,7 +45,7 @@ MME_MODEL_NAME = "MME_DOW_model"
 
 python
 
-```
+```python
 def create_weekly_dataset(n_dates, n_observations_per_date):
   rng = pd.date_range(start="today", periods=n_dates, freq="D")
   df = pd.DataFrame(
@@ -61,10 +60,7 @@ def create_weekly_dataset(n_dates, n_observations_per_date):
 df = create_weekly_dataset(n_dates=30, n_observations_per_date=500)
 print(df.shape)
 df.head()
-```
 
-```
-(15000, 5)
 ```
 
 |                            | x1        | x2        | x3        | y         | dow |
@@ -79,7 +75,7 @@ df.head()
 
 python
 
-```
+```python
 for dow in df["dow"].unique():
   # Create dataset corresponding to a single day of the week
   X = df.loc[df["dow"] == dow]
@@ -103,30 +99,14 @@ for dow in df["dow"].unique():
           registered_model_name=f"{DOW_MODEL_NAME_PREFIX}{dow}",
       )
       mlflow.set_tag("dow", dow)
-```
 
-```
-Successfully registered model 'DOW_model_4'.
-Created version '1' of model 'DOW_model_4'.
-Successfully registered model 'DOW_model_5'.
-Created version '1' of model 'DOW_model_5'.
-Successfully registered model 'DOW_model_6'.
-Created version '1' of model 'DOW_model_6'.
-Successfully registered model 'DOW_model_0'.
-Created version '1' of model 'DOW_model_0'.
-Successfully registered model 'DOW_model_1'.
-Created version '1' of model 'DOW_model_1'.
-Successfully registered model 'DOW_model_2'.
-Created version '1' of model 'DOW_model_2'.
-Successfully registered model 'DOW_model_3'.
-Created version '1' of model 'DOW_model_3'.
 ```
 
 #### 1.3 - Test inference on our DOW models[​](#13---test-inference-on-our-dow-models "Direct link to 1.3 - Test inference on our DOW models")
 
 python
 
-```
+```python
 # Load Tuesday's model
 tuesday_dow = 1
 model_name = f"{DOW_MODEL_NAME_PREFIX}{tuesday_dow}"
@@ -138,10 +118,7 @@ predictor_columns = [column for column in df.columns if column not in {"y", "dow
 head_of_training_data = df.loc[df["dow"] == tuesday_dow, predictor_columns].head()
 tuesday_fitted_values = model.predict(head_of_training_data)
 print(tuesday_fitted_values)
-```
 
-```
-[-0.8571552   0.61833952  0.61625155  0.28999143  0.49778144]
 ```
 
 ## 2 - Create an MME Custom PyFunc Model[​](#2---create-an-mme-custom-pyfunc-model "Direct link to 2 - Create an MME Custom PyFunc Model")
@@ -150,7 +127,7 @@ print(tuesday_fitted_values)
 
 python
 
-```
+```python
 class DOWModel(mlflow.pyfunc.PythonModel):
   def __init__(self, model_uris):
       self.model_uris = model_uris
@@ -179,14 +156,16 @@ class DOWModel(mlflow.pyfunc.PythonModel):
 
       # Perform inference
       return model.predict(model_input)
+
 ```
 
 #### 2.2 - Test our Implementation[​](#22---test-our-implementation "Direct link to 2.2 - Test our Implementation")
 
 python
 
-```
+```python
 head_of_training_data
+
 ```
 
 |                            | x1        | x2        | x3        |
@@ -199,7 +178,7 @@ head_of_training_data
 
 python
 
-```
+```python
 # Instantiate our DOW MME
 model_uris = [f"models:/{DOW_MODEL_NAME_PREFIX}{i}/latest" for i in df["dow"].unique()]
 dow_model = DOWModel(model_uris)
@@ -215,21 +194,14 @@ assert all(tuesday_fitted_values == mme_tuesday_fitted_values)
 print("
 Tuesday fitted values:")
 print(mme_tuesday_fitted_values)
-```
 
-```
-Model URIs:
-['models:/DOW_model_4/latest', 'models:/DOW_model_5/latest', 'models:/DOW_model_6/latest', 'models:/DOW_model_0/latest', 'models:/DOW_model_1/latest', 'models:/DOW_model_2/latest', 'models:/DOW_model_3/latest']
-
-Tuesday fitted values:
-[-0.8571552   0.61833952  0.61625155  0.28999143  0.49778144]
 ```
 
 #### 2.3 - Register our Custom PyFunc Model[​](#23---register-our-custom-pyfunc-model "Direct link to 2.3 - Register our Custom PyFunc Model")
 
 python
 
-```
+```python
 with mlflow.start_run():
   # Instantiate the custom pyfunc model
   model = DOWModel(model_uris)
@@ -255,20 +227,7 @@ with mlflow.start_run():
   # Set some relevant information about our model
   # (Assuming model has a property 'models' that can be counted)
   mlflow.log_param("num_models", len(model.models))
-```
 
-```
-inputs: 
-['x1': double (required), 'x2': double (required), 'x3': double (required)]
-outputs: 
-[Tensor('float64', (-1,))]
-params: 
-['dow': long (default: 1)]
-```
-
-```
-Successfully registered model 'MME_DOW_model'.
-Created version '1' of model 'MME_DOW_model'.
 ```
 
 ## 3 - Serve our Model[​](#3---serve-our-model "Direct link to 3 - Serve our Model")
@@ -281,24 +240,20 @@ To test our endpoint, let's serve our model on our local machine.
 
 python
 
-```
+```python
 PORT = 1234
 print(
   f"""Run the below command in a new window. You must be in the same repo as your mlruns directory and have mlflow installed...
   mlflow models serve -m "models:/{MME_MODEL_NAME}/latest" --env-manager local -p {PORT}"""
 )
-```
 
-```
-Run the below command in a new window. You must be in the same repo as your mlruns directory and have mlflow installed...
-  mlflow models serve -m "models:/MME_DOW_model/latest" --env-manager local -p 1234
 ```
 
 ## 4 - Query our Served Model[​](#4---query-our-served-model "Direct link to 4 - Query our Served Model")
 
 python
 
-```
+```python
 def score_model(pdf, params):
   headers = {"Content-Type": "application/json"}
   url = f"http://127.0.0.1:{PORT}/invocations"
@@ -314,9 +269,5 @@ def score_model(pdf, params):
 print("Inference on dow model 1 (Tuesday):")
 inference_df = head_of_training_data.reset_index(drop=True).to_dict(orient="split")
 print(score_model(inference_df, params={"dow": 1}))
-```
 
-```
-Inference on dow model 1 (Tuesday):
-{'predictions': [-0.8571551951905747, 0.618339524354309, 0.6162515496343108, 0.2899914313294642, 0.4977814353066934]}
 ```

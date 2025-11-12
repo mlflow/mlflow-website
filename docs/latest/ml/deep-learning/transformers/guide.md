@@ -74,7 +74,7 @@ In the below example, a simple pre-trained model is used within a pipeline. Afte
 
 python
 
-```
+```python
 import mlflow
 import transformers
 
@@ -108,6 +108,7 @@ response = chatbot.predict("What is machine learning?")
 print(response)
 
 # >> [It's a new thing that's been around for a while.]
+
 ```
 
 ## Saving Prompt Templates with Transformer Pipelines[​](#saving-prompt-templates-with-transformer-pipelines "Direct link to Saving Prompt Templates with Transformer Pipelines")
@@ -130,7 +131,7 @@ For example:
 
 python
 
-```
+```python
 import mlflow
 from transformers import pipeline
 
@@ -146,13 +147,14 @@ mlflow.transformers.save_model(
     path="path/to/model",
     prompt_template=prompt_template,
 )
+
 ```
 
 When the model is then loaded with [`mlflow.pyfunc.load_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_model), the prompt template will be used to format user inputs before passing them into the pipeline:
 
 python
 
-```
+```python
 import mlflow
 
 # Load the model with pyfunc
@@ -162,6 +164,7 @@ model = mlflow.pyfunc.load_model("path/to/model")
 # string that is passed to the text-generation pipeline will be:
 # "Answer the following question: What is MLflow?"
 model.predict("What is MLflow?")
+
 ```
 
 note
@@ -189,7 +192,7 @@ If both `model_config` and `ModelSignature` with parameters are saved when loggi
 
 python
 
-```
+```python
 import mlflow
 from mlflow.models import infer_signature
 from mlflow.transformers import generate_signature_output
@@ -233,6 +236,7 @@ result = pyfunc_loaded.predict(data)
 pyfunc_loaded = mlflow.pyfunc.load_model(
     "text2text", model_config=dict(do_sample=False)
 )
+
 ```
 
 note
@@ -243,7 +247,7 @@ Note that in the previous example, the user can't override the configuration `do
 
 python
 
-```
+```python
 import mlflow
 from mlflow.models import infer_signature
 from mlflow.transformers import generate_signature_output
@@ -303,6 +307,7 @@ params = {
 #    "remove_invalid_values": True,
 # }
 result = pyfunc_loaded.predict(data, params=params)
+
 ```
 
 ## Pipelines vs. Component Logging[​](#pipelines-vs-component-logging "Direct link to Pipelines vs. Component Logging")
@@ -351,7 +356,7 @@ Not all model types are compatible with the pipeline API constructor via compone
 
 python
 
-```
+```python
 import mlflow
 import transformers
 
@@ -383,6 +388,7 @@ loaded_pipeline(["MLflow is awesome!", "Transformers is a great library!"])
 
 # >> [{'label': 'POSITIVE', 'score': 0.9998478889465332},
 # >>  {'label': 'POSITIVE', 'score': 0.9998030066490173}]
+
 ```
 
 ### Saving a pipeline and loading components[​](#saving-a-pipeline-and-loading-components "Direct link to Saving a pipeline and loading components")
@@ -391,7 +397,7 @@ Some use cases can benefit from the simplicity of defining a solution as a pipel
 
 python
 
-```
+```python
 import transformers
 import mlflow
 
@@ -435,6 +441,7 @@ reconstructed_response = reconstructed_pipeline(
 print(reconstructed_response)
 
 # >> [{'translation_text': "Les transformateurs rendent l'utilisation de modèles Deep Learning facile et amusante!"}]
+
 ```
 
 ## Automatic Metadata and ModelCard logging[​](#automatic-metadata-and-modelcard-logging "Direct link to Automatic Metadata and ModelCard logging")
@@ -475,7 +482,7 @@ Example:
 
 python
 
-```
+```python
 import transformers
 import torch
 import mlflow
@@ -500,13 +507,14 @@ with mlflow.start_run():
 
 # Illustrate that the torch data type is recorded in the flavor configuration
 print(model_info.flavors["transformers"])
+
 ```
 
 Result:
 
 bash
 
-```
+```bash
 {'transformers_version': '4.28.1',
   'code': None,
   'task': 'translation_en_to_fr',
@@ -518,6 +526,7 @@ bash
   'tokenizer_type': 'T5TokenizerFast',
   'components': ['tokenizer'],
   'pipeline': 'pipeline'}
+
 ```
 
 * Specify the *torch\_dtype* argument when loading the model to override any values set during logging or saving.
@@ -526,7 +535,7 @@ Example:
 
 python
 
-```
+```python
 import transformers
 import torch
 import mlflow
@@ -554,14 +563,16 @@ loaded_pipeline = mlflow.transformers.load_model(
 )
 
 print(loaded_pipeline.torch_dtype)
+
 ```
 
 Result:
 
 bash
 
-```
+```bash
 torch.float64
+
 ```
 
 note
@@ -594,7 +605,7 @@ An example of specifying an appropriate uri-based input model signature for an a
 
 python
 
-```
+```python
 from mlflow.models import infer_signature
 from mlflow.transformers import generate_signature_output
 
@@ -606,6 +617,7 @@ with mlflow.start_run():
         name="my_transcriber",
         signature=signature,
     )
+
 ```
 
 * `bytes`
@@ -628,19 +640,20 @@ For example, [LoRA (Low-Rank Adaptation)](https://huggingface.co/docs/peft/main/
 
 python
 
-```
+```python
 from peft import LoraConfig, get_peft_model
 
 base_model = AutoModelForCausalLM.from_pretrained(...)
 lora_config = LoraConfig(...)
 peft_model = get_peft_model(base_model, lora_config)
+
 ```
 
 In MLflow 2.11.0, we introduced support for tracking PEFT models in the MLflow Transformers flavor. You can log and load PEFT models using the same APIs as other Transformers models, such as [`mlflow.transformers.log_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.transformers.html#mlflow.transformers.log_model) and [`mlflow.transformers.load_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.transformers.html#mlflow.transformers.load_model).
 
 python
 
-```
+```python
 import mlflow
 from peft import LoraConfig, get_peft_model
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -667,6 +680,7 @@ with mlflow.start_run():
 
 # Load the PEFT model
 loaded_model = mlflow.transformers.load_model(model_info.model_uri)
+
 ```
 
 ### PEFT Models in MLflow Tutorial[​](#peft-models-in-mlflow-tutorial "Direct link to PEFT Models in MLflow Tutorial")

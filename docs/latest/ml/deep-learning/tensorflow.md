@@ -39,13 +39,14 @@ The simplest way to get started with MLflow and TensorFlow is through **autologg
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.tensorflow.autolog()  # That's it! 🎉
 
 # Your existing TensorFlow code works unchanged
 model.fit(x_train, y_train, validation_data=(x_val, y_val), epochs=10)
+
 ```
 
 What Gets Automatically Logged
@@ -92,7 +93,7 @@ Advanced Callback Capabilities
 
 python
 
-```
+```python
 # Log your TensorFlow model with MLflow
 model_info = mlflow.tensorflow.log_model(model, name="tensorflow_model")
 
@@ -101,6 +102,7 @@ loaded_model = mlflow.tensorflow.load_model(
     model_info.model_uri
 )  # The 'model_uri' attribute is in the format 'models:/<model_id>'
 predictions = loaded_model.predict(test_data)
+
 ```
 
 ### Advanced Experiment Management[​](#advanced-experiment-management "Direct link to Advanced Experiment Management")

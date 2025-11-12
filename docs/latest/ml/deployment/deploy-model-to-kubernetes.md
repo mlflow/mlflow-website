@@ -13,15 +13,16 @@ The essential step to deploy an MLflow model to Kubernetes is to build a Docker 
 
 bash
 
-```
+```bash
 mlflow models build-docker -m runs:/<run_id>/model -n <image_name> --enable-mlserver
+
 ```
 
 If you want to use the bare-bones FastAPI server instead of MLServer, remove the `--enable-mlserver` flag. For other options, see the [build-docker](/mlflow-website/docs/latest/api_reference/cli.html#mlflow-models-build-docker) command documentation.
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.models.build_docker(
@@ -29,6 +30,7 @@ mlflow.models.build_docker(
     name="<image_name>",
     enable_mlserver=True,
 )
+
 ```
 
 If you want to use the bare-bones FastAPI server instead of MLServer, remove `enable_mlserver=True`. For other options, see the [mlflow.models.build\_docker](/mlflow-website/docs/latest/api_reference/python_api/mlflow.models.html#mlflow.models.build_docker) function documentation.

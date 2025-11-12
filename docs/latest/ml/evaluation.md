@@ -54,7 +54,7 @@ MLflow evaluation transforms complex model assessment into simple, reproducible 
 
 python
 
-```
+```python
 import mlflow
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
@@ -86,6 +86,7 @@ with mlflow.start_run():
         model_type="classifier",
         evaluators=["default"],
     )
+
 ```
 
 What Gets Automatically Generated

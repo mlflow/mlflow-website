@@ -53,10 +53,11 @@ A program is a a set of modules connected into a pipeline to perform complex tas
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.dspy.autolog()
+
 ```
 
 Once enabled, MLflow will generate traces whenever your DSPy program is executed and record them in your MLflow Experiment.
@@ -71,13 +72,14 @@ The [Module](https://dspy.ai/learn/programming/modules) object is the centerpiec
 
 shell
 
-```
+```shell
 pip install mlflow dspy -U
+
 ```
 
 python
 
-```
+```python
 import dspy
 
 # Define our language model
@@ -96,6 +98,7 @@ class CoT(dspy.Module):
 
 
 dspy_model = CoT()
+
 ```
 
 tip
@@ -110,7 +113,7 @@ We will also specify a [model signature](/mlflow-website/docs/latest/ml/model/si
 
 python
 
-```
+```python
 import mlflow
 
 # Start an MLflow run
@@ -121,6 +124,7 @@ with mlflow.start_run():
         name="model",
         input_example="what is 2 + 2?",
     )
+
 ```
 
 ![MLflow artifacts for the DSPy program](/mlflow-website/docs/latest/assets/images/dspy-artifacts-e5f816ebc8919118392f3e066edece68.png)
@@ -131,7 +135,7 @@ The saved module can be loaded back for inference using the [`mlflow.pyfunc.load
 
 python
 
-```
+```python
 import mlflow
 
 # Load the model as an MLflow PythonModel
@@ -140,13 +144,14 @@ model = mlflow.pyfunc.load_model(model_info.model_uri)
 # Predict with the object
 response = model.predict("What kind of bear is best?")
 print(response)
+
 ```
 
 Output
 
 python
 
-```
+```python
 {
     "reasoning": """The question "What kind of bear is best?" is often associated with a
     humorous reference from the television show "The Office," where the character Jim
@@ -161,6 +166,7 @@ python
     people humorously refer to the American black bear or the polar bear when discussing
     "the best" kind of bear.""",
 }
+
 ```
 
 The MLflow PythonModel for DSPy supports streaming. To enable streaming, ensure the following conditions are met:
@@ -171,17 +177,18 @@ The MLflow PythonModel for DSPy supports streaming. To enable streaming, ensure 
 
 python
 
-```
+```python
 stream_response = model.predict_stream("What kind of bear is best?")
 for output in stream_response:
     print(output)
+
 ```
 
 Output
 
 python
 
-```
+```python
 {"predict_name": "prog.predict", "signature_field_name": "reasoning", "chunk": "The"}
 {
     "predict_name": "prog.predict",
@@ -197,14 +204,16 @@ python
 {"predict_name": "prog.predict", "signature_field_name": "reasoning", "chunk": " best"}
 {"predict_name": "prog.predict", "signature_field_name": "reasoning", "chunk": " is"}
 ...
+
 ```
 
 To load the DSPy program itself back instead of the PyFunc-wrapped model, use the [`mlflow.dspy.load_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.dspy.html#mlflow.dspy.load_model) function.
 
 python
 
-```
+```python
 model = mlflow.dspy.load_model(model_uri)
+
 ```
 
 ## Optimizer Autologging[​](#optimizer-autologging "Direct link to Optimizer Autologging")

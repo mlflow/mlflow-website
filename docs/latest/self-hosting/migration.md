@@ -21,8 +21,9 @@ If you are using a database-backend store, run the following command to apply sc
 
 bash
 
-```
+```bash
 mlflow db upgrade <backend-store-url>
+
 ```
 
 The command will update the database schema to the latest version using [Alembic](https://alembic.sqlalchemy.org/).

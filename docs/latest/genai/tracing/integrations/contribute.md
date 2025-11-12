@@ -93,11 +93,12 @@ After coding, build and exercise the workspace locally to make sure artifacts in
 
 bash
 
-```
+```bash
 cd libs/typescript
 npm install
 npm run build
 npm run test
+
 ```
 
 attention

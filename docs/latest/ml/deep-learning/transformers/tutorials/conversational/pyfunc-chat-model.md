@@ -18,15 +18,16 @@ In this tutorial, you will:
 
 python
 
-```
+```python
 %pip install mlflow>=2.11.0 -q -U
 # OpenAI-compatible chat model support is available for Transformers 4.34.0 and above
 %pip install transformers>=4.34.0 -q -U
+
 ```
 
 python
 
-```
+```python
 # Disable tokenizers warnings when constructing pipelines
 %env TOKENIZERS_PARALLELISM=false
 
@@ -34,10 +35,7 @@ import warnings
 
 # Disable a few less-than-useful UserWarnings from setuptools and pydantic
 warnings.filterwarnings("ignore", category=UserWarning)
-```
 
-```
-env: TOKENIZERS_PARALLELISM=false
 ```
 
 ### Building a Chat Model[​](#building-a-chat-model "Direct link to Building a Chat Model")
@@ -62,7 +60,7 @@ To begin, let's go through the original flow of saving a text generation pipelin
 
 python
 
-```
+```python
 from transformers import pipeline
 
 import mlflow
@@ -76,50 +74,26 @@ generator = pipeline(
 mlflow.transformers.save_model(
   path="tinyllama-text-generation", transformers_model=generator, task="text-generation"
 )
-```
 
-```
-/var/folders/qd/9rwd0_gd0qs65g4sdqlm51hr0000gp/T/ipykernel_55429/4268198845.py:11: FutureWarning: The 'transformers' MLflow Models integration is known to be compatible with the following package version ranges: ``4.25.1`` -  ``4.37.1``. MLflow Models integrations with transformers may not succeed when used with package versions outside of this range.
-mlflow.transformers.save_model(
 ```
 
 Now, let's load the model and use it for inference. Our loaded model is a `text-generation` pipeline, and let's take a look at its signature to see its expected inputs and outputs.
 
 python
 
-```
+```python
 # load the model for inference
 model = mlflow.pyfunc.load_model("tinyllama-text-generation")
 
 model.metadata.signature
-```
 
-```
-Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]
-```
-
-```
-2024/02/26 21:06:51 WARNING mlflow.transformers: Could not specify device parameter for this pipeline type
-```
-
-```
-Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]
-```
-
-```
-inputs: 
-[string (required)]
-outputs: 
-[string (required)]
-params: 
-None
 ```
 
 Unfortunately, it only accepts `string` as input, which isn't directly compatible with a chat interface. When interacting with OpenAI's API, for example, we expect to simply be able to input a list of messages. In order to do this with our current model, we'll have to write some additional boilerplate:
 
 python
 
-```
+```python
 # first, apply the tokenizer's chat template, since the
 # model is tuned to accept prompts in a chat format. this
 # also converts the list of messages to a string.
@@ -129,20 +103,8 @@ prompt = generator.tokenizer.apply_chat_template(
 )
 
 model.predict(prompt)
+
 ```
-
-````
-['<|user|>
-Write me a hello world program in python</s>
-<|assistant|>
-Here's a simple hello world program in Python:
-
-```python
-print("Hello, world!")
-```
-
-This program prints the string "Hello, world!" to the console. You can run this program by typing it into the Python interpreter or by running the command `python hello_world.py` in your terminal.']
-````
 
 Now we're getting somewhere, but formatting our messages prior to inference is cumbersome.
 
@@ -152,77 +114,36 @@ To simplify all this, let's just pass in `"llm/v1/chat"` as the task param when 
 
 python
 
-```
+```python
 # save the model using the `"llm/v1/chat"`
 # task type instead of `text-generation`
 mlflow.transformers.save_model(
   path="tinyllama-chat", transformers_model=generator, task="llm/v1/chat"
 )
-```
 
-```
-/var/folders/qd/9rwd0_gd0qs65g4sdqlm51hr0000gp/T/ipykernel_55429/609241782.py:3: FutureWarning: The 'transformers' MLflow Models integration is known to be compatible with the following package version ranges: ``4.25.1`` -  ``4.37.1``. MLflow Models integrations with transformers may not succeed when used with package versions outside of this range.
-mlflow.transformers.save_model(
 ```
 
 Once again, let's load the model and inspect the signature:
 
 python
 
-```
+```python
 model = mlflow.pyfunc.load_model("tinyllama-chat")
 
 model.metadata.signature
-```
 
-```
-Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]
-```
-
-```
-2024/02/26 21:10:04 WARNING mlflow.transformers: Could not specify device parameter for this pipeline type
-```
-
-```
-Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]
-```
-
-```
-inputs: 
-['messages': Array({content: string (required), name: string (optional), role: string (required)}) (required), 'temperature': double (optional), 'max_tokens': long (optional), 'stop': Array(string) (optional), 'n': long (optional), 'stream': boolean (optional)]
-outputs: 
-['id': string (required), 'object': string (required), 'created': long (required), 'model': string (required), 'choices': Array({finish_reason: string (required), index: long (required), message: {content: string (required), name: string (optional), role: string (required)} (required)}) (required), 'usage': {completion_tokens: long (required), prompt_tokens: long (required), total_tokens: long (required)} (required)]
-params: 
-None
 ```
 
 Now when performing inference, we can pass our messages in a dict as we'd expect to do when interacting with the OpenAI API. Furthermore, the response we receive back from the model also conforms to the spec.
 
 python
 
-```
+```python
 messages = [{"role": "user", "content": "Write me a hello world program in python"}]
 
 model.predict({"messages": messages})
+
 ```
-
-````
-[{'id': '8435a57d-9895-485e-98d3-95b1cbe007c0',
-'object': 'chat.completion',
-'created': 1708949437,
-'model': 'TinyLlama/TinyLlama-1.1B-Chat-v1.0',
-'usage': {'prompt_tokens': 24, 'completion_tokens': 71, 'total_tokens': 95},
-'choices': [{'index': 0,
-  'finish_reason': 'stop',
-  'message': {'role': 'assistant',
-   'content': 'Here's a simple hello world program in Python:
-
-```python
-print("Hello, world!")
-```
-
-This program prints the string "Hello, world!" to the console. You can run this program by typing it into the Python interpreter or by running the command `python hello_world.py` in your terminal.'}}]}]
-````
 
 ### Serving the Chat Model[​](#serving-the-chat-model "Direct link to Serving the Chat Model")
 
@@ -232,8 +153,9 @@ In a terminal shell, run:
 
 text
 
-```
+```text
 $ mlflow models serve -m tinyllama-chat
+
 ```
 
 When the server has finished initializing, you should be able to interact with the model via HTTP requests. The input format is almost identical to the format described in the [MLflow Deployments Server docs](https://mlflow.org/docs/latest/ml/deployment/index.html#chat), with the exception that `temperature` defaults to `1.0` instead of `0.0`.
@@ -242,48 +164,11 @@ Here's a quick example:
 
 python
 
-```
+```python
 %%sh
 curl http://127.0.0.1:5000/invocations   -H 'Content-Type: application/json'   -d '{ "messages": [{"role": "user", "content": "Write me a hello world program in python"}] }'   | jq
-```
 
 ```
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                               Dload  Upload   Total   Spent    Left  Speed
-100   706  100   617  100    89     25      3  0:00:29  0:00:23  0:00:06   160
-```
-
-````
-[
-{
-  "id": "fc3d08c3-d37d-420d-a754-50f77eb32a92",
-  "object": "chat.completion",
-  "created": 1708949465,
-  "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
-  "usage": {
-    "prompt_tokens": 24,
-    "completion_tokens": 71,
-    "total_tokens": 95
-  },
-  "choices": [
-    {
-      "index": 0,
-      "finish_reason": "stop",
-      "message": {
-        "role": "assistant",
-        "content": "Here's a simple hello world program in Python:
-
-```python
-print("Hello, world!")
-```
-
-This program prints the string "Hello, world!" to the console. You can run this program by typing it into the Python interpreter or by running the command `python hello_world.py` in your terminal."
-      }
-    }
-  ]
-}
-]
-````
 
 It's that easy!
 

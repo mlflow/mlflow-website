@@ -12,13 +12,14 @@ Perfect for getting started quickly or when using supported ML libraries. Just a
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.autolog()  # That's it!
 
 # Your existing training code works unchanged
 model.fit(X_train, y_train)
+
 ```
 
 **What gets logged automatically:**
@@ -43,7 +44,7 @@ Ideal for custom training loops, advanced experimentation, or when you need prec
 
 python
 
-```
+```python
 import mlflow
 
 with mlflow.start_run():
@@ -61,11 +62,12 @@ with mlflow.start_run():
 
     # Log final model
     mlflow.sklearn.log_model(model, name="model")
+
 ```
 
 java
 
-```
+```java
 MlflowClient client = new MlflowClient();
 RunInfo run = client.createRun();
 
@@ -79,11 +81,12 @@ for (int epoch = 0; epoch < numEpochs; epoch++) {
     client.logMetric(run.getRunId(), "train_loss", trainLoss,
                     System.currentTimeMillis(), epoch);
 }
+
 ```
 
 r
 
-```
+```r
 library(mlflow)
 
 with(mlflow_start_run(), {
@@ -97,6 +100,7 @@ with(mlflow_start_run(), {
     mlflow_log_metric("train_loss", train_loss, step = epoch)
   }
 })
+
 ```
 
 ## Core Logging Functions[​](#core-logging-functions "Direct link to Core Logging Functions")
@@ -185,7 +189,7 @@ For models stored outside MLflow (like deployed agents or external model artifac
 
 python
 
-```
+```python
 import mlflow
 
 # Create an external model for tracking without storing artifacts in MLflow
@@ -212,6 +216,7 @@ def chat_with_agent(message):
 
 # Traces are now linked to your external model
 traces = mlflow.search_traces(model_id=model.model_id)
+
 ```
 
 #### Advanced Model Lifecycle Management[​](#advanced-model-lifecycle-management "Direct link to Advanced Model Lifecycle Management")
@@ -220,7 +225,7 @@ For models that require custom preparation or validation:
 
 python
 
-```
+```python
 import mlflow
 from mlflow.entities import LoggedModelStatus
 
@@ -254,13 +259,14 @@ except Exception as e:
 # Retrieve and work with the logged model
 final_model = mlflow.get_logged_model(model.model_id)
 print(f"Model {final_model.name} is {final_model.status}")
+
 ```
 
 #### Searching and Querying Logged Models[​](#searching-and-querying-logged-models "Direct link to Searching and Querying Logged Models")
 
 python
 
-```
+```python
 # Find all production-ready transformer models
 production_models = mlflow.search_logged_models(
     filter_string="tags.environment = 'production' AND model_type = 'transformer'",
@@ -279,6 +285,7 @@ high_accuracy_models = mlflow.search_logged_models(
 latest_model = mlflow.last_logged_model()
 if latest_model:
     print(f"Latest model: {latest_model.name} (ID: {latest_model.model_id})")
+
 ```
 
 ### Precise Metric Tracking[​](#precise-metric-tracking "Direct link to Precise Metric Tracking")
@@ -287,7 +294,7 @@ Control exactly when and how metrics are recorded with custom timestamps and ste
 
 python
 
-```
+```python
 import time
 from datetime import datetime
 
@@ -302,6 +309,7 @@ mlflow.log_metric("inference_latency", latency, timestamp=now)
 
 # Log with both step and timestamp
 mlflow.log_metric("gpu_utilization", gpu_usage, step=epoch, timestamp=now)
+
 ```
 
 **Step Requirements:**
@@ -316,7 +324,7 @@ Structure your experiments for easy comparison and analysis:
 
 python
 
-```
+```python
 # Method 1: Environment variables
 import os
 
@@ -331,6 +339,7 @@ experiment_id = mlflow.create_experiment(
     artifact_location="s3://my-bucket/experiments/",
     tags={"team": "data-science", "environment": "prod"},
 )
+
 ```
 
 ### Hierarchical Runs with Parent-Child Relationships[​](#hierarchical-runs-with-parent-child-relationships "Direct link to Hierarchical Runs with Parent-Child Relationships")
@@ -339,7 +348,7 @@ Organize complex experiments like hyperparameter sweeps or cross-validation:
 
 python
 
-```
+```python
 # Parent run for the entire experiment
 with mlflow.start_run(run_name="hyperparameter_sweep") as parent_run:
     mlflow.log_param("search_strategy", "random")
@@ -375,6 +384,7 @@ child_runs = mlflow.search_runs(
 )
 print("Child run results:")
 print(child_runs[["run_id", "params.learning_rate", "metrics.accuracy"]])
+
 ```
 
 ### Parallel Execution Strategies[​](#parallel-execution-strategies "Direct link to Parallel Execution Strategies")
@@ -389,7 +399,7 @@ Perfect for simple hyperparameter sweeps or A/B testing:
 
 python
 
-```
+```python
 configs = [
     {"model": "RandomForest", "n_estimators": 100},
     {"model": "XGBoost", "max_depth": 6},
@@ -402,13 +412,14 @@ for config in configs:
         model = train_model(config)
         score = evaluate_model(model)
         mlflow.log_metric("f1_score", score)
+
 ```
 
 Scale training across multiple CPU cores:
 
 python
 
-```
+```python
 import multiprocessing as mp
 
 
@@ -432,13 +443,14 @@ if __name__ == "__main__":
         results = pool.map(train_with_config, configs)
 
     print(f"Completed {len(results)} experiments")
+
 ```
 
 Use child runs for thread-safe parallel execution:
 
 python
 
-```
+```python
 import threading
 from concurrent.futures import ThreadPoolExecutor
 
@@ -463,6 +475,7 @@ with mlflow.start_run(run_name="threaded_experiment"):
     # Log summary to parent run
     mlflow.log_metric("avg_accuracy", sum(results) / len(results))
     mlflow.log_metric("max_accuracy", max(results))
+
 ```
 
 ### Smart Tagging for Organization[​](#smart-tagging-for-organization "Direct link to Smart Tagging for Organization")
@@ -471,7 +484,7 @@ Use tags strategically to organize and filter experiments:
 
 python
 
-```
+```python
 with mlflow.start_run():
     # Descriptive tags for filtering
     mlflow.set_tags(
@@ -493,13 +506,14 @@ with mlflow.start_run():
     )
 
     # Training code here...
+
 ```
 
 **Search experiments by tags:**
 
 python
 
-```
+```python
 # Find all transformer experiments
 transformer_runs = mlflow.search_runs(filter_string="tags.model_family = 'transformer'")
 
@@ -507,6 +521,7 @@ transformer_runs = mlflow.search_runs(filter_string="tags.model_family = 'transf
 prod_models = mlflow.search_runs(
     filter_string="tags.environment = 'production' AND metrics.accuracy > 0.95"
 )
+
 ```
 
 ### System Tags Reference[​](#system-tags-reference "Direct link to System Tags Reference")
@@ -534,7 +549,7 @@ Combine auto logging with manual tracking for the best of both worlds:
 
 python
 
-```
+```python
 import mlflow
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
@@ -574,6 +589,7 @@ with mlflow.start_run():
 # Access the completed run
 last_run = mlflow.last_active_run()
 print(f"Final run status: {last_run.info.status}")
+
 ```
 
 ## Language-Specific Guides[​](#language-specific-guides "Direct link to Language-Specific Guides")

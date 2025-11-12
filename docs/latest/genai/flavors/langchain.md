@@ -117,7 +117,7 @@ The following example demonstrates how to log a simple chain with this method:
 
    python
 
-   ```
+   ```python
    # %%writefile chain.py
 
    import os
@@ -168,13 +168,14 @@ The following example demonstrates how to log a simple chain with this method:
    )
 
    mlflow.models.set_model(chain)
+
    ```
 
 2. Then from the main notebook, log the model via supplying the path to the file that defines the chain:
 
    python
 
-   ```
+   ```python
    from pprint import pprint
 
    import mlflow
@@ -183,13 +184,14 @@ The following example demonstrates how to log a simple chain with this method:
 
    with mlflow.start_run():
        info = mlflow.langchain.log_model(lc_model=chain_path, name="chain")
+
    ```
 
 3. The model defined in `chain.py` is now logged to MLflow. You can load the model back and run inference:
 
    python
 
-   ```
+   ```python
    # Load the model and run inference
    homework_chain = mlflow.langchain.load_model(model_uri=info.model_uri)
 
@@ -208,6 +210,7 @@ The following example demonstrates how to log a simple chain with this method:
    response = homework_chain.invoke(exam_question)
 
    pprint(response)
+
    ```
 
    You can see the model is logged as a code on MLflow UI:
@@ -232,10 +235,11 @@ To learn more about the details of the MLflow LangChain flavor, read the detaile
 
   text
 
-  ```
+  ```text
   ValueError: This code relies on the pickle module. You will need to set allow_dangerous_deserialization=True if you want to opt-in to
   allow deserialization of data using pickle. Data can be compromised by a malicious actor if not handled properly to include a malicious
   payload that when deserialized with pickle can execute arbitrary code on your machine.
+
   ```
 
   A change within LangChain that [forces users to opt-in to pickle deserialization](https://github.com/langchain-ai/langchain/pull/18696) can create some issues with loading chains, vector stores, retrievers, and agents that have been logged using MLflow. Because the option is not exposed per component to set this argument on the loader function, you will need to ensure that you are setting this option directly within the defined loader function when logging the model. LangChain components that do not set this value will be saved without issue, but a `ValueError` will be raised when loading if unset.
@@ -284,7 +288,7 @@ To log a LangGraph agent, you can define your agent code within a script, as sho
 
 python
 
-```
+```python
 from typing import Literal
 
 from langchain_core.tools import tool
@@ -309,13 +313,14 @@ graph = create_react_agent(llm, tools)
 
 # specify the Agent as the model interface to be loaded when executing the script
 mlflow.models.set_model(graph)
+
 ```
 
 When you're ready to log this agent script definition to MLflow, you can refer to this saved script directly when defining the model:
 
 python
 
-```
+```python
 import mlflow
 
 input_example = {
@@ -328,6 +333,7 @@ with mlflow.start_run():
         name="langgraph",
         input_example=input_example,
     )
+
 ```
 
 When the agent is loaded from MLflow, the script will be executed and the defined agent will be made available for use for invocation.
@@ -336,7 +342,7 @@ The agent can be loaded and used for inference as follows:
 
 python
 
-```
+```python
 agent = mlflow.langchain.load_model(model_info.model_uri)
 query = {
     "messages": [
@@ -347,6 +353,7 @@ query = {
     ]
 }
 agent.invoke(query)
+
 ```
 
 ### How to control whether my input is converted to List\[langchain.schema.BaseMessage] in PyFunc predict?[​](#how-to-control-whether-my-input-is-converted-to-listlangchainschemabasemessage-in-pyfunc-predict "Direct link to How to control whether my input is converted to List\[langchain.schema.BaseMessage] in PyFunc predict?")
@@ -355,7 +362,7 @@ By default, MLflow converts chat request format input `{"messages": [{"role": "u
 
 python
 
-```
+```python
 import json
 import mlflow
 import os
@@ -386,4 +393,5 @@ with mlflow.start_run():
 
 pyfunc_model = mlflow.pyfunc.load_model(model_info.model_uri)
 assert pyfunc_model.predict(input_example) == ["Hello"]
+
 ```

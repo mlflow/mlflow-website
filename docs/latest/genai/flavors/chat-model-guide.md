@@ -53,7 +53,7 @@ In our example `BasicAgent` implementation we utilize two separate APIs for the 
 
 python
 
-```
+```python
 @mlflow.trace
 def _get_system_message(self, role: str) -> Dict:
     if role not in self.models:
@@ -61,13 +61,14 @@ def _get_system_message(self, role: str) -> Dict:
 
     instruction = self.models[role]["instruction"]
     return ChatMessage(role="system", content=instruction).to_dict()
+
 ```
 
 Using the [`@mlflow.trace`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.html#mlflow.trace) tracing decorator is the simplest way to add tracing functionality to functions and methods. By default, a span that is generated from the application of this decorator will utilize the name of the function as the name of the span. It is possible to override this naming, as well as other parameters associated with the span, as follows:
 
 python
 
-```
+```python
 @mlflow.trace(name="custom_span_name", attributes={"key": "value"}, span_type="func")
 def _get_system_message(self, role: str) -> Dict:
     if role not in self.models:
@@ -75,6 +76,7 @@ def _get_system_message(self, role: str) -> Dict:
 
     instruction = self.models[role]["instruction"]
     return ChatMessage(role="system", content=instruction).to_dict()
+
 ```
 
 tip
@@ -89,12 +91,13 @@ The example from our application for ensuring that we're capturing the parameter
 
 python
 
-```
+```python
 with mlflow.start_span("Audit Agent") as root_span:
     root_span.set_inputs(messages)
     attributes = {**params.to_dict(), **self.models_config, **self.models}
     root_span.set_attributes(attributes)
     # More span manipulation...
+
 ```
 
 #### Traces in the MLflow UI[​](#traces-in-the-mlflow-ui "Direct link to Traces in the MLflow UI")
@@ -160,7 +163,7 @@ To illustrate why it is preferred to use `ChatModel` as a super class to custom 
 
 python
 
-```
+```python
 [
     {
         "type": "array",
@@ -185,6 +188,7 @@ python
     {"type": "double", "name": "frequency_penalty", "required": False},
     {"type": "double", "name": "presence_penalty", "required": False},
 ]
+
 ```
 
 note
@@ -216,7 +220,7 @@ For example, this does not work:
 
 python
 
-```
+```python
 from mlflow.pyfunc import ChatModel
 
 
@@ -227,13 +231,14 @@ class MyModel(ChatModel):
     def load_context(self, context):
         # This will fail on load as the instance attribute self.my_model_config is not defined
         self.my_model_config = context.get("my_model_config")
+
 ```
 
 Instead, ensure that any instance attributes that are set by the `load_context` method are defined in the class constructor with a placeholder value:
 
 python
 
-```
+```python
 from mlflow.pyfunc import ChatModel
 
 
@@ -244,6 +249,7 @@ class MyModel(ChatModel):
 
     def load_context(self, context):
         self.my_model_config = context.get("my_model_config")
+
 ```
 
 #### Failing to Handle Secrets securely[​](#failing-to-handle-secrets-securely "Direct link to Failing to Handle Secrets securely")
@@ -280,7 +286,7 @@ For the example in this tutorial, this is the generated code that is copied from
 
 python
 
-```
+```python
 from mlflow.models import validate_serving_input
 
 model_uri = "runs:/8935b7aff5a84f559b5fcc2af3e2ea31/model"
@@ -302,6 +308,7 @@ serving_payload = """{
 
 # Validate the serving payload works on the model
 validate_serving_input(model_uri, serving_payload)
+
 ```
 
 ## Key Classes and Methods in our example[​](#key-classes-and-methods-in-our-example "Direct link to Key Classes and Methods in our example")
@@ -355,7 +362,7 @@ The implementation below highlights the following key aspects:
 
 python
 
-```
+```python
 import mlflow
 from mlflow.types.llm import ChatCompletionResponse, ChatMessage, ChatParams, ChatChoice
 from mlflow.pyfunc import ChatModel
@@ -534,6 +541,7 @@ class BasicAgent(ChatModel):
 # the model is loaded back
 agent = BasicAgent()
 mlflow.models.set_model(agent)
+
 ```
 
 The snippet above defines our agent as a subclass of `ChatModel`. With the models from code approach, we call
@@ -578,7 +586,7 @@ Here's how we set the configuration for our agents:
 
 python
 
-```
+```python
 model_config = {
     "models": {
         "judge": {
@@ -604,6 +612,7 @@ model_config = {
         "user_response_instruction": "Can you evaluate and enhance this answer with the provided contextual history?"
     },
 }
+
 ```
 
 ### Benefits of External Configuration[​](#benefits-of-external-configuration "Direct link to Benefits of External Configuration")
@@ -631,7 +640,7 @@ Here's the input example we'll use:
 
 python
 
-```
+```python
 input_example = {
     "messages": [
         {
@@ -640,6 +649,7 @@ input_example = {
         }
     ]
 }
+
 ```
 
 This example represents a user asking for an easy scone recipe. It aligns with the input structure expected by our `BasicAgent` model, which processes a list of messages where each message includes a `role` and `content`.
@@ -658,7 +668,7 @@ To log and load the model using MLflow, use:
 
 python
 
-```
+```python
 with mlflow.start_run():
     model_info = mlflow.pyfunc.log_model(
         name="model",
@@ -680,6 +690,7 @@ response = loaded.predict(
         ]
     }
 )
+
 ```
 
 ## Conclusion[​](#conclusion "Direct link to Conclusion")

@@ -42,9 +42,10 @@ The common use case for aliases is to build a robust **deployment pipeline** for
 
 python
 
-```
+```python
 # Set a production alias for a specific version
 mlflow.set_prompt_alias("summarization-prompt", alias="production", version=2)
+
 ```
 
 Attached aliases can be viewed in the prompt list page. You can click the pencil icon to edit or delete an alias directly from the list view.
@@ -55,8 +56,9 @@ To load a prompt using an alias, use the `prompts:/<prompt_name>@<alias>` format
 
 python
 
-```
+```python
 prompt = mlflow.load_prompt("prompts:/summarization-prompt@production")
+
 ```
 
 ### Reserved `@latest` alias[​](#reserved-latest-alias "Direct link to reserved-latest-alias")
@@ -65,6 +67,7 @@ The `@latest` alias is a reserved alias name and MLflow will automatically find 
 
 python
 
-```
+```python
 prompt = mlflow.load_prompt("prompts:/summarization-prompt@latest")
+
 ```

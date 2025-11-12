@@ -14,7 +14,7 @@ There are several ways to create evaluation datasets, each suited to different s
 
 python
 
-```
+```python
 import mlflow
 from mlflow.genai.datasets import create_dataset
 
@@ -57,11 +57,12 @@ annotated_traces = mlflow.search_traces(
 
 # Merge the list of Trace objects directly into your dataset
 dataset.merge_records(annotated_traces)
+
 ```
 
 python
 
-```
+```python
 import mlflow
 from mlflow.genai.datasets import create_dataset
 
@@ -100,11 +101,12 @@ test_cases = [
 ]
 
 dataset.merge_records(test_cases)
+
 ```
 
 python
 
-```
+```python
 import pandas as pd
 import mlflow
 from mlflow.genai.datasets import create_dataset
@@ -147,6 +149,7 @@ custom_df = pd.DataFrame(
 
 # merge_records accepts DataFrames with inputs, expectations, and tags columns
 dataset.merge_records(custom_df)
+
 ```
 
 ## Why Evaluation Datasets?[​](#why-evaluation-datasets "Direct link to Why Evaluation Datasets?")

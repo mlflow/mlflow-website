@@ -17,8 +17,9 @@ MLflow is available on PyPI. Install MLflow and Optuna (Hyperparameter tuning li
 
 bash
 
-```
+```bash
 pip install mlflow optuna
+
 ```
 
 Then, follow the instructions in the [Set Up MLflow](/mlflow-website/docs/latest/ml/getting-started/running-notebooks.md) guide to set up MLflow.
@@ -31,11 +32,12 @@ For production environments or team collaboration, consider hosting a shared [ML
 
 python
 
-```
+```python
 import mlflow
 
 # The set_experiment API creates a new experiment if it doesn't exist.
 mlflow.set_experiment("Hyperparameter Tuning Experiment")
+
 ```
 
 ## Step 2: Prepare Your Data[​](#step-2-prepare-your-data "Direct link to Step 2: Prepare Your Data")
@@ -44,12 +46,13 @@ First, let's load a sample dataset and split it into training and validation set
 
 python
 
-```
+```python
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import fetch_california_housing
 
 X, y = fetch_california_housing(return_X_y=True)
 X_train, X_val, y_train, y_val = train_test_split(X, y, random_state=0)
+
 ```
 
 ## Step 3: Define the objective function[​](#step-3-define-the-objective-function "Direct link to Step 3: Define the objective function")
@@ -62,7 +65,7 @@ First, let's define the objective function that is executed for each trial. To l
 
 python
 
-```
+```python
 import mlflow
 import optuna
 import sklearn
@@ -95,6 +98,7 @@ def objective(trial):
         # Make it easy to retrieve the best-performing child run later
         trial.set_user_attr("run_id", child_run.info.run_id)
         return error
+
 ```
 
 ## Step 3: Run the hyperparameter tuning study[​](#step-3-run-the-hyperparameter-tuning-study "Direct link to Step 3: Run the hyperparameter tuning study")
@@ -103,7 +107,7 @@ Now, let's run the hyperparameter tuning study using Optuna. We create a parent 
 
 python
 
-```
+```python
 # Create a parent run that contains all child runs for different trials
 with mlflow.start_run(run_name="study") as run:
     # Log the experiment settings
@@ -118,6 +122,7 @@ with mlflow.start_run(run_name="study") as run:
     mlflow.log_metrics({"best_error": study.best_value})
     if best_run_id := study.best_trial.user_attrs.get("run_id"):
         mlflow.log_param("best_child_run_id", best_run_id)
+
 ```
 
 ## Step 4: View the results in the MLflow UI[​](#step-4-view-the-results-in-the-mlflow-ui "Direct link to Step 4: View the results in the MLflow UI")
@@ -126,8 +131,9 @@ To see the results of training, you can access the MLflow UI by navigating to th
 
 bash
 
-```
+```bash
 mlflow ui --port 5000
+
 ```
 
 When opening the site, you will see a screen similar to the following:
@@ -148,7 +154,7 @@ Once you identified the best trial, you can register the model into [MLflow Mode
 
 python
 
-```
+```python
 # Register the best model using the model URI
 mlflow.register_model(
     model_uri="runs:/d0210c58afff4737a306a2fbc5f1ff8d/model",
@@ -157,6 +163,7 @@ mlflow.register_model(
 
 # > Successfully registered model 'housing-price-predictor'.
 # > Created version '1' of model 'housing-price-predictor'.
+
 ```
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")

@@ -8,7 +8,7 @@ The fastest way to get started is with MLflow's scikit-learn autologging. With j
 
 python
 
-```
+```python
 import mlflow
 import mlflow.sklearn
 from sklearn.ensemble import RandomForestClassifier
@@ -35,6 +35,7 @@ with mlflow.start_run():
 
     print(f"Training accuracy: {train_score:.3f}")
     print(f"Test accuracy: {test_score:.3f}")
+
 ```
 
 This simple example automatically logs all model parameters, training metrics, the trained model with proper serialization, and model signatures for deployment—all without any additional code.
@@ -81,7 +82,7 @@ For complete control over what gets logged, you can manually instrument your sci
 
 python
 
-```
+```python
 import mlflow
 import mlflow.sklearn
 from sklearn.linear_model import LogisticRegression
@@ -130,13 +131,14 @@ with mlflow.start_run():
         signature=signature,
         input_example=X_train[:5],  # Sample input for documentation
     )
+
 ```
 
 One of MLflow's most powerful features is automatic capture of evaluation metrics after model training. This means any metrics you compute after training are automatically linked to your MLflow run, providing seamless tracking of model evaluation:
 
 python
 
-```
+```python
 import mlflow
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.datasets import load_breast_cancer
@@ -171,6 +173,7 @@ with mlflow.start_run():
 
     print(f"Accuracy: {accuracy:.3f}")
     print(f"AUC Score: {auc_score:.3f}")
+
 ```
 
 The post-training metrics feature intelligently detects when you're evaluating models and automatically logs those metrics with appropriate dataset context, making it easy to track performance across different evaluation datasets.
@@ -184,7 +187,7 @@ MLflow provides exceptional support for scikit-learn's hyperparameter optimizati
 
 python
 
-```
+```python
 import mlflow
 from sklearn.model_selection import GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
@@ -222,6 +225,7 @@ with mlflow.start_run(run_name="Random Forest Hyperparameter Tuning"):
     print(f"Best parameters: {grid_search.best_params_}")
     print(f"Best cross-validation score: {grid_search.best_score_:.3f}")
     print(f"Test score: {best_score:.3f}")
+
 ```
 
 MLflow automatically creates a parent run containing the overall search results and child runs for each parameter combination, making it easy to analyze which parameters work best.
@@ -230,7 +234,7 @@ For more efficient hyperparameter exploration, especially with large parameter s
 
 python
 
-```
+```python
 from sklearn.model_selection import RandomizedSearchCV
 from scipy.stats import randint, uniform
 
@@ -259,6 +263,7 @@ with mlflow.start_run(run_name="Randomized Hyperparameter Search"):
 
     # MLflow automatically creates child runs for parameter combinations
     # The parent run contains the best model and overall results
+
 ```
 
 The `max_tuning_runs` parameter in autolog controls how many of the best parameter combinations get their own child runs, helping you focus on the most promising results.
@@ -273,7 +278,7 @@ MLflow provides a comprehensive evaluation API that automatically generates metr
 
 python
 
-```
+```python
 import mlflow
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
@@ -318,6 +323,7 @@ with mlflow.start_run():
     print("Generated artifacts:")
     for artifact_name, path in result.artifacts.items():
         print(f"  {artifact_name}: {path}")
+
 ```
 
 **Automatic Generation Includes:**
@@ -328,7 +334,7 @@ For scikit-learn regression models, MLflow automatically provides regression-spe
 
 python
 
-```
+```python
 from sklearn.datasets import fetch_california_housing
 from sklearn.linear_model import LinearRegression
 
@@ -363,6 +369,7 @@ with mlflow.start_run():
     print(f"MAE: {result.metrics['mean_absolute_error']:.3f}")
     print(f"RMSE: {result.metrics['root_mean_squared_error']:.3f}")
     print(f"R² Score: {result.metrics['r2_score']:.3f}")
+
 ```
 
 **Automatic Regression Metrics:**
@@ -373,7 +380,7 @@ Extend MLflow evaluation with custom metrics and visualizations specific to your
 
 python
 
-```
+```python
 from mlflow.models import make_metric
 import matplotlib.pyplot as plt
 import numpy as np
@@ -442,6 +449,7 @@ result = mlflow.evaluate(
 )
 
 print(f"Business Value Score: ${result.metrics['business_value_score']:.2f}")
+
 ```
 
 ## Model Comparison and Selection[​](#model-comparison-and-selection "Direct link to Model Comparison and Selection")
@@ -453,7 +461,7 @@ Use MLflow evaluate to systematically compare multiple scikit-learn models:
 
 python
 
-```
+```python
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
@@ -511,13 +519,14 @@ print(comparison_df[["accuracy_score", "f1_score", "roc_auc"]].round(3))
 # Identify best model
 best_model = comparison_df["f1_score"].idxmax()
 print(f"\nBest model by F1 score: {best_model}")
+
 ```
 
 Combine hyperparameter tuning with MLflow evaluation for comprehensive assessment:
 
 python
 
-```
+```python
 from sklearn.model_selection import ParameterGrid
 
 # Define parameter grid for Random Forest
@@ -570,6 +579,7 @@ for params in ParameterGrid(param_grid):
 # Find best parameters
 best_result = max(grid_results, key=lambda x: x["f1_score"])
 print(f"Best parameters: {best_result}")
+
 ```
 
 ## Model Validation and Quality Gates[​](#model-validation-and-quality-gates "Direct link to Model Validation and Quality Gates")
@@ -578,7 +588,7 @@ Use MLflow's validation API to ensure scikit-learn model quality:
 
 python
 
-```
+```python
 from mlflow.models import MetricThreshold
 
 # First, evaluate your scikit-learn model
@@ -622,6 +632,7 @@ try:
     print("✅ New model improves over baseline")
 except mlflow.exceptions.ModelValidationFailedException as e:
     print(f"❌ Model doesn't improve sufficiently: {e}")
+
 ```
 
 ## Model Management[​](#model-management "Direct link to Model Management")
@@ -634,7 +645,7 @@ MLflow supports multiple serialization formats for scikit-learn models, each opt
 
 python
 
-```
+```python
 import mlflow.sklearn
 from sklearn.ensemble import RandomForestRegressor
 
@@ -654,6 +665,7 @@ mlflow.sklearn.log_model(
     name="pickle_model",
     serialization_format=mlflow.sklearn.SERIALIZATION_FORMAT_PICKLE,
 )
+
 ```
 
 **Cloudpickle** is the default format because it provides better cross-system compatibility by identifying and packaging code dependencies with the serialized model. **Pickle** is faster but less portable across different environments.
@@ -662,7 +674,7 @@ Model signatures describe input and output schemas, providing crucial validation
 
 python
 
-```
+```python
 from mlflow.models import infer_signature
 import pandas as pd
 
@@ -678,6 +690,7 @@ mlflow.sklearn.log_model(
     signature=signature,
     input_example=X_sample[:5],  # Include example for documentation
 )
+
 ```
 
 Model signatures are automatically inferred when autologging is enabled, but you can also create them manually for more control over the schema validation process.
@@ -686,7 +699,7 @@ MLflow provides flexible ways to load and use your saved models, depending on yo
 
 python
 
-```
+```python
 # Load model in different ways
 import mlflow.sklearn
 import mlflow.pyfunc
@@ -703,6 +716,7 @@ predictions = pyfunc_model.predict(pd.DataFrame(X_test))
 
 # Load from model registry (production deployment)
 registered_model = mlflow.pyfunc.load_model("models:/MyModel@champion")
+
 ```
 
 The PyFunc format is particularly useful for deployment scenarios where you need a consistent interface across different model types and frameworks.
@@ -716,7 +730,7 @@ The Model Registry provides centralized model management with version control an
 
 python
 
-```
+```python
 # Register model to MLflow Model Registry
 import mlflow
 from mlflow import MlflowClient
@@ -767,6 +781,7 @@ client.set_model_version_tag(
     key="deployment_date",
     value="2025-05-29",
 )
+
 ```
 
 **Modern Model Registry Features:**
@@ -779,24 +794,26 @@ client.set_model_version_tag(
 
 python
 
-```
+```python
 # Promote model from staging to production environment
 client.copy_model_version(
     src_model_uri="models:/staging.CustomerChurnModel@candidate",
     dst_name="prod.CustomerChurnModel",
 )
+
 ```
 
 MLflow provides built-in model serving capabilities that make it easy to deploy your scikit-learn models as REST APIs. This is perfect for development, testing, and small-scale production deployments:
 
 bash
 
-```
+```bash
 # Serve model using alias for production deployment
 mlflow models serve \
     -m "models:/CustomerChurnModel@champion" \
     -p 5000 \
     --no-conda
+
 ```
 
 **Deployment Best Practices:**
@@ -807,7 +824,7 @@ Once your model is served, you can make predictions by sending POST requests to 
 
 python
 
-```
+```python
 import requests
 import json
 
@@ -821,6 +838,7 @@ response = requests.post(
 )
 
 predictions = response.json()
+
 ```
 
 For larger production deployments, you can also deploy MLflow models to cloud platforms like AWS SageMaker, Azure ML, or deploy them as Docker containers for Kubernetes orchestration.
@@ -835,7 +853,7 @@ Scikit-learn pipelines are first-class citizens in MLflow, providing end-to-end 
 
 python
 
-```
+```python
 import mlflow
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -882,6 +900,7 @@ with mlflow.start_run(run_name="Complete Pipeline Experiment"):
     test_score = pipeline.score(X_test, y_test)
 
     print(f"Pipeline R² score: {test_score:.3f}")
+
 ```
 
 MLflow automatically logs parameters from each pipeline stage, making it easy to understand exactly how your data was processed and which model parameters were used.
@@ -890,7 +909,7 @@ MLflow's autologging behavior can be customized to fit your specific workflow ne
 
 python
 
-```
+```python
 # Fine-tune autologging behavior
 mlflow.sklearn.autolog(
     log_input_examples=True,  # Include input examples in logged models
@@ -903,6 +922,7 @@ mlflow.sklearn.autolog(
     pos_label=1,  # Specify positive label for binary classification
     extra_tags={"team": "data-science", "project": "customer-churn"},
 )
+
 ```
 
 These configuration options give you fine-grained control over the autologging behavior. **Dataset logging** tracks the data used for training and evaluation. **Input examples** and **signatures** are crucial for production deployment. **Max tuning runs** controls how many hyperparameter combinations get detailed tracking. **Extra tags** help organize experiments across teams and projects.
@@ -911,7 +931,7 @@ Proper experiment organization is crucial for team collaboration and project man
 
 python
 
-```
+```python
 # Organize experiments with descriptive names and tags
 experiment_name = "Customer Churn Prediction - Q4 2024"
 mlflow.set_experiment(experiment_name)
@@ -931,6 +951,7 @@ with mlflow.start_run(run_name="Baseline Random Forest"):
     # Train model
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
+
 ```
 
 Consistent tagging and naming conventions make it much easier to find, compare, and understand experiments later. Consider establishing team-wide conventions for experiment names, tags, and run organization.

@@ -10,9 +10,9 @@ The [MLflow Transformers flavor](/mlflow-website/docs/latest/ml/deep-learning/tr
 
 The following table summarizes the different methods for logging models with the Transformers flavor. Please be aware that each method has certain limitations and requirements, as described in the following sections.
 
-| Save method                                                              | Description                                                                                       | Memory Usage | Disk Usage | Example                                                                                                                                                                                                                                                                                                                                                               |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- | ------------ | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Normal pipeline-based logging                                            | Log a model using a pipeline instance or a dictionary of pipeline components.                     | High         | High       | python```
+| Save method                                                              | Description                                                                                       | Memory Usage | Disk Usage | Example                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- | ------------ | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Normal pipeline-based logging                                            | Log a model using a pipeline instance or a dictionary of pipeline components.                     | High         | High       | python```python
 import mlflow
 import transformers
 
@@ -26,8 +26,9 @@ with mlflow.start_run():
         transformers_model=pipeline,
         name="model",
     )
+
 ```                                                                                           |
-| [Memory-Efficient Model Logging](#transformers-memory-efficient-logging) | Log a model by specifying a path to a local checkpoint, avoiding loading the model into memory.   | ****Low****  | High       | python```
+| [Memory-Efficient Model Logging](#transformers-memory-efficient-logging) | Log a model by specifying a path to a local checkpoint, avoiding loading the model into memory.   | ****Low****  | High       | python```python
 import mlflow
 
 with mlflow.start_run():
@@ -38,8 +39,9 @@ with mlflow.start_run():
         task="text-generation",
         name="model",
     )
+
 ```                                                      |
-| [Storage-Efficient Model Logging](#transformers-save-pretrained-guide)   | Log a model by saving a reference to the HuggingFace Hub repository instead of the model weights. | High         | **Low**    | python```
+| [Storage-Efficient Model Logging](#transformers-save-pretrained-guide)   | Log a model by saving a reference to the HuggingFace Hub repository instead of the model weights. | High         | **Low**    | python```python
 import mlflow
 import transformers
 
@@ -55,6 +57,7 @@ with mlflow.start_run():
         # Set save_pretrained to False to save storage space
         save_pretrained=False,
     )
+
 ``` |
 
 ## Memory-Efficient Model Logging[​](#transformers-memory-efficient-logging "Direct link to Memory-Efficient Model Logging")
@@ -63,7 +66,7 @@ Introduced in MLflow 2.16.1, this method allows you to log a model without loadi
 
 python
 
-```
+```python
 import mlflow
 
 with mlflow.start_run():
@@ -74,6 +77,7 @@ with mlflow.start_run():
         task="text-generation",
         name="model",
     )
+
 ```
 
 In the above example, we pass a path to the local model checkpoint/weight as the model argument in the [`mlflow.transformers.log_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.transformers.html#mlflow.transformers.log_model) API, instead of a pipeline instance. MLflow will inspect the model metadata of the checkpoint and log the model weights without loading them into memory. This way, you can log an enormous multi-billion parameter model to MLflow with minimal computational resources.
@@ -100,7 +104,7 @@ Here is the example of using `save_pretrained` argument for logging a model
 
 python
 
-```
+```python
 import transformers
 
 pipeline = transformers.pipeline(
@@ -116,6 +120,7 @@ with mlflow.start_run():
         # Set save_pretrained to False to save storage space
         save_pretrained=False,
     )
+
 ```
 
 In the above example, MLflow will not save a copy of the **Llama-3.1-70B** model's weights and will instead log the following metadata as a reference to the HuggingFace Hub model. This will save roughly 150GB of storage space and reduce the logging latency significantly as well for each run that you initiate during development.
@@ -124,13 +129,14 @@ By navigating to the MLflow UI, you can see the model logged with the repository
 
 bash
 
-```
+```bash
 flavors:
     ...
     transformers:
         source_model_name: meta-llama/Meta-Llama-3.1-70B-Instruct
         source_model_revision: 33101ce6ccc08fa6249c10a543ebfcac65173393
         ...
+
 ```
 
 Before production deployments, you may want to persist the model weight instead of the repository reference. To do so, you can use the [`mlflow.transformers.persist_pretrained_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.transformers.html#mlflow.transformers.persist_pretrained_model) API to download the model weight from the HuggingFace Hub and save it to the artifact location. Please refer to the [OSS Model Registry or Legacy Workspace Model Registry](#persist-pretrained-guide) section for more information.
@@ -147,7 +153,7 @@ Registering reference-only models to [Databricks Unity Catalog Model Registry](h
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_registry_uri("databricks-uc")
@@ -162,6 +168,7 @@ with mlflow.start_run():
 # When registering the model to Unity Catalog Model Registry, MLflow will automatically
 # persist the model weight files. This may take a several minutes for large models.
 mlflow.register_model(model_info.model_uri, "your.model.name")
+
 ```
 
 ### OSS Model Registry or Legacy Workspace Model Registry[​](#persist-pretrained-guide "Direct link to OSS Model Registry or Legacy Workspace Model Registry")
@@ -170,7 +177,7 @@ For OSS Model Registry or the legacy Workspace Model Registry in Databricks, you
 
 python
 
-```
+```python
 import mlflow
 
 # Log the repository ID as a model. The model weight will not be saved to the artifact store
@@ -186,6 +193,7 @@ mlflow.transformers.persist_pretrained_model(model_info.model_uri)
 
 # Register the model
 mlflow.register_model(model_info.model_uri, "your.model.name")
+
 ```
 
 ### Caveats for Skipping Saving of Pretrained Model Weights[​](#caveats-of-save-pretrained "Direct link to Caveats for Skipping Saving of Pretrained Model Weights")

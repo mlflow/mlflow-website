@@ -10,13 +10,14 @@ This quickstart guide is compatible with cloud-based notebook such as Google Col
 
 python
 
-```
+```python
 %pip install -q mlflow torchmetrics torchinfo
+
 ```
 
 python
 
-```
+```python
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
@@ -26,6 +27,7 @@ from torchvision import datasets
 from torchvision.transforms import ToTensor
 
 import mlflow
+
 ```
 
 ## Task Overview[​](#task-overview "Direct link to Task Overview")
@@ -46,7 +48,7 @@ Let's load our training data `FashionMNIST` from `torchvision`, which has alread
 
 python
 
-```
+```python
 training_data = datasets.FashionMNIST(
   root="data",
   train=True,
@@ -60,31 +62,28 @@ test_data = datasets.FashionMNIST(
   download=True,
   transform=ToTensor(),
 )
+
 ```
 
 Let's look into our data.
 
 python
 
-```
+```python
 print(f"Image size: {training_data[0][0].shape}")
 print(f"Size of training dataset: {len(training_data)}")
 print(f"Size of test dataset: {len(test_data)}")
-```
 
-```
-Image size: torch.Size([1, 28, 28])
-Size of training dataset: 60000
-Size of test dataset: 10000
 ```
 
 We wrap the dataset a `Dataloader` instance for batching purposes. `Dataloader` is a useful tool for data preprocessing. For more details, you can refer to the [developer guide from PyTorch](https://pytorch.org/tutorials/beginner/basics/data_tutorial.html#preparing-your-data-for-training-with-dataloaders).
 
 python
 
-```
+```python
 train_dataloader = DataLoader(training_data, batch_size=64)
 test_dataloader = DataLoader(test_data, batch_size=64)
+
 ```
 
 ## Define our Model[​](#define-our-model "Direct link to Define our Model")
@@ -95,7 +94,7 @@ We will build a simple convolution neural network (CNN) consisting of 2 convolut
 
 python
 
-```
+```python
 class ImageClassifier(nn.Module):
   def __init__(self):
       super().__init__()
@@ -110,6 +109,7 @@ class ImageClassifier(nn.Module):
 
   def forward(self, x):
       return self.model(x)
+
 ```
 
 ## Connect to MLflow Tracking Server[​](#connect-to-mlflow-tracking-server "Direct link to Connect to MLflow Tracking Server")
@@ -127,23 +127,18 @@ After successfully registering an account on the Databricks Free Trial, let's co
 
 python
 
-```
+```python
 mlflow.login()
+
 ```
 
 Now you have successfully connected to MLflow tracking server on your Databricks Workspace, and let's give our experiment a name.
 
 python
 
-```
+```python
 mlflow.set_experiment("/Users/<your email>/mlflow-pytorch-quickstart")
-```
 
-```
-<Experiment: artifact_location='dbfs:/databricks/mlflow-tracking/1078557169589361', creation_time=1703121702068, experiment_id='1078557169589361', last_update_time=1703194525608, lifecycle_stage='active', name='/mlflow-pytorch-quickstart', tags={'mlflow.experiment.sourceName': '/mlflow-pytorch-quickstart',
-'mlflow.experimentType': 'MLFLOW_EXPERIMENT',
-'mlflow.ownerEmail': 'qianchen94era@gmail.com',
-'mlflow.ownerId': '3209978630771139'}>
 ```
 
 ## Implement the Training Loop[​](#implement-the-training-loop "Direct link to Implement the Training Loop")
@@ -154,16 +149,17 @@ Get the device info, as PyTorch requires manual device management.
 
 python
 
-```
+```python
 # Get cpu or gpu for training.
 device = "cuda" if torch.cuda.is_available() else "cpu"
+
 ```
 
 Define the training function.
 
 python
 
-```
+```python
 def train(dataloader, model, loss_fn, metrics_fn, optimizer, epoch):
   """Train the model on a single pass of the dataloader.
 
@@ -196,13 +192,14 @@ def train(dataloader, model, loss_fn, metrics_fn, optimizer, epoch):
           mlflow.log_metric("loss", f"{loss_value:2f}", step=step)
           mlflow.log_metric("accuracy", f"{accuracy:2f}", step=step)
           print(f"loss: {loss_value:2f} accuracy: {accuracy:2f} [{current} / {len(dataloader)}]")
+
 ```
 
 Define the evaluation function, which will be run at the end of each epoch.
 
 python
 
-```
+```python
 def evaluate(dataloader, model, loss_fn, metrics_fn, epoch):
   """Evaluate the model on a single pass of the dataloader.
 
@@ -233,6 +230,7 @@ def evaluate(dataloader, model, loss_fn, metrics_fn, epoch):
   print(f"Eval metrics: 
 Accuracy: {eval_accuracy:.2f}, Avg loss: {eval_loss:2f} 
 ")
+
 ```
 
 ## Start Training[​](#start-training "Direct link to Start Training")
@@ -241,24 +239,20 @@ It's time to start the training! First let's define training hyperparameters, cr
 
 python
 
-```
+```python
 epochs = 3
 loss_fn = nn.CrossEntropyLoss()
 metric_fn = Accuracy(task="multiclass", num_classes=10).to(device)
 model = ImageClassifier().to(device)
 optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
-```
 
-```
-/usr/local/lib/python3.10/dist-packages/torch/nn/modules/lazy.py:180: UserWarning: Lazy modules are a new feature under heavy development so changes to the API or functionality can happen at any moment.
-warnings.warn('Lazy modules are a new feature under heavy development '
 ```
 
 Putting everything together, let's kick off the training and log information to MLflow. At the beginning of training, we log training and model information to MLflow, and during training, we log training and evaluation metrics. After everything is done, we log the trained model.
 
 python
 
-```
+```python
 with mlflow.start_run() as run:
   params = {
       "epochs": epochs,
@@ -284,71 +278,7 @@ with mlflow.start_run() as run:
 
   # Save the trained model to MLflow.
   model_info = mlflow.pytorch.log_model(model, name="model")
-```
 
-```
-Epoch 1
--------------------------------
-loss: 2.294313 accuracy: 0.046875 [0 / 938]
-loss: 2.151955 accuracy: 0.515625 [100 / 938]
-loss: 1.825312 accuracy: 0.640625 [200 / 938]
-loss: 1.513407 accuracy: 0.593750 [300 / 938]
-loss: 1.059044 accuracy: 0.718750 [400 / 938]
-loss: 0.931140 accuracy: 0.687500 [500 / 938]
-loss: 0.889886 accuracy: 0.703125 [600 / 938]
-loss: 0.742625 accuracy: 0.765625 [700 / 938]
-loss: 0.786106 accuracy: 0.734375 [800 / 938]
-loss: 0.788444 accuracy: 0.781250 [900 / 938]
-Eval metrics: 
-Accuracy: 0.75, Avg loss: 0.719401 
-
-Epoch 2
--------------------------------
-loss: 0.649325 accuracy: 0.796875 [0 / 938]
-loss: 0.756684 accuracy: 0.718750 [100 / 938]
-loss: 0.488664 accuracy: 0.828125 [200 / 938]
-loss: 0.780433 accuracy: 0.718750 [300 / 938]
-loss: 0.691777 accuracy: 0.656250 [400 / 938]
-loss: 0.670005 accuracy: 0.750000 [500 / 938]
-loss: 0.712286 accuracy: 0.687500 [600 / 938]
-loss: 0.644150 accuracy: 0.765625 [700 / 938]
-loss: 0.683426 accuracy: 0.750000 [800 / 938]
-loss: 0.659378 accuracy: 0.781250 [900 / 938]
-Eval metrics: 
-Accuracy: 0.77, Avg loss: 0.636072 
-
-Epoch 3
--------------------------------
-loss: 0.528523 accuracy: 0.781250 [0 / 938]
-loss: 0.634942 accuracy: 0.750000 [100 / 938]
-loss: 0.420757 accuracy: 0.843750 [200 / 938]
-loss: 0.701463 accuracy: 0.703125 [300 / 938]
-loss: 0.649267 accuracy: 0.656250 [400 / 938]
-loss: 0.624556 accuracy: 0.812500 [500 / 938]
-loss: 0.648762 accuracy: 0.718750 [600 / 938]
-loss: 0.630074 accuracy: 0.781250 [700 / 938]
-loss: 0.682306 accuracy: 0.718750 [800 / 938]
-loss: 0.587403 accuracy: 0.750000 [900 / 938]
-```
-
-```
-2023/12/21 21:39:55 WARNING mlflow.models.model: Model logged without a signature. Signatures will be required for upcoming model registry features as they validate model inputs and denote the expected schema of model outputs. Please visit https://www.mlflow.org/docs/2.9.2/models.html#set-signature-on-logged-model for instructions on setting a model signature on your logged model.
-2023/12/21 21:39:56 WARNING mlflow.utils.requirements_utils: Found torch version (2.1.0+cu121) contains a local version label (+cu121). MLflow logged a pip requirement for this package as 'torch==2.1.0' without the local version label to make it installable from PyPI. To specify pip requirements containing local version labels, please use `conda_env` or `pip_requirements`.
-```
-
-```
-Eval metrics: 
-Accuracy: 0.77, Avg loss: 0.616615
-```
-
-```
-2023/12/21 21:40:02 WARNING mlflow.utils.requirements_utils: Found torch version (2.1.0+cu121) contains a local version label (+cu121). MLflow logged a pip requirement for this package as 'torch==2.1.0' without the local version label to make it installable from PyPI. To specify pip requirements containing local version labels, please use `conda_env` or `pip_requirements`.
-/usr/local/lib/python3.10/dist-packages/_distutils_hack/__init__.py:33: UserWarning: Setuptools is replacing distutils.
-warnings.warn("Setuptools is replacing distutils.")
-```
-
-```
-Uploading artifacts:   0%|          | 0/6 [00:00<?, ?it/s]
 ```
 
 While your training is ongoing, you can find this training in your dashboard. Log in to your Databricks Workspace, and click on the `Experiments tab`. See the screenshot below: ![landing page](https://i.imgur.com/bBiIPqp.png)
@@ -361,18 +291,16 @@ For the last step, let's load back the model and run inference on it.
 
 python
 
-```
+```python
 loaded_model = mlflow.pyfunc.load_model(model_info.model_uri)
-```
 
-```
-Downloading artifacts:   0%|          | 0/6 [00:00<?, ?it/s]
 ```
 
 There is a caveat that the input to the loaded model has to be a `numpy` array or `pandas` Dataframe, so we need to cast the tensor to `numpy` format explicitly.
 
 python
 
-```
+```python
 outputs = loaded_model.predict(training_data[0][0][None, :].numpy())
+
 ```

@@ -14,7 +14,7 @@ The following example shows how to trace Instructor call that wraps an OpenAI AP
 
 python
 
-```
+```python
 import instructor
 from pydantic import BaseModel
 from openai import OpenAI
@@ -40,4 +40,5 @@ res = client.chat.completions.create(
     messages=[{"role": "user", "content": "John Doe is 30 years old."}],
 )
 print(f"Name: {res.name}, Age:{res.age}")
+
 ```

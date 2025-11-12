@@ -20,15 +20,16 @@ Before running the script, let's start the MLflow UI on a local host:
 
 bash
 
-```
+```bash
 mlflow ui
+
 ```
 
 Visit `http://localhost:5000/` in your web browser. Let's create some example models:
 
 python
 
-```
+```python
 import mlflow
 import mlflow.sklearn
 import numpy as np
@@ -141,6 +142,7 @@ for i, config in enumerate(model_configs):
             input_example=input_example,
             registered_model_name=f"SearchGuide{config['model_type']}",
         )
+
 ```
 
 After running this script, you should have 6 different models logged across your experiments, each with different parameters, metrics, and tags.
@@ -187,7 +189,7 @@ Metrics represent model performance measurements. When searching by metrics, use
 
 python
 
-```
+```python
 import mlflow
 
 # Find high-performing models
@@ -201,6 +203,7 @@ balanced_models = mlflow.search_logged_models(
     experiment_ids=["1"],
     filter_string="metrics.precision > 0.88 AND metrics.recall > 0.90",
 )
+
 ```
 
 ### 2 - Searching By Parameters[​](#2---searching-by-parameters "Direct link to 2 - Searching By Parameters")
@@ -209,7 +212,7 @@ Parameters capture model configuration. Use the `params.` prefix and remember th
 
 python
 
-```
+```python
 # Find specific model types
 rf_models = mlflow.search_logged_models(
     experiment_ids=["1"], filter_string="params.model_type = 'RandomForest'"
@@ -220,6 +223,7 @@ tuned_rf_models = mlflow.search_logged_models(
     experiment_ids=["1"],
     filter_string="params.model_type = 'RandomForest' AND params.n_estimators = '200'",
 )
+
 ```
 
 ### 3 - Searching By Model Name[​](#3---searching-by-model-name "Direct link to 3 - Searching By Model Name")
@@ -228,7 +232,7 @@ Model names are searchable as attributes. Use the `name` field with supported co
 
 python
 
-```
+```python
 # Exact name match
 specific_model = mlflow.search_logged_models(
     experiment_ids=["1"], filter_string="name = 'SVM_model_5'"
@@ -244,6 +248,7 @@ multiple_models = mlflow.search_logged_models(
 not_svm = mlflow.search_logged_models(
     experiment_ids=["1"], filter_string="name != 'SVM_model_4'"
 )
+
 ```
 
 ### 4 - Searching By Model Attributes[​](#4---searching-by-model-attributes "Direct link to 4 - Searching By Model Attributes")
@@ -252,7 +257,7 @@ Attributes include model metadata like creation time. No prefix is needed for at
 
 python
 
-```
+```python
 # Find recently created models (timestamp in milliseconds)
 import time
 
@@ -261,6 +266,7 @@ last_week = int((time.time() - 7 * 24 * 60 * 60) * 1000)
 recent_models = mlflow.search_logged_models(
     experiment_ids=["1"], filter_string=f"creation_time > {last_week}"
 )
+
 ```
 
 ### 5 - Dataset-Specific Metric Filtering[​](#5---dataset-specific-metric-filtering "Direct link to 5 - Dataset-Specific Metric Filtering")
@@ -269,7 +275,7 @@ One powerful feature of `search_logged_models` is the ability to filter metrics 
 
 python
 
-```
+```python
 # Find models with high accuracy on test dataset
 test_accurate_models = mlflow.search_logged_models(
     experiment_ids=["1"],
@@ -283,6 +289,7 @@ multi_dataset_models = mlflow.search_logged_models(
     filter_string="metrics.accuracy > 0.85",
     datasets=[{"dataset_name": "test_dataset"}, {"dataset_name": "validation_dataset"}],
 )
+
 ```
 
 ### 6 - Complex Queries[​](#6---complex-queries "Direct link to 6 - Complex Queries")
@@ -291,7 +298,7 @@ Combine multiple conditions for sophisticated model discovery:
 
 python
 
-```
+```python
 # Production-ready RandomForest models with high performance
 production_ready = mlflow.search_logged_models(
     experiment_ids=["1"],
@@ -301,6 +308,7 @@ production_ready = mlflow.search_logged_models(
         AND metrics.precision > 0.88
     """,
 )
+
 ```
 
 ## Programmatic Search with Python[​](#programmatic-search-with-python "Direct link to Programmatic Search with Python")
@@ -313,7 +321,7 @@ The Python API provides powerful capabilities for searching logged models progra
 
 python
 
-```
+```python
 import mlflow
 
 # Basic search with pandas output (default)
@@ -333,6 +341,7 @@ models_list = mlflow.search_logged_models(
 
 for model in models_list:
     print(f"Model: {model.name}, Run ID: {model.source_run_id}")
+
 ```
 
 ### Using the Client API[​](#using-the-client-api "Direct link to Using the Client API")
@@ -341,7 +350,7 @@ for model in models_list:
 
 python
 
-```
+```python
 from mlflow import MlflowClient
 
 client = MlflowClient()
@@ -365,6 +374,7 @@ while True:
     page_token = result.token
 
 print(f"Found {len(all_models)} models")
+
 ```
 
 ### Advanced Ordering[​](#advanced-ordering "Direct link to Advanced Ordering")
@@ -377,7 +387,7 @@ The `order_by` functionality for results sorting must be supplied as a list of d
 
 python
 
-```
+```python
 # Order by single metric
 best_models = mlflow.search_logged_models(
     experiment_ids=["1"],
@@ -409,6 +419,7 @@ complex_order = mlflow.search_logged_models(
         {"field_name": "creation_time", "ascending": True},
     ],
 )
+
 ```
 
 ### Getting Top N Models[​](#getting-top-n-models "Direct link to Getting Top N Models")
@@ -417,7 +428,7 @@ Combine `max_results` with `order_by` to get the best models:
 
 python
 
-```
+```python
 # Get top 5 models by accuracy
 top_5_models = mlflow.search_logged_models(
     experiment_ids=["1"],
@@ -437,6 +448,7 @@ accuracy_metric = next(
     (metric for metric in best_model.metrics if metric.key == "accuracy"), None
 )
 print(f"Model ID: {best_model.model_id}, Accuracy: {accuracy_metric.value}")
+
 ```
 
 ### Searching Across Multiple Experiments[​](#searching-across-multiple-experiments "Direct link to Searching Across Multiple Experiments")
@@ -449,11 +461,12 @@ Do not search over more than 10 experiments when using the `search_logged_models
 
 python
 
-```
+```python
 # Search specific experiments
 multi_exp_models = mlflow.search_logged_models(
     experiment_ids=["1", "2", "3"], filter_string="metrics.accuracy > 0.9"
 )
+
 ```
 
 ## Common Use Cases[​](#common-use-cases "Direct link to Common Use Cases")
@@ -464,7 +477,7 @@ Find the best model that meets production criteria:
 
 python
 
-```
+```python
 deployment_candidates = mlflow.search_logged_models(
     experiment_ids=exp_ids,
     filter_string="""
@@ -475,6 +488,7 @@ deployment_candidates = mlflow.search_logged_models(
     max_results=1,
     order_by=[{"field_name": "metrics.f1_score", "ascending": False}],
 )
+
 ```
 
 ### Model Comparison[​](#model-comparison "Direct link to Model Comparison")
@@ -483,7 +497,7 @@ Compare different model architectures:
 
 python
 
-```
+```python
 # Get best model of each type
 model_types = ["RandomForest", "LogisticRegression", "SVM"]
 best_by_type = {}
@@ -512,6 +526,7 @@ for model_type, model in best_by_type.items():
     print(
         f"{model_type}: Model ID = {model.model_id}, Run ID = {model.source_run_id}, Accuracy = {accuracy_display}"
     )
+
 ```
 
 ## Important Notes[​](#important-notes "Direct link to Important Notes")
@@ -522,7 +537,7 @@ The `LoggedModel` objects returned by `search_logged_models` contain a `metrics`
 
 python
 
-```
+```python
 # Option 1: Access metrics from LoggedModel objects (list output)
 models_list = mlflow.search_logged_models(
     experiment_ids=["1"], filter_string="metrics.accuracy > 0.9", output_format="list"
@@ -543,6 +558,7 @@ models_df = mlflow.search_logged_models(
 first_model_metrics = models_df.iloc[0].get("metrics", [])
 for metric in first_model_metrics:
     print(f"{metric.key}: {metric.value}")
+
 ```
 
 ## Summary[​](#summary "Direct link to Summary")

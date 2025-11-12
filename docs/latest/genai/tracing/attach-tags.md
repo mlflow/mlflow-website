@@ -26,7 +26,7 @@ Use [`mlflow.update_current_trace()`](/mlflow-website/docs/latest/api_reference/
 
 python
 
-```
+```python
 import mlflow
 
 
@@ -37,13 +37,14 @@ def my_func(x):
 
 
 result = my_func(5)
+
 ```
 
 ### Example: Setting Service Tags in Production System[​](#example-setting-service-tags-in-production-system "Direct link to Example: Setting Service Tags in Production System")
 
 python
 
-```
+```python
 import mlflow
 import os
 
@@ -64,6 +65,7 @@ def process_user_request(user_id: str, session_id: str, request_text: str):
 
     response = f"Processed: {request_text}"
     return response
+
 ```
 
 note
@@ -86,7 +88,7 @@ Add or modify tags on traces that have already been completed and logged.
 
 python
 
-```
+```python
 import mlflow
 from mlflow import MlflowClient
 
@@ -98,13 +100,14 @@ mlflow.delete_trace_tag(trace_id="your-trace-id", key="tag_key")
 client = MlflowClient()
 client.set_trace_tag(trace_id="your-trace-id", key="tag_key", value="tag_value")
 client.delete_trace_tag(trace_id="your-trace-id", key="tag_key")
+
 ```
 
 ### Batch Tagging[​](#batch-tagging "Direct link to Batch Tagging")
 
 python
 
-```
+```python
 import mlflow
 from mlflow import MlflowClient
 
@@ -121,13 +124,14 @@ for trace in traces:
     client.set_trace_tag(
         trace_id=trace.info.trace_id, key="review_priority", value="high"
     )
+
 ```
 
 ### Performance Analysis Tagging[​](#performance-analysis-tagging "Direct link to Performance Analysis Tagging")
 
 python
 
-```
+```python
 import mlflow
 from mlflow import MlflowClient
 from datetime import datetime
@@ -153,6 +157,7 @@ for trace in traces:
     client.set_trace_tag(
         trace_id=trace.info.trace_id, key="performance_category", value=performance_tag
     )
+
 ```
 
 ### Using the MLflow UI[​](#using-the-mlflow-ui "Direct link to Using the MLflow UI")
@@ -176,7 +181,7 @@ Use tags to find specific traces quickly and efficiently.
 
 python
 
-```
+```python
 import mlflow
 
 # Find traces by environment
@@ -193,13 +198,14 @@ user_traces = mlflow.search_traces(
 urgent_traces = mlflow.search_traces(
     experiment_ids=["1"], filter_string="tags.priority = 'high'"
 )
+
 ```
 
 ### Complex Tag-Based Queries[​](#complex-tag-based-queries "Direct link to Complex Tag-Based Queries")
 
 python
 
-```
+```python
 # Combine tag filters with other conditions
 slow_production_errors = mlflow.search_traces(
     experiment_ids=["1"],
@@ -223,13 +229,14 @@ session_traces = mlflow.search_traces(
     filter_string="tags.session_id = 'session_456'",
     order_by=["timestamp_ms ASC"],
 )
+
 ```
 
 ### Operational Monitoring Queries[​](#operational-monitoring-queries "Direct link to Operational Monitoring Queries")
 
 python
 
-```
+```python
 # Monitor A/B test performance
 control_group = mlflow.search_traces(
     experiment_ids=["1"], filter_string="tags.experiment_variant = 'control'"
@@ -247,13 +254,14 @@ escalation_traces = mlflow.search_traces(
         AND execution_time_ms > 30000
     """,
 )
+
 ```
 
 ### Analytics and Reporting[​](#analytics-and-reporting "Direct link to Analytics and Reporting")
 
 python
 
-```
+```python
 # Generate performance reports by model version
 model_v1_traces = mlflow.search_traces(
     experiment_ids=["1"], filter_string="tags.model_version = 'v1.0.0'"
@@ -273,6 +281,7 @@ v2_avg_time = sum(t.info.execution_time_ms for t in model_v2_traces) / len(
 
 print(f"V1 average time: {v1_avg_time:.2f}ms")
 print(f"V2 average time: {v2_avg_time:.2f}ms")
+
 ```
 
 ## Best Practices for Trace Tags[​](#best-practices-for-trace-tags "Direct link to Best Practices for Trace Tags")
@@ -281,7 +290,7 @@ print(f"V2 average time: {v2_avg_time:.2f}ms")
 
 python
 
-```
+```python
 # Good: Consistent naming
 tags = {
     "environment": "production",  # lowercase
@@ -297,13 +306,14 @@ tags = {
     "user_type": "premium",  # different terminology
     "stage": "pre",  # unclear abbreviation
 }
+
 ```
 
 ### 2. Hierarchical Organization[​](#2-hierarchical-organization "Direct link to 2. Hierarchical Organization")
 
 python
 
-```
+```python
 # Use dots for hierarchical organization
 tags = {
     "service.name": "chat_api",
@@ -314,13 +324,14 @@ tags = {
     "request.type": "completion",
     "request.priority": "high",
 }
+
 ```
 
 ### 3. Temporal Information[​](#3-temporal-information "Direct link to 3. Temporal Information")
 
 python
 
-```
+```python
 import datetime
 
 tags = {
@@ -329,13 +340,14 @@ tags = {
     "week": "2024-W03",
     "shift": "evening",  # for operational monitoring
 }
+
 ```
 
 ### 4. Operational Monitoring[​](#4-operational-monitoring "Direct link to 4. Operational Monitoring")
 
 python
 
-```
+```python
 # Tags for monitoring and alerting
 tags = {
     "sla_tier": "critical",  # for SLA monitoring
@@ -343,13 +355,14 @@ tags = {
     "alert_group": "ml_ops",  # for alert routing
     "escalation": "tier_1",  # for incident management
 }
+
 ```
 
 ### 5. Experiment Tracking[​](#5-experiment-tracking "Direct link to 5. Experiment Tracking")
 
 python
 
-```
+```python
 # Tags for A/B testing and experiments
 tags = {
     "experiment_name": "prompt_optimization_v2",
@@ -357,6 +370,7 @@ tags = {
     "hypothesis": "improved_context_helps",
     "feature_flag": "new_prompt_engine",
 }
+
 ```
 
 ## Common Tag Categories[​](#common-tag-categories "Direct link to Common Tag Categories")

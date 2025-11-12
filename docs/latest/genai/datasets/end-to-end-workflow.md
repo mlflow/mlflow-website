@@ -26,8 +26,9 @@ Analyze Results
 
 bash
 
-```
+```bash
 pip install --upgrade mlflow>=3.4 openai
+
 ```
 
 ## Step 1: Build & Trace Your Application[​](#step-1-build--trace-your-application "Direct link to Step 1: Build & Trace Your Application")
@@ -36,7 +37,7 @@ Start with a traced GenAI application. This example shows a customer support bot
 
 python
 
-```
+```python
 import mlflow
 import openai
 import os
@@ -86,6 +87,7 @@ class CustomerSupportBot:
 
 
 bot = CustomerSupportBot()
+
 ```
 
 ## Step 2: Capture Production Traces[​](#step-2-capture-production-traces "Direct link to Step 2: Capture Production Traces")
@@ -94,7 +96,7 @@ Run your application with real or test scenarios to capture traces. Later, you'l
 
 python
 
-```
+```python
 # Test scenarios
 test_questions = [
     "What is your refund policy?",
@@ -106,6 +108,7 @@ test_questions = [
 # Capture traces - automatically logged to the active experiment
 for question in test_questions:
     response = bot.answer(question)
+
 ```
 
 ## Step 3: Add Ground Truth Expectations[​](#step-3-add-ground-truth-expectations "Direct link to Step 3: Add Ground Truth Expectations")
@@ -114,7 +117,7 @@ Add expectations to your traces to define what constitutes correct behavior. Use
 
 python
 
-```
+```python
 # Search for recent traces (uses current active experiment by default)
 traces = mlflow.search_traces(
     max_results=10, return_type="list"  # Return list of Trace objects for iteration
@@ -140,6 +143,7 @@ for trace in traces:
             name="key_information",
             value={"must_mention": ["5-7 days"], "offers_express": True},
         )
+
 ```
 
 ## Step 4: Create an Evaluation Dataset[​](#step-4-create-an-evaluation-dataset "Direct link to Step 4: Create an Evaluation Dataset")
@@ -148,7 +152,7 @@ Transform your annotated traces into a reusable evaluation dataset. Use [create\
 
 python
 
-```
+```python
 from mlflow.genai.datasets import create_dataset
 
 # Create dataset from current experiment
@@ -180,6 +184,7 @@ manual_tests = [
     },
 ]
 dataset.merge_records(manual_tests)
+
 ```
 
 ## Step 5: Run Systematic Evaluation[​](#step-5-run-systematic-evaluation "Direct link to Step 5: Run Systematic Evaluation")
@@ -188,7 +193,7 @@ Evaluate your application against the dataset using built-in and custom scorers.
 
 python
 
-```
+```python
 from mlflow.genai import evaluate
 from mlflow.genai.scorers import Correctness, Guidelines, scorer
 
@@ -226,6 +231,7 @@ results = evaluate(
 # Access results
 metrics = results.metrics
 detailed_results = results.tables["eval_results_table"]
+
 ```
 
 ## Step 6: Iterate and Improve[​](#step-6-iterate-and-improve "Direct link to Step 6: Iterate and Improve")
@@ -234,7 +240,7 @@ Use evaluation results to improve your application, then re-evaluate using the s
 
 python
 
-```
+```python
 # Analyze results
 low_scores = detailed_results[detailed_results["factual_accuracy/score"] < 0.8]
 if not low_scores.empty:
@@ -260,6 +266,7 @@ if not low_scores.empty:
         improved_results.metrics["factual_accuracy/score"]
         - metrics["factual_accuracy/score"]
     )
+
 ```
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")

@@ -8,10 +8,11 @@
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.crewai.autolog()
+
 ```
 
 MLflow trace automatically captures the following information about CrewAI agents:
@@ -32,7 +33,7 @@ First, enable auto-tracing for CrewAI, and optionally create an MLflow experimen
 
 python
 
-```
+```python
 import mlflow
 
 # Turn on auto tracing by calling mlflow.crewai.autolog()
@@ -42,13 +43,14 @@ mlflow.crewai.autolog()
 # Optional: Set a tracking URI and an experiment
 mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_experiment("CrewAI")
+
 ```
 
 Next, define a multi-agent workflow using CrewAI. The following example defines a trip planner agent that uses web search capability as a tool.
 
 python
 
-```
+```python
 from crewai import Agent, Crew, Task
 from crewai.knowledge.source.string_knowledge_source import StringKnowledgeSource
 from crewai_tools import SerperDevTool, WebsiteSearchTool
@@ -183,6 +185,7 @@ class TripCrew:
 
 trip_crew = TripCrew("California", "Tokyo", "Dec 12 - Dec 20", "sports")
 result = trip_crew.run()
+
 ```
 
 ## Token usage[​](#token-usage "Direct link to Token usage")
@@ -191,7 +194,7 @@ MLflow >= 3.5.0 supports token usage tracking for CrewAI. The token usage for ea
 
 python
 
-```
+```python
 import json
 import mlflow
 
@@ -211,11 +214,12 @@ print("== Total token usage: ==")
 print(f"  Input tokens: {total_usage['input_tokens']}")
 print(f"  Output tokens: {total_usage['output_tokens']}")
 print(f"  Total tokens: {total_usage['total_tokens']}")
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 32870
   Output tokens: 1826
@@ -236,6 +240,7 @@ LLM.call_3:
   Total tokens: 4521
 
 ... (other modules)
+
 ```
 
 ### Disable auto-tracing[​](#disable-auto-tracing "Direct link to Disable auto-tracing")

@@ -18,15 +18,16 @@ Install the Vercel AI SDK and MLflow integration packages.
 
 bash
 
-```
+```bash
 npm install ai @ai-sdk/openai mlflow-tracing mlflow-vercel
+
 ```
 
 Initialize MLflow in your app and call the AI SDK as usual. Set `experimental_telemetry.isEnabled` to `true` to allow the integration to capture inputs/outputs and usage.
 
 typescript
 
-```
+```typescript
 import * as mlflow from 'mlflow-tracing';
 import { generateText } from 'ai';
 import { openai } from '@ai-sdk/openai';
@@ -46,6 +47,7 @@ const result = await generateText({
 });
 
 console.log(result.text);
+
 ```
 
 ## Streaming[​](#streaming "Direct link to Streaming")
@@ -54,7 +56,7 @@ Streaming is supported as well. Similarly to the `generateText` function, specif
 
 typescript
 
-```
+```typescript
 import { streamText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 
@@ -67,6 +69,7 @@ const stream = await streamText({
 for await (const part of stream.textStream) {
   process.stdout.write(part);
 }
+
 ```
 
 ## Token usage[​](#token-usage "Direct link to Token usage")
@@ -75,7 +78,7 @@ When the underlying provider supplies token usage (e.g., input and output tokens
 
 typescript
 
-```
+```typescript
 // Flush any pending spans then fetch the most recent trace
 await mlflow.flushTraces();
 const lastTraceId = mlflow.getLastActiveTraceId();
@@ -85,6 +88,7 @@ if (lastTraceId) {
   const trace = await client.getTrace(lastTraceId);
   console.log('Token usage:', trace.info.tokenUsage);  // { input_tokens, output_tokens, total_tokens }
 }
+
 ```
 
 ## Disable auto-tracing[​](#disable-auto-tracing "Direct link to Disable auto-tracing")

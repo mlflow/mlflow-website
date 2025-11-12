@@ -6,11 +6,12 @@
 
 python
 
-```
+```python
 import mlflow
 
 # Enable
 mlflow.openai.autolog()
+
 ```
 
 MLflow trace automatically captures the following information about DeepSeek calls:
@@ -38,7 +39,7 @@ To request support for additional APIs, please open a [feature request](https://
 
 python
 
-```
+```python
 import openai
 import mlflow
 
@@ -65,6 +66,7 @@ response = client.chat.completions.create(
     temperature=0.1,
     max_tokens=100,
 )
+
 ```
 
 The above example should generate a trace in the `DeepSeek` experiment in the MLflow UI:
@@ -83,7 +85,7 @@ The following example implements a simple function calling agent using DeepSeek 
 
 python
 
-```
+```python
 import json
 from openai import OpenAI
 import mlflow
@@ -163,6 +165,7 @@ def run_tool_agent(question: str):
 # Run the tool calling agent
 question = "What's the weather like in Paris today?"
 answer = run_tool_agent(question)
+
 ```
 
 ## Token usage[​](#token-usage "Direct link to Token usage")
@@ -171,7 +174,7 @@ MLflow >= 3.2.0 supports token usage tracking for Deepseek models through the Op
 
 python
 
-```
+```python
 import json
 import mlflow
 
@@ -200,11 +203,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 84
   Output tokens: 22
@@ -219,6 +223,7 @@ Completions_2:
   Input tokens: 39
   Output tokens: 8
   Total tokens: 47
+
 ```
 
 ## Disable auto-tracing[​](#disable-auto-tracing "Direct link to Disable auto-tracing")

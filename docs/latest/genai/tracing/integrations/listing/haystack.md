@@ -8,10 +8,11 @@
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.haystack.autolog()
+
 ```
 
 MLflow trace automatically captures the following information:
@@ -27,7 +28,7 @@ MLflow trace automatically captures the following information:
 
 python
 
-```
+```python
 import mlflow
 
 from haystack import Document, Pipeline
@@ -87,6 +88,7 @@ results = rag_pipeline.run(
 )
 
 print(results["llm"]["replies"])
+
 ```
 
 ![Haystack Tracing via autolog](/mlflow-website/docs/latest/assets/images/haystack-basic-tracing-cc6d8017b6b96aefb71c5df7cdce81b1.png)
@@ -97,7 +99,7 @@ MLflow >= 3.4.0 supports token usage tracking for Haystack. The token usage for 
 
 python
 
-```
+```python
 question = "Who lives in Paris?"
 results = rag_pipeline.run(
     {
@@ -126,11 +128,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 64
   Output tokens: 5
@@ -140,6 +143,7 @@ bash
 OpenAIChatGenerator:
   Input tokens: 64
   Output tokens: 5
+
 ```
 
 ### Disable auto-tracing[​](#disable-auto-tracing "Direct link to Disable auto-tracing")

@@ -57,8 +57,9 @@ Install MLflow 3 by running the following command:
 
 bash
 
-```
+```bash
 pip install "mlflow>=3.1"
+
 ```
 
 Resources: 🌐 [New Website](https://mlflow.org/) | 📖 [Documentation](https://mlflow.org/docs/latest/index.html) | 🎉 [Release Notes](https://mlflow.org/releases/3)
@@ -71,16 +72,18 @@ Run the following command to install MLflow 3 and OpenAI packages.
 
 text
 
-```
+```text
 pip install mlflow openai -U
+
 ```
 
 Set `OPENAI_API_KEY` environment variable in CLI to authenticate to OpenAI APIs.
 
 bash
 
-```
+```bash
 export OPENAI_API_KEY=your_api_key_here
+
 ```
 
 This quickstart demonstrates how to create a generative AI application with prompt engineering and evaluate it using MLflow 3. It highlights the integration of the LoggedModel lineage feature with runs and traces, showcasing seamless tracking and observability for GenAI workflows.
@@ -91,7 +94,7 @@ First, we create a prompt template and register it with [MLflow Prompt Registry]
 
 python
 
-```
+```python
 import mlflow
 
 # define a prompt template
@@ -115,6 +118,7 @@ prompt = mlflow.genai.register_prompt(
     template=prompt_template,
     commit_message="Initial version of AI assistant",
 )
+
 ```
 
 Switch to the **Prompts** tab to view the registered prompt:
@@ -127,7 +131,7 @@ At this step, we set an active model for grouping traces. After enabling autolog
 
 python
 
-```
+```python
 from openai import OpenAI
 
 # set an active model for linking traces, a model named `openai_model` will be created
@@ -159,6 +163,7 @@ mlflow.search_traces(model_id=active_model_id)
 #                            trace_id                                             trace  ...  assessments                        request_id
 # 0  7bb4569d3d884e3e87b1d8752276a13c  Trace(trace_id=7bb4569d3d884e3e87b1d8752276a13c)  ...           []  7bb4569d3d884e3e87b1d8752276a13c
 # [1 rows x 12 columns]
+
 ```
 
 Generated traces can be viewed in the **Traces** tab of the logged model:
@@ -171,7 +176,7 @@ Finally, we evaluate the response using different metrics and record the results
 
 python
 
-```
+```python
 from mlflow.metrics.genai import answer_correctness, answer_similarity, faithfulness
 
 # ground truth result for evaluation
@@ -212,6 +217,7 @@ with mlflow.start_run() as run:
         },
         model_id=active_model_id,
     )
+
 ```
 
 Navigate to the **Models** tab of the experiment to view the newly created LoggedModel. Evaluation metrics, model ID, source run, parameters, and other details are displayed on the models detail page, providing a comprehensive overview of the model's performance and lineage.
@@ -242,23 +248,25 @@ MLflow 3 introduces some key API changes while also removes some outdated featur
 
 ### Key changes[​](#key-changes "Direct link to Key changes")
 
-|                                  | MLflow 2.x                                                                                                                                                                                           | MLflow 3                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| log\_model API usage             | Pass `artifact_path` when logging a model.text```
+|                                  | MLflow 2.x                                                                                                                                                                                               | MLflow 3                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| log\_model API usage             | Pass `artifact_path` when logging a model.text```text
   with mlflow.start_run():
       mlflow.pyfunc.log_model(
           artifact_path="model",
           python_model=python_model,
           ...
       )
-``` | Pass **name** when logging a model. This allows you to later search for LoggedModels using this name, `artifact_path` parameter is deprecated.noteMLflow no longer requires starting a Run before logging models, because Models become first citizen entity in MLflow 3. You can directly call the `log_model` API without `mlflow.start_run()` context manager to log a model.text```
+
+``` | Pass **name** when logging a model. This allows you to later search for LoggedModels using this name, `artifact_path` parameter is deprecated.noteMLflow no longer requires starting a Run before logging models, because Models become first citizen entity in MLflow 3. You can directly call the `log_model` API without `mlflow.start_run()` context manager to log a model.text```text
 mlflow.pyfunc.log_model(
     name="model",
     python_model=python_model,
     ...
 )
+
 ``` |
-| Model artifacts storage location | model artifacts are stored as run artifacts.                                                                                                                                                         | Model artifacts are stored into models artifacts location. Note: this impacts the behavior of [list\_artifacts](/mlflow-website/docs/latest/api_reference/python_api/mlflow.client.html#mlflow.client.MlflowClient.list_artifacts) API.                                                                                                                                                                                                                                   |
+| Model artifacts storage location | model artifacts are stored as run artifacts.                                                                                                                                                             | Model artifacts are stored into models artifacts location. Note: this impacts the behavior of [list\_artifacts](/mlflow-website/docs/latest/api_reference/python_api/mlflow.client.html#mlflow.client.MlflowClient.list_artifacts) API.                                                                                                                                                                                                                                       |
 
 ### Removed Features[​](#removed-features "Direct link to Removed Features")
 

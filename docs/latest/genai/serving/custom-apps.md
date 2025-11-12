@@ -20,7 +20,7 @@ Here's an example of a custom PyFunc model:
 
 python
 
-```
+```python
 import mlflow
 import pandas as pd
 import json
@@ -134,6 +134,7 @@ with mlflow.start_run():
         artifacts={"config": "config.json"},
         input_example=input_example,
     )
+
 ```
 
 ### Multi-Model Ensemble[​](#multi-model-ensemble "Direct link to Multi-Model Ensemble")
@@ -142,7 +143,7 @@ Create a custom application that combines multiple LLMs with different strengths
 
 python
 
-```
+```python
 import mlflow
 import mlflow.pyfunc
 import pandas as pd
@@ -335,6 +336,7 @@ with mlflow.start_run():
         artifacts={"ensemble_config": "ensemble_config.json"},
         input_example=input_example,
     )
+
 ```
 
 ## Serving Custom Applications[​](#serving-custom-applications "Direct link to Serving Custom Applications")
@@ -345,12 +347,13 @@ Once you've created and saved your custom application, serve it locally:
 
 bash
 
-```
+```bash
 # Serve from saved model path
 mlflow models serve -m ./path/to/custom/model -p 5000
 
 # Serve from Model Registry
 mlflow models serve -m "models:/CustomApp/Production" -p 5000
+
 ```
 
 ### Docker Deployment[​](#docker-deployment "Direct link to Docker Deployment")
@@ -359,12 +362,13 @@ Build a Docker image for your custom application:
 
 bash
 
-```
+```bash
 # Build Docker image
 mlflow models build-docker -m ./path/to/custom/model -n custom-app
 
 # Run the container
 docker run -p 5000:8080 custom-app
+
 ```
 
 ### Testing Custom Applications[​](#testing-custom-applications "Direct link to Testing Custom Applications")
@@ -373,7 +377,7 @@ Test your custom serving application:
 
 python
 
-```
+```python
 import requests
 import pandas as pd
 import json
@@ -398,6 +402,7 @@ response = requests.post(
 )
 
 print("Response:", response.json())
+
 ```
 
 ## Best Practices for Custom Applications[​](#best-practices-for-custom-applications "Direct link to Best Practices for Custom Applications")
@@ -408,7 +413,7 @@ Implement comprehensive error handling:
 
 python
 
-```
+```python
 def predict(self, context, model_input):
     try:
         # Validate input
@@ -425,6 +430,7 @@ def predict(self, context, model_input):
     except Exception as e:
         # Handle unexpected errors
         return {"error": f"Prediction failed: {str(e)}"}
+
 ```
 
 ### Performance Optimization[​](#performance-optimization "Direct link to Performance Optimization")

@@ -17,19 +17,21 @@ First install MLflow and OpenAI SDK. If you use different LLM providers, install
 
 bash
 
-```
+```bash
 pip install mlflow>=2.21.0 openai -qU
+
 ```
 
 Also set OpenAI API key (or any other LLM providers e.g. Anthropic).
 
 python
 
-```
+```python
 import os
 from getpass import getpass
 
 os.environ["OPENAI_API_KEY"] = getpass("Enter your OpenAI API key: ")
+
 ```
 
 ### 1. Create a Prompt[​](#1-create-a-prompt "Direct link to 1. Create a Prompt")
@@ -49,7 +51,7 @@ To create a new prompt using the Python API, use [`mlflow.register_prompt()`](/m
 
 python
 
-```
+```python
 import mlflow
 
 # Use double curly braces for variables in the template
@@ -69,6 +71,7 @@ prompt = mlflow.genai.register_prompt(
 
 # The prompt object contains information about the registered prompt
 print(f"Created prompt '{prompt.name}' (version {prompt.version})")
+
 ```
 
 ### 2. Prepare Evaluation Data[​](#2-prepare-evaluation-data "Direct link to 2. Prepare Evaluation Data")
@@ -77,7 +80,7 @@ Below, we create a small summarization dataset for demonstration purposes.
 
 python
 
-```
+```python
 import pandas as pd
 
 eval_data = [
@@ -114,6 +117,7 @@ eval_data = [
         },
     },
 ]
+
 ```
 
 ### 3. Define Prediction Function[​](#3-define-prediction-function "Direct link to 3. Define Prediction Function")
@@ -124,7 +128,7 @@ MLflow will pass the input columns (`inputs` only in this example) to the functi
 
 python
 
-```
+```python
 import mlflow
 import openai
 
@@ -142,6 +146,7 @@ def predict_fn(sentences: str) -> str:
         ],
     )
     return completion.choices[0].message.content
+
 ```
 
 ### 4. Run Evaluation[​](#4-run-evaluation "Direct link to 4. Run Evaluation")
@@ -150,7 +155,7 @@ Run the [`mlflow.genai.evaluate()`](/mlflow-website/docs/latest/api_reference/py
 
 python
 
-```
+```python
 from typing import Literal
 from mlflow.genai.judges import make_judge
 
@@ -171,6 +176,7 @@ results = mlflow.genai.evaluate(
     predict_fn=predict_fn,
     scorers=[answer_similarity],
 )
+
 ```
 
 ### 5. View Results[​](#5-view-results "Direct link to 5. View Results")

@@ -24,36 +24,40 @@ Install the package from the [npm registry](https://www.npmjs.com/package/mlflow
 
 bash
 
-```
+```bash
 npm install mlflow-tracing
+
 ```
 
 After installation, connect your application to an MLflow server by specifying the tracking URI and experiment ID.
 
 typescript
 
-```
+```typescript
 import * as mlflow from "mlflow-tracing";
 
 mlflow.init({
     trackingUri: "<your-tracking-server-uri>",
     experimentId: "<your-experiment-id>",
 });
+
 ```
 
 Alternatively, you can set the tracking URI and experiment ID as environment variables.
 
 bash
 
-```
+```bash
 export MLFLOW_TRACKING_URI=http://localhost:5000
 export MLFLOW_EXPERIMENT_ID=123456789
+
 ```
 
 typescript
 
-```
+```typescript
 mlflow.init();
+
 ```
 
 ## Integrations[​](#integrations "Direct link to Integrations")
@@ -81,7 +85,7 @@ MLflow currently supports automatic tracing for the following TypeScript/JavaScr
 
 typescript
 
-```
+```typescript
 // Wrap a function with mlflow.trace to generate a span when the function is called.
 const getWeather = mlflow.trace(
   (city: string) => {
@@ -98,21 +102,23 @@ getWeather('San Francisco');
 // Alternatively, start and end spans manually.
 const span = mlflow.startSpan({ name: 'my-span', inputs: { message: 'Hi, MLflow!' } });
 span.end({ outputs: { message: 'Hi, what can I do for you?' } });
+
 ```
 
 Install the OpenAI integration package:
 
 bash
 
-```
+```bash
 npm install mlflow-openai
+
 ```
 
 Then, wrap the OpenAI client with the `tracedOpenAI` function:
 
 typescript
 
-```
+```typescript
 import { OpenAI } from "openai";
 import { tracedOpenAI } from "mlflow-openai";
 import * as mlflow from "mlflow-tracing";
@@ -134,6 +140,7 @@ const response = await client.chat.completions.create({
         {"role": "user", "content": "What's the weather like in Seattle?"},
     ],
 })
+
 ```
 
 ## Manual Tracing[​](#manual-tracing "Direct link to Manual Tracing")
@@ -149,7 +156,7 @@ The `trace` API is useful when you want to trace a function.
 
 typescript
 
-```
+```typescript
 import * as mlflow from "mlflow-tracing";
 
 const getWeather = async (city: string) => {
@@ -164,11 +171,12 @@ const tracedGetWeather = mlflow.trace(
 
 // Invoke the traced function as usual.
 await tracedGetWeather('San Francisco');
+
 ```
 
 typescript
 
-```
+```typescript
 import * as mlflow from "mlflow-tracing";
 
 const getWeather = mlflow.trace(
@@ -181,6 +189,7 @@ const getWeather = mlflow.trace(
 
 // Invoke the traced function as usual.
 getWeather('San Francisco');
+
 ```
 
 On the invocation of the traced function, MLflow will automatically create a span that captures:
@@ -196,7 +205,7 @@ If you trace nested functions, MLflow will generate a trace with multiple spans,
 
 typescript
 
-```
+```typescript
 const sum = mlflow.trace(
     (a: number, b: number) => {
         return a + b;
@@ -221,17 +230,19 @@ const computeArea = mlflow.trace(
 );
 
 computeArea(1, 2, 3);
+
 ```
 
 The trace will look like this:
 
 text
 
-```
+```text
 - compute-area
   - sum (a=1, b=2)
   - multiply (a=3, b=3)
   - multiply (a=9, b=0.5)
+
 ```
 
 ### Tracing a class method with the `@trace` API[​](#tracing-a-class-method-with-the-trace-api "Direct link to tracing-a-class-method-with-the-trace-api")
@@ -245,7 +256,7 @@ TypeScript version 5.0+ supports decorators. MLflow Tracing supports this syntax
 
 typescript
 
-```
+```typescript
 import * as mlflow from "mlflow-tracing";
 
 class MyClass {
@@ -257,6 +268,7 @@ class MyClass {
 
 const myClass = new MyClass();
 myClass.generateText("What's the weather like in Seattle?");
+
 ```
 
 ### Tracing a block of code with the `withSpan` API[​](#tracing-a-block-of-code-with-the-withspan-api "Direct link to tracing-a-block-of-code-with-the-withspan-api")
@@ -265,7 +277,7 @@ The `withSpan` API is useful when you want to trace a block of code, not a funct
 
 typescript
 
-```
+```typescript
 import * as mlflow from "mlflow-tracing";
 
 const question = "What's the weather like in Seattle?";
@@ -281,6 +293,7 @@ const result = await mlflow.withSpan(
         inputs: { prompt: question },
     }
 );
+
 ```
 
 ### Create and End a Span Explicitly[​](#create-and-end-a-span-explicitly "Direct link to Create and End a Span Explicitly")
@@ -289,7 +302,7 @@ To get more control over the span lifecycle, you can create and end a span expli
 
 typescript
 
-```
+```typescript
 import * as mlflow from "mlflow-tracing";
 
 const span = mlflow.startSpan({
@@ -302,6 +315,7 @@ span.end({
     outputs: { answer: "It's sunny in Seattle!" },
     status: 'OK',
 });
+
 ```
 
 ## Grouping Traces by Users and Sessions[​](#grouping-traces-by-users-and-sessions "Direct link to Grouping Traces by Users and Sessions")
@@ -324,8 +338,9 @@ The [mlflow-tracing](https://www.npmjs.com/package/mlflow-tracing) package only 
 
 bash
 
-```
+```bash
 npm install mlflow-js
+
 ```
 
 #### Q. Do I need to install Python to use MLflow Typescript SDK?[​](#q-do-i-need-to-install-python-to-use-mlflow-typescript-sdk "Direct link to Q. Do I need to install Python to use MLflow Typescript SDK?")

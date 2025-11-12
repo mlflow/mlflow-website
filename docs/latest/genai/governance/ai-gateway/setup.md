@@ -10,8 +10,9 @@ The AI Gateway requires MLflow with additional dependencies for server functiona
 
 bash
 
-```
+```bash
 pip install 'mlflow[gateway]'
+
 ```
 
 ## Environment Setup[​](#environment-setup "Direct link to Environment Setup")
@@ -20,7 +21,7 @@ Store your API keys as environment variables to keep them secure and separate fr
 
 bash
 
-```
+```bash
 # OpenAI
 export OPENAI_API_KEY=sk-...
 
@@ -38,6 +39,7 @@ export AWS_REGION=us-east-1
 
 # Cohere
 export COHERE_API_KEY=...
+
 ```
 
 ## Basic Server Configuration[​](#basic-server-configuration "Direct link to Basic Server Configuration")
@@ -50,7 +52,7 @@ The gateway uses a YAML configuration file to define endpoints. Each endpoint sp
 
 yaml
 
-```
+```yaml
 endpoints:
   - name: chat
     endpoint_type: llm/v1/chat
@@ -59,11 +61,12 @@ endpoints:
       name: gpt-3.5-turbo
       config:
         openai_api_key: $OPENAI_API_KEY
+
 ```
 
 yaml
 
-```
+```yaml
 endpoints:
   - name: chat
     endpoint_type: llm/v1/chat
@@ -88,11 +91,12 @@ endpoints:
       name: text-embedding-ada-002
       config:
         openai_api_key: $OPENAI_API_KEY
+
 ```
 
 yaml
 
-```
+```yaml
 endpoints:
   - name: chat1
     endpoint_type: llm/v1/chat
@@ -119,6 +123,7 @@ routes:
       - name: chat2
         traffic_percentage: 20
     routing_strategy: TRAFFIC_SPLIT
+
 ```
 
 ## Starting the Gateway Server[​](#starting-the-gateway-server "Direct link to Starting the Gateway Server")
@@ -131,8 +136,9 @@ This starts the server with default settings on localhost port 5000:
 
 bash
 
-```
+```bash
 mlflow gateway start --config-path config.yaml
+
 ```
 
 The server will start on `http://localhost:5000` by default.
@@ -143,12 +149,13 @@ For production or specific networking requirements, customize the host, port, an
 
 bash
 
-```
+```bash
 mlflow gateway start \
   --config-path config.yaml \
   --port 8080 \
   --host 0.0.0.0 \
   --workers 4
+
 ```
 
 ### Command Line Options[​](#command-line-options "Direct link to Command Line Options")
@@ -168,9 +175,10 @@ Verify the gateway is running and healthy with a simple HTTP health check:
 
 bash
 
-```
+```bash
 # Check if server is responding
 curl http://localhost:5000/health
+
 ```
 
 ### View API Documentation[​](#view-api-documentation "Direct link to View API Documentation")
@@ -179,8 +187,9 @@ The gateway automatically generates interactive API documentation using FastAPI'
 
 text
 
-```
+```text
 http://localhost:5000/docs
+
 ```
 
 ### Test a Simple Request[​](#test-a-simple-request "Direct link to Test a Simple Request")
@@ -189,24 +198,26 @@ Send a test request to the chat endpoint to verify your endpoint configuration i
 
 bash
 
-```
+```bash
 curl -X POST http://localhost:5000/gateway/chat/invocations \
   -H "Content-Type: application/json" \
   -d '{
     "messages": [{"role": "user", "content": "Hello!"}]
   }'
+
 ```
 
 Send a test request to the "chat-route" route to verify your route configuration is working correctly:
 
 bash
 
-```
+```bash
 curl -X POST http://localhost:5000/gateway/chat-route/invocations \
   -H "Content-Type: application/json" \
   -d '{
     "messages": [{"role": "user", "content": "Hello!"}]
   }'
+
 ```
 
 ## Troubleshooting[​](#troubleshooting "Direct link to Troubleshooting")
@@ -217,8 +228,9 @@ curl -X POST http://localhost:5000/gateway/chat-route/invocations \
 
 text
 
-```
+```text
 Error: Provider 'openai' requires 'openai_api_key' configuration
+
 ```
 
 Solution: Ensure environment variables are set before starting the server.
@@ -227,8 +239,9 @@ Solution: Ensure environment variables are set before starting the server.
 
 text
 
-```
+```text
 Error: Port 5000 is already in use
+
 ```
 
 Solution: Use a different port with `--port` or stop the conflicting process.
@@ -237,8 +250,9 @@ Solution: Use a different port with `--port` or stop the conflicting process.
 
 text
 
-```
+```text
 Error: Invalid configuration file
+
 ```
 
 Solution: Check YAML syntax and required fields. Configuration is validated when starting the server.

@@ -14,18 +14,20 @@ Let's install the `mlflow` package.
 
 text
 
-```
+```text
 %pip install -q mlflow
+
 ```
 
 Then let's import the packages.
 
 python
 
-```
+```python
 import tensorflow as tf
 import tensorflow_datasets as tfds
 from tensorflow import keras
+
 ```
 
 ## Load the dataset[​](#load-the-dataset "Direct link to Load the dataset")
@@ -36,25 +38,14 @@ Let's load the dataset using `tensorflow_datasets` (`tfds`), which returns datas
 
 python
 
-```
+```python
 # Load the mnist dataset.
 train_ds, test_ds = tfds.load(
   "mnist",
   split=["train", "test"],
   shuffle_files=True,
 )
-```
 
-```
-Downloading and preparing dataset 11.06 MiB (download: 11.06 MiB, generated: 21.00 MiB, total: 32.06 MiB) to /root/tensorflow_datasets/mnist/3.0.1...
-```
-
-```
-Dl Completed...:   0%|          | 0/5 [00:00<?, ? file/s]
-```
-
-```
-Dataset mnist downloaded and prepared to /root/tensorflow_datasets/mnist/3.0.1. Subsequent calls will reuse this data.
 ```
 
 Let's preprocess our data with the following steps:
@@ -65,7 +56,7 @@ Let's preprocess our data with the following steps:
 
 python
 
-```
+```python
 def preprocess_fn(data):
   image = tf.cast(data["image"], tf.float32) / 255
   label = data["label"]
@@ -74,6 +65,7 @@ def preprocess_fn(data):
 
 train_ds = train_ds.map(preprocess_fn).batch(128).prefetch(tf.data.AUTOTUNE)
 test_ds = test_ds.map(preprocess_fn).batch(128).prefetch(tf.data.AUTOTUNE)
+
 ```
 
 ## Define the Model[​](#define-the-model "Direct link to Define the Model")
@@ -82,7 +74,7 @@ Let's define a convolutional neural network as our classifier. We can use `keras
 
 python
 
-```
+```python
 input_shape = (28, 28, 1)
 num_classes = 10
 
@@ -98,18 +90,20 @@ model = keras.Sequential(
       keras.layers.Dense(num_classes, activation="softmax"),
   ]
 )
+
 ```
 
 Set training-related configs, optimizers, loss function, metrics.
 
 python
 
-```
+```python
 model.compile(
   loss=keras.losses.SparseCategoricalCrossentropy(),
   optimizer=keras.optimizers.Adam(0.001),
   metrics=[keras.metrics.SparseCategoricalAccuracy()],
 )
+
 ```
 
 ## Set up tracking/visualization tool[​](#set-up-trackingvisualization-tool "Direct link to Set up tracking/visualization tool")
@@ -125,10 +119,11 @@ After successfully registering an account on the Databricks Free Trial, let's co
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.login()
+
 ```
 
 Now this colab is connected to the hosted tracking server. Let's configure MLflow metadata. Two things to set up:
@@ -151,49 +146,14 @@ All you need to do is to call `mlflow.tensorflow.autolog()` before kicking off t
 
 python
 
-```
+```python
 # Choose any name that you like.
 mlflow.set_experiment("/Users/<your email>/mlflow-tf-keras-mnist")
 
 mlflow.tensorflow.autolog()
 
 model.fit(x=train_ds, epochs=3)
-```
 
-```
-2023/11/15 01:53:35 INFO mlflow.utils.autologging_utils: Created MLflow autologging run with ID '7c1db53e417b43f0a1d9e095c9943acb', which will track hyperparameters, performance metrics, model artifacts, and lineage information for the current tensorflow workflow
-```
-
-```
-Epoch 1/3
-469/469 [==============================] - 13s 7ms/step - loss: 0.3610 - sparse_categorical_accuracy: 0.8890
-Epoch 2/3
-469/469 [==============================] - 3s 6ms/step - loss: 0.1035 - sparse_categorical_accuracy: 0.9681
-Epoch 3/3
-469/469 [==============================] - 4s 8ms/step - loss: 0.0798 - sparse_categorical_accuracy: 0.9760
-```
-
-```
-2023/11/15 01:54:05 WARNING mlflow.tensorflow: Failed to infer model signature: could not sample data to infer model signature: tuple index out of range
-2023/11/15 01:54:05 WARNING mlflow.models.model: Model logged without a signature. Signatures will be required for upcoming model registry features as they validate model inputs and denote the expected schema of model outputs. Please visit https://www.mlflow.org/docs/2.8.1/models.html#set-signature-on-logged-model for instructions on setting a model signature on your logged model.
-2023/11/15 01:54:05 WARNING mlflow.tensorflow: You are saving a TensorFlow Core model or Keras model without a signature. Inference with mlflow.pyfunc.spark_udf() will not work unless the model's pyfunc representation accepts pandas DataFrames as inference inputs.
-2023/11/15 01:54:13 WARNING mlflow.utils.autologging_utils: MLflow autologging encountered a warning: "/usr/local/lib/python3.10/dist-packages/_distutils_hack/__init__.py:33: UserWarning: Setuptools is replacing distutils."
-```
-
-```
-Uploading artifacts:   0%|          | 0/11 [00:00<?, ?it/s]
-```
-
-```
-2023/11/15 01:54:13 INFO mlflow.store.artifact.cloud_artifact_repo: The progress bar can be disabled by setting the environment variable MLFLOW_ENABLE_ARTIFACTS_PROGRESS_BAR to false
-```
-
-```
-Uploading artifacts:   0%|          | 0/1 [00:00<?, ?it/s]
-```
-
-```
-<keras.src.callbacks.History at 0x7d48e6556b60>
 ```
 
 While your training is ongoing, you can find this training in your dashboard. Log in to your Databricks Workspace, and click on the `Experiments tab`. See the screenshot below: ![landing page](https://i.imgur.com/bBiIPqp.png)
@@ -206,17 +166,12 @@ Let's evaluate the training result.
 
 python
 
-```
+```python
 score = model.evaluate(test_ds)
 
 print(f"Test loss: {score[0]:.4f}")
 print(f"Test accuracy: {score[1]: .2f}")
-```
 
-```
-79/79 [==============================] - 1s 12ms/step - loss: 0.0484 - sparse_categorical_accuracy: 0.9838
-Test loss: 0.05
-Test accuracy:  0.98
 ```
 
 ### Log with MLflow Callback[​](#log-with-mlflow-callback "Direct link to Log with MLflow Callback")
@@ -228,7 +183,7 @@ Auto logging is powerful and convenient, but if you are looking for a more nativ
 
 python
 
-```
+```python
 from mlflow.tensorflow import MlflowCallback
 
 # Turn off autologging.
@@ -240,13 +195,7 @@ with mlflow.start_run() as run:
       epochs=2,
       callbacks=[MlflowCallback(run)],
   )
-```
 
-```
-Epoch 1/2
-469/469 [==============================] - 5s 10ms/step - loss: 0.0473 - sparse_categorical_accuracy: 0.9851
-Epoch 2/2
-469/469 [==============================] - 4s 8ms/step - loss: 0.0432 - sparse_categorical_accuracy: 0.9866
 ```
 
 Going to the Databricks Workspace experiment view, you will see a similar dashboard as before.
@@ -259,7 +208,7 @@ Let's look at an example that we want to replace the loss with its log value to 
 
 python
 
-```
+```python
 import math
 
 
@@ -272,13 +221,14 @@ class MlflowCustomCallback(MlflowCallback):
       logs["log_loss"] = math.log(loss)
       del logs["loss"]
       mlflow.log_metrics(logs, epoch)
+
 ```
 
 Train the model with the new callback.
 
 python
 
-```
+```python
 with mlflow.start_run() as run:
   run_id = run.info.run_id
   model.fit(
@@ -286,13 +236,7 @@ with mlflow.start_run() as run:
       epochs=2,
       callbacks=[MlflowCustomCallback(run)],
   )
-```
 
-```
-Epoch 1/2
-469/469 [==============================] - 5s 10ms/step - loss: 0.0537 - sparse_categorical_accuracy: 0.9834 - log_loss: -2.9237
-Epoch 2/2
-469/469 [==============================] - 4s 9ms/step - loss: 0.0497 - sparse_categorical_accuracy: 0.9846 - log_loss: -3.0022
 ```
 
 Going to your Databricks Workspace page, you should find the `log_loss` is replacing the `loss` metric, similar to what is shown in the screenshot below.

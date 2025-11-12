@@ -14,13 +14,14 @@ To enable autologging for DSPy optimization, call [`mlflow.dspy.autolog()`](/mlf
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.dspy.autolog(log_compiles=True, log_evals=True, log_traces_from_compile=True)
 
 # Your DSPy code here
 ...
+
 ```
 
 | Target                     | Default | Parameter                 | Description                                                                                                                                                    |
@@ -35,7 +36,7 @@ mlflow.dspy.autolog(log_compiles=True, log_evals=True, log_traces_from_compile=T
 
 python
 
-```
+```python
 import dspy
 from dspy.datasets.gsm8k import GSM8K, gsm8k_metric
 import mlflow
@@ -70,6 +71,7 @@ optimized_program = teleprompter.compile(
     max_labeled_demos=4,
     requires_permission_to_run=False,
 )
+
 ```
 
 ## What Gets Logged?[​](#what-gets-logged "Direct link to What Gets Logged?")
@@ -103,7 +105,7 @@ To log both optimization and evaluation into a same run, you can manually create
 
 python
 
-```
+```python
 with mlflow.start_run(run_name="My Optimization Run") as run:
     optimized_program = teleprompter.compile(
         program,
@@ -111,4 +113,5 @@ with mlflow.start_run(run_name="My Optimization Run") as run:
     )
     evaluation = dspy.Evaluate(devset=devset, metric=metric)
     evaluation(optimized_program)
+
 ```

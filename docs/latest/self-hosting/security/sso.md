@@ -22,9 +22,10 @@ This plugin is maintained by the community.
 
 bash
 
-```
+```bash
 pip install mlflow-oidc-auth[full]
 mlflow server --app-name oidc-auth --host 0.0.0.0 --port 8080
+
 ```
 
 ## Reverse proxy pattern[​](#reverse-proxy-pattern "Direct link to Reverse proxy pattern")

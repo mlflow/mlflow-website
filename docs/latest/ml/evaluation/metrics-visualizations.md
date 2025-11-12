@@ -8,7 +8,7 @@ Define domain-specific metrics using MLflow's metric builder:
 
 python
 
-```
+```python
 import mlflow
 import numpy as np
 import pandas as pd
@@ -85,6 +85,7 @@ with mlflow.start_run():
     print(
         f"Value per Prediction: ${result.metrics['business_value/value_per_prediction']:.2f}"
     )
+
 ```
 
 ## Custom Metric Patterns[​](#custom-metric-patterns "Direct link to Custom Metric Patterns")
@@ -97,7 +98,7 @@ Create metrics that translate model performance into business terms:
 
 python
 
-```
+```python
 def create_profit_loss_metric(cost_per_fp=50, revenue_per_tp=200):
     """Calculate profit/loss impact of model predictions."""
 
@@ -140,13 +141,14 @@ with mlflow.start_run():
 
     print(f"Net Profit: ${result.metrics['profit_loss/net_profit']:.2f}")
     print(f"ROI: {result.metrics['profit_loss/roi']:.1f}%")
+
 ```
 
 Create metrics that evaluate performance at specific business thresholds:
 
 python
 
-```
+```python
 def create_threshold_precision_metric(threshold=0.8):
     """Precision metric for high-confidence predictions only."""
 
@@ -200,13 +202,14 @@ with mlflow.start_run():
     print(
         f"Coverage: {result.metrics['threshold_precision/high_confidence_coverage']:.3f}"
     )
+
 ```
 
 Create metrics tailored to specific business domains:
 
 python
 
-```
+```python
 # Example: Healthcare/Medical Domain
 def create_medical_safety_metric(false_negative_penalty=10, false_positive_penalty=1):
     """Safety-focused metric for medical predictions where FN is more critical than FP."""
@@ -276,6 +279,7 @@ medical_metric = create_medical_safety_metric(
     false_negative_penalty=5, false_positive_penalty=1
 )
 diversity_metric = create_recommendation_diversity_metric()
+
 ```
 
 ## Custom Visualizations[​](#custom-visualizations "Direct link to Custom Visualizations")
@@ -288,7 +292,7 @@ Generate custom visual analysis beyond standard plots:
 
 python
 
-```
+```python
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
@@ -367,13 +371,14 @@ def create_business_impact_visualization(eval_df, builtin_metrics, artifacts_dir
     plt.close()
 
     return {"business_impact_analysis": viz_path}
+
 ```
 
 Create detailed performance analysis visualizations:
 
 python
 
-```
+```python
 def create_performance_breakdown_visualization(eval_df, builtin_metrics, artifacts_dir):
     """Create detailed performance breakdown visualization."""
 
@@ -456,13 +461,14 @@ def create_performance_breakdown_visualization(eval_df, builtin_metrics, artifac
     plt.close()
 
     return {"performance_breakdown_analysis": viz_path}
+
 ```
 
 Create interactive visualizations for deeper analysis:
 
 python
 
-```
+```python
 def create_interactive_analysis_artifacts(eval_df, builtin_metrics, artifacts_dir):
     """Create interactive HTML visualizations using Plotly."""
 
@@ -561,6 +567,7 @@ def create_interactive_analysis_artifacts(eval_df, builtin_metrics, artifacts_di
         return create_business_impact_visualization(
             eval_df, builtin_metrics, artifacts_dir
         )
+
 ```
 
 ## Advanced Custom Metrics[​](#advanced-custom-metrics "Direct link to Advanced Custom Metrics")
@@ -572,7 +579,7 @@ Create composite metrics that combine multiple evaluation criteria:
 
 python
 
-```
+```python
 def create_composite_business_metric():
     """Composite metric combining accuracy, profit, and risk measures."""
 
@@ -627,13 +634,14 @@ def create_composite_business_metric():
 
 # Usage
 composite_metric = create_composite_business_metric()
+
 ```
 
 Create metrics that consider temporal aspects of predictions:
 
 python
 
-```
+```python
 def create_time_decay_metric(decay_rate=0.1):
     """Metric that gives more weight to recent predictions."""
 
@@ -666,6 +674,7 @@ def create_time_decay_metric(decay_rate=0.1):
         )
 
     return make_metric(eval_fn=eval_fn, greater_is_better=True, name="time_decay")
+
 ```
 
 ## Best Practices and Guidelines[​](#best-practices-and-guidelines "Direct link to Best Practices and Guidelines")
@@ -694,7 +703,7 @@ Here's a comprehensive example combining custom metrics and visualizations:
 
 python
 
-```
+```python
 def comprehensive_custom_evaluation():
     """Complete example of custom metrics and visualizations."""
 
@@ -750,6 +759,7 @@ def comprehensive_custom_evaluation():
 
 # Run comprehensive evaluation
 # comprehensive_custom_evaluation()
+
 ```
 
 ## Conclusion[​](#conclusion "Direct link to Conclusion")

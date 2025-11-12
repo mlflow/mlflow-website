@@ -35,7 +35,7 @@ Use CLI tracing to automatically capture your interactive Claude Code CLI conver
 
 bash
 
-```
+```bash
 # Set up tracing in current directory
 mlflow autolog claude
 
@@ -47,13 +47,14 @@ mlflow autolog claude --status
 
 # Disable tracing
 mlflow autolog claude --disable
+
 ```
 
 #### Configuration Examples[​](#configuration-examples "Direct link to Configuration Examples")
 
 bash
 
-```
+```bash
 # Set up with custom tracking URI
 mlflow autolog claude -u file://./custom-mlruns
 mlflow autolog claude -u sqlite:///mlflow.db
@@ -63,6 +64,7 @@ mlflow autolog claude -u databricks -e 123456789
 
 # Set up with specific experiment
 mlflow autolog claude -n "My AI Project"
+
 ```
 
 #### How It Works[​](#how-it-works "Direct link to How It Works")
@@ -75,7 +77,7 @@ mlflow autolog claude -n "My AI Project"
 
 bash
 
-```
+```bash
 # Set up tracing in your project
 mlflow autolog claude ~/my-project
 
@@ -87,6 +89,7 @@ claude "help me refactor this Python function to be more efficient"
 
 # View traces in MLflow UI
 mlflow ui
+
 ```
 
 ### SDK Tracing Setup[​](#sdk-tracing-setup "Direct link to SDK Tracing Setup")
@@ -102,11 +105,12 @@ Use SDK tracing when building applications that programmatically use the Claude 
 
 python
 
-```
+```python
 import mlflow.anthropic
 
 # Enable automatic tracing for Claude Agent SDK
 mlflow.anthropic.autolog()
+
 ```
 
 Once enabled, all Claude Agent SDK interactions will be automatically traced.
@@ -119,7 +123,7 @@ Only `ClaudeSDKClient` supports tracing. Directly calling `query` will not be tr
 
 python
 
-```
+```python
 import asyncio
 import mlflow.anthropic
 from claude_agent_sdk import ClaudeSDKClient
@@ -141,6 +145,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 ```
 
 #### Claude Tracing with MLflow GenAI Evaluation[​](#claude-tracing-with-mlflow-genai-evaluation "Direct link to Claude Tracing with MLflow GenAI Evaluation")
@@ -149,7 +154,7 @@ You can also use SDK tracing with MLflow's GenAI evaluation framework:
 
 python
 
-```
+```python
 import asyncio
 import pandas as pd
 from claude_agent_sdk import ClaudeSDKClient
@@ -200,6 +205,7 @@ eval_data = pd.DataFrame(
 # Run evaluation with automatic tracing
 mlflow.set_experiment("claude_evaluation")
 evaluate(data=eval_data, predict_fn=predict_fn, scorers=[relevance])
+
 ```
 
 ## Troubleshooting[​](#troubleshooting "Direct link to Troubleshooting")
@@ -211,8 +217,9 @@ evaluate(data=eval_data, predict_fn=predict_fn, scorers=[relevance])
 
 bash
 
-```
+```bash
 mlflow autolog claude --status
+
 ```
 
 This shows:
@@ -242,8 +249,9 @@ To stop automatic CLI tracing:
 
 bash
 
-```
+```bash
 mlflow autolog claude --disable
+
 ```
 
 This removes the hooks from `.claude/settings.json` but preserves existing traces.
@@ -262,6 +270,7 @@ To disable SDK tracing:
 
 python
 
-```
+```python
 mlflow.anthropic.autolog(disable=True)
+
 ```

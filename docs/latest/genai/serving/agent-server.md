@@ -19,16 +19,17 @@ In this example, we'll use the openai-agents-sdk to define our Responses API com
 
    bash
 
-   ```
+   ```bash
    pip install -U openai-agents mlflow>=3.6.0
    export OPENAI_API_KEY=sk-...
+
    ```
 
 2. Define your agent in `agent.py` and create methods to annotate with `@invoke`:
 
    python
 
-   ```
+   ```python
    from agents import Agent, Runner
    from mlflow.genai.agent_server import invoke, stream
    from mlflow.types.responses import ResponsesAgentRequest, ResponsesAgentResponse
@@ -49,13 +50,14 @@ In this example, we'll use the openai-agents-sdk to define our Responses API com
 
 
    # You can also optionally register a @stream function to support streaming responses
+
    ```
 
 3. Define a `start_server.py` file to start the `AgentServer`:
 
    python
 
-   ```
+   ```python
    # Need to import the agent to register the functions with the server
    import agent  # noqa: F401
    from mlflow.genai.agent_server import (
@@ -78,6 +80,7 @@ In this example, we'll use the openai-agents-sdk to define our Responses API com
 
    if __name__ == "__main__":
        main()
+
    ```
 
 ## Deploying and Testing Your Agent[​](#deploying-and-testing-your-agent "Direct link to Deploying and Testing Your Agent")
@@ -86,22 +89,24 @@ Run your agent server with the `--reload` flag to automatically reload the serve
 
 bash
 
-```
+```bash
 python3 start_server.py --reload
 # Pass in a number of workers to support multiple concurrent requests
 # python3 start_server.py --workers 4
 # Pass in a port to run the server on
 # python3 start_server.py --reload --port 8000
+
 ```
 
 Send a request to the server to test your agent out:
 
 bash
 
-```
+```bash
 curl -X POST http://localhost:8000/invocations \
    -H "Content-Type: application/json" \
    -d '{ "input": [{ "role": "user", "content": "What is the 14th Fibonacci number?"}]}'
+
 ```
 
 After testing your agent, you can view the traces in the MLflow UI by clicking on "Traces" tab.
@@ -110,13 +115,14 @@ If you have registered a `@stream` function, you can send a streaming request to
 
 bash
 
-```
+```bash
 curl -X POST http://localhost:8000/invocations \
    -H "Content-Type: application/json" \
    -d '{
     "input": [{ "role": "user", "content": "What is the 14th Fibonacci number?"}],
     "stream": true
     }'
+
 ```
 
 ## Evaluating Your Agent[​](#evaluating-your-agent "Direct link to Evaluating Your Agent")
@@ -127,7 +133,7 @@ You can use [`mlflow.genai.evaluate()`](/mlflow-website/docs/latest/api_referenc
 
    python
 
-   ```
+   ```python
    import asyncio
 
    import mlflow
@@ -163,14 +169,16 @@ You can use [`mlflow.genai.evaluate()`](/mlflow-website/docs/latest/api_referenc
        predict_fn=sync_invoke_fn,
        scorers=[RelevanceToQuery(), Safety()],
    )
+
    ```
 
 2. Run the evaluation:
 
    bash
 
-   ```
+   ```bash
    python3 eval_agent.py
+
    ```
 
    You should see the evaluation results and MLflow run information in the console output. In the MLflow UI, you can find the resulting runs from the evaluation on the experiment page. Click the run name to view the aggregated metrics and metadata in the overview pane.

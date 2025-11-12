@@ -10,7 +10,7 @@ Most community flavors are available via PyPI:
 
 bash
 
-```
+```bash
 # Time series forecasting
 pip install mlflow[sktime]
 pip install mlflavors
@@ -21,6 +21,7 @@ pip install mlflow-vizmod
 # Big data and cloud platforms
 pip install bigmlflow
 pip install mlflow[aliyun-oss]
+
 ```
 
 ### Basic Usage Pattern[​](#basic-usage-pattern "Direct link to Basic Usage Pattern")
@@ -29,7 +30,7 @@ All community flavors follow MLflow's standard interface:
 
 python
 
-```
+```python
 import mlflow
 import community_flavor  # Replace with actual flavor
 
@@ -44,6 +45,7 @@ with mlflow.start_run():
 # Load for inference
 loaded_model = community_flavor.load_model("model_uri")
 predictions = loaded_model.predict(new_data)
+
 ```
 
 ## Featured Community Flavors[​](#featured-community-flavors "Direct link to Featured Community Flavors")
@@ -60,13 +62,14 @@ Unified interface for time series forecasting, classification, and transformatio
 
 bash
 
-```
+```bash
 pip install sktime[mlflow]
+
 ```
 
 python
 
-```
+```python
 import pandas as pd
 from sktime.datasets import load_airline
 from sktime.forecasting.arima import AutoARIMA
@@ -88,6 +91,7 @@ print(predictions)
 # Load as PyFunc for serving
 loaded_pyfunc = mlflow_sktime.pyfunc.load_model(model_uri="model")
 pyfunc_predictions = loaded_pyfunc.predict(pd.DataFrame())
+
 ```
 
 ### **MLflavors Package**[​](#mlflavors-package "Direct link to mlflavors-package")
@@ -96,8 +100,9 @@ Support for multiple time series and ML frameworks in one package.
 
 bash
 
-```
+```bash
 pip install mlflavors
+
 ```
 
 **Supported Frameworks:**
@@ -113,7 +118,7 @@ pip install mlflavors
 
 python
 
-```
+```python
 import mlflow
 from pyod.models.knn import KNN
 from pyod.utils.data import generate_data
@@ -140,13 +145,14 @@ with mlflow.start_run():
     # Evaluate
     scores = clf.decision_function(X_test)
     mlflow.log_metric("mean_anomaly_score", scores.mean())
+
 ```
 
 **Serving PyOD Model:**
 
 python
 
-```
+```python
 # Load as PyFunc
 loaded_pyfunc = mlflavors.pyod.pyfunc.load_model(model_uri="model_uri")
 
@@ -156,6 +162,7 @@ import pandas as pd
 predict_conf = pd.DataFrame([{"X": X_test, "predict_method": "decision_function"}])
 
 anomaly_scores = loaded_pyfunc.predict(predict_conf)[0]
+
 ```
 
 ### **MLflow VizMod**[​](#mlflow-vizmod "Direct link to mlflow-vizmod")
@@ -164,15 +171,16 @@ Treat visualizations as models for versioning, tracking, and deployment.
 
 bash
 
-```
+```bash
 pip install mlflow-vizmod
+
 ```
 
 **Create and Log Interactive Visualizations:**
 
 python
 
-```
+```python
 from sklearn.datasets import load_iris
 import altair as alt
 import mlflow_vismod
@@ -197,6 +205,7 @@ with mlflow.start_run():
         style="vegalite",
         input_example=df_iris.head(5),
     )
+
 ```
 
 **Benefits:** Version Control: Track visualization changes over time. Reproducibility: Recreate exact visualizations with same data. Deployment: Serve interactive visualizations as web services. Collaboration: Share visualizations with consistent metadata.
@@ -207,13 +216,14 @@ Deploy and manage BigML supervised models through MLflow.
 
 bash
 
-```
+```bash
 pip install bigmlflow
+
 ```
 
 python
 
-```
+```python
 import json
 import mlflow
 import bigmlflow
@@ -238,6 +248,7 @@ predictions = loaded_model.predict(test_dataframe)
 # Load as PyFunc
 pyfunc_model = mlflow.pyfunc.load_model("model_uri")
 pyfunc_predictions = pyfunc_model.predict(test_dataframe)
+
 ```
 
 **Key Features:** BigML Integration: Direct support for BigML's supervised models. PyFunc Compatible: Use with MLflow's generic Python function interface. Model Registry: Register BigML models for production deployment. DataFrame Inference: Standard pandas DataFrame input/output.
@@ -248,8 +259,9 @@ High-performance Go implementation of the MLflow tracking server for better scal
 
 bash
 
-```
+```bash
 pip install mlflow-go-backend
+
 ```
 
 **Performance Benefits:**
@@ -265,25 +277,27 @@ Replace your existing MLflow server command:
 
 bash
 
-```
+```bash
 # Traditional MLflow server
 mlflow server --backend-store-uri postgresql://user:pass@localhost:5432/mlflow
 
 # High-performance Go backend
 mlflow-go server --backend-store-uri postgresql://user:pass@localhost:5432/mlflow
+
 ```
 
 **All existing MLflow server options are supported:**
 
 bash
 
-```
+```bash
 mlflow-go server \
   --backend-store-uri postgresql://user:pass@localhost:5432/mlflow \
   --artifacts-destination s3://my-mlflow-artifacts \
   --host 0.0.0.0 \
   --port 5000 \
   --workers 4
+
 ```
 
 #### **Client Usage**[​](#client-usage "Direct link to client-usage")
@@ -292,7 +306,7 @@ Enable Go backend in your Python code:
 
 python
 
-```
+```python
 import mlflow
 import mlflow_go_backend
 
@@ -309,6 +323,7 @@ with mlflow.start_run():
     mlflow.log_param("algorithm", "xgboost")
     mlflow.log_metric("accuracy", 0.95)
     mlflow.log_artifact("model.pkl")
+
 ```
 
 #### **Direct Store Usage**[​](#direct-store-usage "Direct link to direct-store-usage")
@@ -317,7 +332,7 @@ Use Go backend directly with MLflow stores:
 
 python
 
-```
+```python
 import mlflow
 import mlflow_go_backend
 
@@ -334,6 +349,7 @@ mlflow.set_experiment("my-experiment")
 with mlflow.start_run():
     mlflow.log_param("param", 1)
     mlflow.log_metric("metric", 2)
+
 ```
 
 #### **Performance Benchmarks**[​](#performance-benchmarks "Direct link to performance-benchmarks")
@@ -358,7 +374,7 @@ Initial benchmarks show significant performance improvements:
 
 python
 
-```
+```python
 # Supported database URIs
 mlflow.set_tracking_uri("sqlite:///mlflow.db")
 mlflow.set_tracking_uri("postgresql://user:pass@host:5432/db")
@@ -366,6 +382,7 @@ mlflow.set_tracking_uri("mysql://user:pass@host:3306/db")
 
 # Not supported yet
 # mlflow.set_tracking_uri("file:///local/mlruns")
+
 ```
 
 **Endpoint Coverage:** Most MLflow REST API endpoints are implemented in Go. Missing endpoints automatically fall back to the Python implementation for seamless compatibility.
@@ -376,37 +393,40 @@ mlflow.set_tracking_uri("mysql://user:pass@host:3306/db")
 
 bash
 
-```
+```bash
 pip install mlflow-go-backend
+
 ```
 
 **Step 2: Update Server Command**
 
 bash
 
-```
+```bash
 # Old command
 mlflow server --backend-store-uri postgresql://...
 
 # New command
 mlflow-go server --backend-store-uri postgresql://...
+
 ```
 
 **Step 3: Enable in Client Code**
 
 python
 
-```
+```python
 import mlflow_go_backend
 
 mlflow_go_backend.enable_go()
+
 ```
 
 **Step 4: Verify Performance**
 
 python
 
-```
+```python
 import time
 import mlflow
 
@@ -417,6 +437,7 @@ with mlflow.start_run():
         mlflow.log_metric(f"metric_{i}", i)
 duration = time.time() - start_time
 print(f"Logged 1000 metrics in {duration:.2f} seconds")
+
 ```
 
 #### **Contributing to Go Backend**[​](#contributing-to-go-backend "Direct link to contributing-to-go-backend")
@@ -439,7 +460,7 @@ Every custom flavor must implement these core functions:
 
 python
 
-```
+```python
 # Required functions for any custom flavor
 def save_model(model, path, **kwargs):
     """Save model to specified path with MLflow format"""
@@ -459,13 +480,14 @@ def load_model(model_uri):
 def _load_pyfunc(path):
     """Load model as PyFunc for generic inference"""
     pass
+
 ```
 
 #### **Example: Custom Sktime Flavor Implementation**[​](#example-custom-sktime-flavor-implementation "Direct link to example-custom-sktime-flavor-implementation")
 
 python
 
-```
+```python
 import os
 import pickle
 import mlflow
@@ -574,13 +596,14 @@ def _load_pyfunc(path):
     """Load model as PyFunc"""
     model = load_model(path)
     return SktimeModelWrapper(model)
+
 ```
 
 #### **Usage Example**[​](#usage-example "Direct link to usage-example")
 
 python
 
-```
+```python
 import mlflow
 import pandas as pd
 from sktime.forecasting.naive import NaiveForecaster
@@ -617,20 +640,22 @@ config_df = pd.DataFrame(
 )
 
 pyfunc_predictions = loaded_pyfunc.predict(config_df)
+
 ```
 
 #### **Model Serving**[​](#model-serving "Direct link to model-serving")
 
 bash
 
-```
+```bash
 # Serve your custom flavor model
 mlflow models serve -m runs:/RUN_ID/custom_forecaster --host 127.0.0.1 --port 5000
+
 ```
 
 python
 
-```
+```python
 # Request predictions from served model
 import requests
 import pandas as pd
@@ -643,6 +668,7 @@ response = requests.post(
 )
 
 predictions = response.json()
+
 ```
 
 ### Framework Support Matrix[​](#framework-support-matrix "Direct link to Framework Support Matrix")
@@ -667,7 +693,7 @@ predictions = response.json()
 
 python
 
-```
+```python
 import mlflow
 import community_flavor
 
@@ -692,13 +718,14 @@ predictions = loaded_model.predict(new_data)
 # 4. Load as PyFunc for generic serving
 pyfunc_model = community_flavor.pyfunc.load_model(model_uri)
 generic_predictions = pyfunc_model.predict(input_dataframe)
+
 ```
 
 **Configuration-based serving for complex models:**
 
 python
 
-```
+```python
 import pandas as pd
 
 # Many community flavors use configuration DataFrames
@@ -718,13 +745,14 @@ config_df = pd.DataFrame(
 # Use configuration with PyFunc model
 pyfunc_model = community_flavor.pyfunc.load_model(model_uri)
 predictions = pyfunc_model.predict(config_df)
+
 ```
 
 **Production deployment workflow:**
 
 text
 
-```
+```text
 # 1. Register model in MLflow Model Registry
 mlflow.register_model(
     model_uri="runs:/RUN_ID/model",
@@ -750,6 +778,7 @@ mlflow deployments create \
   -t azureml \
   -m "models:/production_forecaster/Production" \
   --name forecaster-service
+
 ```
 
 ## Best Practices[​](#best-practices "Direct link to Best Practices")
@@ -766,7 +795,7 @@ mlflow deployments create \
 
 python
 
-```
+```python
 # Efficient serialization for large models
 def save_model(model, path, serialization_format="pickle"):
     if serialization_format == "joblib":
@@ -780,13 +809,14 @@ def save_model(model, path, serialization_format="pickle"):
 
         with open(os.path.join(path, "model.pkl"), "wb") as f:
             cloudpickle.dump(model, f)
+
 ```
 
 #### **Error Handling**[​](#error-handling "Direct link to error-handling")
 
 python
 
-```
+```python
 def load_model(model_uri):
     try:
         # Attempt to load model
@@ -796,6 +826,7 @@ def load_model(model_uri):
             f"Failed to load {FLAVOR_NAME} model. "
             f"Ensure model was saved with compatible version. Error: {str(e)}"
         )
+
 ```
 
 ## Community Resources[​](#community-resources "Direct link to Community Resources")
@@ -808,7 +839,7 @@ def load_model(model_uri):
 
    text
 
-   ```
+   ```text
    mlflow-myframework/
    ├── setup.py
    ├── README.md
@@ -819,6 +850,7 @@ def load_model(model_uri):
    │   └── example_usage.ipynb
    └── tests/
        └── test_flavor.py
+
    ```
 
 3. **Documentation Requirements** - Installation instructions. Basic usage examples. API reference. Model serving examples.

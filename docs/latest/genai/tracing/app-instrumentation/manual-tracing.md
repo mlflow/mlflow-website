@@ -34,7 +34,7 @@ To ensure complete observability, the `@mlflow.trace` decorator should generally
 
 python
 
-```
+```python
 import mlflow
 
 
@@ -55,6 +55,7 @@ def trace_test(x):
 
 
 trace_test(4)
+
 ```
 
 ![Tracing Decorator](/mlflow-website/docs/latest/assets/images/trace-decorator-8ae22208121b562582947549f8b9a46e.png)
@@ -77,7 +78,7 @@ When combining `@mlflow.trace` with other decorators (e.g., from web frameworks)
 
 python
 
-```
+```python
 from mlflow.entities import SpanType
 
 
@@ -88,13 +89,14 @@ def invoke(prompt: str):
     return client.invoke(
         messages=[{"role": "user", "content": prompt}], model="gpt-4o-mini"
     )
+
 ```
 
 Alternatively, you can update the span dynamically inside the function by using [`mlflow.get_current_active_span()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.html#mlflow.get_current_active_span) API.
 
 python
 
-```
+```python
 from mlflow.entities import SpanType
 
 
@@ -106,6 +108,7 @@ def invoke(prompt: str):
     # Set the attribute to the span
     span.set_attributes({"model": model_id})
     return client.invoke(messages=[{"role": "user", "content": prompt}], model=model_id)
+
 ```
 
 ### Using `@mlflow.trace` with Other Decorators[​](#using-mlflowtrace-with-other-decorators "Direct link to using-mlflowtrace-with-other-decorators")
@@ -118,7 +121,7 @@ Consider the following conceptual example:
 
 python
 
-```
+```python
 import mlflow
 import functools
 import time
@@ -165,6 +168,7 @@ if __name__ == "__main__":
 
     print("\nCalling function with incorrect decorator order:")
     my_other_complex_function(5, 3)
+
 ```
 
 In the `my_complex_function` example (correct order), `@mlflow.trace` will capture the full execution, including the time added by `simple_timing_decorator`. In `my_other_complex_function` (incorrect order), the trace captured by MLflow might not accurately reflect the total execution time or could miss modifications to inputs/outputs made by `simple_timing_decorator` before `@mlflow.trace` sees them.
@@ -175,11 +179,12 @@ Tags can be added to traces to provide additional metadata at the trace level. T
 
 python
 
-```
+```python
 @mlflow.trace
 def my_func(x):
     mlflow.update_current_trace(tags={"fruit": "apple"})
     return x + 1
+
 ```
 
 ### Customizing Request and Response Previews in the UI[​](#customizing-request-and-response-previews-in-the-ui "Direct link to Customizing Request and Response Previews in the UI")
@@ -192,7 +197,7 @@ Below is an example of setting a custom request preview for a trace that process
 
 python
 
-```
+```python
 import mlflow
 
 
@@ -226,6 +231,7 @@ long_document = (
 )
 instructions = "Focus on the key takeaways regarding topic X."
 summary_result = summarize_document(long_document, instructions)
+
 ```
 
 By setting `request_preview` and `response_preview` on the trace (typically the root span), you control how the overall interaction is summarized in the main trace list view, making it easier to identify and understand traces at a glance.
@@ -246,11 +252,12 @@ The `@mlflow.trace` decorator can be used to trace functions that return a gener
 
 python
 
-```
+```python
 @mlflow.trace
 def stream_data():
     for i in range(5):
         yield i
+
 ```
 
 The above example will generate a trace with a single span for the `stream_data` function. By default, MLflow will capture all elements yielded by the generator as a list in the span's output. In the example above, the output of the span will be `[0, 1, 2, 3, 4]`.
@@ -263,11 +270,12 @@ If you want to aggregate the elements to be a single span output, you can use th
 
 python
 
-```
+```python
 @mlflow.trace(output_reducer=lambda x: ",".join(x))
 def stream_data():
     for c in "hello":
         yield c
+
 ```
 
 In the example above, the output of the span will be `"h,e,l,l,o"`. The raw chunks can still be found in the `Events` tab of the span.
@@ -280,7 +288,7 @@ Of course, we recommend using the [auto-tracing for OpenAI](/mlflow-website/docs
 
 python
 
-```
+```python
 import mlflow
 import openai
 from openai.types.chat import *
@@ -327,6 +335,7 @@ def predict(messages: list[dict]):
 
 for chunk in predict([{"role": "user", "content": "Hello"}]):
     print(chunk)
+
 ```
 
 In the example above, the generated `predict` span will have a single chat completion message as the output, which is aggregated by the custom reducer function.
@@ -341,7 +350,7 @@ When wrapping functions dynamically, the concept of "outermost" still applies. T
 
 python
 
-```
+```python
 import math
 import mlflow
 
@@ -357,6 +366,7 @@ def invocation(x, y, exp=2):
 
 
 invocation(4, 2)
+
 ```
 
 ## Context Manager[​](#context-manager "Direct link to Context Manager")
@@ -367,20 +377,21 @@ Similarly to the decorator, the context manager automatically captures parent-ch
 
 python
 
-```
+```python
 import mlflow
 
 with mlflow.start_span(name="my_span") as span:
     span.set_inputs({"x": 1, "y": 2})
     z = x + y
     span.set_outputs(z)
+
 ```
 
 Below is a slightly more complex example that uses the [`mlflow.start_span()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.html#mlflow.start_span) context manager in conjunction with both the decorator and auto-tracing for OpenAI.
 
 python
 
-```
+```python
 import mlflow
 import openai
 from mlflow.entities import SpanType
@@ -415,6 +426,7 @@ def start_session():
 
 
 start_session()
+
 ```
 
 ## Advanced Features[​](#advanced-features "Direct link to Advanced Features")
@@ -427,7 +439,7 @@ MLflow uses Python's built-in [ContextVar](https://docs.python.org/3/library/con
 
 python
 
-```
+```python
 import contextvars
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import mlflow
@@ -477,6 +489,7 @@ questions = [
 ]
 
 main(questions)
+
 ```
 
 ![Multi threaded tracing](/mlflow-website/docs/latest/assets/images/tracing-multi-thread-acfb6f382ce45e030c95b7c0536749bf.png)
@@ -491,7 +504,7 @@ The `@mlflow.trace` decorator works seamlessly with async functions:
 
 python
 
-```
+```python
 import asyncio
 import mlflow
 
@@ -514,6 +527,7 @@ async def async_pipeline(items: list[str]) -> list[str]:
 
 # Run the async pipeline
 asyncio.run(async_pipeline(["item1", "item2", "item3"]))
+
 ```
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")

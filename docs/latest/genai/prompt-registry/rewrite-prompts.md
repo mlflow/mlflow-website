@@ -22,18 +22,19 @@ The `optimize_prompts` API requires **MLflow >= 3.5.0**.
 
 text
 
-```
+```text
 Classify the sentiment. Answer 'positive'
 or 'negative' or 'neutral'.
 
 Text: {{text}}
+
 ```
 
 **After Optimization:**
 
 text
 
-```
+```text
 Classify the sentiment of the provided text.
 Your response must be one of the following:
 - 'positive'
@@ -55,6 +56,7 @@ Guidelines:
 
 Your response must match this exact format with
 no additional explanation.
+
 ```
 
 ## When to Use Prompt Rewriting[​](#when-to-use-prompt-rewriting "Direct link to When to Use Prompt Rewriting")
@@ -76,7 +78,7 @@ First, collect outputs from your existing model using MLflow tracing:
 
 python
 
-```
+```python
 import mlflow
 import openai
 from mlflow.genai.optimize import GepaPromptOptimizer
@@ -127,6 +129,7 @@ inputs = [
 with mlflow.start_run() as run:
     for record in inputs:
         predict_fn_base_model(**record["inputs"])
+
 ```
 
 ### Step 2: Create Training Dataset from Traces[​](#step-2-create-training-dataset-from-traces "Direct link to Step 2: Create Training Dataset from Traces")
@@ -135,7 +138,7 @@ Convert the traced outputs into a training dataset:
 
 python
 
-```
+```python
 # Create dataset
 dataset = create_dataset(name="sentiment_migration_dataset")
 
@@ -144,6 +147,7 @@ traces = mlflow.search_traces(return_type="list", run_id=run.info.run_id)
 
 # Merge traces into dataset
 dataset.merge_records(traces)
+
 ```
 
 This automatically creates a dataset with:
@@ -167,7 +171,7 @@ Switch your LM to the target model:
 
 python
 
-```
+```python
 # Define function using target model
 @mlflow.trace
 def predict_fn(text: str) -> str:
@@ -177,6 +181,7 @@ def predict_fn(text: str) -> str:
         temperature=0,
     )
     return completion.choices[0].message.content.lower()
+
 ```
 
 You might notice the target model doesn't follow the format as consistently as the original model.
@@ -187,7 +192,7 @@ Use the collected dataset to optimize prompts for the target model:
 
 python
 
-```
+```python
 # Optimize prompts for the target model
 result = mlflow.genai.optimize_prompts(
     predict_fn=predict_fn,
@@ -200,13 +205,14 @@ result = mlflow.genai.optimize_prompts(
 # View the optimized prompt
 optimized_prompt = result.optimized_prompts[0]
 print(f"Optimized template: {optimized_prompt.template}")
+
 ```
 
 The optimized prompt will include additional instructions to help `gpt-4o-mini` match the behavior of `gpt-5`:
 
 text
 
-```
+```text
 Optimized template:
 Classify the sentiment of the provided text. Your response must be one of the following:
 - 'positive'
@@ -223,6 +229,7 @@ Guidelines:
 - 'neutral': The text is factual or balanced without strong emotion
 
 Your response must match this exact format with no additional explanation.
+
 ```
 
 ### Step 5: Use Optimized Prompt[​](#step-5-use-optimized-prompt "Direct link to Step 5: Use Optimized Prompt")
@@ -231,7 +238,7 @@ Deploy the optimized prompt in your application:
 
 python
 
-```
+```python
 # Load the optimized prompt
 optimized = mlflow.genai.load_prompt(optimized_prompt.uri)
 
@@ -250,6 +257,7 @@ def predict_fn_optimized(text: str) -> str:
 # Test with new inputs
 test_result = predict_fn_optimized("This product is amazing!")
 print(test_result)  # Output: positive
+
 ```
 
 ## Best Practices[​](#best-practices "Direct link to Best Practices")
@@ -260,7 +268,7 @@ For best results, collect outputs from at least 20-50 diverse examples:
 
 python
 
-```
+```python
 # ✅ Good: Diverse examples
 inputs = [
     {"inputs": {"text": "Great product!"}},
@@ -282,6 +290,7 @@ inputs = [
     {"inputs": {"text": "Good"}},
     {"inputs": {"text": "Bad"}},
 ]
+
 ```
 
 ### 2. Use Representative Examples[​](#2-use-representative-examples "Direct link to 2. Use Representative Examples")
@@ -290,12 +299,13 @@ Include edge cases and challenging inputs:
 
 python
 
-```
+```python
 inputs = [
     {"inputs": {"text": "Absolutely fantastic!"}},  # Clear positive
     {"inputs": {"text": "It's not bad, I guess."}},  # Ambiguous
     {"inputs": {"text": "The food was good but service terrible."}},  # Mixed sentiment
 ]
+
 ```
 
 ### 3. Verify Results[​](#3-verify-results "Direct link to 3. Verify Results")
@@ -304,7 +314,7 @@ Always test optimized prompts using [`mlflow.genai.evaluate()`](/mlflow-website/
 
 python
 
-```
+```python
 # Evaluate optimized prompt
 results = mlflow.genai.evaluate(
     data=test_dataset,
@@ -314,6 +324,7 @@ results = mlflow.genai.evaluate(
 
 print(f"Accuracy: {results.metrics['accuracy']}")
 print(f"Format compliance: {results.metrics['format_scorer']}")
+
 ```
 
 ## See Also[​](#see-also "Direct link to See Also")

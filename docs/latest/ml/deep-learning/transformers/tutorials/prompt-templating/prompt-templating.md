@@ -30,7 +30,7 @@ Now, let's dive in and see how it's done!
 
 python
 
-```
+```python
 # Disable tokenizers warnings when constructing pipelines
 %env TOKENIZERS_PARALLELISM=false
 
@@ -38,10 +38,7 @@ import warnings
 
 # Disable a few less-than-useful UserWarnings from setuptools and pydantic
 warnings.filterwarnings("ignore", category=UserWarning)
-```
 
-```
-env: TOKENIZERS_PARALLELISM=false
 ```
 
 ### Pipeline setup and inference[​](#pipeline-setup-and-inference "Direct link to Pipeline setup and inference")
@@ -52,7 +49,7 @@ For this demonstration, let's say the user's input is the phrase "Tell me the la
 
 python
 
-```
+```python
 from transformers import pipeline
 
 generator = pipeline("text-generation", model="TinyLlama/TinyLlama-1.1B-intermediate-step-1431k-3T")
@@ -82,25 +79,7 @@ for idx, response in enumerate(responses):
   print(f"Response to Template #{idx}:")
   print(response[0]["generated_text"] + "
 ")
-```
 
-```
-Response to Template #0:
-Tell me the largest bird you've ever seen.
-I've seen a lot of birds
-
-Response to Template #1:
-Q: Tell me the largest bird
-A: The largest bird is a pigeon.
-
-A: The largest
-
-Response to Template #2:
-You are an assistant that is knowledgeable about birds. If asked about the largest bird, you will reply 'Duck'.
-User: Tell me the largest bird
-Assistant: Duck
-User: What is the largest bird?
-Assistant:
 ```
 
 ## Saving the model and template with MLflow[​](#saving-the-model-and-template-with-mlflow "Direct link to Saving the model and template with MLflow")
@@ -115,7 +94,7 @@ Creating a signature can be done simply by calling `mlflow.models.infer_signatur
 
 python
 
-```
+```python
 import mlflow
 
 sample_input = "Tell me the largest bird"
@@ -128,19 +107,7 @@ signature = mlflow.models.infer_signature(
 
 # visualize the signature
 signature
-```
 
-```
-2024/01/16 17:28:42 WARNING mlflow.transformers: params provided to the `predict` method will override the inference configuration saved with the model. If the params provided are not valid for the pipeline, MlflowException will be raised.
-```
-
-```
-inputs: 
-[string (required)]
-outputs: 
-[string (required)]
-params: 
-['max_new_tokens': long (default: 15)]
 ```
 
 ### Starting a new experiment[​](#starting-a-new-experiment "Direct link to Starting a new experiment")
@@ -159,7 +126,7 @@ Two important thing to take note of:
 
 python
 
-```
+```python
 # If you are running this tutorial in local mode, leave the next line commented out.
 # Otherwise, uncomment the following line and set your tracking uri to your local or remote tracking server.
 
@@ -183,12 +150,7 @@ with mlflow.start_run():
       # following line:
       # save_pretrained=False,
   )
-```
 
-```
-2024/01/16 17:28:45 INFO mlflow.tracking.fluent: Experiment with name 'prompt-templating' does not exist. Creating a new experiment.
-2024/01/16 17:28:52 INFO mlflow.transformers: text-generation pipelines saved with prompt templates have the `return_full_text` pipeline kwarg set to False by default. To override this behavior, provide a `model_config` dict with `return_full_text` set to `True` when saving the model.
-2024/01/16 17:32:57 WARNING mlflow.utils.environment: Encountered an unexpected error while inferring pip requirements (model URI: /var/folders/qd/9rwd0_gd0qs65g4sdqlm51hr0000gp/T/tmpbs0poq1a/model, flavor: transformers), fall back to return ['transformers==4.34.1', 'torch==2.1.1', 'torchvision==0.16.1', 'accelerate==0.25.0']. Set logging level to DEBUG to see the full traceback.
 ```
 
 ## Loading the model for inference[​](#loading-the-model-for-inference "Direct link to Loading the model for inference")
@@ -203,32 +165,11 @@ Now, when we call the `predict()` method on our loaded model, the user's input s
 
 python
 
-```
+```python
 loaded_generator = mlflow.pyfunc.load_model(model_uri=model_info.model_uri)
 
 loaded_generator.predict("Tell me the largest bird")
-```
 
-```
-Downloading artifacts:   0%|          | 0/23 [00:00<?, ?it/s]
-```
-
-```
-2024/01/16 17:33:16 INFO mlflow.store.artifact.artifact_repo: The progress bar can be disabled by setting the environment variable MLFLOW_ENABLE_ARTIFACTS_PROGRESS_BAR to false
-```
-
-```
-Loading checkpoint shards:   0%|          | 0/10 [00:00<?, ?it/s]
-```
-
-```
-2024/01/16 17:33:56 WARNING mlflow.transformers: params provided to the `predict` method will override the inference configuration saved with the model. If the params provided are not valid for the pipeline, MlflowException will be raised.
-```
-
-```
-['The largest bird is a pigeon.
-
-A: The largest']
 ```
 
 ## Closing Remarks[​](#closing-remarks "Direct link to Closing Remarks")

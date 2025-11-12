@@ -12,8 +12,9 @@ MLflow is available on PyPI. If you don't already have it installed on your syst
 
 bash
 
-```
+```bash
 pip install mlflow
+
 ```
 
 Then, follow the instructions in the [Set Up MLflow](/mlflow-website/docs/latest/ml/getting-started/running-notebooks.md) guide to set up MLflow.
@@ -22,10 +23,11 @@ If you just want to start super quick, run the following code in a notebook cell
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_experiment("MLflow Quickstart")
+
 ```
 
 ## Step 2 - Prepare training data[​](#step-2---prepare-training-data "Direct link to Step 2 - Prepare training data")
@@ -34,7 +36,7 @@ Before training our first model, let's prepare the training data and model hyper
 
 python
 
-```
+```python
 import pandas as pd
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
@@ -56,6 +58,7 @@ params = {
     "multi_class": "auto",
     "random_state": 8888,
 }
+
 ```
 
 ## Step 3 - Train a model with MLflow Autologging[​](#step-3---train-a-model-with-mlflow-autologging "Direct link to Step 3 - Train a model with MLflow Autologging")
@@ -64,7 +67,7 @@ In this step, we train the model on the training data loaded in the previous ste
 
 python
 
-```
+```python
 import mlflow
 
 # Enable autologging for scikit-learn
@@ -73,6 +76,7 @@ mlflow.sklearn.autolog()
 # Just train the model normally
 lr = LogisticRegression(**params)
 lr.fit(X_train, y_train)
+
 ```
 
 With just one line of additional code `mlflow.sklearn.autolog()`, now you get the best of both worlds: you can focus on training the model, and MLflow will take care of the rest:
@@ -90,8 +94,9 @@ To see the results of training, you can access the MLflow UI by navigating to th
 
 bash
 
-```
+```bash
 mlflow ui --port 5000
+
 ```
 
 When opening the site, you will see a screen similar to the following:
@@ -129,7 +134,7 @@ The steps that we will take are:
 
 python
 
-```
+```python
 # Start an MLflow run
 with mlflow.start_run():
     # Log the hyperparameters
@@ -149,6 +154,7 @@ with mlflow.start_run():
 
     # Optional: Set a tag that we can use to remind ourselves what this run was for
     mlflow.set_tag("Training Info", "Basic LR model for iris data")
+
 ```
 
 ## Step 6 - Load the model back for inference.[​](#step-6---load-the-model-back-for-inference "Direct link to Step 6 - Load the model back for inference.")
@@ -164,7 +170,7 @@ To load the model as native scikit-learn model, use `mlflow.sklearn.load_model(m
 
 python
 
-```
+```python
 # Load the model back for predictions as a generic Python Function model
 loaded_model = mlflow.pyfunc.load_model(model_info.model_uri)
 
@@ -177,6 +183,7 @@ result["actual_class"] = y_test
 result["predicted_class"] = predictions
 
 result[:4]
+
 ```
 
 The output of this code will look something like this:

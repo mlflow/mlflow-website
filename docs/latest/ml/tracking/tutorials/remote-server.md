@@ -53,8 +53,9 @@ MLflow is available on PyPI. Also [pyscopg2](https://pypi.org/project/psycopg2/)
 
 bash
 
-```
+```bash
 pip install mlflow psycopg2 boto3
+
 ```
 
 ### Step 2 - Set up remote data stores[​](#step-2---set-up-remote-data-stores "Direct link to Step 2 - Set up remote data stores")
@@ -80,7 +81,7 @@ compose.yaml
 
 yaml
 
-```
+```yaml
 version: "3.7"
 services:
   # PostgreSQL database
@@ -128,6 +129,7 @@ services:
         echo 'bucket already exists'
       fi
       "
+
 ```
 
 #### Start the containers[​](#start-the-containers "Direct link to Start the containers")
@@ -136,8 +138,9 @@ Run the following command from the same directory `compose.yaml` file resides to
 
 bash
 
-```
+```bash
 docker compose up -d
+
 ```
 
 ### Step 3 - Start the Tracking Server[​](#step-3---start-the-tracking-server "Direct link to Step 3 - Start the Tracking Server")
@@ -152,10 +155,11 @@ For the tracking server to access remote storage, it needs to be configured with
 
 bash
 
-```
+```bash
 export MLFLOW_S3_ENDPOINT_URL=http://localhost:9000 # Replace this with remote storage endpoint e.g. s3://my-bucket in real use cases
 export AWS_ACCESS_KEY_ID=minio_user
 export AWS_SECRET_ACCESS_KEY=minio_password
+
 ```
 
 You can find the instructions for how to configure credentials for other storages in [Supported Storage](/mlflow-website/docs/latest/self-hosting/architecture/artifact-store.md#artifacts-store-supported-storages).
@@ -166,12 +170,13 @@ To specify the backend store and artifact store, you can use the `--backend-stor
 
 bash
 
-```
+```bash
 mlflow server \
   --backend-store-uri postgresql://user:password@localhost:5432/mlflowdb \
   --artifacts-destination s3://bucket \
   --host 0.0.0.0 \
   --port 5000
+
 ```
 
 Replace `localhost` with the remote host name or IP address for your database server in actual environment.
@@ -182,15 +187,16 @@ Once the tracking server is running, you can log runs to it by setting the MLflo
 
 bash
 
-```
+```bash
 export MLFLOW_TRACKING_URI=http://127.0.0.1:5000  # Replace with remote host name or IP address in an actual environment
+
 ```
 
 Then run your code with MLflow tracking APIs as usual. The following code runs training for a scikit-learn RandomForest model on the diabetes dataset:
 
 python
 
-```
+```python
 import mlflow
 
 from sklearn.model_selection import train_test_split
@@ -208,6 +214,7 @@ rf.fit(X_train, y_train)
 
 # Use the model to make predictions on the test dataset.
 predictions = rf.predict(X_test)
+
 ```
 
 ### Step 5: View logged Run in Tracking UI[​](#step-5-view-logged-run-in-tracking-ui "Direct link to Step 5: View logged Run in Tracking UI")
@@ -220,7 +227,7 @@ MLflow Tracking Server also serves as a proxy host for artifact access. Artifact
 
 python
 
-```
+```python
 import mlflow
 
 model_id = "YOUR_MODEL_ID"  # You can find model ID in the Tracking UI
@@ -231,6 +238,7 @@ local_path = mlflow.artifacts.download_artifacts(mlflow_artifact_uri)
 
 # Load the model
 model = mlflow.sklearn.load_model(local_path)
+
 ```
 
 ## What's Next?[​](#whats-next "Direct link to What's Next?")

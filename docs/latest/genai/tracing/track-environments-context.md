@@ -57,7 +57,7 @@ Here's how to add various types of context as tags to your traces:
 
 python
 
-```
+```python
 import mlflow
 import os
 import platform
@@ -99,6 +99,7 @@ input_data = {"input": "Summarize this document...", "source": "realtime_api"}
 
 processed_result = process_data_with_context(input_data, config)
 print(processed_result)
+
 ```
 
 **Key points:**
@@ -112,7 +113,7 @@ For more complex scenarios, you can use context managers to ensure consistent ta
 
 python
 
-```
+```python
 import mlflow
 import os
 from contextlib import contextmanager
@@ -149,13 +150,14 @@ def my_genai_pipeline(user_input: str):
 
 
 result = my_genai_pipeline("What is the weather like?")
+
 ```
 
 In a production web application, context can be derived from environment variables, request headers, or application configuration:
 
 python
 
-```
+```python
 import mlflow
 import os
 from fastapi import FastAPI, Request
@@ -206,19 +208,21 @@ async def handle_chat(request: Request):
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=5000, debug=True)
+
 ```
 
 **Example request with context headers:**
 
 bash
 
-```
+```bash
 curl -X POST "http://127.0.0.1:5000/chat" \
      -H "Content-Type: application/json" \
      -H "X-Request-ID: req-abc-123-xyz-789" \
      -H "X-Session-ID: session-def-456-uvw-012" \
      -H "X-User-ID: user-jane-doe-12345" \
      -d '{"message": "What is my account balance?"}'
+
 ```
 
 ## Querying and Analyzing Context Data[​](#querying-and-analyzing-context-data "Direct link to Querying and Analyzing Context Data")
@@ -246,7 +250,7 @@ Compare error rates and performance across different application versions:
 
 python
 
-```
+```python
 import mlflow
 from mlflow import MlflowClient
 
@@ -297,13 +301,14 @@ for version, data in metrics.items():
     print(
         f"Version {version}: {data['error_rate']:.1f}% errors, {data['avg_latency']:.1f}ms avg latency"
     )
+
 ```
 
 Analyze performance differences across environments:
 
 python
 
-```
+```python
 def analyze_environment_performance(experiment_id: str):
     """Compare performance across different environments"""
 
@@ -335,13 +340,14 @@ for env, metrics in env_performance.items():
         f"avg: {metrics['avg_latency']:.1f}ms, "
         f"p95: {metrics['p95_latency']:.1f}ms"
     )
+
 ```
 
 Analyze the impact of feature flags on performance:
 
 python
 
-```
+```python
 def analyze_feature_flag_impact(experiment_id: str, flag_name: str):
     """Analyze performance impact of a feature flag"""
 
@@ -395,6 +401,7 @@ if "impact" in flag_analysis:
         f"Feature flag impact: {impact['latency_change_ms']:.1f}ms "
         f"({impact['latency_change_percent']:.1f}% change)"
     )
+
 ```
 
 ## Best Practices[​](#best-practices "Direct link to Best Practices")

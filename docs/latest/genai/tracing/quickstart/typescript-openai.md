@@ -12,8 +12,9 @@ Install the required packages by running the following command:
 
 bash
 
-```
+```bash
 npm install mlflow-openai
+
 ```
 
 tip
@@ -30,7 +31,7 @@ Example of wrapping Anthropic API calls to generate a trace
 
 typescript
 
-```
+```typescript
 import * as mlflow from "mlflow-tracing";
 import Anthropic from '@anthropic-ai/sdk';
 
@@ -53,6 +54,7 @@ const generate = mlflow.trace(
 
 // Call the wrapped function as usual.
 const response = await generate("Hello, Claude");
+
 ```
 
 ## Step 1: Set up your environment[​](#step-1-set-up-your-environment "Direct link to Step 1: Set up your environment")
@@ -70,18 +72,20 @@ For the fastest setup, you can install the [mlflow](https://pypi.org/project/mlf
 
 bash
 
-```
+```bash
 mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5000
+
 ```
 
 This will start the server at port 5000 on your local machine. Connect your notebook/IDE to the server by setting the tracking URI. You can also access to the MLflow UI at <http://localhost:5000>.
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_tracking_uri("http://localhost:5000")
+
 ```
 
 You can also brows the MLflow UI at <http://localhost:5000>.
@@ -90,21 +94,23 @@ MLflow provides a Docker Compose file to start a local MLflow server with a post
 
 bash
 
-```
+```bash
 git clone https://github.com/mlflow/mlflow.git
 cd docker-compose
 cp .env.dev.example .env
 docker compose up -d
+
 ```
 
 This will start the server at port 5000 on your local machine. Connect your notebook/IDE to the server by setting the tracking URI. You can also access to the MLflow UI at <http://localhost:5000>.
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_tracking_uri("http://localhost:5000")
+
 ```
 
 Refer to the [instruction](https://github.com/mlflow/mlflow/tree/master/docker-compose/README.md) for more details, e.g., overriding the default environment variables.
@@ -113,7 +119,7 @@ If you have a remote MLflow tracking server, configure the connection:
 
 python
 
-```
+```python
 import os
 import mlflow
 
@@ -121,16 +127,18 @@ import mlflow
 os.environ["MLFLOW_TRACKING_URI"] = "http://your-mlflow-server:5000"
 # Or directly in code
 mlflow.set_tracking_uri("http://your-mlflow-server:5000")
+
 ```
 
 If you have a Databricks account, configure the connection:
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.login()
+
 ```
 
 This will prompt you for your configuration details (Databricks Host url and a PAT).
@@ -169,20 +177,21 @@ icon next to the experiment name within the MLflow UI.
 
 typescript
 
-```
+```typescript
 import { init } from "mlflow-tracing";
 
 init({
     trackingUri: "<your-tracking-server-uri>",
     experimentId: "<your-experiment-id>",
 });
+
 ```
 
 If [authentication](/mlflow-website/docs/latest/self-hosting/security/basic-http-auth.md) is enabled on the tracking server, you can pass the credential through `trackingServerUsername` and `trackingServerPassword`.
 
 typescript
 
-```
+```typescript
 import { init } from "mlflow-tracing";
 
 init({
@@ -191,6 +200,7 @@ init({
     trackingServerUsername: "<your-tracking-server-username>",
     trackingServerPassword: "<your-tracking-server-password>",
 });
+
 ```
 
 Call the `init` function with the URI of your remote MLflow server and the experiment ID. You can find the experiment ID by hovering over the
@@ -201,20 +211,21 @@ icon next to the experiment name within the MLflow UI.
 
 typescript
 
-```
+```typescript
 import { init } from "mlflow-tracing";
 
 init({
     trackingUri: "<remote-tracking-server-uri>",
     experimentId: "<your-experiment-id>",
 });
+
 ```
 
 If [authentication](/mlflow-website/docs/latest/self-hosting/security/basic-http-auth.md) is enabled on the tracking server, you can pass the credential through `trackingServerUsername` and `trackingServerPassword`.
 
 typescript
 
-```
+```typescript
 import { init } from "mlflow-tracing";
 
 init({
@@ -223,6 +234,7 @@ init({
     trackingServerUsername: "<remote-tracking-server-username>",
     trackingServerPassword: "<remote-tracking-server-password>",
 });
+
 ```
 
 Call the `init` function with the URI of your remote MLflow server and the experiment ID. You can find the experiment ID by hovering over the
@@ -235,7 +247,7 @@ icon next to the experiment name within the MLflow UI.
 
 typescript
 
-```
+```typescript
 import { init } from "mlflow-tracing";
 
 init({
@@ -244,52 +256,58 @@ init({
     // Optional: Set the Databricks config file path if it is not in the default location
     configPath: "<your-databricks-config-file-path>",
 });
+
 ```
 
 **Method 2: Use environment variables**
 
 bash
 
-```
+```bash
 export DATABRICKS_HOST=<your-databricks-host>
 export DATABRICKS_TOKEN=<your-databricks-personal-access-token>
+
 ```
 
 or create a `.env` file in the root directory of your project and add the following:
 
 bash
 
-```
+```bash
 DATABRICKS_HOST=<your-databricks-host>
 DATABRICKS_TOKEN=<your-databricks-personal-access-token>
+
 ```
 
 typescript
 
-```
+```typescript
 // Load environment variables from .env file
 import 'dotenv/config';
+
 ```
 
 The `init` function will automatically load the above environment variables when tracking URI is set to `databricks`.
 
 typescript
 
-```
+```typescript
 import { init } from "mlflow-tracing";
 
 init({
     trackingUri: "databricks",
     experimentId: "<your-experiment-id>",
 });
+
 ```
 
 ### Set OpenAI API Key (or other LLM providers)[​](#set-openai-api-key-or-other-llm-providers "Direct link to Set OpenAI API Key (or other LLM providers)")
 
 bash
 
-```
+```bash
 export OPENAI_API_KEY="your-api-key-here"  # Replace with your actual API key
+
 ```
 
 ## Step 2: Trace a single LLM call[​](#step-2-trace-a-single-llm-call "Direct link to Step 2: Trace a single LLM call")
@@ -298,7 +316,7 @@ Let's start with a simple example of tracing a single LLM call. We first wrap th
 
 typescript
 
-```
+```typescript
 import { OpenAI } from "openai";
 import { tracedOpenAI } from "mlflow-openai";
 
@@ -314,6 +332,7 @@ await client.chat.completions.create({
         {"role": "user", "content": "What's the weather like in Seattle?"},
     ],
 })
+
 ```
 
 After running the code above, go to the MLflow UI and select the "Traces" tab. It should show the newly created trace.
@@ -334,7 +353,7 @@ Next, let's add a bit more complexity to the application. To get the real-time w
 
 typescript
 
-```
+```typescript
 import * as mlflow from "mlflow-tracing";
 
 // Wrap the tool function with the `mlflow.trace` wrapper. The wrapped function will be automatically traced and logged to MLflow.
@@ -348,13 +367,14 @@ const getWeather = mlflow.trace(
      // Set the span type to TOOL. You can also set other span configuration here.
     { spanType: mlflow.SpanType.TOOL }
 );
+
 ```
 
 To pass the function as a tool to the LLM, we need to define the JSON schema for the function.
 
 typescript
 
-```
+```typescript
 const tools = [{
     type: "function",
     function: {
@@ -372,13 +392,14 @@ const tools = [{
         strict: true
     }
 }];
+
 ```
 
 Lastly, define a simple flow that first asks the LLM to get instructions for calling the tool, then invokes the tool function, and lastly returns the result to the LLM.. This example uses the `mlflow.withSpan` API to create a parent span for the agent flow, but you can also achieve the same by using the `mlflow.trace` API like the previous example.
 
 typescript
 
-```
+```typescript
 async function runToolAgent(question: string) {
     console.log(`\n🤖 Running tool agent with question: "${question}"`);
 
@@ -431,15 +452,18 @@ async function runToolAgent(question: string) {
         }
     );
 }
+
+
 ```
 
 Now we can run the application.
 
 typescript
 
-```
+```typescript
 // If you are running this tutorial as a script, remove the `await` keyword.
 await runToolAgent("What's the weather like in Seattle?")
+
 ```
 
 ## Step 4: Explore Traces in the UI[​](#step-4-explore-traces-in-the-ui "Direct link to Step 4: Explore Traces in the UI")

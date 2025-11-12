@@ -28,7 +28,7 @@ Here's a realistic example of optimizing a prompt for medical paper section clas
 
 python
 
-```
+```python
 import mlflow
 import openai
 from mlflow.genai.optimize import GepaPromptOptimizer
@@ -101,6 +101,7 @@ result = mlflow.genai.optimize_prompts(
 # Use the optimized prompt
 optimized_prompt = result.optimized_prompts[0]
 print(f"Optimized template: {optimized_prompt.template}")
+
 ```
 
 The API will automatically improve the prompt to better classify medical paper sections by learning from the training examples.
@@ -111,19 +112,20 @@ The API will automatically improve the prompt to better classify medical paper s
 
 text
 
-```
+```text
 Classify this medical research paper sentence
 into one of these sections: CONCLUSIONS, RESULTS,
 METHODS, OBJECTIVE, BACKGROUND.
 
 Sentence: {{sentence}}
+
 ```
 
 **After Optimization:**
 
 text
 
-```
+```text
 You are a single-sentence classifier for medical research abstracts. For each input sentence, decide which abstract section it belongs to and output exactly one label in UPPERCASE with no extra words, punctuation, or explanation.
 
 Allowed labels: CONCLUSIONS, RESULTS, METHODS, OBJECTIVE, BACKGROUND
@@ -181,6 +183,7 @@ Important tie-break rules:
 
 Output constraint:
 - Return exactly one uppercase label: CONCLUSIONS, RESULTS, METHODS, OBJECTIVE, or BACKGROUND. No extra text or punctuation.
+
 ```
 
 ## Components[​](#components "Direct link to Components")
@@ -200,11 +203,12 @@ Specify which prompts to optimize using their URIs from MLflow Prompt Registry:
 
 python
 
-```
+```python
 prompt_uris = [
     "prompts:/qa/1",  # Specific version
     "prompts:/instruction@latest",  # Latest version
 ]
+
 ```
 
 You can reference prompts by:
@@ -231,7 +235,7 @@ Your `predict_fn` must:
 
 python
 
-```
+```python
 def predict_fn(question: str) -> str:
     # Load prompt from registry
     prompt = mlflow.genai.load_prompt("prompts:/qa/1")
@@ -243,6 +247,7 @@ def predict_fn(question: str) -> str:
     response = your_llm_call(formatted_prompt)
 
     return response
+
 ```
 
 ### 3. Training Data[​](#3-training-data "Direct link to 3. Training Data")
@@ -251,7 +256,7 @@ Provide a dataset with `inputs` and `expectations`. Both columns should have dic
 
 python
 
-```
+```python
 # List of dictionaries - Example: Medical paper classification
 dataset = [
     {
@@ -303,6 +308,7 @@ dataset = pd.DataFrame(
         ],
     }
 )
+
 ```
 
 ### 4. Optimizer[​](#4-optimizer "Direct link to 4. Optimizer")
@@ -311,7 +317,7 @@ Create an optimizer instance for the optimization algorithm. Currently only [`Ge
 
 python
 
-```
+```python
 from mlflow.genai.optimize import GepaPromptOptimizer
 
 optimizer = GepaPromptOptimizer(
@@ -319,6 +325,7 @@ optimizer = GepaPromptOptimizer(
     max_metric_calls=100,
     display_progress_bar=False,
 )
+
 ```
 
 ## Advanced Usage[​](#advanced-usage "Direct link to Advanced Usage")
@@ -329,7 +336,7 @@ Define custom evaluation metrics to guide optimization:
 
 python
 
-```
+```python
 from typing import Any
 from mlflow.genai.scorers import scorer
 
@@ -360,6 +367,7 @@ result = mlflow.genai.optimize_prompts(
     scorers=[accuracy_scorer, brevity_scorer],
     aggregation=weighted_objective,
 )
+
 ```
 
 ### Custom Optimization Algorithm[​](#custom-optimization-algorithm "Direct link to Custom Optimization Algorithm")
@@ -368,7 +376,7 @@ Implement your own optimizer by extending [`BasePromptOptimizer`](/mlflow-websit
 
 python
 
-```
+```python
 from mlflow.genai.optimize import BasePromptOptimizer, PromptOptimizerOutput
 from mlflow.genai.scorers import Correctness
 
@@ -397,6 +405,7 @@ result = mlflow.genai.optimize_prompts(
     optimizer=MyCustomOptimizer(model_name="openai:/gpt-5"),
     scorers=[Correctness(model="openai:/gpt-5")],
 )
+
 ```
 
 ### Multi-Prompt Optimization[​](#multi-prompt-optimization "Direct link to Multi-Prompt Optimization")
@@ -405,7 +414,7 @@ Optimize multiple prompts together:
 
 python
 
-```
+```python
 import mlflow
 from mlflow.genai.scorers import Correctness
 
@@ -453,6 +462,7 @@ result = mlflow.genai.optimize_prompts(
 # Access optimized prompts
 optimized_plan = result.optimized_prompts[0]
 optimized_answer = result.optimized_prompts[1]
+
 ```
 
 ### Works with Any Agent Framework[​](#works-with-any-agent-framework "Direct link to Works with Any Agent Framework")
@@ -463,7 +473,7 @@ The example below shows how easy it is to optimize prompts in a LangChain workfl
 
 python
 
-```
+```python
 import mlflow
 from mlflow.genai.scorers import Correctness
 from mlflow.genai.optimize.optimizers import GepaPromptOptimizer
@@ -523,6 +533,7 @@ result = mlflow.genai.optimize_prompts(
     optimizer=GepaPromptOptimizer(reflection_model="openai:/gpt-5"),
     scorers=[Correctness(model="openai:/gpt-5")],
 )
+
 ```
 
 ## Result Object[​](#result-object "Direct link to Result Object")
@@ -531,7 +542,7 @@ The API returns a [`PromptOptimizationResult`](/mlflow-website/docs/latest/api_r
 
 python
 
-```
+```python
 result = mlflow.genai.optimize_prompts(...)
 
 # Access optimized prompts
@@ -547,6 +558,7 @@ print(f"Optimizer: {result.optimizer_name}")
 # View evaluation scores (if available)
 print(f"Initial score: {result.initial_eval_score}")
 print(f"Final score: {result.final_eval_score}")
+
 ```
 
 ## Common Use Cases[​](#common-use-cases "Direct link to Common Use Cases")
@@ -557,7 +569,7 @@ Optimize prompts to produce more accurate outputs:
 
 python
 
-```
+```python
 from mlflow.genai.scorers import Correctness
 
 
@@ -568,6 +580,7 @@ result = mlflow.genai.optimize_prompts(
     optimizer=GepaPromptOptimizer(reflection_model="openai:/gpt-5"),
     scorers=[Correctness(model="openai:/gpt-5")],
 )
+
 ```
 
 ### Optimizing for Safeness[​](#optimizing-for-safeness "Direct link to Optimizing for Safeness")
@@ -576,7 +589,7 @@ Ensure outputs are safe:
 
 python
 
-```
+```python
 from mlflow.genai.scorers import Safety
 
 
@@ -587,6 +600,7 @@ result = mlflow.genai.optimize_prompts(
     optimizer=GepaPromptOptimizer(reflection_model="openai:/gpt-5"),
     scorers=[Safety(model="openai:/gpt-5")],
 )
+
 ```
 
 ### Model Switching and Migration[​](#model-switching-and-migration "Direct link to Model Switching and Migration")
@@ -603,7 +617,7 @@ See the [Auto-rewrite Prompts for New Models](/mlflow-website/docs/latest/genai/
 
 python
 
-```
+```python
 # Use fewer examples
 small_dataset = dataset[:20]
 
@@ -611,6 +625,7 @@ small_dataset = dataset[:20]
 optimizer = GepaPromptOptimizer(
     reflection_model="openai:/gpt-5-mini", max_metric_calls=100
 )
+
 ```
 
 ### Issue: No Improvement Observed[​](#issue-no-improvement-observed "Direct link to Issue: No Improvement Observed")
@@ -628,7 +643,7 @@ optimizer = GepaPromptOptimizer(
 
 python
 
-```
+```python
 # ✅ Correct - loads from registry
 def predict_fn(question: str):
     prompt = mlflow.genai.load_prompt("prompts:/qa@latest")
@@ -638,6 +653,7 @@ def predict_fn(question: str):
 # ❌ Incorrect - hardcoded prompt
 def predict_fn(question: str):
     return llm_call(f"Answer: {question}")
+
 ```
 
 ## See Also[​](#see-also "Direct link to See Also")

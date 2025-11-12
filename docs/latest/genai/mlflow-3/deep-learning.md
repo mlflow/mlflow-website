@@ -4,7 +4,7 @@ In this example, we demonstrate how to use MLflow 3 to track and evaluate deep l
 
 python
 
-```
+```python
 import pandas as pd
 import torch
 import torch.nn as nn
@@ -111,6 +111,7 @@ with mlflow.start_run() as run:
                 model_id=model_info.model_id,
                 dataset=train_dataset,
             )
+
 ```
 
 In the run page, you can see the logged models generated, and the model names follow the pattern of `torch-iris-<epoch>`:
@@ -125,7 +126,7 @@ Use **[`mlflow.search_logged_models()`](/mlflow-website/docs/latest/api_referenc
 
 python
 
-```
+```python
 ranked_checkpoints = mlflow.search_logged_models(
     filter_string=f"source_run_id='{run.info.run_id}'",
     order_by=[{"field_name": "metrics.accuracy", "ascending": False}],
@@ -154,6 +155,7 @@ print(worst_checkpoint.metrics)
 #  'mlflow.source.type': 'LOCAL',
 #  'mlflow.user': 'serena.ruan'}>
 # [<Metric: dataset_digest='1f1c13b5', dataset_name='train', key='accuracy', model_id='0d789084-9a3b-4b85-9d43-6a148c014b7e', run_id='12f143a7fda1461e9240d7ffad4ea5bd', step=0, timestamp=1743734022737, value=0.3>]
+
 ```
 
 Artifacts of the model can be viewed on the **Artifacts** tab of the model page:

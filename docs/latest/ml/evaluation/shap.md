@@ -8,7 +8,7 @@ Enable SHAP explanations during model evaluation with a simple configuration:
 
 python
 
-```
+```python
 import mlflow
 import xgboost as xgb
 import shap
@@ -47,6 +47,7 @@ with mlflow.start_run():
     for artifact_name in result.artifacts:
         if "shap" in artifact_name.lower():
             print(f"  - {artifact_name}")
+
 ```
 
 This automatically generates:
@@ -64,7 +65,7 @@ MLflow automatically creates SHAP-based feature importance charts:
 
 python
 
-```
+```python
 # The evaluation generates several SHAP visualizations:
 # - shap_feature_importance_plot.png: Bar chart of average feature importance
 # - shap_summary_plot.png: Dot plot showing feature impact distribution
@@ -76,6 +77,7 @@ print("Generated SHAP artifacts:")
 for name, path in result.artifacts.items():
     if "shap" in name:
         print(f"  {name}: {path}")
+
 ```
 
 ![](/mlflow-website/docs/latest/assets/images/model_evaluation_feature_importance-e3b91eb353333c150ec7b4e91f67f5f4.png)
@@ -88,7 +90,7 @@ Control how SHAP explanations are generated:
 
 python
 
-```
+```python
 # Advanced SHAP configuration
 shap_config = {
     "log_explainer": True,  # Save the explainer model
@@ -105,6 +107,7 @@ result = mlflow.evaluate(
     evaluators=["default"],
     evaluator_config=shap_config,
 )
+
 ```
 
 Configuration Options
@@ -131,7 +134,7 @@ Once logged, you can load and use SHAP explainers on new data:
 
 python
 
-```
+```python
 # Load the saved SHAP explainer
 run_id = "your_run_id_here"
 explainer_uri = f"runs:/{run_id}/explainer"
@@ -147,13 +150,14 @@ print(f"Generated explanations shape: {explanations.shape}")
 print(f"Feature contributions for first prediction: {explanations[0]}")
 
 # The explanations array contains SHAP values for each feature and prediction
+
 ```
 
 ### Interpreting SHAP Values[​](#interpreting-shap-values "Direct link to Interpreting SHAP Values")
 
 python
 
-```
+```python
 def interpret_shap_explanations(explanations, feature_names, sample_idx=0):
     """Interpret SHAP explanations for a specific prediction."""
 
@@ -176,13 +180,14 @@ def interpret_shap_explanations(explanations, feature_names, sample_idx=0):
 # Usage
 feature_names = X_test.columns.tolist()
 top_features = interpret_shap_explanations(explanations, feature_names, sample_idx=0)
+
 ```
 
 Compare feature importance across different models:
 
 python
 
-```
+```python
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 
@@ -243,13 +248,14 @@ comparison_results = compare_models_with_shap(models, eval_data, "label")
 print("Model Comparison Results:")
 for model_name, results in comparison_results.items():
     print(f"  {model_name}: {results['accuracy']:.3f} accuracy")
+
 ```
 
 Perform custom SHAP analysis beyond automatic generation:
 
 python
 
-```
+```python
 def custom_shap_analysis(model, data, feature_names):
     """Perform custom SHAP analysis with detailed insights."""
 
@@ -301,6 +307,7 @@ def custom_shap_analysis(model, data, feature_names):
 
 # Usage
 # shap_values, importance = custom_shap_analysis(model, X_test[:100], X_test.columns.tolist())
+
 ```
 
 SHAP Visualization Types
@@ -327,7 +334,7 @@ Generate explanations for large datasets efficiently:
 
 python
 
-```
+```python
 def batch_shap_explanations(model_uri, data_path, batch_size=1000):
     """Generate SHAP explanations for large datasets in batches."""
 
@@ -379,13 +386,14 @@ def generate_explanations(model, data):
     # This would contain your actual SHAP explanation logic
     # returning mock data for example
     return np.random.random((len(data), data.shape[1]))
+
 ```
 
 Track how feature importance changes over time:
 
 python
 
-```
+```python
 def monitor_feature_importance_drift(current_explainer_uri, historical_importance_path):
     """Monitor changes in feature importance over time."""
 
@@ -439,13 +447,14 @@ def monitor_feature_importance_drift(current_explainer_uri, historical_importanc
 #     "runs:/your_run_id/explainer",
 #     "path/to/historical/importance.npy"
 # )
+
 ```
 
 Optimize SHAP performance for large-scale applications:
 
 python
 
-```
+```python
 # Optimized configuration for large datasets
 def get_optimized_shap_config(dataset_size):
     """Get optimized SHAP configuration based on dataset size."""
@@ -513,6 +522,7 @@ def memory_efficient_shap_evaluation(model_uri, eval_data, targets, sample_size=
 
 # Usage
 # result = memory_efficient_shap_evaluation(model_uri, large_eval_data, "target")
+
 ```
 
 **Performance Guidelines:**
@@ -556,7 +566,7 @@ SHAP explainers can be stored and versioned alongside your models:
 
 python
 
-```
+```python
 def register_model_with_explainer(model_uri, explainer_uri, model_name):
     """Register both model and explainer in MLflow Model Registry."""
 
@@ -587,6 +597,7 @@ def register_model_with_explainer(model_uri, explainer_uri, model_name):
 # model_ver, explainer_ver = register_model_with_explainer(
 #     model_uri, explainer_uri, "my_classifier"
 # )
+
 ```
 
 ## Conclusion[​](#conclusion "Direct link to Conclusion")

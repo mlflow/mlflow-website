@@ -18,7 +18,7 @@ The notebook includes a range of examples showcasing different data types and st
 
 python
 
-```
+```python
 import numpy as np
 import pandas as pd
 
@@ -38,6 +38,7 @@ The inferred signature is:
 {inferred_signature}
 """
   print(report)
+
 ```
 
 ### Scalar Support in MLflow Signatures[​](#scalar-support-in-mlflow-signatures "Direct link to Scalar Support in MLflow Signatures")
@@ -50,141 +51,55 @@ Through practical examples, including lists of strings, floats, and other types,
 
 python
 
-```
+```python
 # List of strings
 
 report_signature_info(["a", "list", "of", "strings"])
-```
 
-```
-
-The input data: 
-['a', 'list', 'of', 'strings'].
-The data is of type: <class 'list'>.
-The inferred signature is:
-
-inputs: 
-[string (required)]
-outputs: 
-None
-params: 
-None
 ```
 
 python
 
-```
+```python
 # List of floats
 
 report_signature_info([np.float32(0.117), np.float32(1.99)])
-```
 
-```
-
-The input data: 
-[0.117, 1.99].
-The data is of type: <class 'list'>.
-The inferred signature is:
-
-inputs: 
-[float (required)]
-outputs: 
-None
-params: 
-None
 ```
 
 python
 
-```
+```python
 # Adding a column header to a list of doubles
 my_data = pd.DataFrame({"input_data": [np.float64(0.117), np.float64(1.99)]})
 report_signature_info(my_data)
-```
 
-```
-
-The input data: 
-   input_data
-0       0.117
-1       1.990.
-The data is of type: <class 'pandas.core.frame.DataFrame'>.
-The inferred signature is:
-
-inputs: 
-['input_data': double (required)]
-outputs: 
-None
-params: 
-None
 ```
 
 python
 
-```
+```python
 # List of Dictionaries
 report_signature_info([{"a": "a1", "b": "b1"}, {"a": "a2", "b": "b2"}])
-```
 
-```
-
-The input data: 
-[{'a': 'a1', 'b': 'b1'}, {'a': 'a2', 'b': 'b2'}].
-The data is of type: <class 'list'>.
-The inferred signature is:
-
-inputs: 
-['a': string (required), 'b': string (required)]
-outputs: 
-None
-params: 
-None
 ```
 
 python
 
-```
+```python
 # List of Arrays of strings
 report_signature_info([["a", "b", "c"], ["d", "e", "f"]])
-```
 
-```
-
-The input data: 
-[['a', 'b', 'c'], ['d', 'e', 'f']].
-The data is of type: <class 'list'>.
-The inferred signature is:
-
-inputs: 
-[Array(string) (required)]
-outputs: 
-None
-params: 
-None
 ```
 
 python
 
-```
+```python
 # List of Arrays of Dictionaries
 report_signature_info(
   [[{"a": "a", "b": "b"}, {"a": "a", "b": "b"}], [{"a": "a", "b": "b"}, {"a": "a", "b": "b"}]]
 )
-```
 
-```
-
-The input data: 
-[[{'a': 'a', 'b': 'b'}, {'a': 'a', 'b': 'b'}], [{'a': 'a', 'b': 'b'}, {'a': 'a', 'b': 'b'}]].
-The data is of type: <class 'list'>.
-The inferred signature is:
-
-inputs: 
-[Array({a: string (required), b: string (required)}) (required)]
-outputs: 
-None
-params: 
-None
 ```
 
 ### Understanding Type Conversion: Int to Long[​](#understanding-type-conversion-int-to-long "Direct link to Understanding Type Conversion: Int to Long")
@@ -199,100 +114,39 @@ In this section of the tutorial, we observe an interesting aspect of type conver
 
 python
 
-```
+```python
 # List of integers
 report_signature_info([1, 2, 3])
-```
 
-```
-
-The input data: 
-[1, 2, 3].
-The data is of type: <class 'list'>.
-The inferred signature is:
-
-inputs: 
-[long (required)]
-outputs: 
-None
-params: 
-None
-```
-
-```
-/Users/benjamin.wilson/repos/mlflow-fork/mlflow/mlflow/types/utils.py:378: UserWarning: Hint: Inferred schema contains integer column(s). Integer columns in Python cannot represent missing values. If your input data contains missing values at inference time, it will be encoded as floats and will cause a schema enforcement error. The best way to avoid this problem is to infer the model schema based on a realistic data sample (training dataset) that includes missing values. Alternatively, you can declare integer columns as doubles (float64) whenever these columns may have missing values. See `Handling Integers With Missing Values <https://www.mlflow.org/docs/latest/models.html#handling-integers-with-missing-values>`_ for more details.
-warnings.warn(
 ```
 
 python
 
-```
+```python
 # List of Booleans
 report_signature_info([True, False, False, False, True])
-```
 
-```
-
-The input data: 
-[True, False, False, False, True].
-The data is of type: <class 'list'>.
-The inferred signature is:
-
-inputs: 
-[boolean (required)]
-outputs: 
-None
-params: 
-None
 ```
 
 python
 
-```
+```python
 # List of Datetimes
 report_signature_info([np.datetime64("2023-12-24 11:59:59"), np.datetime64("2023-12-25 00:00:00")])
-```
 
-```
-
-The input data: 
-[numpy.datetime64('2023-12-24T11:59:59'), numpy.datetime64('2023-12-25T00:00:00')].
-The data is of type: <class 'list'>.
-The inferred signature is:
-
-inputs: 
-[datetime (required)]
-outputs: 
-None
-params: 
-None
 ```
 
 python
 
-```
+```python
 # Complex list of Dictionaries
 report_signature_info([{"a": "b", "b": [1, 2, 3], "c": {"d": [4, 5, 6]}}])
-```
 
-```
-
-The input data: 
-[{'a': 'b', 'b': [1, 2, 3], 'c': {'d': [4, 5, 6]}}].
-The data is of type: <class 'list'>.
-The inferred signature is:
-
-inputs: 
-['a': string (required), 'b': Array(long) (required), 'c': {d: Array(long) (required)} (required)]
-outputs: 
-None
-params: 
-None
 ```
 
 python
 
-```
+```python
 # Pandas DF input
 
 data = [
@@ -302,23 +156,7 @@ data = [
 data = pd.DataFrame(data)
 
 report_signature_info(data)
-```
 
-```
-
-The input data: 
-     a          b                   c                       f
-0    a  [a, b, c]  {'d': 1, 'e': 0.1}  [{'g': 'g'}, {'h': 1}]
-1  NaN     [a, b]  {'d': 2, 'f': 'f'}            [{'g': 'g'}].
-The data is of type: <class 'pandas.core.frame.DataFrame'>.
-The inferred signature is:
-
-inputs: 
-['a': string (optional), 'b': Array(string) (required), 'c': {d: long (required), e: double (optional), f: string (optional)} (required), 'f': Array({g: string (optional), h: long (optional)}) (required)]
-outputs: 
-None
-params: 
-None
 ```
 
 ### Signature Enforcement[​](#signature-enforcement "Direct link to Signature Enforcement")
@@ -331,38 +169,25 @@ This section also highlights the importance of precise data representation in ML
 
 python
 
-```
+```python
 class MyModel(mlflow.pyfunc.PythonModel):
   def predict(self, context, model_input, params=None):
       return model_input
+
 ```
 
 python
 
-```
+```python
 data = [{"a": ["a", "b", "c"], "b": "b", "c": {"d": "d"}}, {"a": ["a"], "c": {"d": "d", "e": "e"}}]
 
 report_signature_info(data)
-```
 
-```
-
-The input data: 
-[{'a': ['a', 'b', 'c'], 'b': 'b', 'c': {'d': 'd'}}, {'a': ['a'], 'c': {'d': 'd', 'e': 'e'}}].
-The data is of type: <class 'list'>.
-The inferred signature is:
-
-inputs: 
-['a': Array(string) (required), 'b': string (optional), 'c': {d: string (required), e: string (optional)} (required)]
-outputs: 
-None
-params: 
-None
 ```
 
 python
 
-```
+```python
 # Generate a prediction that will serve as the model output example for signature inference
 model_output = MyModel().predict(context=None, model_input=data)
 
@@ -377,11 +202,7 @@ loaded_model = mlflow.pyfunc.load_model(model_info.model_uri)
 prediction = loaded_model.predict(data)
 
 prediction
-```
 
-```
-/Users/benjamin.wilson/miniconda3/envs/mlflow-dev-env/lib/python3.8/site-packages/_distutils_hack/__init__.py:30: UserWarning: Setuptools is replacing distutils.
-warnings.warn("Setuptools is replacing distutils.")
 ```
 
 |   | a          | b   | c                    |
@@ -393,17 +214,9 @@ We can check the inferred signature directly from the logged model information t
 
 python
 
-```
+```python
 model_info.signature
-```
 
-```
-inputs: 
-['a': Array(string) (required), 'b': string (optional), 'c': {d: string (required), e: string (optional)} (required)]
-outputs: 
-['a': Array(string) (required), 'b': string (optional), 'c': {d: string (required), e: string (optional)} (required)]
-params: 
-None
 ```
 
 We can also quickly verify that the logged input signature matches the signature inference. While we're at it, we can generate the output signature as well.
@@ -412,31 +225,18 @@ We can also quickly verify that the logged input signature matches the signature
 
 python
 
-```
+```python
 report_signature_info(data, prediction)
-```
 
-```
-
-The input data: 
-[{'a': ['a', 'b', 'c'], 'b': 'b', 'c': {'d': 'd'}}, {'a': ['a'], 'c': {'d': 'd', 'e': 'e'}}].
-The data is of type: <class 'list'>.
-The inferred signature is:
-
-inputs: 
-['a': Array(string) (required), 'b': string (optional), 'c': {d: string (required), e: string (optional)} (required)]
-outputs: 
-['a': Array(string) (required), 'b': string (optional), 'c': {d: string (required), e: string (optional)} (required)]
-params: 
-None
 ```
 
 python
 
-```
+```python
 # Using the model while not providing an optional input (note the output return structure and the non existent optional columns)
 
 loaded_model.predict([{"a": ["a", "b", "c"], "c": {"d": "d"}}])
+
 ```
 
 |   | a          | c          |
@@ -445,66 +245,12 @@ loaded_model.predict([{"a": ["a", "b", "c"], "c": {"d": "d"}}])
 
 python
 
-```
+```python
 # Using the model while omitting the input of required fields (this will raise an Exception from schema enforcement,
 # stating that the required fields "a" and "c" are missing)
 
 loaded_model.predict([{"b": "b"}])
-```
 
-```
----------------------------------------------------------------------------
-```
-
-```
-MlflowException                           Traceback (most recent call last)
-```
-
-```
-~/repos/mlflow-fork/mlflow/mlflow/pyfunc/__init__.py in predict(self, data, params)
-  469             try:
---> 470                 data = _enforce_schema(data, input_schema)
-  471             except Exception as e:
-```
-
-```
-~/repos/mlflow-fork/mlflow/mlflow/models/utils.py in _enforce_schema(pf_input, input_schema)
-  939                 message += f" Note that there were extra inputs: {extra_cols}"
---> 940             raise MlflowException(message)
-  941     elif not input_schema.is_tensor_spec():
-```
-
-```
-MlflowException: Model is missing inputs ['a', 'c'].
-```
-
-```
-
-During handling of the above exception, another exception occurred:
-```
-
-```
-MlflowException                           Traceback (most recent call last)
-```
-
-```
-/var/folders/cd/n8n0rm2x53l_s0xv_j_xklb00000gp/T/ipykernel_97464/1628231496.py in <cell line: 4>()
-    2 # stating that the required fields "a" and "c" are missing)
-    3 
-----> 4 loaded_model.predict([{"b": "b"}])
-```
-
-```
-~/repos/mlflow-fork/mlflow/mlflow/pyfunc/__init__.py in predict(self, data, params)
-  471             except Exception as e:
-  472                 # Include error in message for backwards compatibility
---> 473                 raise MlflowException.invalid_parameter_value(
-  474                     f"Failed to enforce schema of data '{data}' "
-  475                     f"with schema '{input_schema}'. "
-```
-
-```
-MlflowException: Failed to enforce schema of data '[{'b': 'b'}]' with schema '['a': Array(string) (required), 'b': string (optional), 'c': {d: string (required), e: string (optional)} (required)]'. Error: Model is missing inputs ['a', 'c'].
 ```
 
 ### Updating Signatures[​](#updating-signatures "Direct link to Updating Signatures")
@@ -517,7 +263,7 @@ By exploring the steps to update a model's signature, you will learn how to upda
 
 python
 
-```
+```python
 # Updating an existing model that wasn't saved with a signature
 
 
@@ -539,22 +285,15 @@ with mlflow.start_run():
 loaded_model = mlflow.pyfunc.load_model(model_info.model_uri)
 
 loaded_model.metadata.signature
+
 ```
 
 python
 
-```
+```python
 test_data = [{"a": "we are expecting strings", "b": "and only strings"}, [1, 2, 3]]
 loaded_model.predict(test_data)
-```
 
-```
-<class 'list'>
-[{'a': 'we are expecting strings', 'b': 'and only strings'}, [1, 2, 3]]
-```
-
-```
-'Input is valid.'
 ```
 
 ### The Necessity of Schema Enforcement in MLflow[​](#the-necessity-of-schema-enforcement-in-mlflow "Direct link to The Necessity of Schema Enforcement in MLflow")
@@ -571,51 +310,29 @@ To illustrate the value of schema enforcement, we will update the signature of a
 
 python
 
-```
+```python
 expected_data_structure = [{"a": "string", "b": "another string"}, {"a": "string"}]
 
 signature = infer_signature(expected_data_structure, loaded_model.predict(expected_data_structure))
 
 set_signature(model_info.model_uri, signature)
-```
 
-```
-<class 'list'>
-[{'a': 'string', 'b': 'another string'}, {'a': 'string'}]
 ```
 
 python
 
-```
+```python
 loaded_with_signature = mlflow.pyfunc.load_model(model_info.model_uri)
 
 loaded_with_signature.metadata.signature
-```
 
-```
-inputs: 
-['a': string (required), 'b': string (optional)]
-outputs: 
-[string (required)]
-params: 
-None
 ```
 
 python
 
-```
+```python
 loaded_with_signature.predict(expected_data_structure)
-```
 
-```
-<class 'pandas.core.frame.DataFrame'>
-      a               b
-0  string  another string
-1  string             NaN
-```
-
-```
-'Input is valid.'
 ```
 
 #### Validating that schema enforcement will not permit a flawed input[​](#validating-that-schema-enforcement-will-not-permit-a-flawed-input "Direct link to Validating that schema enforcement will not permit a flawed input")
@@ -624,100 +341,9 @@ Now that we've set our signature correctly and updated the model definition, let
 
 python
 
-```
+```python
 loaded_with_signature.predict(test_data)
-```
 
-```
----------------------------------------------------------------------------
-```
-
-```
-AttributeError                            Traceback (most recent call last)
-```
-
-```
-~/repos/mlflow-fork/mlflow/mlflow/pyfunc/__init__.py in predict(self, data, params)
-  469             try:
---> 470                 data = _enforce_schema(data, input_schema)
-  471             except Exception as e:
-```
-
-```
-~/repos/mlflow-fork/mlflow/mlflow/models/utils.py in _enforce_schema(pf_input, input_schema)
-  907         elif isinstance(pf_input, (list, np.ndarray, pd.Series)):
---> 908             pf_input = pd.DataFrame(pf_input)
-  909 
-```
-
-```
-~/miniconda3/envs/mlflow-dev-env/lib/python3.8/site-packages/pandas/core/frame.py in __init__(self, data, index, columns, dtype, copy)
-  781                         columns = ensure_index(columns)
---> 782                     arrays, columns, index = nested_data_to_arrays(
-  783                         # error: Argument 3 to "nested_data_to_arrays" has incompatible
-```
-
-```
-~/miniconda3/envs/mlflow-dev-env/lib/python3.8/site-packages/pandas/core/internals/construction.py in nested_data_to_arrays(data, columns, index, dtype)
-  497 
---> 498     arrays, columns = to_arrays(data, columns, dtype=dtype)
-  499     columns = ensure_index(columns)
-```
-
-```
-~/miniconda3/envs/mlflow-dev-env/lib/python3.8/site-packages/pandas/core/internals/construction.py in to_arrays(data, columns, dtype)
-  831     elif isinstance(data[0], abc.Mapping):
---> 832         arr, columns = _list_of_dict_to_arrays(data, columns)
-  833     elif isinstance(data[0], ABCSeries):
-```
-
-```
-~/miniconda3/envs/mlflow-dev-env/lib/python3.8/site-packages/pandas/core/internals/construction.py in _list_of_dict_to_arrays(data, columns)
-  911         sort = not any(isinstance(d, dict) for d in data)
---> 912         pre_cols = lib.fast_unique_multiple_list_gen(gen, sort=sort)
-  913         columns = ensure_index(pre_cols)
-```
-
-```
-~/miniconda3/envs/mlflow-dev-env/lib/python3.8/site-packages/pandas/_libs/lib.pyx in pandas._libs.lib.fast_unique_multiple_list_gen()
-```
-
-```
-~/miniconda3/envs/mlflow-dev-env/lib/python3.8/site-packages/pandas/core/internals/construction.py in <genexpr>(.0)
-  909     if columns is None:
---> 910         gen = (list(x.keys()) for x in data)
-  911         sort = not any(isinstance(d, dict) for d in data)
-```
-
-```
-AttributeError: 'list' object has no attribute 'keys'
-```
-
-```
-
-During handling of the above exception, another exception occurred:
-```
-
-```
-MlflowException                           Traceback (most recent call last)
-```
-
-```
-/var/folders/cd/n8n0rm2x53l_s0xv_j_xklb00000gp/T/ipykernel_97464/2586525788.py in <cell line: 1>()
-----> 1 loaded_with_signature.predict(test_data)
-```
-
-```
-~/repos/mlflow-fork/mlflow/mlflow/pyfunc/__init__.py in predict(self, data, params)
-  471             except Exception as e:
-  472                 # Include error in message for backwards compatibility
---> 473                 raise MlflowException.invalid_parameter_value(
-  474                     f"Failed to enforce schema of data '{data}' "
-  475                     f"with schema '{input_schema}'. "
-```
-
-```
-MlflowException: Failed to enforce schema of data '[{'a': 'we are expecting strings', 'b': 'and only strings'}, [1, 2, 3]]' with schema '['a': string (required), 'b': string (optional)]'. Error: 'list' object has no attribute 'keys'
 ```
 
 ###

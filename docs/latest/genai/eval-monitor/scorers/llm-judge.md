@@ -36,12 +36,13 @@ By default, MLflow will use **OpenAI's GPT-4o-mini** model as the judge model. Y
 
 python
 
-```
+```python
 from mlflow.genai.scorers import Correctness
 
 Correctness(model="openai:/gpt-4o-mini")
 Correctness(model="anthropic:/claude-4-opus")
 Correctness(model="google:/gemini-2.0-flash")
+
 ```
 
 ### Supported Models[​](#supported-models "Direct link to Supported Models")

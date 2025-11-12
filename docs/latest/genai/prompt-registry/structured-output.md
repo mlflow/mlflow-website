@@ -24,7 +24,7 @@ The most common way to define structured output is using Pydantic models:
 
 python
 
-```
+```python
 import mlflow
 from pydantic import BaseModel
 from typing import List
@@ -44,6 +44,7 @@ prompt = mlflow.genai.register_prompt(
     commit_message="Added structured output for summarization",
     tags={"task": "summarization", "structured": "true"},
 )
+
 ```
 
 ### Using JSON Schema[​](#using-json-schema "Direct link to Using JSON Schema")
@@ -52,7 +53,7 @@ You can also define response formats using JSON schema dictionaries:
 
 python
 
-```
+```python
 import mlflow
 
 # Define response format as JSON schema
@@ -78,6 +79,7 @@ prompt = mlflow.genai.register_prompt(
     commit_message="Added structured output for Q&A",
     tags={"task": "qa", "structured": "true"},
 )
+
 ```
 
 ## Advanced Examples[​](#advanced-examples "Direct link to Advanced Examples")
@@ -88,7 +90,7 @@ For more complex applications, you can define nested structures:
 
 python
 
-```
+```python
 import mlflow
 from pydantic import BaseModel
 from typing import List, Optional
@@ -117,6 +119,7 @@ prompt = mlflow.genai.register_prompt(
     commit_message="Added comprehensive document analysis output",
     tags={"task": "analysis", "complex": "true"},
 )
+
 ```
 
 ### Chat Prompts with Structured Output[​](#chat-prompts-with-structured-output "Direct link to Chat Prompts with Structured Output")
@@ -125,7 +128,7 @@ Chat prompts can also use structured output formats:
 
 python
 
-```
+```python
 import mlflow
 from pydantic import BaseModel
 
@@ -149,6 +152,7 @@ prompt = mlflow.genai.register_prompt(
     commit_message="Added structured output for chat responses",
     tags={"type": "chat", "structured": "true"},
 )
+
 ```
 
 ## Loading and Using Structured Prompts[​](#loading-and-using-structured-prompts "Direct link to Loading and Using Structured Prompts")
@@ -157,7 +161,7 @@ When you load a prompt with structured output, you can access the response forma
 
 python
 
-```
+```python
 # Load the prompt
 prompt = mlflow.genai.load_prompt("prompts:/summarization-prompt/1")
 
@@ -170,6 +174,7 @@ formatted_text = prompt.format(num_sentences=3, text="Your content here...")
 
 # Use with a language model that supports structured output
 # Note: You need to implement validation against your defined schema
+
 ```
 
 ## Integration with Language Models[​](#integration-with-language-models "Direct link to Integration with Language Models")
@@ -178,7 +183,7 @@ formatted_text = prompt.format(num_sentences=3, text="Your content here...")
 
 python
 
-```
+```python
 import openai
 
 client = openai.OpenAI()
@@ -199,13 +204,14 @@ response = client.chat.completions.create(
 import json
 
 result = json.loads(response.choices[0].message.content)
+
 ```
 
 ### LangChain Integration[​](#langchain-integration "Direct link to LangChain Integration")
 
 python
 
-```
+```python
 from langchain.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
@@ -223,6 +229,7 @@ chain = langchain_prompt | llm.with_structured_output(prompt.response_format)
 # Execute the chain
 result = chain.invoke({"question": "What is MLflow?"})
 # result will be a validated Pydantic model instance
+
 ```
 
 ## Key Takeaways[​](#key-takeaways "Direct link to Key Takeaways")

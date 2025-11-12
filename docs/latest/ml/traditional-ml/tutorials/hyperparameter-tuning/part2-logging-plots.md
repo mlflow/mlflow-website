@@ -72,7 +72,7 @@ In the intricate world of data visualization, the structured and organized prese
 
 python
 
-```
+```python
 def plot_box_weekend(df, style="seaborn", plot_size=(10, 8)):
     with plt.style.context(style=style):
         fig, ax = plt.subplots(figsize=plot_size)
@@ -98,6 +98,7 @@ def plot_box_weekend(df, style="seaborn", plot_size=(10, 8)):
         plt.tight_layout()
     plt.close(fig)
     return fig
+
 ```
 
 #### Key Elements[​](#key-elements "Direct link to Key Elements")
@@ -114,7 +115,7 @@ There are scenarios when saving a plot locally before logging to MLflow is more 
 
 python
 
-```
+```python
 def plot_correlation_matrix_and_save(
     df, style="seaborn", plot_size=(10, 8), path="/tmp/corr_plot.png"
 ):
@@ -147,6 +148,7 @@ def plot_correlation_matrix_and_save(
     # convert to filesystem path spec for os compatibility
     save_path = pathlib.Path(path)
     fig.savefig(path)
+
 ```
 
 #### Key Insights[​](#key-insights "Direct link to Key Insights")
@@ -167,7 +169,7 @@ For simplicity, if you have a large volume of plots that you would like to log t
 
 python
 
-```
+```python
 mlflow.set_tracking_uri("http://127.0.0.1:8080")
 
 mlflow.set_experiment("Visualizations Demo")
@@ -232,6 +234,7 @@ with mlflow.start_run() as run:
 
     # Log the saved correlation matrix plot by referring to the local file system location
     mlflow.log_artifact("/tmp/corr_plot.png")
+
 ```
 
 ## Viewing plots in the UI[​](#viewing-plots-in-the-ui "Direct link to Viewing plots in the UI")

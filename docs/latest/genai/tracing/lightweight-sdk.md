@@ -34,8 +34,9 @@ Install the lightweight SDK using pip:
 
 bash
 
-```
+```bash
 pip install mlflow-tracing
+
 ```
 
 warning
@@ -48,7 +49,7 @@ Here's a simple example using the lightweight SDK with OpenAI for logging traces
 
 python
 
-```
+```python
 import mlflow
 import openai
 
@@ -66,6 +67,7 @@ response = client.chat.completions.create(
 )
 
 print(response.choices[0].message.content)
+
 ```
 
 ## Choose Your Backend[​](#choose-your-backend "Direct link to Choose Your Backend")
@@ -109,9 +111,10 @@ If you are using OpenTelemetry as part of your observability tech stack, you can
 
 bash
 
-```
+```bash
 export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT="http://your-collector:4317/v1/traces"
 export OTEL_SERVICE_NAME="genai-app"
+
 ```
 
 Refer to the [OpenTelemetry Integration](/mlflow-website/docs/latest/genai/tracing/opentelemetry/export.md) documentation for detailed setup instructions.
@@ -177,7 +180,7 @@ Here's a complete example of setting up the lightweight SDK for production use:
 
 python
 
-```
+```python
 import mlflow
 import os
 from your_app import process_user_request
@@ -225,6 +228,7 @@ def handle_user_request(user_id: str, session_id: str, message: str):
             },
         )
         raise
+
 ```
 
 ## Features Not Included[​](#features-not-included "Direct link to Features Not Included")
@@ -249,12 +253,13 @@ If you're currently using the full MLflow package and want to switch to the ligh
 
 bash
 
-```
+```bash
 # Remove full MLflow
 pip uninstall mlflow
 
 # Install lightweight SDK
 pip install mlflow-tracing
+
 ```
 
 ### 2. Update Import Statements[​](#2-update-import-statements "Direct link to 2. Update Import Statements")
@@ -263,7 +268,7 @@ Most tracing functionality remains the same:
 
 python
 
-```
+```python
 # These imports work the same way
 import mlflow
 import mlflow.openai
@@ -273,6 +278,7 @@ from mlflow.tracing import trace
 # import mlflow.sklearn  # ❌ Model logging
 # mlflow.start_run()     # ❌ Run management
 # mlflow.log_metric()    # ❌ Metric logging
+
 ```
 
 ### 3. Update Configuration[​](#3-update-configuration "Direct link to 3. Update Configuration")
@@ -281,7 +287,7 @@ Focus on tracing-specific configuration:
 
 python
 
-```
+```python
 # Configure tracking URI (same as before)
 mlflow.set_tracking_uri("http://your-server:5000")
 mlflow.set_experiment("your-experiment")
@@ -292,6 +298,7 @@ mlflow.set_experiment("your-experiment")
 def your_function():
     # Your code here
     pass
+
 ```
 
 ## Package Size Comparison[​](#package-size-comparison "Direct link to Package Size Comparison")

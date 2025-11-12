@@ -6,10 +6,11 @@ MLflow supports automatic tracing for Amazon Bedrock, a fully managed service on
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.bedrock.autolog()
+
 ```
 
 MLflow trace automatically captures the following information about Amazon Bedrock calls:
@@ -34,7 +35,7 @@ MLflow supports automatic tracing for the following Amazon Bedrock APIs:
 
 python
 
-```
+```python
 import boto3
 import mlflow
 
@@ -61,6 +62,7 @@ response = bedrock.converse(
         "topP": 0.9,
     },
 )
+
 ```
 
 The logged trace, associated with the `Bedrock` experiment, can be seen in the MLflow UI.
@@ -101,7 +103,7 @@ Token usage is logged for:
 
 python
 
-```
+```python
 import boto3
 import mlflow
 
@@ -148,6 +150,7 @@ for span in trace.data.spans:
         print(f" Input tokens: {usage['input_tokens']}")
         print(f" Output tokens: {usage['output_tokens']}")
         print(f" Total tokens: {usage['total_tokens']}")
+
 ```
 
 If a provider or model does not return usage information, this attribute will be omitted.
@@ -158,7 +161,7 @@ MLflow supports tracing streaming calls to Amazon Bedrock APIs. The generated tr
 
 python
 
-```
+```python
 response = bedrock.converse_stream(
     modelId="anthropic.claude-3-5-sonnet-20241022-v2:0",
     messages=[
@@ -178,6 +181,7 @@ response = bedrock.converse_stream(
 
 for chunk in response["stream"]:
     print(chunk)
+
 ```
 
 ![Bedrock Stream Tracing](/mlflow-website/docs/latest/assets/images/bedrock-tracing-stream-d7219a525c3716936e81512180dc0d69.png)
@@ -194,7 +198,7 @@ Combining this with the manual tracing feature, you can define a function-callin
 
 python
 
-```
+```python
 import boto3
 import mlflow
 from mlflow.entities import SpanType
@@ -285,6 +289,7 @@ def run_tool_agent(question: str) -> str:
 # Run the tool calling agent
 question = "What's the weather like in San Francisco today?"
 answer = run_tool_agent(question)
+
 ```
 
 Executing the code above will create a single trace that involves all LLM invocations and the tool calls.

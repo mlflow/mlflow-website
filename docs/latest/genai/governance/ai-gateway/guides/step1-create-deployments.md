@@ -6,8 +6,9 @@ First, install MLflow along with the `gateway` extras to get access to a range o
 
 bash
 
-```
+```bash
 pip install 'mlflow[gateway]'
+
 ```
 
 ## Step 2: Set the OpenAI Token as an Environment Variable[​](#step-2-set-the-openai-token-as-an-environment-variable "Direct link to Step 2: Set the OpenAI Token as an Environment Variable")
@@ -18,8 +19,9 @@ This approach allows the MLflow AI Gateway to read the sensitive API key safely,
 
 bash
 
-```
+```bash
 export OPENAI_API_KEY=your_api_key_here
+
 ```
 
 ## Step 3: Configure the gateway server[​](#step-3-configure-the-gateway-server "Direct link to Step 3: Configure the gateway server")
@@ -30,7 +32,7 @@ Notably, the gateway server allows real-time updates to an active server through
 
 yaml
 
-```
+```yaml
 endpoints:
   - name: completions
     endpoint_type: llm/v1/completions
@@ -63,6 +65,7 @@ endpoints:
       name: text-embedding-ada-002
       config:
         openai_api_key: $OPENAI_API_KEY
+
 ```
 
 ## Step 4: Start the Server[​](#step-4-start-the-server "Direct link to Step 4: Start the Server")
@@ -75,8 +78,9 @@ The gateway server will automatically start on `localhost` at port `5000`, acces
 
 bash
 
-```
+```bash
 mlflow gateway start --config-path config.yaml
+
 ```
 
 note

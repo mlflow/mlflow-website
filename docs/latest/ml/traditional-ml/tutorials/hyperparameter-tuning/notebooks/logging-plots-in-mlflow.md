@@ -52,7 +52,7 @@ In conclusion, the `generate_apple_sales_data_with_promo_adjustment` function of
 
 python
 
-```
+```python
 import math
 import pathlib
 from datetime import datetime, timedelta
@@ -200,6 +200,7 @@ def generate_apple_sales_data_with_promo_adjustment(
   )
 
   return df
+
 ```
 
 ### Generating Apple Sales Data[​](#generating-apple-sales-data "Direct link to Generating Apple Sales Data")
@@ -218,16 +219,18 @@ You can see the data in the cell after the generation cell.
 
 python
 
-```
+```python
 my_data = generate_apple_sales_data_with_promo_adjustment(
   base_demand=1000, n_rows=10_000, competitor_price_effect=-25.0
 )
+
 ```
 
 python
 
-```
+```python
 my_data
+
 ```
 
 |      | date                       | average\_temperature | rainfall  | weekend | holiday | price\_per\_kg | promo | demand      | previous\_days\_demand | competitor\_price\_per\_kg | marketing\_intensity |
@@ -268,7 +271,7 @@ We return the figure object (`fig`) instead of rendering it directly so that eac
 
 python
 
-```
+```python
 def plot_time_series_demand(data, window_size=7, style="seaborn", plot_size=(16, 12)):
   if not isinstance(data, pd.DataFrame):
       raise TypeError("df must be a pandas DataFrame.")
@@ -306,6 +309,7 @@ def plot_time_series_demand(data, window_size=7, style="seaborn", plot_size=(16,
 
   plt.close(fig)
   return fig
+
 ```
 
 ### Visualizing Demand on Weekends vs. Weekdays with Box Plots[​](#visualizing-demand-on-weekends-vs-weekdays-with-box-plots "Direct link to Visualizing Demand on Weekends vs. Weekdays with Box Plots")
@@ -328,7 +332,7 @@ As with the time series plot, this function also returns the figure object (`fig
 
 python
 
-```
+```python
 def plot_box_weekend(df, style="seaborn", plot_size=(10, 8)):
   with plt.style.context(style=style):
       fig, ax = plt.subplots(figsize=plot_size)
@@ -354,6 +358,7 @@ def plot_box_weekend(df, style="seaborn", plot_size=(10, 8)):
       plt.tight_layout()
   plt.close(fig)
   return fig
+
 ```
 
 ### Exploring the Relationship Between Demand and Price per Kg[​](#exploring-the-relationship-between-demand-and-price-per-kg "Direct link to Exploring the Relationship Between Demand and Price per Kg")
@@ -373,7 +378,7 @@ In this visualization, we're creating a scatter plot to investigate the relation
 
 python
 
-```
+```python
 def plot_scatter_demand_price(df, style="seaborn", plot_size=(10, 8)):
   with plt.style.context(style=style):
       fig, ax = plt.subplots(figsize=plot_size)
@@ -413,6 +418,7 @@ def plot_scatter_demand_price(df, style="seaborn", plot_size=(10, 8)):
       plt.tight_layout()
   plt.close(fig)
   return fig
+
 ```
 
 ### Visualizing Demand Density: Weekday vs. Weekend[​](#visualizing-demand-density-weekday-vs-weekend "Direct link to Visualizing Demand Density: Weekday vs. Weekend")
@@ -437,7 +443,7 @@ This visualization allows us to observe the distribution of `demand` separately 
 
 python
 
-```
+```python
 def plot_density_weekday_weekend(df, style="seaborn", plot_size=(10, 8)):
   with plt.style.context(style=style):
       fig, ax = plt.subplots(figsize=plot_size)
@@ -471,6 +477,7 @@ def plot_density_weekday_weekend(df, style="seaborn", plot_size=(10, 8)):
       plt.tight_layout()
   plt.close(fig)
   return fig
+
 ```
 
 ### Visualization of Model Coefficients[​](#visualization-of-model-coefficients "Direct link to Visualization of Model Coefficients")
@@ -492,7 +499,7 @@ By visualizing the coefficients, we can gain a deeper understanding of the model
 
 python
 
-```
+```python
 def plot_coefficients(model, feature_names, style="seaborn", plot_size=(10, 8)):
   with plt.style.context(style=style):
       fig, ax = plt.subplots(figsize=plot_size)
@@ -503,6 +510,7 @@ def plot_coefficients(model, feature_names, style="seaborn", plot_size=(10, 8)):
       plt.tight_layout()
   plt.close(fig)
   return fig
+
 ```
 
 ### Visualization of Residuals[​](#visualization-of-residuals "Direct link to Visualization of Residuals")
@@ -526,7 +534,7 @@ By examining the residual plot, we can make better-informed decisions on the mod
 
 python
 
-```
+```python
 def plot_residuals(y_test, y_pred, style="seaborn", plot_size=(10, 8)):
   residuals = y_test - y_pred
 
@@ -552,6 +560,7 @@ def plot_residuals(y_test, y_pred, style="seaborn", plot_size=(10, 8)):
 
   plt.close(fig)
   return fig
+
 ```
 
 ### Visualization of Prediction Errors[​](#visualization-of-prediction-errors "Direct link to Visualization of Prediction Errors")
@@ -574,7 +583,7 @@ By analyzing the prediction error plot, practitioners can gain valuable insights
 
 python
 
-```
+```python
 def plot_prediction_error(y_test, y_pred, style="seaborn", plot_size=(10, 8)):
   with plt.style.context(style=style):
       fig, ax = plt.subplots(figsize=plot_size)
@@ -586,6 +595,7 @@ def plot_prediction_error(y_test, y_pred, style="seaborn", plot_size=(10, 8)):
       plt.tight_layout()
   plt.close(fig)
   return fig
+
 ```
 
 ### Visualization of Quantile-Quantile Plot (QQ Plot)[​](#visualization-of-quantile-quantile-plot-qq-plot "Direct link to Visualization of Quantile-Quantile Plot (QQ Plot)")
@@ -608,7 +618,7 @@ By closely analyzing the QQ plot, we can ensure our model's residuals meet the n
 
 python
 
-```
+```python
 def plot_qq(y_test, y_pred, style="seaborn", plot_size=(10, 8)):
   residuals = y_test - y_pred
   with plt.style.context(style=style):
@@ -618,6 +628,7 @@ def plot_qq(y_test, y_pred, style="seaborn", plot_size=(10, 8)):
       plt.tight_layout()
   plt.close(fig)
   return fig
+
 ```
 
 ### Feature Correlation Matrix[​](#feature-correlation-matrix "Direct link to Feature Correlation Matrix")
@@ -645,7 +656,7 @@ By analyzing the correlation matrix, we can make more informed decisions about f
 
 python
 
-```
+```python
 def plot_correlation_matrix_and_save(
   df, style="seaborn", plot_size=(10, 8), path="/tmp/corr_plot.png"
 ):
@@ -678,6 +689,7 @@ def plot_correlation_matrix_and_save(
   # convert to filesystem path spec for os compatibility
   save_path = pathlib.Path(path)
   fig.savefig(save_path)
+
 ```
 
 ### Detailed Overview of Main Execution for Model Training and Visualization[​](#detailed-overview-of-main-execution-for-model-training-and-visualization "Direct link to Detailed Overview of Main Execution for Model Training and Visualization")
@@ -741,7 +753,7 @@ By executing this comprehensive and structured code, we ensure that every aspect
 
 python
 
-```
+```python
 mlflow.set_tracking_uri("http://127.0.0.1:8080")
 
 mlflow.set_experiment("Visualizations Demo")
@@ -806,12 +818,5 @@ with mlflow.start_run() as run:
 
   # Log the saved correlation matrix plot by referring to the local file system location
   mlflow.log_artifact("/tmp/corr_plot.png")
-```
 
-```
-2023/09/26 13:10:41 INFO mlflow.tracking.fluent: Experiment with name 'Visualizations Demo' does not exist. Creating a new experiment.
-/Users/benjamin.wilson/miniconda3/envs/mlflow-dev-env/lib/python3.8/site-packages/mlflow/models/signature.py:333: UserWarning: Hint: Inferred schema contains integer column(s). Integer columns in Python cannot represent missing values. If your input data contains missing values at inference time, it will be encoded as floats and will cause a schema enforcement error. The best way to avoid this problem is to infer the model schema based on a realistic data sample (training dataset) that includes missing values. Alternatively, you can declare integer columns as doubles (float64) whenever these columns may have missing values. See `Handling Integers With Missing Values <https://www.mlflow.org/docs/latest/models.html#handling-integers-with-missing-values>`_ for more details.
-input_schema = _infer_schema(input_ex)
-/Users/benjamin.wilson/miniconda3/envs/mlflow-dev-env/lib/python3.8/site-packages/_distutils_hack/__init__.py:30: UserWarning: Setuptools is replacing distutils.
-warnings.warn("Setuptools is replacing distutils.")
 ```

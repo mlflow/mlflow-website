@@ -104,7 +104,7 @@ The following example shows a simple evaluation of a dataset of questions and ex
 
 python
 
-```
+```python
 import os
 import openai
 import mlflow
@@ -146,6 +146,7 @@ results = mlflow.genai.evaluate(
         Guidelines(name="is_english", guidelines="The answer must be in English"),
     ],
 )
+
 ```
 
 ## Review the results[​](#review-the-results "Direct link to Review the results")
@@ -154,8 +155,9 @@ Open the MLflow UI to review the evaluation results. If you are using OSS MLflow
 
 bash
 
-```
+```bash
 mlflow ui --port 5000
+
 ```
 
 If you are using cloud-based MLflow, open the experiment page in the platform. You should see a new evaluation run is created under the "Runs" tab. Click on the run name to view the evaluation results.

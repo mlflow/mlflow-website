@@ -30,8 +30,9 @@ First, install the required packages by running the following command:
 
 bash
 
-```
+```bash
 pip install --upgrade mlflow>=3.3 openai
+
 ```
 
 MLflow stores evaluation results in a tracking server. Connect your local environment to the tracking server by one of the following methods.
@@ -45,18 +46,20 @@ For the fastest setup, you can install the [mlflow](https://pypi.org/project/mlf
 
 bash
 
-```
+```bash
 mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5000
+
 ```
 
 This will start the server at port 5000 on your local machine. Connect your notebook/IDE to the server by setting the tracking URI. You can also access to the MLflow UI at <http://localhost:5000>.
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_tracking_uri("http://localhost:5000")
+
 ```
 
 You can also brows the MLflow UI at <http://localhost:5000>.
@@ -65,21 +68,23 @@ MLflow provides a Docker Compose file to start a local MLflow server with a post
 
 bash
 
-```
+```bash
 git clone https://github.com/mlflow/mlflow.git
 cd docker-compose
 cp .env.dev.example .env
 docker compose up -d
+
 ```
 
 This will start the server at port 5000 on your local machine. Connect your notebook/IDE to the server by setting the tracking URI. You can also access to the MLflow UI at <http://localhost:5000>.
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_tracking_uri("http://localhost:5000")
+
 ```
 
 Refer to the [instruction](https://github.com/mlflow/mlflow/tree/master/docker-compose/README.md) for more details, e.g., overriding the default environment variables.
@@ -88,7 +93,7 @@ If you have a remote MLflow tracking server, configure the connection:
 
 python
 
-```
+```python
 import os
 import mlflow
 
@@ -96,16 +101,18 @@ import mlflow
 os.environ["MLFLOW_TRACKING_URI"] = "http://your-mlflow-server:5000"
 # Or directly in code
 mlflow.set_tracking_uri("http://your-mlflow-server:5000")
+
 ```
 
 If you have a Databricks account, configure the connection:
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.login()
+
 ```
 
 This will prompt you for your configuration details (Databricks Host url and a PAT).
@@ -120,7 +127,7 @@ Create a math agent that can use tools to answer questions. We use [OpenAI Agent
 
 python
 
-```
+```python
 from agents import Agent, Runner, function_tool
 
 
@@ -150,25 +157,27 @@ agent = Agent(
     ),
     tools=[add, multiply, modular],
 )
+
 ```
 
 Make sure you can run the agent locally.
 
 python
 
-```
+```python
 from agents import Runner
 
 result = await Runner.run(agent, "What is 15% of 240?")
 print(result.final_output)
 # 36
+
 ```
 
 Lastly, let's wrap it in a function that MLflow can call. Note that MLflow runs each prediction in a threadpool, so using a synchronous function does not slow down the evaluation.
 
 python
 
-```
+```python
 from openai import OpenAI
 
 # If you are using Jupyter Notebook, you need to apply nest_asyncio.
@@ -178,6 +187,7 @@ from openai import OpenAI
 
 def predict_fn(question: str) -> str:
     return Runner.run_sync(agent, question).final_output
+
 ```
 
 ### Step 2: Create evaluation dataset[​](#step-2-create-evaluation-dataset "Direct link to Step 2: Create evaluation dataset")
@@ -186,7 +196,7 @@ Design test cases as a list of dictionaries, each with an `inputs`, `expectation
 
 python
 
-```
+```python
 eval_dataset = [
     {
         "inputs": {"task": "What is 15% of 240?"},
@@ -208,6 +218,7 @@ eval_dataset = [
         "tags": {"topic": "math"},
     },
 ]
+
 ```
 
 ### Step 3: Define agent-specific scorers[​](#step-3-define-agent-specific-scorers "Direct link to Step 3: Define agent-specific scorers")
@@ -222,7 +233,7 @@ For more details, see the [Evaluate Traces](/mlflow-website/docs/latest/genai/ev
 
 python
 
-```
+```python
 from mlflow.entities import Feedback, SpanType, Trace
 from mlflow.genai import scorer
 
@@ -249,6 +260,7 @@ def uses_correct_tools(trace: Trace, expectations: dict) -> Feedback:
     )
     # Return a Feedback object with the score and rationale
     return Feedback(value=score, rationale=rationale)
+
 ```
 
 ### Step 4: Run the evaluation[​](#step-4-run-the-evaluation "Direct link to Step 4: Run the evaluation")
@@ -257,10 +269,11 @@ Now we are ready to run the evaluation!
 
 python
 
-```
+```python
 results = mlflow.genai.evaluate(
     data=eval_dataset, predict_fn=predict_fn, scorers=[exact_match, uses_correct_tools]
 )
+
 ```
 
 Once the evaluation is done, open the MLflow UI in your browser and navigate to the experiment page. You should see MLflow creates a new Run and logs the evaluation results.
@@ -279,8 +292,9 @@ Running a complex agent can take a long time. MLflow by default uses background 
 
 bash
 
-```
+```bash
 export MLFLOW_GENAI_EVAL_MAX_WORKERS=10
+
 ```
 
 ## Evaluating MLflow Models[​](#evaluating-mlflow-models "Direct link to Evaluating MLflow Models")
@@ -289,7 +303,7 @@ In MLflow 2.x, you can pass the model URI directly to the `model` argument of th
 
 python
 
-```
+```python
 import mlflow
 
 # Load the model **outside** the prediction function.
@@ -305,6 +319,7 @@ def predict_fn(question: str) -> str:
 mlflow.genai.evaluate(
     data=eval_dataset, predict_fn=predict_fn, scorers=[exact_match, uses_correct_tools]
 )
+
 ```
 
 ## Next steps[​](#next-steps "Direct link to Next steps")

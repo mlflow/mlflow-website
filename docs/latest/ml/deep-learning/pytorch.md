@@ -39,7 +39,7 @@ Transform your PyTorch training workflow instantly with MLflow's powerful autolo
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.pytorch.autolog()  # That's it! 🎉
@@ -48,6 +48,7 @@ mlflow.pytorch.autolog()  # That's it! 🎉
 for epoch in range(num_epochs):
     model.train()
     # ... your training loop stays exactly the same
+
 ```
 
 What Gets Automatically Captured
@@ -99,11 +100,12 @@ PyTorch's dynamic nature pairs perfectly with MLflow's flexible tracking:
 
 python
 
-```
+```python
 # Track models that change during training
 if epoch > 50:
     model.add_layer(new_attention_layer)  # Dynamic architecture changes
     mlflow.log_param("architecture_change", f"Added attention at epoch {epoch}")
+
 ```
 
 ### Production-Ready Model Management[​](#production-ready-model-management "Direct link to Production-Ready Model Management")

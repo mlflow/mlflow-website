@@ -8,10 +8,11 @@ Since the local LLM endpoint served by Ollama is compatible with the OpenAI API,
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.openai.autolog()
+
 ```
 
 ### Example Usage[​](#example-usage "Direct link to Example Usage")
@@ -20,15 +21,16 @@ mlflow.openai.autolog()
 
 bash
 
-```
+```bash
 ollama run llama3.2:1b
+
 ```
 
 2. Enable auto-tracing for OpenAI SDK.
 
 text
 
-```
+```text
 import mlflow
 
 # Enable auto-tracing for OpenAI
@@ -37,13 +39,14 @@ mlflow.openai.autolog()
 # Optional: Set a tracking URI and an experiment
 mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_experiment("Ollama")
+
 ```
 
 3. Query the LLM and see the traces in the MLflow UI.
 
 python
 
-```
+```python
 from openai import OpenAI
 
 client = OpenAI(
@@ -58,6 +61,7 @@ response = client.chat.completions.create(
         {"role": "user", "content": "Why is the sky blue?"},
     ],
 )
+
 ```
 
 ## Token usage[​](#token-usage "Direct link to Token usage")
@@ -66,7 +70,7 @@ MLflow >= 3.2.0 supports token usage tracking for local LLM endpoint served thro
 
 python
 
-```
+```python
 import json
 import mlflow
 
@@ -106,11 +110,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 23
   Output tokens: 194
@@ -121,6 +126,7 @@ Completions:
   Input tokens: 23
   Output tokens: 194
   Total tokens: 217
+
 ```
 
 ### Disable auto-tracing[​](#disable-auto-tracing "Direct link to Disable auto-tracing")

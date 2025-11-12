@@ -68,7 +68,7 @@ MLflow's scorer system is highly flexible, supporting everything from simple rul
 
 python
 
-```
+```python
 from mlflow.genai.judges import make_judge
 import mlflow
 
@@ -136,11 +136,12 @@ trace = mlflow.get_trace(trace_id)
 feedback = efficiency_judge(trace=trace)
 print(f"Efficiency: {feedback.value}")
 print(f"Analysis: {feedback.rationale}")
+
 ```
 
 python
 
-```
+```python
 from mlflow.genai.judges import make_judge
 
 correctness_judge = make_judge(
@@ -161,11 +162,12 @@ feedback = correctness_judge(
     },
 )
 print(f"Correctness: {feedback.value}")
+
 ```
 
 python
 
-```
+```python
 import textstat
 from mlflow.genai.scorers import scorer
 from mlflow.entities import Feedback
@@ -187,11 +189,12 @@ def reading_level(outputs: str) -> Feedback:
         rationale = f"Reading ease score of {score:.1f} - expert level required"
 
     return Feedback(value=level, rationale=rationale, metadata={"score": score})
+
 ```
 
 python
 
-```
+```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 from mlflow.genai.scorers import scorer
@@ -209,11 +212,12 @@ def perplexity_score(outputs: str) -> float:
 
     perplexity = torch.exp(outputs.loss).item()
     return perplexity  # Lower is better - indicates more natural text
+
 ```
 
 python
 
-```
+```python
 from mlflow.genai.scorers import scorer
 from mlflow.entities import Feedback, Trace
 
@@ -236,6 +240,7 @@ def response_time(trace: Trace) -> Feedback:
         rationale=f"Response took {latency_ms:.0f}ms",
         metadata={"latency_ms": latency_ms},
     )
+
 ```
 
 ## Judge Alignment[​](#judge-alignment "Direct link to Judge Alignment")
@@ -248,7 +253,7 @@ Judge alignment uses human feedback to improve the accuracy and consistency of L
 
 python
 
-```
+```python
 from mlflow.genai.judges import make_judge
 import mlflow
 
@@ -270,6 +275,7 @@ aligned_judge = quality_judge.align(traces_with_feedback)
 
 # The aligned judge now better matches your team's quality standards
 feedback = aligned_judge(inputs={"query": "..."}, outputs={"response": "..."})
+
 ```
 
 ### Key Benefits of Alignment[​](#key-benefits-of-alignment "Direct link to Key Benefits of Alignment")
@@ -285,7 +291,7 @@ MLflow's alignment system uses a plugin architecture, allowing you to create cus
 
 python
 
-```
+```python
 from mlflow.genai.judges.base import AlignmentOptimizer
 
 
@@ -297,6 +303,7 @@ class CustomOptimizer(AlignmentOptimizer):
 
 # Use your custom optimizer
 aligned_judge = quality_judge.align(traces, CustomOptimizer())
+
 ```
 
 ## Integration with MLflow Evaluation[​](#integration-with-mlflow-evaluation "Direct link to Integration with MLflow Evaluation")
@@ -305,7 +312,7 @@ Scorers are the building blocks of MLflow's evaluation framework. They integrate
 
 python
 
-```
+```python
 import mlflow
 import pandas as pd
 
@@ -353,6 +360,7 @@ results = mlflow.genai.evaluate(
 # Access evaluation metrics
 print(f"Correctness: {results.metrics.get('correctness/mean', 'N/A')}")
 print(f"Reading Level: {results.metrics.get('reading_level/mode', 'N/A')}")
+
 ```
 
 ## Best Practices[​](#best-practices "Direct link to Best Practices")

@@ -8,7 +8,7 @@ The simplest way to get started is by logging your Spark MLlib models directly t
 
 python
 
-```
+```python
 import mlflow
 import mlflow.spark
 from pyspark.ml.classification import LogisticRegression
@@ -55,6 +55,7 @@ with mlflow.start_run():
     )
 
 print(f"Model logged with URI: {model_info.model_uri}")
+
 ```
 
 This simple example automatically logs:
@@ -73,7 +74,7 @@ The native Spark format preserves the full functionality of your Spark ML pipeli
 
 python
 
-```
+```python
 # Load as native Spark model (requires Spark session)
 spark_model = mlflow.spark.load_model(model_info.model_uri)
 
@@ -85,6 +86,7 @@ test_data = spark.createDataFrame(
 
 predictions = spark_model.transform(test_data)
 predictions.show()
+
 ```
 
 **Best for:** Large-scale batch processing, existing Spark infrastructure
@@ -93,7 +95,7 @@ The PyFunc format enables deployment outside of Spark environments:
 
 python
 
-```
+```python
 import pandas as pd
 
 # Load as PyFunc model (no Spark session required)
@@ -107,6 +109,7 @@ test_data = pd.DataFrame(
 # Predictions work seamlessly
 predictions = pyfunc_model.predict(test_data)
 print(predictions)
+
 ```
 
 **Best for:** REST API deployment, edge computing, non-Spark environments
@@ -130,7 +133,7 @@ print(predictions)
 
 python
 
-```
+```python
 from pyspark.ml.feature import VectorAssembler, StandardScaler
 from pyspark.ml.classification import RandomForestClassifier
 
@@ -161,11 +164,12 @@ with mlflow.start_run(run_name="Feature Pipeline"):
 
     # Log the complete pipeline
     mlflow.spark.log_model(spark_model=model, artifact_path="feature_pipeline")
+
 ```
 
 python
 
-```
+```python
 from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
 
@@ -214,6 +218,7 @@ with mlflow.start_run(run_name="Hyperparameter Tuning"):
     mlflow.spark.log_model(
         spark_model=cv_model.bestModel, artifact_path="best_cv_model"
     )
+
 ```
 
 ## Spark Datasource Autologging[​](#spark-datasource-autologging "Direct link to Spark Datasource Autologging")
@@ -225,7 +230,7 @@ MLflow provides automatic logging of Spark datasource information:
 
 python
 
-```
+```python
 import mlflow.spark
 
 # Enable Spark datasource autologging
@@ -244,6 +249,7 @@ with mlflow.start_run():
 
     # Model training and datasource information both captured
     mlflow.spark.log_model(model, artifact_path="model_with_datasource_tracking")
+
 ```
 
 **Requirements:**
@@ -256,7 +262,7 @@ with mlflow.start_run():
 
 python
 
-```
+```python
 from pyspark.sql import SparkSession
 
 # Configure Spark session with MLflow JAR
@@ -265,6 +271,7 @@ spark = (
     .config("spark.jars.packages", "org.mlflow:mlflow-spark_2.12:2.16.2")
     .getOrCreate()
 )
+
 ```
 
 **What Gets Logged:**
@@ -280,7 +287,7 @@ spark = (
 
 python
 
-```
+```python
 from mlflow.models import infer_signature
 from pyspark.ml.linalg import Vectors
 from pyspark.ml.functions import array_to_vector
@@ -307,11 +314,12 @@ with mlflow.start_run():
         signature=signature,
         input_example=vector_data.limit(2).toPandas(),
     )
+
 ```
 
 python
 
-```
+```python
 from mlflow.types import DataType, Schema, ColSpec
 from mlflow.types.schema import SparkMLVector
 from mlflow.models.signature import ModelSignature
@@ -334,6 +342,7 @@ with mlflow.start_run():
     mlflow.spark.log_model(
         spark_model=model, artifact_path="production_model", signature=signature
     )
+
 ```
 
 ## Cross-Platform Deployment[​](#cross-platform-deployment "Direct link to Cross-Platform Deployment")
@@ -345,7 +354,7 @@ Convert Spark MLlib models to ONNX format for cross-platform deployment:
 
 python
 
-```
+```python
 # Note: This requires onnxmltools (Spark ML support is experimental)
 # pip install onnxmltools
 
@@ -384,13 +393,14 @@ with mlflow.start_run(run_name="ONNX Conversion"):
 
         # ONNX conversion for Spark ML is experimental and may not work
         # for all model types. Consider using PyFunc format instead.
+
 ```
 
 **Note:** Spark ML to ONNX conversion is experimental in onnxmltools and may not support all Spark ML operators. For production deployments, consider using MLflow's PyFunc format for broader compatibility.
 
 python
 
-```
+```python
 from mlflow import MlflowClient
 
 client = MlflowClient()
@@ -425,6 +435,7 @@ model_version = client.get_latest_versions(
 client.transition_model_version_stage(
     name="CustomerSegmentationModel", version=model_version.version, stage="Staging"
 )
+
 ```
 
 ## Production Deployment[​](#production-deployment "Direct link to Production Deployment")
@@ -434,7 +445,7 @@ client.transition_model_version_stage(
 
 python
 
-```
+```python
 def production_batch_scoring(model_uri, input_path, output_path):
     """Simple production batch scoring pipeline."""
 
@@ -469,11 +480,12 @@ production_batch_scoring(
     input_path="s3://data-lake/daily-customers/",
     output_path="s3://predictions/customer-segments/",
 )
+
 ```
 
 python
 
-```
+```python
 def evaluate_spark_model(model, test_data, model_name):
     """Evaluate Spark ML model with comprehensive metrics."""
 
@@ -514,6 +526,7 @@ def evaluate_spark_model(model, test_data, model_name):
 
 # Usage
 evaluation_results = evaluate_spark_model(model, test_data, "RandomForest")
+
 ```
 
 ## Error Handling and Best Practices[​](#error-handling-and-best-practices "Direct link to Error Handling and Best Practices")
@@ -524,7 +537,7 @@ evaluation_results = evaluate_spark_model(model, test_data, "RandomForest")
 
 python
 
-```
+```python
 def train_spark_model_with_error_handling(data_path, model_config):
     """Production-ready model training with error handling."""
 
@@ -582,6 +595,7 @@ def create_pipeline(config):
         raise ValueError(f"Unsupported algorithm: {algorithm}")
 
     return Pipeline(stages=[assembler, classifier])
+
 ```
 
 **Common Issues and Solutions:**
@@ -590,7 +604,7 @@ def create_pipeline(config):
 
 python
 
-```
+```python
 # Test model serialization
 def test_model_serialization(model):
     try:
@@ -601,26 +615,28 @@ def test_model_serialization(model):
     except Exception as e:
         print(f"Serialization failed: {e}")
         return False
+
 ```
 
 **Memory Issues:**
 
 python
 
-```
+```python
 # Configure Spark for large models
 spark.conf.set("spark.sql.adaptive.enabled", "true")
 spark.conf.set("spark.sql.adaptive.coalescePartitions.enabled", "true")
 
 # Cache strategically
 large_dataset.cache()  # Only when reused multiple times
+
 ```
 
 **Efficient Logging:**
 
 python
 
-```
+```python
 def efficient_spark_ml_logging():
     """Configure efficient logging for Spark ML."""
 
@@ -641,13 +657,14 @@ def efficient_spark_ml_logging():
             artifact_path="efficient_model",
             input_example=sample_data.limit(3).toPandas(),  # Small sample only
         )
+
 ```
 
 **Spark Configuration:**
 
 python
 
-```
+```python
 # Optimize Spark for MLflow operations
 def configure_spark_for_mlflow():
     """Configure Spark session for optimal MLflow performance."""
@@ -660,6 +677,7 @@ def configure_spark_for_mlflow():
 
     for key, value in spark_config.items():
         spark.conf.set(key, value)
+
 ```
 
 ## Conclusion[​](#conclusion "Direct link to Conclusion")

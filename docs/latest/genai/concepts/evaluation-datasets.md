@@ -71,7 +71,7 @@ Each record in an evaluation dataset represents a single test case:
 
 json
 
-```
+```json
 {
     "inputs": {
         "question": "What is the capital of France?",
@@ -97,6 +97,7 @@ json
         "validated": "true"
     }
 }
+
 ```
 
 ### Record Fields[​](#record-fields "Direct link to Record Fields")
@@ -112,7 +113,7 @@ Evaluation datasets automatically track and adapt to schema changes as you add r
 
 python
 
-```
+```python
 # Initial records might have simple structure
 initial_record = {
     "inputs": {"question": "What is MLflow?"},
@@ -139,6 +140,7 @@ enhanced_record = {
 # Access the computed schema and profile:
 dataset.schema  # JSON string describing field structure
 dataset.profile  # JSON string with statistics (record counts, field coverage)
+
 ```
 
 ## Dataset Evolution[​](#dataset-evolution "Direct link to Dataset Evolution")
@@ -155,7 +157,7 @@ Immediately capture and learn from production failures:
 
 python
 
-```
+```python
 # Find failed traces
 failure_traces = mlflow.search_traces(
     filter_string="attributes.error = 'true'", max_results=10
@@ -171,6 +173,7 @@ for trace in failure_traces:
 
 # Add to dataset for regression testing
 dataset.merge_records(failure_traces)
+
 ```
 
 #### Adversarial Test Expansion[​](#adversarial-test-expansion "Direct link to Adversarial Test Expansion")
@@ -179,7 +182,7 @@ Progressively add challenging test cases:
 
 python
 
-```
+```python
 adversarial_records = [
     # Prompt injection attempts
     {
@@ -193,6 +196,7 @@ adversarial_records = [
 ]
 
 dataset.merge_records(adversarial_records)
+
 ```
 
 #### Quality Threshold Evolution[​](#quality-threshold-evolution "Direct link to Quality Threshold Evolution")
@@ -201,7 +205,7 @@ Raise the bar as your model improves:
 
 python
 
-```
+```python
 # Update accuracy thresholds for existing records
 for record in dataset.records:
     if "accuracy" in record.get("expectations", {}):
@@ -210,6 +214,7 @@ for record in dataset.records:
         )
 
 dataset.merge_records(dataset.records)  # Updates existing
+
 ```
 
 #### Track Evolution with Tags[​](#track-evolution-with-tags "Direct link to Track Evolution with Tags")
@@ -218,7 +223,7 @@ While datasets are mutable, use tags to mark evolution milestones:
 
 python
 
-```
+```python
 from mlflow.genai.datasets import set_dataset_tags
 
 # Mark dataset evolution stages
@@ -232,6 +237,7 @@ set_dataset_tags(
         "record_count": str(len(dataset.records)),
     },
 )
+
 ```
 
 #### Benefits of Continuous Evolution[​](#benefits-of-continuous-evolution "Direct link to Benefits of Continuous Evolution")
@@ -250,7 +256,7 @@ The `merge_records()` method intelligently handles new test cases:
 
 python
 
-```
+```python
 # Start with existing dataset
 dataset = get_dataset(dataset_id="d-4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d")
 print(f"Starting with {len(dataset.records)} records")
@@ -269,6 +275,7 @@ new_cases = [
 
 dataset.merge_records(new_cases)
 print(f"Now contains {len(dataset.records)} records")
+
 ```
 
 #### Schema Evolution[​](#schema-evolution-1 "Direct link to Schema Evolution")
@@ -277,7 +284,7 @@ Datasets automatically adapt as you add fields:
 
 python
 
-```
+```python
 # Initial records might be simple
 initial = {
     "inputs": {"question": "What is MLflow?"},
@@ -301,6 +308,7 @@ enhanced = {
 
 # Schema automatically evolves to include all fields
 dataset.merge_records([initial, enhanced])
+
 ```
 
 ## Trace to Dataset Workflow[​](#trace-to-dataset-workflow "Direct link to Trace to Dataset Workflow")

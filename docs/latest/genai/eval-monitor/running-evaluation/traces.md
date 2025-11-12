@@ -32,8 +32,9 @@ First, install the required packages by running the following command:
 
 bash
 
-```
+```bash
 pip install --upgrade mlflow>=3.3 openai
+
 ```
 
 MLflow stores evaluation results in a tracking server. Connect your local environment to the tracking server by one of the following methods.
@@ -47,18 +48,20 @@ For the fastest setup, you can install the [mlflow](https://pypi.org/project/mlf
 
 bash
 
-```
+```bash
 mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5000
+
 ```
 
 This will start the server at port 5000 on your local machine. Connect your notebook/IDE to the server by setting the tracking URI. You can also access to the MLflow UI at <http://localhost:5000>.
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_tracking_uri("http://localhost:5000")
+
 ```
 
 You can also brows the MLflow UI at <http://localhost:5000>.
@@ -67,21 +70,23 @@ MLflow provides a Docker Compose file to start a local MLflow server with a post
 
 bash
 
-```
+```bash
 git clone https://github.com/mlflow/mlflow.git
 cd docker-compose
 cp .env.dev.example .env
 docker compose up -d
+
 ```
 
 This will start the server at port 5000 on your local machine. Connect your notebook/IDE to the server by setting the tracking URI. You can also access to the MLflow UI at <http://localhost:5000>.
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_tracking_uri("http://localhost:5000")
+
 ```
 
 Refer to the [instruction](https://github.com/mlflow/mlflow/tree/master/docker-compose/README.md) for more details, e.g., overriding the default environment variables.
@@ -90,7 +95,7 @@ If you have a remote MLflow tracking server, configure the connection:
 
 python
 
-```
+```python
 import os
 import mlflow
 
@@ -98,16 +103,18 @@ import mlflow
 os.environ["MLFLOW_TRACKING_URI"] = "http://your-mlflow-server:5000"
 # Or directly in code
 mlflow.set_tracking_uri("http://your-mlflow-server:5000")
+
 ```
 
 If you have a Databricks account, configure the connection:
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.login()
+
 ```
 
 This will prompt you for your configuration details (Databricks Host url and a PAT).
@@ -122,7 +129,7 @@ First, let's simulate some production traces to use for evaluation. Here we defi
 
 python
 
-```
+```python
 import mlflow
 from mlflow.entities import Document
 import openai
@@ -200,13 +207,14 @@ def generate_sales_email(customer_name: str, user_instructions: str) -> dict[str
         max_tokens=2000,
     )
     return {"email": response.choices[0].message.content}
+
 ```
 
 Let's run the app and generate some traces.
 
 python
 
-```
+```python
 test_requests = [
     {"customer_name": "Acme Corp", "user_instructions": "Follow up after product demo"},
     {
@@ -240,6 +248,7 @@ for req in test_requests:
         print(f"✓ Generated email for {req['customer_name']}")
     except Exception as e:
         print(f"✗ Error for {req['customer_name']}: {e}")
+
 ```
 
 This generates a list of traces as follows:
@@ -252,7 +261,7 @@ Traces stored in the MLflow backend can be retrieved using the [`mlflow.search_t
 
 python
 
-```
+```python
 import mlflow
 from datetime import datetime, timedelta
 
@@ -261,6 +270,7 @@ yesterday = datetime.now() - timedelta(days=1)
 traces = mlflow.search_traces(
     filter_string=f"timestamp > {int(yesterday.timestamp() * 1000)}"
 )
+
 ```
 
 The API returns a set of traces as a pandas DataFrame, where various data in the trace is expanded into columns. The dataframe can be directly passed into the [`mlflow.genai.evaluate()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.evaluate) function for evaluation.
@@ -279,7 +289,7 @@ These scorers uses LLM for judging the criteria. The default model is `openai:/g
 
 python
 
-```
+```python
 email_scorers = [
     RetrievalGroundedness(),
     RelevanceToQuery(),  # Checks if email addresses the user's request
@@ -296,6 +306,7 @@ email_scorers = [
         guidelines="The email must be in a professional tone.",
     ),
 ]
+
 ```
 
 Scoring Intermediate Information in Traces
@@ -308,11 +319,12 @@ Now we are ready to run the evaluation. One notable difference from other exampl
 
 python
 
-```
+```python
 results = mlflow.genai.evaluate(
     data=traces,
     scorers=email_scorers,
 )
+
 ```
 
 Once the evaluation is done, open the MLflow UI in your browser and navigate to the experiment page. You should see MLflow creates a new Run and logs the evaluation results.
@@ -339,7 +351,7 @@ Using the [`mlflow.log_feedback()`](/mlflow-website/docs/latest/api_reference/py
 
 python
 
-```
+```python
 # Decorate the endpoint with MLflow tracing
 @mlflow.trace(span_type="LLM")
 @app.post("/chat", response_model=ChatResponse)
@@ -392,6 +404,7 @@ async def feedback(request: FeedbackRequest):
         raise HTTPException(
             status_code=500, detail=f"Error processing feedback: {str(e)}"
         )
+
 ```
 
 ## Next steps[​](#next-steps "Direct link to Next steps")

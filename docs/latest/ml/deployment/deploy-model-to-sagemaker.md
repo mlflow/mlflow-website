@@ -40,16 +40,18 @@ It's recommended to test your model locally before deploying it to a production 
 
 bash
 
-```
+```bash
 mlflow deployments run-local -t sagemaker -m models:/<model_id> -p 5000
+
 ```
 
 You can then test the model by sending a POST request to the endpoint:
 
 bash
 
-```
+```bash
 curl -X POST -H "Content-Type:application/json; format=pandas-split" --data '{"columns":["a","b"],"data":[[1,2]]}' http://localhost:5000/invocations
+
 ```
 
 ### Step 2: Build a Docker Image and Push to ECR[​](#step-2-build-a-docker-image-and-push-to-ecr "Direct link to Step 2: Build a Docker Image and Push to ECR")
@@ -58,8 +60,9 @@ The [mlflow sagemaker build-and-push-container](/mlflow-website/docs/latest/api_
 
 bash
 
-```
+```bash
 $ mlflow sagemaker build-and-push-container  -m models:/<model_id>
+
 ```
 
 Alternatively, you can create a custom Docker image using the [official MLflow Docker image](/mlflow-website/docs/latest/ml/docker.md) and manually push it to ECR.
@@ -72,12 +75,13 @@ Various command-line options are available to customize the deployment, such as 
 
 bash
 
-```
+```bash
 $ mlflow deployments create -t sagemaker -m runs:/<run_id>/model \
     -C region_name=<your-region> \
     -C instance-type=ml.m4.xlarge \
     -C instance-count=1 \
     -C env='{"DISABLE_NGINX": "true"}''
+
 ```
 
 ## API Reference[​](#api-reference "Direct link to API Reference")

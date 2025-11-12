@@ -15,16 +15,18 @@ Add [`mlflow`](https://pypistats.org/packages/mlflow) to your Python environment
 
 bash
 
-```
+```bash
 pip install mlflow
+
 ```
 
 Install the [mlflow-tracing](https://www.npmjs.com/package/mlflow-tracing) package and other auto-tracing integrations (e.g., [mlflow-openai](https://www.npmjs.com/package/mlflow-tracing-openai)).
 
 bash
 
-```
+```bash
 npm install mlflow-tracing
+
 ```
 
 ### 2. Instrumenting Your Application Logic[​](#2-instrumenting-your-application-logic "Direct link to 2. Instrumenting Your Application Logic")

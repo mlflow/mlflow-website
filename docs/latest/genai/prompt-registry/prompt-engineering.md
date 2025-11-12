@@ -12,8 +12,9 @@ To use the prompt engineering UI, you need to create one or more [MLflow AI Gate
 
 bash
 
-```
+```bash
 mlflow gateway start --config-path config.yaml --port 7000
+
 ```
 
 ### Step 2: Connect the MLflow AI Gateway to your MLflow Tracking Server[​](#step-2-connect-the-mlflow-ai-gateway-to-your-mlflow-tracking-server "Direct link to Step 2: Connect the MLflow AI Gateway to your MLflow Tracking Server")
@@ -22,9 +23,10 @@ The prompt engineering UI also requires a connection between the MLflow AI Gatew
 
 bash
 
-```
+```bash
 export MLFLOW_DEPLOYMENTS_TARGET="http://127.0.0.1:7000"
 mlflow server --port 5000
+
 ```
 
 ### Step 3: Create or find an MLflow Experiment[​](#step-3-create-or-find-an-mlflow-experiment "Direct link to Step 3: Create or find an MLflow Experiment")
@@ -55,7 +57,7 @@ Replace the prompt template from the previous step with a prompt template of you
 
 text
 
-````
+````text
 Read the following article from the MLflow documentation that appears between triple
 backticks. Then, answer the question about the documentation that appears between triple quotes.
 Include relevant links and code examples in your answer.
@@ -65,6 +67,7 @@ Include relevant links and code examples in your answer.
 """
 {{question}}
 """
+
 ````
 
 Then, fill in the input variables. For example, in the MLflow documentation use case, the *article* input variable can be set to the contents of <https://mlflow.org/docs/latest/tracking.html#logging-data-to-runs> and the *question* input variable can be set to `"How do I create a new MLflow Run using the Python API?"`.
@@ -115,10 +118,11 @@ As you try additional inputs, you might discover scenarios where your choice of 
 
    text
 
-   ```
+   ```text
    If the question does not relate to the article, respond exactly with the phrase
    "I do not know how to answer that question." Do not include any additional text in your
    response.
+
    ```
 
    ![](/mlflow-website/docs/latest/assets/images/duplicate_run-71f18e13acc59fb8bc860b27f2c24529.png)
@@ -145,7 +149,7 @@ All of the inputs and outputs produced by the MLflow prompt engineering UI and E
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_experiment("/Path/to/your/prompt/engineering/experiment")
@@ -162,6 +166,7 @@ inputs_outputs_pdf = mlflow.load_table(
 # Optionally convert the Pandas DataFrame to Spark where it can be stored as a Delta
 # table or joined with existing Delta tables
 inputs_outputs_sdf = spark.createDataFrame(inputs_outputs_pdf)
+
 ```
 
 ### Step 12: Generate predictions programmatically[​](#quickstart-score "Direct link to Step 12: Generate predictions programmatically")
@@ -174,20 +179,21 @@ Once you have found a configuration of LLM, prompt template, and parameters that
 
    python
 
-   ```
+   ```python
    import mlflow
 
    logged_model = "runs:/8451075c46964f82b85fe16c3d2b7ea0/model"
 
    # Load model as a PyFuncModel.
    loaded_model = mlflow.pyfunc.load_model(logged_model)
+
    ```
 
 2. Then, to generate predictions, call the [`predict()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.PyFuncModel.predict) method and pass in a dictionary of input variables. For example:
 
    python
 
-   ```
+   ```python
    article_text = """
    An MLflow Project is a format for packaging data science code in a reusable and reproducible way.
    The MLflow Projects component includes an API and command-line tools for running projects, which
@@ -200,6 +206,7 @@ Once you have found a configuration of LLM, prompt template, and parameters that
    question = "What is an MLflow project?"
 
    loaded_model.predict({"article": article_text, "question": question})
+
    ```
 
    For more information about deployment for real-time serving with MLflow, see the [instructions below](#deploy-prompt-serving).
@@ -212,11 +219,12 @@ Once you have found a configuration of LLM, prompt template, and parameters that
 
    python
 
-   ```
+   ```python
    mlflow.register_model(
        model_uri="runs:/8451075c46964f82b85fe16c3d2b7ea0/model",
        name="mlflow_docs_qa_model",
    )
+
    ```
 
 2. Define the following environment variables in the environment where you will run your MLflow Model Server, such as a shell on your local machine:
@@ -227,15 +235,16 @@ Once you have found a configuration of LLM, prompt template, and parameters that
 
    bash
 
-   ```
+   ```bash
    mlflow models serve --model-uri models:/mlflow_docs_qa_model/1 --port 8000
+
    ```
 
 4. Once the server has been started, it can be queried via REST API call. For example:
 
    bash
 
-   ```
+   ```bash
    input='
    {
        "dataframe_records": [
@@ -252,6 +261,7 @@ Once you have found a configuration of LLM, prompt template, and parameters that
      https://localhost:8000/invocations
      -H 'Content-Type: application/json' \
      -d @-
+
    ```
 
    where `article` and `question` are replaced with the input variable(s) from your prompt template.

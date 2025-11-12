@@ -45,7 +45,7 @@ A translation pipeline for English to French is created. This pipeline streamlin
 
 python
 
-```
+```python
 # Disable tokenizers warnings when constructing pipelines
 %env TOKENIZERS_PARALLELISM=false
 
@@ -53,15 +53,12 @@ import warnings
 
 # Disable a few less-than-useful UserWarnings from setuptools and pydantic
 warnings.filterwarnings("ignore", category=UserWarning)
-```
 
-```
-env: TOKENIZERS_PARALLELISM=false
 ```
 
 python
 
-```
+```python
 import transformers
 
 import mlflow
@@ -75,6 +72,7 @@ translation_pipeline = transformers.pipeline(
   ),
   tokenizer=transformers.T5TokenizerFast.from_pretrained(model_architecture, return_tensors="pt"),
 )
+
 ```
 
 ### Testing the Translation Pipeline[​](#testing-the-translation-pipeline "Direct link to Testing the Translation Pipeline")
@@ -99,15 +97,12 @@ This step confirms that both the model and tokenizer in the pipeline are correct
 
 python
 
-```
+```python
 # Evaluate the pipeline on a sample sentence prior to logging
 translation_pipeline(
   "translate English to French: I enjoyed my slow saunter along the Champs-Élysées."
 )
-```
 
-```
-[{'translation_text': "J'ai apprécié mon sajour lente sur les Champs-Élysées."}]
 ```
 
 ### Evaluating the Translation Results[​](#evaluating-the-translation-results "Direct link to Evaluating the Translation Results")
@@ -118,16 +113,18 @@ The initial translation output was:
 
 text
 
-```
+```text
     `[{'translation_text': "J'ai apprécié mon sajour lente sur les Champs-Élysées."}]`
+
 ```
 
 This translation captures the essence of the original English sentence but shows minor grammatical errors and word choice issues. For instance, a more refined translation might be:
 
 text
 
-```
+```text
     `"J'ai apprécié ma lente promenade le long des Champs-Élysées."`
+
 ```
 
 This version corrects grammatical gender and adds necessary articles, accentuation, and hyphenation. These subtle nuances enhance the translation quality significantly. The base model's performance is encouraging, indicating the potential for more precise translations with further fine-tuning and context. MLflow's tracking and management capabilities will be instrumental in monitoring the iterative improvements of such models.
@@ -156,7 +153,7 @@ By establishing these parameters and signature, we lay a robust foundation for o
 
 python
 
-```
+```python
 # Define the parameters that we are permitting to be used at inference time, along with their default values if not overridden
 model_params = {"max_length": 1000}
 
@@ -166,6 +163,7 @@ signature = mlflow.models.infer_signature(
   mlflow.transformers.generate_signature_output(translation_pipeline, "This is another sample."),
   params=model_params,
 )
+
 ```
 
 ### Reviewing the Model Signature[​](#reviewing-the-model-signature "Direct link to Reviewing the Model Signature")
@@ -182,18 +180,10 @@ Reviewing the signature through the `signature` command allows us to validate th
 
 python
 
-```
+```python
 # Visualize the model signature
 signature
-```
 
-```
-inputs: 
-[string]
-outputs: 
-[string]
-params: 
-['max_length': long (default: 1000)]
 ```
 
 ### Creating an experiment[​](#creating-an-experiment "Direct link to Creating an experiment")
@@ -202,17 +192,14 @@ We create a new MLflow Experiment so that the run we're going to log our model t
 
 python
 
-```
+```python
 # If you are running this tutorial in local mode, leave the next line commented out.
 # Otherwise, uncomment the following line and set your tracking uri to your local or remote tracking server.
 
 # mlflow.set_tracking_uri("http://127.0.0.1:8080")
 
 mlflow.set_experiment("Translation")
-```
 
-```
-<Experiment: artifact_location='file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/transformers/tutorials/translation/mlruns/996217394074032926', creation_time=1701286351921, experiment_id='996217394074032926', last_update_time=1701286351921, lifecycle_stage='active', name='Translation', tags={}>
 ```
 
 ### Logging the Model with MLflow[​](#logging-the-model-with-mlflow "Direct link to Logging the Model with MLflow")
@@ -238,7 +225,7 @@ Post logging, we obtain the `model_info` object, which encompasses all the essen
 
 python
 
-```
+```python
 with mlflow.start_run():
   model_info = mlflow.transformers.log_model(
       transformers_model=translation_pipeline,
@@ -246,6 +233,7 @@ with mlflow.start_run():
       signature=signature,
       model_params=model_params,
   )
+
 ```
 
 ### Inspecting the Loaded Model Components[​](#inspecting-the-loaded-model-components "Direct link to Inspecting the Loaded Model Components")
@@ -275,7 +263,7 @@ This verification step is vital for the successful application of the model in p
 
 python
 
-```
+```python
 # Load our saved model as a dictionary of components, comprising the model itself, the tokenizer, and any other components that were saved
 translation_components = mlflow.transformers.load_model(
   model_info.model_uri, return_type="components"
@@ -284,22 +272,7 @@ translation_components = mlflow.transformers.load_model(
 # Show the components that made up our pipeline that we saved and what type each are
 for key, value in translation_components.items():
   print(f"{key} -> {type(value).__name__}")
-```
 
-```
-2023/11/30 12:00:44 INFO mlflow.transformers: 'runs:/2357c12ca17a4f328b2f72cbb7d70343/french_translator' resolved as 'file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/transformers/tutorials/translation/mlruns/996217394074032926/2357c12ca17a4f328b2f72cbb7d70343/artifacts/french_translator'
-```
-
-```
-Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]
-```
-
-```
-task -> str
-device_map -> str
-model -> T5ForConditionalGeneration
-tokenizer -> T5TokenizerFast
-framework -> str
 ```
 
 ### Understanding Model Flavors in MLflow[​](#understanding-model-flavors-in-mlflow "Direct link to Understanding Model Flavors in MLflow")
@@ -315,26 +288,10 @@ This information guides how to interact with the model within MLflow, ensuring p
 
 python
 
-```
+```python
 # Show the model parameters that were saved with our model to gain an understanding of what is recorded when saving a transformers pipeline
 model_info.flavors
-```
 
-```
-{'python_function': {'model_binary': 'model',
-'loader_module': 'mlflow.transformers',
-'python_version': '3.8.13',
-'env': {'conda': 'conda.yaml', 'virtualenv': 'python_env.yaml'}},
-'transformers': {'transformers_version': '4.34.1',
-'code': None,
-'task': 'translation_en_to_fr',
-'instance_type': 'TranslationPipeline',
-'source_model_name': 'google/flan-t5-base',
-'pipeline_model_type': 'T5ForConditionalGeneration',
-'framework': 'pt',
-'tokenizer_type': 'T5TokenizerFast',
-'components': ['tokenizer'],
-'model_binary': 'model'}}
 ```
 
 ### Evaluating the Translation Output[​](#evaluating-the-translation-output "Direct link to Evaluating the Translation Output")
@@ -355,24 +312,13 @@ Testing with linguistically complex sentences is vital. It ensures the model can
 
 python
 
-```
+```python
 # Load our saved model as a transformers pipeline and validate the performance for a simple translation task
 translation_pipeline = mlflow.transformers.load_model(model_info.model_uri)
 response = translation_pipeline("I have heard that Nice is nice this time of year.")
 
 print(response)
-```
 
-```
-2023/11/30 12:00:45 INFO mlflow.transformers: 'runs:/2357c12ca17a4f328b2f72cbb7d70343/french_translator' resolved as 'file:///Users/benjamin.wilson/repos/mlflow-fork/mlflow/docs/source/llms/transformers/tutorials/translation/mlruns/996217394074032926/2357c12ca17a4f328b2f72cbb7d70343/artifacts/french_translator'
-```
-
-```
-Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]
-```
-
-```
-[{'translation_text': "J'ai entendu que Nice est bien cette période de l'année."}]
 ```
 
 ### Assessing the Reconstructed Pipeline's Translation[​](#assessing-the-reconstructed-pipelines-translation "Direct link to Assessing the Reconstructed Pipeline's Translation")
@@ -393,7 +339,7 @@ This test is key in verifying that the saved model and its components are not on
 
 python
 
-```
+```python
 # Verify that the components that we loaded can be constructed into a pipeline manually
 reconstructed_pipeline = transformers.pipeline(**translation_components)
 
@@ -402,10 +348,7 @@ reconstructed_response = reconstructed_pipeline(
 )
 
 print(reconstructed_response)
-```
 
-```
-[{'translation_text': "transformers simplifie l'utilisation des modèles de l'apprentissage profonde!"}]
 ```
 
 ### Direct Utilization of Model Components[​](#direct-utilization-of-model-components "Direct link to Direct Utilization of Model Components")
@@ -426,13 +369,10 @@ Utilizing components individually allows for precise adjustments and custom inte
 
 python
 
-```
+```python
 # View the components that were saved with our model
 translation_components.keys()
-```
 
-```
-dict_keys(['task', 'device_map', 'model', 'tokenizer', 'framework'])
 ```
 
 ### Advanced Usage: Direct Interaction with Model Components[​](#advanced-usage-direct-interaction-with-model-components "Direct link to Advanced Usage: Direct Interaction with Model Components")
@@ -450,7 +390,7 @@ This approach provides granular control, enabling interventions in the model's o
 
 python
 
-```
+```python
 # Access the individual components from the components dictionary
 tokenizer = translation_components["tokenizer"]
 model = translation_components["model"]
@@ -467,11 +407,7 @@ result = tokenizer.decode(outputs[0])
 # Since we're not using a pipeline here, we need to modify the output slightly to get only the translated text.
 print(result.replace("<pad> ", "
 ").replace("</s>", ""))
-```
 
-```
-
-La liberté, l'égalité, la fraternité ou la mort.
 ```
 
 ### Tutorial Recap[​](#tutorial-recap "Direct link to Tutorial Recap")

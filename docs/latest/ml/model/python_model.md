@@ -30,13 +30,14 @@ Below is an example of a simple PythonModel that takes a list of string and retu
 
 python
 
-```
+```python
 import mlflow
 
 
 class MyModel(mlflow.pyfunc.PythonModel):
     def predict(self, model_input: list[str], params=None) -> list[str]:
         return model_input
+
 ```
 
 #### Option 2: Define a callable[​](#option-2-define-a-callable "Direct link to Option 2: Define a callable")
@@ -49,13 +50,14 @@ Starting from MLflow 2.20.0, you can use the `@pyfunc` decorator on the callable
 
 python
 
-```
+```python
 from mlflow.pyfunc.utils import pyfunc
 
 
 @pyfunc
 def predict(model_input: list[str]) -> list[str]:
     return model_input
+
 ```
 
 ### Log the model[​](#log-the-model "Direct link to Log the model")
@@ -64,7 +66,7 @@ Use the pyfunc module to log a custom model with [`mlflow.pyfunc.log_model()`](/
 
 python
 
-```
+```python
 import mlflow
 
 with mlflow.start_run():
@@ -73,6 +75,7 @@ with mlflow.start_run():
         python_model=MyModel(),
         input_example=input_example,
     )
+
 ```
 
 ### Validate the model before deployment[​](#validate-the-model-before-deployment "Direct link to Validate the model before deployment")
@@ -81,7 +84,7 @@ Use [`mlflow.models.predict()`](/mlflow-website/docs/latest/api_reference/python
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.models.predict(
@@ -91,17 +94,19 @@ mlflow.models.predict(
     # ONLY SET THIS if your model dependencies include pre-release packages (e.g. mlflow==3.2.0rc0)
     extra_envs={"UV_PRERELEASE": "allow"},
 )
+
 ```
 
 In addition, you can load the model locally and validate it by running predictions.
 
 python
 
-```
+```python
 import mlflow
 
 pyfunc_model = mlflow.pyfunc.load_model(model_info.model_uri)
 pyfunc_model.predict(["hello", "world"])
+
 ```
 
 ### Deploy the model[​](#deploy-the-model "Direct link to Deploy the model")
@@ -147,7 +152,7 @@ Below is an example of nested pydantic models as type hints:
 
 python
 
-```
+```python
 from mlflow.pyfunc.utils import pyfunc
 import pydantic
 from typing import Optional
@@ -184,6 +189,7 @@ def predict(model_input: list[ChatRequest]) -> list[list[str]]:
 
 input_example = [ChatRequest(messages=[Message(role="user", content="Hello")])]
 print(predict(input_example))  # Output: [['Hello']]
+
 ```
 
 ### Using type hints in PythonModel[​](#using-type-hints-in-pythonmodel "Direct link to Using type hints in PythonModel")
@@ -192,7 +198,7 @@ To use type hints in PythonModel, you can define the input and output types in t
 
 python
 
-```
+```python
 import pydantic
 import mlflow
 
@@ -205,6 +211,7 @@ class Message(pydantic.BaseModel):
 class CustomModel(mlflow.pyfunc.PythonModel):
     def predict(self, model_input: list[Message], params=None) -> list[str]:
         return [msg.content for msg in model_input]
+
 ```
 
 ### Type hints data validation in PythonModel[​](#type-hints-data-validation-in-pythonmodel "Direct link to Type hints data validation in PythonModel")
@@ -215,7 +222,7 @@ Below example demonstrates how data validation works based on the `CustomModel` 
 
 python
 
-```
+```python
 model = CustomModel()
 
 # The input_example can be a list of Message objects as defined in the type hint
@@ -245,13 +252,14 @@ model_info = mlflow.pyfunc.log_model(
 )
 pyfunc_model = mlflow.pyfunc.load_model(model_info.model_uri)
 print(pyfunc_model.predict(input_example))
+
 ```
 
 For callables, you can use the `@pyfunc` decorator to enable data validation based on the type hints.
 
 python
 
-```
+```python
 from mlflow.pyfunc.utils import pyfunc
 
 
@@ -279,6 +287,7 @@ print(predict(input_example))  # Output: ['Hello', 'Hi']
 predict(["hello"])
 # Output: Failed to validate data against type hint `list[Message]`, invalid elements:
 # [('hello', "Expecting example to be a dictionary or pydantic model instance for Pydantic type hint, got <class 'str'>")]
+
 ```
 
 note
@@ -293,7 +302,7 @@ The example below demonstrates how to use a base class as type hint, while prese
 
 python
 
-```
+```python
 from pydantic import BaseModel, ConfigDict
 from mlflow.pyfunc.utils import pyfunc
 
@@ -330,6 +339,7 @@ input_example = [
     {"role": "user", "content": "Hi", "user_prompt": "Hello"},
 ]
 print(predict(input_example))  # Output: ['Hi', 'Hello']
+
 ```
 
 ### Model signature inference based on type hints[​](#model-signature-inference-based-on-type-hints "Direct link to Model signature inference based on type hints")
@@ -361,7 +371,7 @@ When logging a PythonModel, it is recommended to provide an input example that m
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.pyfunc.log_model(
@@ -369,6 +379,7 @@ mlflow.pyfunc.log_model(
     python_model=CustomModel(),
     input_example=["a", "b", "c"],
 )
+
 ```
 
 ### Query a serving endpoint hosting a PythonModel with type hints[​](#query-a-serving-endpoint-hosting-a-pythonmodel-with-type-hints "Direct link to Query a serving endpoint hosting a PythonModel with type hints")
@@ -377,9 +388,10 @@ When querying a serving endpoint hosting a PythonModel with type hints, you **mu
 
 bash
 
-```
+```bash
 mlflow models serve -m runs:/<run_id>/model --env-manager local
 curl http://127.0.0.1:5000/invocations -H 'Content-Type: application/json' -d '{"inputs": [{"role": "system", "content": "Hello"}]}'
+
 ```
 
 ### Extra allowed type hints that don't support data validation or schema inference[​](#extra-allowed-type-hints-that-dont-support-data-validation-or-schema-inference "Direct link to Extra allowed type hints that don't support data validation or schema inference")
@@ -404,7 +416,7 @@ The example below demonstrates how to use `TypeFromExample` type hint:
 
 python
 
-```
+```python
 import mlflow
 from mlflow.types.type_hints import TypeFromExample
 
@@ -422,6 +434,7 @@ with mlflow.start_run():
     )
 pyfunc_model = mlflow.pyfunc.load_model(model_info.model_uri)
 assert pyfunc_model.predict(["d", "e", "f"]) == ["d", "e", "f"]
+
 ```
 
 warning

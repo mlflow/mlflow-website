@@ -8,8 +8,9 @@
 
 bash
 
-```
+```bash
 npm create mastra@laster
+
 ```
 
 This will create a new TypeScript project with a simple tool calling agent implementation.
@@ -20,8 +21,9 @@ Start the MLflow Tracking Server with a SQL-based backend store:
 
 bash
 
-```
+```bash
 mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
+
 ```
 
 This example uses SQLite as the backend store. To use other types of SQL databases such as PostgreSQL, MySQL, and MSSQL, change the store URI as described in the [backend store documentation](/mlflow-website/docs/latest/self-hosting/architecture/backend-store.md). OpenTelemetry ingestion is not supported with file-based backend stores.
@@ -34,7 +36,7 @@ Open the `src/mastra/index.ts` file and add the `observability` configuration to
 
 typescript
 
-```
+```typescript
 export const mastra = new Mastra({
   workflows: { weatherWorkflow },
   ...
@@ -60,6 +62,7 @@ export const mastra = new Mastra({
     }
   },
 });
+
 ```
 
 ## Step 4: Run the Agent[​](#step-4-run-the-agent "Direct link to Step 4: Run the Agent")

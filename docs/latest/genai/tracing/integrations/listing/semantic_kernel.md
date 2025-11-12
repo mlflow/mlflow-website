@@ -25,8 +25,9 @@ To get started, let's install the requisite libraries. Note that we will use Ope
 
 bash
 
-```
+```bash
 pip install 'mlflow>=3.2.0' semantic_kernel openai
+
 ```
 
 Then, enable autologging in your Python code:
@@ -37,22 +38,24 @@ You must run `mlflow.semantic_kernel.autolog()` prior to running Semantic Kernel
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.semantic_kernel.autolog()
+
 ```
 
 Finally, for setup, let's establish our OpenAI token:
 
 python
 
-```
+```python
 import os
 from getpass import getpass
 
 # Set the OpenAI API key as an environment variable
 os.environ["OPENAI_API_KEY"] = getpass("openai_api_key: ")
+
 ```
 
 ## Example Usage[​](#example-usage "Direct link to Example Usage")
@@ -65,7 +68,7 @@ The simplest example to show the tracing integration is to instrument a [ChatCom
 
 python
 
-```
+```python
 import openai
 from semantic_kernel import Kernel
 from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
@@ -86,6 +89,7 @@ kernel.add_service(
 
 answer = await kernel.invoke_prompt("Is sushi the best food ever?")
 print("AI says:", answer)
+
 ```
 
 ## Token Usage Tracking[​](#token-usage-tracking "Direct link to Token Usage Tracking")
@@ -94,7 +98,7 @@ MLflow >= 3.2.0 supports token usage tracking for Semantic Kernel. The token usa
 
 python
 
-```
+```python
 # Generate a trace using the above example
 # ...
 
@@ -109,15 +113,17 @@ print("== Total token usage: ==")
 print(f"  Input tokens: {total_usage['input_tokens']}")
 print(f"  Output tokens: {total_usage['output_tokens']}")
 print(f"  Total tokens: {total_usage['total_tokens']}")
+
 ```
 
 text
 
-```
+```text
 == Total token usage: ==
   Input tokens: 14
   Output tokens: 113
   Total tokens: 127
+
 ```
 
 ## Disable Auto-tracing[​](#disable-auto-tracing "Direct link to Disable Auto-tracing")

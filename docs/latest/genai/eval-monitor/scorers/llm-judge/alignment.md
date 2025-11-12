@@ -54,7 +54,7 @@ First, create your judge and generate traces with initial assessments:
 
 python
 
-```
+```python
 from mlflow.genai.judges import make_judge
 from mlflow.genai.judges.optimizers import SIMBAAlignmentOptimizer
 from mlflow.entities import AssessmentSource, AssessmentSourceType
@@ -98,6 +98,7 @@ for trace_id in traces:
     # Judge evaluates using field-based approach (inputs/outputs)
     judge_result = initial_judge(inputs=inputs, outputs=outputs)
     # Judge's assessment is automatically logged when called
+
 ```
 
 ### Step 2: Collect Human Feedback[​](#step-2-collect-human-feedback "Direct link to Step 2: Collect Human Feedback")
@@ -118,7 +119,7 @@ After collecting feedback, align your judge and register it:
 
 python
 
-```
+```python
 # Retrieve traces with both judge and human assessments
 traces_for_alignment = mlflow.search_traces(
     experiment_ids=[experiment_id], max_results=15, return_type="list"
@@ -138,11 +139,12 @@ if len(traces_for_alignment) >= 10:
     print("Judge aligned successfully with human feedback")
 else:
     print(f"Need at least 10 traces for alignment, have {len(traces_for_alignment)}")
+
 ```
 
 python
 
-```
+```python
 from mlflow.genai.judges.optimizers import SIMBAAlignmentOptimizer
 
 # Retrieve traces with both judge and human assessments
@@ -161,6 +163,7 @@ if len(traces_for_alignment) >= 10:
     print("Judge aligned successfully with human feedback")
 else:
     print(f"Need at least 10 traces for alignment, have {len(traces_for_alignment)}")
+
 ```
 
 ## The SIMBA Alignment Optimizer[​](#the-simba-alignment-optimizer "Direct link to The SIMBA Alignment Optimizer")
@@ -169,7 +172,7 @@ MLflow provides the **default alignment optimizer** using [DSPy's implementation
 
 python
 
-```
+```python
 # Default: Uses SIMBA optimizer automatically
 aligned_judge = initial_judge.align(traces_with_feedback)
 
@@ -186,6 +189,7 @@ aligned_judge = initial_judge.align(traces_with_feedback, optimizer)
 # - Both assessments must use the same name (matching the judge name)
 # - Order doesn't matter - humans can assess before or after judge
 # - Mix of agreements and disagreements between judge and human recommended
+
 ```
 
 Default Optimizer Behavior
@@ -198,7 +202,7 @@ By default, alignment shows minimal progress information to keep logs clean. If 
 
 python
 
-```
+```python
 import logging
 
 # Enable detailed optimization output
@@ -214,6 +218,7 @@ aligned_judge = initial_judge.align(optimizer, traces_with_feedback)
 
 # Reset to default (minimal output) after debugging
 logging.getLogger("mlflow.genai.judges.optimizers.simba").setLevel(logging.INFO)
+
 ```
 
 When to Use Detailed Logging
@@ -263,7 +268,7 @@ If you already have labeled data, you can programmatically log it as feedback:
 
 python
 
-```
+```python
 import mlflow
 from mlflow.entities import AssessmentSource, AssessmentSourceType
 
@@ -286,6 +291,7 @@ for item in ground_truth_data:
     )
 
 print(f"Logged {len(ground_truth_data)} ground truth labels for alignment")
+
 ```
 
 This approach is efficient when you have pre-labeled data from:
@@ -318,7 +324,7 @@ To create a custom alignment optimizer, extend the [AlignmentOptimizer](/mlflow-
 
 python
 
-```
+```python
 from mlflow.genai.judges.base import AlignmentOptimizer, Judge
 from mlflow.entities.trace import Trace
 
@@ -364,6 +370,7 @@ class MyCustomOptimizer(AlignmentOptimizer):
         """Your custom optimization logic."""
         # Implement your optimization strategy
         pass
+
 ```
 
 ### Using Custom Optimizers[​](#using-custom-optimizers "Direct link to Using Custom Optimizers")
@@ -372,12 +379,13 @@ Once implemented, use your custom optimizer just like the built-in ones:
 
 python
 
-```
+```python
 # Create your custom optimizer
 custom_optimizer = MyCustomOptimizer(model="your-model")
 
 # Use it for alignment
 aligned_judge = initial_judge.align(traces_with_feedback, custom_optimizer)
+
 ```
 
 ### Available Optimizers[​](#available-optimizers "Direct link to Available Optimizers")
@@ -395,7 +403,7 @@ Validate that alignment improved your judge:
 
 python
 
-```
+```python
 def test_alignment_improvement(
     original_judge, aligned_judge, test_traces: list
 ) -> dict:
@@ -430,6 +438,7 @@ def test_alignment_improvement(
         "aligned_accuracy": aligned_correct / total,
         "improvement": (aligned_correct - original_correct) / total,
     }
+
 ```
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")

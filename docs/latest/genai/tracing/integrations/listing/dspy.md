@@ -8,10 +8,11 @@
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.dspy.autolog()
+
 ```
 
 tip
@@ -22,7 +23,7 @@ MLflow DSPy integration is not only about tracing. MLflow offers full tracking e
 
 python
 
-```
+```python
 import dspy
 import mlflow
 
@@ -63,6 +64,7 @@ summarizer(
         "enabling you to easily pinpoint the source of bugs and unexpected behaviors."
     )
 )
+
 ```
 
 ### Tracing during Evaluation[​](#tracing-during-evaluation "Direct link to Tracing during Evaluation")
@@ -73,7 +75,7 @@ When MLflow auto-tracing is enabled for DSPy, traces will be automatically gener
 
 python
 
-```
+```python
 import dspy
 from dspy.evaluate.metrics import answer_exact_match
 
@@ -128,6 +130,7 @@ with mlflow.start_run(run_name="CoT Evaluation"):
         },
         artifact_file="eval_results.json",
     )
+
 ```
 
 If you open the MLflow UI and go to the "CoT Evaluation" run, you will see the evaluation result, and the list of traces generated during the evaluation on the `Traces` tab.
@@ -144,7 +147,7 @@ By default, MLflow does **NOT** generate traces during complication, because com
 
 python
 
-```
+```python
 import dspy
 import mlflow
 
@@ -154,6 +157,7 @@ mlflow.dspy.autolog(log_traces_from_compile=True)
 # Optimize the DSPy program as usual
 tp = dspy.MIPROv2(metric=metric, auto="medium", num_threads=24)
 optimized = tp.compile(cot, trainset=trainset)
+
 ```
 
 ### Token usage[​](#token-usage "Direct link to Token usage")
@@ -162,7 +166,7 @@ MLflow >= 3.5.0 supports token usage tracking for dspy. The token usage call wil
 
 python
 
-```
+```python
 import dspy
 import mlflow
 
@@ -191,11 +195,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 143
   Output tokens: 12
@@ -206,6 +211,7 @@ LM.__call__:
   Input tokens: 143
   Output tokens: 12
   Total tokens: 155
+
 ```
 
 ### Disable auto-tracing[​](#disable-auto-tracing "Direct link to Disable auto-tracing")

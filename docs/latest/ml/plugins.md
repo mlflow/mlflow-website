@@ -10,21 +10,23 @@ Try the built-in test plugin to see how plugins work:
 
 bash
 
-```
+```bash
 # Clone MLflow and install example plugin
 git clone https://github.com/mlflow/mlflow
 cd mlflow
 pip install -e . tests/resources/mlflow-test-plugin
+
 ```
 
 bash
 
-```
+```bash
 # Use the plugin with custom tracking URI scheme
 MLFLOW_TRACKING_URI=file-plugin:$(PWD)/mlruns python examples/quickstart/mlflow_tracking.py
 
 # Launch MLflow UI to view results
 mlflow server --backend-store-uri ./mlruns
+
 ```
 
 Open <http://localhost:5000> to see your tracked experiment:
@@ -71,7 +73,7 @@ Create a plugin as a standalone Python package:
 
 python
 
-```
+```python
 # setup.py
 from setuptools import setup
 
@@ -91,6 +93,7 @@ setup(
         "mlflow.app": "my-app=my_plugin.app:create_app",
     },
 )
+
 ```
 
 ### Storage Plugins[​](#storage-plugins "Direct link to Storage Plugins")
@@ -101,7 +104,7 @@ setup(
 
 python
 
-```
+```python
 # my_plugin/store.py
 from mlflow.store.tracking.abstract_store import AbstractStore
 
@@ -127,11 +130,12 @@ class MyTrackingStore(AbstractStore):
         pass
 
     # Implement other required AbstractStore methods...
+
 ```
 
 python
 
-```
+```python
 # my_plugin/artifacts.py
 from mlflow.store.artifact.artifact_repo import ArtifactRepository
 
@@ -158,11 +162,12 @@ class MyArtifactRepo(ArtifactRepository):
     def download_artifacts(self, artifact_path, dst_path=None):
         # Download artifacts from your storage system
         pass
+
 ```
 
 python
 
-```
+```python
 # my_plugin/registry.py
 from mlflow.store.model_registry.abstract_store import AbstractStore
 
@@ -190,6 +195,7 @@ class MyModelRegistryStore(AbstractStore):
         pass
 
     # Implement other required AbstractStore methods...
+
 ```
 
 ### Authentication Plugins[​](#authentication-plugins "Direct link to Authentication Plugins")
@@ -200,7 +206,7 @@ class MyModelRegistryStore(AbstractStore):
 
 python
 
-```
+```python
 # my_plugin/auth.py
 from mlflow.tracking.request_auth.abstract_request_auth_provider import (
     RequestAuthProvider,
@@ -232,20 +238,22 @@ class MyCustomAuth:
         # Implement token retrieval logic
         # E.g., read from file, environment, or API call
         pass
+
 ```
 
 **Usage:**
 
 bash
 
-```
+```bash
 export MLFLOW_TRACKING_AUTH=my_auth_provider
 python your_mlflow_script.py
+
 ```
 
 python
 
-```
+```python
 # my_plugin/context.py
 from mlflow.tracking.context.abstract_context import RunContextProvider
 
@@ -276,11 +284,12 @@ class MyContextProvider(RunContextProvider):
     def _get_cost_center(self):
         # Get cost center for billing
         pass
+
 ```
 
 python
 
-```
+```python
 # my_plugin/headers.py
 from mlflow.tracking.request_header.abstract_request_header_provider import (
     RequestHeaderProvider,
@@ -307,6 +316,7 @@ class MyHeaderProvider(RequestHeaderProvider):
     def _get_environment(self):
         # Detect environment context
         return os.getenv("DEPLOYMENT_ENV", "development")
+
 ```
 
 ### Execution Plugins[​](#execution-plugins "Direct link to Execution Plugins")
@@ -315,7 +325,7 @@ class MyHeaderProvider(RequestHeaderProvider):
 
 python
 
-```
+```python
 # my_plugin/backend.py
 from mlflow.projects.backend import AbstractBackend
 from mlflow.projects.submitted_run import SubmittedRun
@@ -375,13 +385,14 @@ class MySubmittedRun(SubmittedRun):
     def get_status(self):
         # Get current job status
         return self._get_job_status()
+
 ```
 
 ### Model Evaluation Plugin[​](#model-evaluation-plugin "Direct link to Model Evaluation Plugin")
 
 python
 
-```
+```python
 # my_plugin/evaluator.py
 from mlflow.models.evaluation import ModelEvaluator
 from mlflow.models import EvaluationResult
@@ -423,6 +434,7 @@ class MyEvaluator(ModelEvaluator):
     def _generate_artifacts(self, predictions, dataset, config):
         # Generate custom plots, reports, etc.
         return {}
+
 ```
 
 ### Popular Community Plugins[​](#popular-community-plugins "Direct link to Popular Community Plugins")
@@ -439,13 +451,14 @@ Store artifacts directly in SQL Server databases:
 
 bash
 
-```
+```bash
 pip install mlflow[sqlserver]
+
 ```
 
 python
 
-```
+```python
 import mlflow
 
 # Use SQL Server as artifact store
@@ -454,6 +467,7 @@ mlflow.create_experiment("sql_experiment", artifact_location=db_uri)
 
 with mlflow.start_run():
     mlflow.onnx.log_model(model, name="model")  # Stored as BLOB in SQL Server
+
 ```
 
 #### **Alibaba Cloud OSS Plugin**[​](#alibaba-cloud-oss-plugin "Direct link to alibaba-cloud-oss-plugin")
@@ -462,13 +476,14 @@ Integrate with Aliyun Object Storage Service:
 
 bash
 
-```
+```bash
 pip install mlflow[aliyun-oss]
+
 ```
 
 python
 
-```
+```python
 import os
 import mlflow
 
@@ -479,6 +494,7 @@ os.environ["MLFLOW_OSS_KEY_SECRET"] = "your_secret_key"
 
 # Use OSS as artifact store
 mlflow.create_experiment("oss_experiment", artifact_location="oss://bucket/path")
+
 ```
 
 #### **XetHub Plugin**[​](#xethub-plugin "Direct link to xethub-plugin")
@@ -487,19 +503,21 @@ Use XetHub for versioned artifact storage:
 
 bash
 
-```
+```bash
 pip install mlflow[xethub]
+
 ```
 
 python
 
-```
+```python
 import mlflow
 
 # Authenticate with XetHub (via CLI or environment variables)
 mlflow.create_experiment(
     "xet_experiment", artifact_location="xet://username/repo/branch"
 )
+
 ```
 
 #### **Elasticsearch Plugin**[​](#elasticsearch-plugin "Direct link to elasticsearch-plugin")
@@ -508,8 +526,9 @@ Use Elasticsearch for experiment tracking:
 
 bash
 
-```
+```bash
 pip install mlflow-elasticsearchstore
+
 ```
 
 | Plugin                | Target Platform | Installation                    |
@@ -524,7 +543,7 @@ pip install mlflow-elasticsearchstore
 
 python
 
-```
+```python
 import mlflow.deployments
 
 # Deploy to custom target
@@ -532,6 +551,7 @@ client = mlflow.deployments.get_deploy_client("redisai")
 client.create_deployment(
     name="my_model", model_uri="models:/MyModel/1", config={"device": "GPU"}
 )
+
 ```
 
 #### **Giskard Plugin**[​](#giskard-plugin "Direct link to giskard-plugin")
@@ -540,13 +560,14 @@ Comprehensive model validation and bias detection:
 
 bash
 
-```
+```bash
 pip install mlflow-giskard
+
 ```
 
 python
 
-```
+```python
 import mlflow
 
 # Evaluate with Giskard
@@ -562,6 +583,7 @@ result = mlflow.evaluate(
         }
     },
 )
+
 ```
 
 **Detects vulnerabilities:**
@@ -578,8 +600,9 @@ Advanced model validation framework:
 
 bash
 
-```
+```bash
 pip install trubrics-sdk
+
 ```
 
 | Plugin          | Platform     | Use Case                     |
@@ -591,9 +614,10 @@ pip install trubrics-sdk
 
 bash
 
-```
+```bash
 # Run MLflow project on YARN
 mlflow run . --backend yarn --backend-config yarn-config.json
+
 ```
 
 #### **JFrog Artifactory Plugin**[​](#jfrog-artifactory-plugin "Direct link to jfrog-artifactory-plugin")
@@ -602,8 +626,9 @@ Enterprise artifact governance:
 
 bash
 
-```
+```bash
 pip install mlflow[jfrog]
+
 ```
 
 **Key Features:**
@@ -617,20 +642,21 @@ pip install mlflow[jfrog]
 
 bash
 
-```
+```bash
 export ARTIFACTORY_AUTH_TOKEN="your_token"
 
 mlflow server \
   --host 0.0.0.0 \
   --port 5000 \
   --artifacts-destination "artifactory://artifactory.company.com/artifactory/ml-models"
+
 ```
 
 **Usage:**
 
 python
 
-```
+```python
 import mlflow
 from transformers import pipeline
 
@@ -641,13 +667,14 @@ with mlflow.start_run():
     mlflow.transformers.log_model(
         transformers_model=classifier, name="model"
     )  # Automatically stored in JFrog Artifactory
+
 ```
 
 **Configuration:**
 
 bash
 
-```
+```bash
 # Optional: Use HTTP instead of HTTPS
 export ARTIFACTORY_NO_SSL=true
 
@@ -656,6 +683,7 @@ export ARTIFACTORY_DEBUG=true
 
 # Optional: Skip artifact deletion during garbage collection
 export ARTIFACTORY_ARTIFACTS_DELETE_SKIP=true
+
 ```
 
 ## Testing Your Plugin[​](#testing-your-plugin "Direct link to Testing Your Plugin")
@@ -666,7 +694,7 @@ export ARTIFACTORY_ARTIFACTS_DELETE_SKIP=true
 
 python
 
-```
+```python
 # tests/test_my_plugin.py
 import pytest
 import mlflow
@@ -696,11 +724,12 @@ class TestMyTrackingStore:
     def test_log_artifact(self):
         # Test artifact logging functionality
         pass
+
 ```
 
 python
 
-```
+```python
 # tests/test_integration.py
 import tempfile
 import mlflow
@@ -728,11 +757,12 @@ def test_end_to_end_workflow():
         assert len(runs) == 1
         assert runs.iloc[0]["params.alpha"] == "0.5"
         assert runs.iloc[0]["metrics.rmse"] == 0.8
+
 ```
 
 python
 
-```
+```python
 # tests/test_performance.py
 import time
 import mlflow
@@ -778,6 +808,7 @@ class TestPerformance:
             t.join()
 
         assert len(set(results)) == 10  # All unique experiment IDs
+
 ```
 
 ## Distribution & Publishing[​](#distribution--publishing "Direct link to Distribution & Publishing")
@@ -786,7 +817,7 @@ class TestPerformance:
 
 text
 
-```
+```text
 my-mlflow-plugin/
 ├── setup.py                    # Package configuration
 ├── README.md                   # Plugin documentation
@@ -802,49 +833,54 @@ my-mlflow-plugin/
 │   └── test_integration.py
 └── examples/
     └── example_usage.py
+
 ```
 
 ### Publishing to PyPI[​](#publishing-to-pypi "Direct link to Publishing to PyPI")
 
 bash
 
-```
+```bash
 # Build distribution packages
 python setup.py sdist bdist_wheel
 
 # Upload to PyPI
 pip install twine
 twine upload dist/*
+
 ```
 
 ### Documentation Template[​](#documentation-template "Direct link to Documentation Template")
 
 markdown
 
-````
+````markdown
 # My MLflow Plugin
 
 ## Installation
 ```bash
 pip install my-mlflow-plugin
+
 ````
 
 ## Configuration[​](#configuration "Direct link to Configuration")
 
 bash
 
-```
+```bash
 export MY_PLUGIN_CONFIG="value"
+
 ```
 
 ## Usage[​](#usage "Direct link to Usage")
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_tracking_uri("my-scheme://config")
+
 ```
 
 ## Features[​](#features "Direct link to Features")

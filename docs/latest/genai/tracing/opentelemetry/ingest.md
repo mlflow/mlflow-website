@@ -12,8 +12,9 @@ To use this endpoint, start MLflow Server with a SQL-based backend store. The fo
 
 bash
 
-```
+```bash
 mlflow server --backend-store-uri sqlite:///mlflow.db
+
 ```
 
 To use other types of SQL databases such as PostgreSQL, MySQL, and MSSQL, change the store URI as described in the [backend store documentation](/mlflow-website/docs/latest/self-hosting/architecture/backend-store.md).
@@ -22,9 +23,10 @@ In your application, configure the server endpoint and set the MLflow experiment
 
 bash
 
-```
+```bash
 export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:5000/v1/traces
 export OTEL_EXPORTER_OTLP_TRACES_HEADERS=x-mlflow-experiment-id=123
+
 ```
 
 note
@@ -37,7 +39,7 @@ The following example shows how to collect traces from a FastAPI application usi
 
 python
 
-```
+```python
 import os
 import uvicorn
 from fastapi import FastAPI
@@ -64,6 +66,7 @@ async def root():
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
 ```
 
 ## Using OpenTelemetry Collector[​](#using-opentelemetry-collector "Direct link to Using OpenTelemetry Collector")
@@ -72,16 +75,17 @@ if __name__ == "__main__":
 
 bash
 
-```
+```bash
 export MLFLOW_TRACKING_URI=http://localhost:5000
 export MLFLOW_EXPERIMENT_ID=123
+
 ```
 
 opentelemetry-collector.yaml
 
 yaml
 
-```
+```yaml
 receivers:
   otlp:
     protocols:
@@ -102,14 +106,16 @@ service:
       receivers: [otlp]
       processors: [batch]
       exporters: [otlp]
+
 ```
 
 bash
 
-```
+```bash
 docker run -d --name opentelemetry-collector \
   -p 4317:4317 \
   -p 4318:4318 \
   -v $(pwd)/opentelemetry-collector.yaml:/etc/otel/collector/config.yaml \
   otel/opentelemetry-collector
+
 ```

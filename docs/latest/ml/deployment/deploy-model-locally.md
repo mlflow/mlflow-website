@@ -12,16 +12,18 @@ Once you have the model ready, deploying to a local server is straightforward. U
 
 bash
 
-```
+```bash
 mlflow models serve -m runs:/<run_id>/model -p 5000
+
 ```
 
 You can then send a test request to the server as follows:
 
 bash
 
-```
+```bash
 curl http://127.0.0.1:5000/invocations -H "Content-Type:application/json"  --data '{"inputs": [[1, 2], [3, 4], [5, 6]]}'
+
 ```
 
 Several command line options are available to customize the server's behavior. For instance, the `--env-manager` option allows you to choose a specific environment manager, like Anaconda, to create the virtual environment. The `mlflow models` module also provides additional useful commands, such as building a Docker image or generating a Dockerfile. For comprehensive details, please refer to the [MLflow CLI Reference](/mlflow-website/docs/latest/api_reference/cli.html#mlflow-models).
@@ -58,26 +60,30 @@ You can either pass a flat dictionary corresponding to the desired model payload
 
 If your model format is not supported above or you want to avoid transforming your input data to the required payload format, you can leverage the dict payload structures below.
 
-| Field               | Description                                                                                                                                                                              | Example                                                              |
-| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| `dataframe_split`   | Pandas DataFrames in the `split` orientation.                                                                                                                                            | text```
+| Field               | Description                                                                                                                                                                              | Example                                                                  |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `dataframe_split`   | Pandas DataFrames in the `split` orientation.                                                                                                                                            | text```text
 {"dataframe_split": pandas_df.to_dict(orient="split")}
+
 ```     |
-| `dataframe_records` | Pandas DataFrame in the records orientation. **We do not recommend using this format because it is not guaranteed to preserve column ordering.**                                         | text```
+| `dataframe_records` | Pandas DataFrame in the records orientation. **We do not recommend using this format because it is not guaranteed to preserve column ordering.**                                         | text```text
 {"dataframe_records": pandas_df.to_dict(orient="records")}
+
 ``` |
-| `instances`         | Tensor input formatted as described in [TF Serving's API docs](https://www.tensorflow.org/tfx/serving/api_rest#request_format_2) where the provided inputs will be cast to Numpy arrays. | text```
+| `instances`         | Tensor input formatted as described in [TF Serving's API docs](https://www.tensorflow.org/tfx/serving/api_rest#request_format_2) where the provided inputs will be cast to Numpy arrays. | text```text
 {"instances": [1.0, 2.0, 5.0]}
+
 ```                             |
-| `inputs`            | Same as `instances` but with a different key.                                                                                                                                            | text```
+| `inputs`            | Same as `instances` but with a different key.                                                                                                                                            | text```text
 {"inputs": [["Cheese"], ["and", "Crackers"]]}
+
 ```              |
 
 Example
 
 python
 
-```
+```python
 # Prerequisite: serve a custom pyfunc OpenAI model (not mlflow.openai) on localhost:5678
 #   that defines inputs in the below format and params of `temperature` and `max_tokens`
 
@@ -99,18 +105,20 @@ response = requests.post(
     headers={"Content-Type": "application/json"},
 )
 print(response.json())
+
 ```
 
 The JSON input can also include an optional `params` field for passing additional parameters. Valid parameter types are `Union[DataType, List[DataType], None]`, where DataType is [`MLflow data types`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.types.html#mlflow.types.DataType). To pass parameters, a valid [Model Signature](/mlflow-website/docs/latest/ml/model/signatures.md) with `params` must be defined.
 
 bash
 
-```
+```bash
 curl http://127.0.0.1:5000/invocations -H 'Content-Type: application/json' -d '{
     "inputs": {"question": ["What color is it?"],
                 "context": ["Some people said it was green but I know that it is pink."]},
     "params": {"max_answer_len": 10}
 }'
+
 ```
 
 note
@@ -121,13 +129,14 @@ Since JSON discards type information, MLflow will cast the JSON input to the inp
 
 If your payload is in a format that your mlflow served model will accept and it's in the supported models below, you can pass a raw payload dict.
 
-| Supported Request Format | Description                                                                                | Example                                                                                                   |
-| ------------------------ | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| OpenAI Chat              | [OpenAI chat request payload](https://platform.openai.com/docs/api-reference/chat/create)† | text```
+| Supported Request Format | Description                                                                                | Example                                                                                                       |
+| ------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| OpenAI Chat              | [OpenAI chat request payload](https://platform.openai.com/docs/api-reference/chat/create)† | text```text
 {
     "messages": [{"role": "user", "content": "Tell a joke!"}],  # noqa
     "temperature": 0.0,
 }
+
 ``` |
 
 † Note that the `model` argument **should not** be included when using the OpenAI APIs, due to its configuration being set by the MLflow model instance. All other parameters can be freely used, provided that they are defined within the `params` argument within the logged model signature.
@@ -136,7 +145,7 @@ Example
 
 python
 
-```
+```python
 # Prerequisite: serve a Pyfunc model accepts OpenAI-compatible chat requests on localhost:5678 that defines
 #   `temperature` and `max_tokens` as parameters within the logged model signature
 
@@ -156,6 +165,7 @@ requests.post(
     headers={"Content-Type": "application/json"},
 )
 print(requests.json())
+
 ```
 
 #### Encoding complex data[​](#encoding-complex-data "Direct link to Encoding complex data")
@@ -170,7 +180,7 @@ Example requests:
 
 bash
 
-```
+```bash
 # record-oriented DataFrame input with binary column "b"
 curl http://127.0.0.1:5000/invocations -H 'Content-Type: application/json' -d '[
     {"a": 0, "b": "dGVzdCBiaW5hcnkgZGF0YSAw"},
@@ -184,6 +194,7 @@ curl http://127.0.0.1:5000/invocations -H 'Content-Type: application/json' -d '[
     {"a": 1, "b": "2020-02-01T12:34:56Z"},
     {"a": 2, "b": "2021-03-01T00:00:00Z"}
 ]'
+
 ```
 
 ## Serving Frameworks[​](#serving-frameworks "Direct link to Serving Frameworks")
@@ -201,8 +212,9 @@ MLServer exposes the same scoring API through the `/invocations` endpoint. To de
 
 bash
 
-```
+```bash
 mlflow models serve -m runs:/<run_id>/model -p 5000 --enable-mlserver
+
 ```
 
 To read more about the integration between MLflow and MLServer, please check the [end-to-end example](https://mlserver.readthedocs.io/en/latest/examples/mlflow/README.html) in the MLServer documentation. You can also find guides to deploy MLflow models to a Kubernetes cluster using MLServer in [Deploying a model to Kubernetes](/mlflow-website/docs/latest/ml/deployment/deploy-model-to-kubernetes.md).
@@ -216,18 +228,20 @@ Instead of running an online inference endpoint, you can execute a single batch 
 
 bash
 
-```
+```bash
 mlflow models predict -m models:/<model_id> -i input.csv -o output.csv
+
 ```
 
 python
 
-```
+```python
 import mlflow
 
 model = mlflow.pyfunc.load_model("models:/<model_id>")
 predictions = model.predict(pd.read_csv("input.csv"))
 predictions.to_csv("output.csv")
+
 ```
 
 ## Troubleshooting[​](#troubleshooting "Direct link to Troubleshooting")

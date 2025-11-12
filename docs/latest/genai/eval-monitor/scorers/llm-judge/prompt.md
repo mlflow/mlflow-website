@@ -23,7 +23,7 @@ We recommend starting with [guidelines-based judges](/mlflow-website/docs/latest
 
 python
 
-```
+```python
 from mlflow.genai.judges import custom_prompt_judge
 from mlflow.genai.scorers import scorer
 
@@ -60,6 +60,7 @@ def is_issue_resolved(inputs, outputs):
     # Pass values for the placeholders ({{conversation}}) as kwargs
     conversation = inputs["messages"] + outputs["messages"]
     return issue_judge(conversation=conversation)
+
 ```
 
 ## Prompt requirements[​](#prompt-requirements "Direct link to Prompt requirements")
@@ -79,13 +80,14 @@ Writing good prompts for LLM judges requires iterative testing and refinement. [
 
 python
 
-```
+```python
 from mlflow.genai import register_prompt
 
 register_prompt(
     name="issue_resolution",
     template=issue_resolution_prompt,
 )
+
 ```
 
 ![Prompt Registry](/mlflow-website/docs/latest/images/mlflow-3/eval-monitor/scorers/prompt-registry.png)
@@ -96,7 +98,7 @@ MLflow supports all major LLM providers, such as OpenAI, Anthropic, Google, xAI,
 
 python
 
-```
+```python
 from mlflow.genai.judges import custom_prompt_judge
 
 custom_prompt_judge(
@@ -104,6 +106,7 @@ custom_prompt_judge(
     prompt_template=issue_resolution_prompt,
     model="anthropic:/claude-3-opus",
 )
+
 ```
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")

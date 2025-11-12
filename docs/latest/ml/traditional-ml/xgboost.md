@@ -42,7 +42,7 @@ MLflow's XGBoost integration offers the most comprehensive autologging experienc
 
 python
 
-```
+```python
 import mlflow
 import xgboost as xgb
 from sklearn.datasets import load_breast_cancer
@@ -78,6 +78,7 @@ model = xgb.train(
     early_stopping_rounds=10,
     verbose_eval=False,
 )
+
 ```
 
 What Gets Automatically Captured

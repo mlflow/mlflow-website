@@ -8,8 +8,9 @@
 
 bash
 
-```
+```bash
 pip install mlflow>=3.6.0 google-adk opentelemetry-exporter-otlp-proto-http
+
 ```
 
 ## Step 2: Start the MLflow Tracking Server[​](#step-2-start-the-mlflow-tracking-server "Direct link to Step 2: Start the MLflow Tracking Server")
@@ -18,8 +19,9 @@ Start the MLflow Tracking Server with a SQL-based backend store:
 
 bash
 
-```
+```bash
 mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
+
 ```
 
 This example uses SQLite as the backend store. To use other types of SQL databases such as PostgreSQL, MySQL, and MSSQL, change the store URI as described in the [backend store documentation](/mlflow-website/docs/latest/self-hosting/architecture/backend-store.md). OpenTelemetry ingestion is not supported with file-based backend stores.
@@ -33,9 +35,10 @@ Configure the OpenTelemetry tracer to export traces to the MLflow Tracking Serve
 
 bash
 
-```
+```bash
 export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:5000/v1/traces
 export OTEL_EXPORTER_OTLP_HEADERS=x-mlflow-experiment-id=123
+
 ```
 
 ## Step 4: Run the Agent[​](#step-4-run-the-agent "Direct link to Step 4: Run the Agent")
@@ -44,7 +47,7 @@ Define and invoke the agent in a Python script like `my_agent/agent.py` as usual
 
 python
 
-```
+```python
 # my_agent/agent.py
 from google.adk.agents import LlmAgent
 from google.adk.tools import FunctionTool
@@ -84,14 +87,16 @@ root_agent = LlmAgent(
     ),
     tools=[calculator_tool],
 )
+
 ```
 
 Run the agent with the `adk run` command or the web UI.
 
 bash
 
-```
+```bash
 adk run my_agent
+
 ```
 
 Open the MLflow UI at `http://localhost:5000` and navigate to the experiment to see the traces.

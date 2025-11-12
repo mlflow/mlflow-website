@@ -11,15 +11,16 @@
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.langchain.autolog()
+
 ```
 
 typescript
 
-```
+```typescript
 import { MlflowCallback } from "mlflow-langchain";
 
 const tracer = new MlflowCallback();
@@ -28,6 +29,7 @@ await agent.invoke(
   { messages: [{ role: "user", content: "What is MLflow?" }] },
   { callbacks: [tracer] }
 );
+
 ```
 
 tip
@@ -40,7 +42,7 @@ Running the following code will generate a trace for the graph as shown in the a
 
 python
 
-```
+```python
 from typing import Literal
 
 import mlflow
@@ -76,6 +78,7 @@ graph = create_react_agent(llm, tools)
 result = graph.invoke(
     {"messages": [{"role": "user", "content": "what is the weather in sf?"}]}
 )
+
 ```
 
 ## Token Usage Tracking[​](#token-usage-tracking "Direct link to Token Usage Tracking")
@@ -84,7 +87,7 @@ MLflow >= 3.1.0 supports token usage tracking for LangGraph. The token usage for
 
 python
 
-```
+```python
 import json
 import mlflow
 
@@ -112,11 +115,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 149
   Output tokens: 135
@@ -131,6 +135,7 @@ ChatOpenAI_2:
   Input tokens: 91
   Output tokens: 48
   Total tokens: 139
+
 ```
 
 ### Adding spans within a node or a tool[​](#adding-spans-within-a-node-or-a-tool "Direct link to Adding spans within a node or a tool")
@@ -141,7 +146,7 @@ Let's take LangGraph's [Code Assistant](https://langchain-ai.github.io/langgraph
 
 python
 
-```
+```python
 def code_check(state: GraphState):
     # State
     messages = state["messages"]
@@ -193,6 +198,7 @@ def code_check(state: GraphState):
         "iterations": iterations,
         "error": "no",
     }
+
 ```
 
 This way, the span for the `check_code` node will have child spans, which record whether the each validation fails or not, with their exception details.
@@ -205,8 +211,9 @@ Since MLflow 3.6, MLflow will automatically record the thread (session) ID for t
 
 python
 
-```
+```python
 graph.invoke(inputs, {"configurable": {"thread_id": "1"}})
+
 ```
 
 The thread ID will be recorded in the trace metadata and displayed in the MLflow Trace UI.

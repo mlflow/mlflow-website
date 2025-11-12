@@ -50,7 +50,7 @@ Link your application versions to git commits for complete traceability:
 
 python
 
-```
+```python
 import mlflow
 import openai
 import os
@@ -96,6 +96,7 @@ for question in test_questions:
         max_tokens=1000,
     )
     # ✅ Automatically: traced, versioned, and linked to git commit
+
 ```
 
 **What happens automatically:**
@@ -109,7 +110,7 @@ for question in test_questions:
 
 python
 
-```
+```python
 # Create a new version for experimentation
 with mlflow.set_active_model(name=f"agent-v2-{new_commit}"):
     # Test new prompt engineering approach
@@ -126,6 +127,7 @@ with mlflow.set_active_model(name=f"agent-v2-{new_commit}"):
         max_tokens=500,  # More focused responses
     )
     # ✅ New version automatically tracked with different configurations
+
 ```
 
 Context manager automatically handles version switching—clean, explicit, and error-free.
@@ -134,7 +136,7 @@ Context manager automatically handles version switching—clean, explicit, and e
 
 python
 
-```
+```python
 import pandas as pd
 
 # Evaluate multiple versions against the same test set
@@ -168,6 +170,7 @@ results_v2 = mlflow.evaluate(
 )
 
 # ✅ Side-by-side comparison shows which version performs better
+
 ```
 
 Objective metrics remove guesswork from version selection.

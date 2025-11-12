@@ -10,8 +10,9 @@ Install the required packages by running the following command:
 
 bash
 
-```
+```bash
 pip install --upgrade mlflow>=3.3 openai
+
 ```
 
 info
@@ -33,18 +34,20 @@ For the fastest setup, you can install the [mlflow](https://pypi.org/project/mlf
 
 bash
 
-```
+```bash
 mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5000
+
 ```
 
 This will start the server at port 5000 on your local machine. Connect your notebook/IDE to the server by setting the tracking URI. You can also access to the MLflow UI at <http://localhost:5000>.
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_tracking_uri("http://localhost:5000")
+
 ```
 
 You can also brows the MLflow UI at <http://localhost:5000>.
@@ -53,21 +56,23 @@ MLflow provides a Docker Compose file to start a local MLflow server with a post
 
 bash
 
-```
+```bash
 git clone https://github.com/mlflow/mlflow.git
 cd docker-compose
 cp .env.dev.example .env
 docker compose up -d
+
 ```
 
 This will start the server at port 5000 on your local machine. Connect your notebook/IDE to the server by setting the tracking URI. You can also access to the MLflow UI at <http://localhost:5000>.
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.set_tracking_uri("http://localhost:5000")
+
 ```
 
 Refer to the [instruction](https://github.com/mlflow/mlflow/tree/master/docker-compose/README.md) for more details, e.g., overriding the default environment variables.
@@ -76,7 +81,7 @@ If you have a remote MLflow tracking server, configure the connection:
 
 python
 
-```
+```python
 import os
 import mlflow
 
@@ -84,16 +89,18 @@ import mlflow
 os.environ["MLFLOW_TRACKING_URI"] = "http://your-mlflow-server:5000"
 # Or directly in code
 mlflow.set_tracking_uri("http://your-mlflow-server:5000")
+
 ```
 
 If you have a Databricks account, configure the connection:
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.login()
+
 ```
 
 This will prompt you for your configuration details (Databricks Host url and a PAT).
@@ -106,22 +113,24 @@ If you are unsure about how to set up an MLflow tracking server, you can start w
 
 python
 
-```
+```python
 import mlflow
 
 # This will create a new experiment called "GenAI Evaluation Quickstart" and set it as active
 mlflow.set_experiment("GenAI Evaluation Quickstart")
+
 ```
 
 ### Configure OpenAI API Key (or other LLM providers)[​](#configure-openai-api-key-or-other-llm-providers "Direct link to Configure OpenAI API Key (or other LLM providers)")
 
 python
 
-```
+```python
 import os
 
 # Use different env variable when using a different LLM provider
 os.environ["OPENAI_API_KEY"] = "your-api-key-here"  # Replace with your actual API key
+
 ```
 
 ## Step 2: Create a simple QA function[​](#step-2-create-a-simple-qa-function "Direct link to Step 2: Create a simple QA function")
@@ -130,7 +139,7 @@ First, we need to create a prediction function that takes a question and returns
 
 python
 
-```
+```python
 from openai import OpenAI
 
 client = OpenAI()
@@ -149,6 +158,7 @@ def qa_predict_fn(question: str) -> str:
         ],
     )
     return response.choices[0].message.content
+
 ```
 
 ## Step 3: Prepare an evaluation dataset[​](#step-3-prepare-an-evaluation-dataset "Direct link to Step 3: Prepare an evaluation dataset")
@@ -162,7 +172,7 @@ The dataset can be a list of dictionaries, a pandas DataFrame, a spark DataFrame
 
 python
 
-```
+```python
 # Define a simple Q&A dataset with questions and expected answers
 eval_dataset = [
     {
@@ -178,6 +188,7 @@ eval_dataset = [
         "expectations": {"expected_response": "William Shakespeare"},
     },
 ]
+
 ```
 
 ## Step 4: Define evaluation criteria using Scorers[​](#step-4-define-evaluation-criteria-using-scorers "Direct link to Step 4: Define evaluation criteria using Scorers")
@@ -186,7 +197,7 @@ eval_dataset = [
 
 python
 
-```
+```python
 from mlflow.genai import scorer
 from mlflow.genai.scorers import Correctness, Guidelines
 
@@ -202,6 +213,7 @@ scorers = [
     Guidelines(name="is_english", guidelines="The answer must be in English"),
     is_concise,
 ]
+
 ```
 
 Here we use three scorers:
@@ -222,7 +234,7 @@ Example of using different model providers for the judge model
 
 python
 
-```
+```python
 # Anthropic
 Correctness(model="anthropic:/claude-sonnet-4-20250514")
 
@@ -236,6 +248,7 @@ Correctness(model="gemini/gemini-2.5-flash")
 # xAI
 # Run `pip install litellm` to use xAI as the judge model
 Correctness(model="xai/grok-2-latest")
+
 ```
 
 ## Step 5: Run the evaluation[​](#step-5-run-the-evaluation "Direct link to Step 5: Run the evaluation")
@@ -244,7 +257,7 @@ Now we have all three components of the evaluation: dataset, prediction function
 
 python
 
-```
+```python
 import mlflow
 
 results = mlflow.genai.evaluate(
@@ -252,6 +265,7 @@ results = mlflow.genai.evaluate(
     predict_fn=qa_predict_fn,
     scorers=scorers,
 )
+
 ```
 
 After running the code above, go to the MLflow UI and navigate to your experiment. You'll see the evaluation results with detailed metrics for each scorer.

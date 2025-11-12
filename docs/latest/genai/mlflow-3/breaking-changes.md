@@ -143,7 +143,7 @@ MLflow 3 introduces several breaking changes as part of our commitment to improv
 
 python
 
-```
+```python
 mlflow.evaluate(
     ...,
     evaluator_config={
@@ -151,6 +151,7 @@ mlflow.evaluate(
         "log_explainer": True,
     },
 )
+
 ```
 
 ## Summary[​](#summary "Direct link to Summary")

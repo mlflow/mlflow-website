@@ -16,7 +16,7 @@ Delete traces older than a specific timestamp:
 
 python
 
-```
+```python
 import time
 from mlflow import MlflowClient
 
@@ -31,13 +31,14 @@ deleted_count = client.delete_traces(
 )
 
 print(f"Deleted {deleted_count} traces")
+
 ```
 
 **Delete traces older than a specific time period:**
 
 python
 
-```
+```python
 from datetime import datetime, timedelta
 
 # Calculate timestamp for 7 days ago
@@ -47,13 +48,14 @@ timestamp_ms = int(seven_days_ago.timestamp() * 1000)
 deleted_count = client.delete_traces(
     experiment_id="1", max_timestamp_millis=timestamp_ms
 )
+
 ```
 
 Delete specific traces by their trace IDs:
 
 python
 
-```
+```python
 from mlflow import MlflowClient
 
 client = MlflowClient()
@@ -64,13 +66,14 @@ trace_ids = ["trace_id_1", "trace_id_2", "trace_id_3"]
 deleted_count = client.delete_traces(experiment_id="1", trace_ids=trace_ids)
 
 print(f"Deleted {deleted_count} traces")
+
 ```
 
 Delete traces in batches for better performance:
 
 python
 
-```
+```python
 import time
 from datetime import datetime, timedelta
 from mlflow import MlflowClient
@@ -106,6 +109,7 @@ def cleanup_old_traces(experiment_id: str, days_old: int = 30, batch_size: int =
 
 # Usage
 cleanup_old_traces(experiment_id="1", days_old=7)
+
 ```
 
 ## Advanced Use Cases[​](#advanced-use-cases "Direct link to Advanced Use Cases")
@@ -118,7 +122,7 @@ Delete traces based on specific criteria:
 
 python
 
-```
+```python
 import mlflow
 from mlflow import MlflowClient
 
@@ -147,13 +151,14 @@ def delete_error_traces(experiment_id: str):
 
 # Usage
 delete_error_traces("1")
+
 ```
 
 Test deletion criteria before actual deletion:
 
 python
 
-```
+```python
 import mlflow
 from mlflow import MlflowClient
 
@@ -183,13 +188,14 @@ def delete_with_dry_run(experiment_id: str, max_timestamp: int, dry_run: bool = 
 count = delete_with_dry_run("1", 1234567890000, dry_run=True)
 if count < 100:  # Only proceed if reasonable number
     delete_with_dry_run("1", 1234567890000, dry_run=False)
+
 ```
 
 Handle deletion errors gracefully:
 
 python
 
-```
+```python
 from mlflow import MlflowClient
 from mlflow.exceptions import MlflowException
 
@@ -221,6 +227,7 @@ def safe_delete_traces(experiment_id: str, **delete_params):
 
 # Usage
 safe_delete_traces("1", max_timestamp_millis=1234567890000, max_traces=50)
+
 ```
 
 ## Best Practices[​](#best-practices "Direct link to Best Practices")

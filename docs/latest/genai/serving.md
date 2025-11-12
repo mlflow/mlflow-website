@@ -29,7 +29,7 @@ Choose your serving approach:
 
 bash
 
-```
+```bash
 # Serve a logged model
 mlflow models serve -m "models:/<model-id>" -p 5000
 
@@ -38,6 +38,7 @@ mlflow models serve -m "models:/<model-name>/<model-version>" -p 5000
 
 # Serve a model from local path
 mlflow models serve -m ./path/to/model -p 5000
+
 ```
 
 Your model will be available at `http://localhost:5000`
@@ -46,17 +47,18 @@ Send prediction requests via HTTP:
 
 bash
 
-```
+```bash
 curl -X POST http://localhost:5000/invocations \
   -H "Content-Type: application/json" \
   -d '{"inputs": [[1, 2, 3, 4]]}'
+
 ```
 
 **Using Python:**
 
 python
 
-```
+```python
 import requests
 import json
 
@@ -74,6 +76,7 @@ response = requests.post(
 )
 
 print(response.json())
+
 ```
 
 ## How Model Serving Works[​](#how-model-serving-works "Direct link to How Model Serving Works")
@@ -113,12 +116,13 @@ Once the input is validated and formatted, MLflow calls your model's `predict()`
 
 python
 
-```
+```python
 # For models that accept parameters
 raw_predictions = model.predict(data, params=params)
 
 # For traditional models
 raw_predictions = model.predict(data)
+
 ```
 
 MLflow then serializes the predictions back to JSON, handling various data types including NumPy arrays, pandas DataFrames, and Python lists. The response format depends on your input format - traditional requests get wrapped in a `predictions` object, while LLM-style requests return unwrapped results.
@@ -148,7 +152,7 @@ Here are the main input formats MLflow accepts:
 
 json
 
-```
+```json
 // dataframe_split format
 {
   "dataframe_split": {
@@ -169,6 +173,7 @@ json
 {
   "instances": [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]
 }
+
 ```
 
 All formats return a consistent response structure with your predictions and any additional metadata your model provides.
@@ -188,7 +193,7 @@ All formats return a consistent response structure with your predictions and any
 
 python
 
-```
+```python
 import mlflow
 from mlflow.models.signature import infer_signature
 from mlflow.tracking import MlflowClient
@@ -208,6 +213,7 @@ client = MlflowClient()
 client.set_registered_model_alias(
     name="production_model", alias="production", version="1"
 )
+
 ```
 
 **Configure your serving infrastructure for optimal performance:**
@@ -219,7 +225,7 @@ client.set_registered_model_alias(
 
 bash
 
-```
+```bash
 # Configure server for production workloads
 export MLFLOW_SCORING_SERVER_REQUEST_TIMEOUT=60
 
@@ -234,6 +240,7 @@ mlflow models serve \
   --model-uri models:/my_model@production \
   --port 5000 \
   --env-manager local  # For production, use conda or virtualenv
+
 ```
 
 **Implement advanced serving patterns with custom PyFunc models:**
@@ -245,7 +252,7 @@ mlflow models serve \
 
 python
 
-```
+```python
 import joblib
 import mlflow
 import pandas as pd
@@ -291,6 +298,7 @@ mlflow.pyfunc.log_model(
     model_config={"weights": [0.6, 0.4]},
     pip_requirements=["scikit-learn", "pandas", "numpy"],
 )
+
 ```
 
 ## Complete Example: Train to Production[​](#complete-example-train-to-production "Direct link to Complete Example: Train to Production")
@@ -306,7 +314,7 @@ Train a simple model with automatic logging:
 
 python
 
-```
+```python
 import mlflow
 import mlflow.sklearn
 from sklearn.ensemble import RandomForestClassifier
@@ -343,13 +351,14 @@ with mlflow.start_run() as run:
 
     print(f"Run ID: {run.info.run_id}")
     print("Model automatically logged and registered!")
+
 ```
 
 Set up model alias for production:
 
 python
 
-```
+```python
 from mlflow.tracking import MlflowClient
 
 client = MlflowClient()
@@ -367,13 +376,14 @@ print(f"Model version {model_version.version} tagged as 'production'")
 # Model URI for serving (using alias)
 model_uri = "models:/iris_classifier@production"
 print(f"Production model URI: {model_uri}")
+
 ```
 
 Serve the registered model:
 
 bash
 
-```
+```bash
 # Serve using model alias (MLflow 3.x way)
 mlflow models serve \
   --model-uri "models:/iris_classifier@production" \
@@ -385,13 +395,14 @@ mlflow models serve \
 # - POST /invocations (predictions)
 # - GET /ping (health check)
 # - GET /version (model info)
+
 ```
 
 **Alternative serving approaches:**
 
 bash
 
-```
+```bash
 # Serve by specific version number
 mlflow models serve \
   --model-uri "models:/iris_classifier/1" \
@@ -401,13 +412,14 @@ mlflow models serve \
 mlflow models serve \
   --model-uri "runs:/<run-id>/model" \
   --port 5000
+
 ```
 
 Send requests to your served model:
 
 python
 
-```
+```python
 import requests
 import json
 import pandas as pd
@@ -451,6 +463,7 @@ print("Health status:", health.status_code)  # Should be 200
 # Model info
 info = requests.get("http://localhost:5000/version")
 print("Model version info:", info.json())
+
 ```
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")

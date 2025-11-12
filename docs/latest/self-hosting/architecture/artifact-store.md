@@ -40,11 +40,33 @@ To add S3 file upload extra arguments, set `MLFLOW_S3_UPLOAD_EXTRA_ARGS` to a JS
 
 bash
 
-```
+```bash
 export MLFLOW_S3_UPLOAD_EXTRA_ARGS='{"ServerSideEncryption": "aws:kms", "SSEKMSKeyId": "1234"}'
+
 ```
 
 For a list of available extra args see [Boto3 ExtraArgs Documentation](https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-uploading-files.rst#the-extraargs-parameter).
+
+#### Bucket Ownership Verification[​](#bucket-ownership-verification "Direct link to Bucket Ownership Verification")
+
+To protect against bucket takeover attacks where a deleted bucket is recreated by a different AWS account, you can set `MLFLOW_S3_EXPECTED_BUCKET_OWNER` to the expected AWS account ID that owns your S3 bucket:
+
+bash
+
+```bash
+export MLFLOW_S3_EXPECTED_BUCKET_OWNER=123456789012
+
+```
+
+When set, MLflow will include the `ExpectedBucketOwner` parameter in all S3 API calls. If the bucket is owned by a different account, S3 will reject the operation with an access denied error, preventing unauthorized access to artifacts.
+
+This is particularly important for scenarios where:
+
+* S3 bucket names are globally unique across all AWS accounts
+* A bucket could be deleted and recreated by an attacker with the same name
+* MLflow would unknowingly send artifacts to the attacker's bucket
+
+For more information, see the [AWS S3 Bucket Owner Condition documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-owner-condition.html).
 
 #### Setting Custom S3 Endpoints[​](#setting-custom-s3-endpoints "Direct link to Setting Custom S3 Endpoints")
 
@@ -52,16 +74,18 @@ To store artifacts in a custom endpoint, set the `MLFLOW_S3_ENDPOINT_URL` to you
 
 bash
 
-```
+```bash
 export MLFLOW_S3_ENDPOINT_URL=https://<region>.digitaloceanspaces.com
+
 ```
 
 If you have a MinIO server at 1.2.3.4 on port 9000:
 
 bash
 
-```
+```bash
 export MLFLOW_S3_ENDPOINT_URL=http://1.2.3.4:9000
+
 ```
 
 #### Using Non-TLS Authentication[​](#using-non-tls-authentication "Direct link to Using Non-TLS Authentication")
@@ -70,10 +94,11 @@ If the MinIO server is configured with using SSL self-signed or signed using som
 
 bash
 
-```
+```bash
 export MLFLOW_S3_IGNORE_TLS=true
 #or
 export AWS_CA_BUNDLE=/some/ca/bundle.pem
+
 ```
 
 #### Setting Bucket Region[​](#setting-bucket-region "Direct link to Setting Bucket Region")
@@ -82,8 +107,9 @@ Additionally, if MinIO server is configured with non-default region, you should 
 
 bash
 
-```
+```bash
 export AWS_DEFAULT_REGION=my_region
+
 ```
 
 warning
@@ -141,9 +167,10 @@ There are also two ways to authenticate to HDFS:
 
 bash
 
-```
+```bash
 export MLFLOW_KERBEROS_TICKET_CACHE=/tmp/krb5cc_22222222
 export MLFLOW_KERBEROS_USER=user_name_to_use
+
 ```
 
 The HDFS artifact store is accessed using the `pyarrow.fs` module, refer to the [PyArrow Documentation](https://arrow.apache.org/docs/python/filesystems.html#filesystem-hdfs) for configuration and environment variables needed.
@@ -158,8 +185,9 @@ The Tracking Server supports uploading large artifacts using multipart upload fo
 
 bash
 
-```
+```bash
 export MLFLOW_ENABLE_PROXY_MULTIPART_UPLOAD=true
+
 ```
 
 Under the hood, the Tracking Server will create a multipart upload request with the underlying storage, generate presigned urls for each part, and let the client upload the parts directly to the storage. Once all parts are uploaded, the Tracking Server will complete the multipart upload. None of the data will pass through the Tracking Server.

@@ -10,7 +10,7 @@ Note that only synchronous calls are supported, and that asynchronous API and st
 
 python
 
-```
+```python
 from smolagents import CodeAgent, LiteLLMModel
 import mlflow
 
@@ -23,6 +23,7 @@ agent = CodeAgent(tools=[], model=model, add_base_tools=True)
 result = agent.run(
     "Could you give me the 118th number in the Fibonacci sequence?",
 )
+
 ```
 
 ## Token usage[​](#token-usage "Direct link to Token usage")
@@ -31,7 +32,7 @@ MLflow >= 3.2.0 supports token usage tracking for Smolagents. The token usage fo
 
 python
 
-```
+```python
 import json
 import mlflow
 
@@ -63,11 +64,12 @@ for span in trace.data.spans:
         print(f"  Input tokens: {usage['input_tokens']}")
         print(f"  Output tokens: {usage['output_tokens']}")
         print(f"  Total tokens: {usage['total_tokens']}")
+
 ```
 
 bash
 
-```
+```bash
 == Total token usage: ==
   Input tokens: 4360
   Output tokens: 185
@@ -82,6 +84,7 @@ LiteLLMModel.__call___2:
   Input tokens: 2313
   Output tokens: 61
   Total tokens: 2374
+
 ```
 
 ## Disable auto-tracing[​](#disable-auto-tracing "Direct link to Disable auto-tracing")

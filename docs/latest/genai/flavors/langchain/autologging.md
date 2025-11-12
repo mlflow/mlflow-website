@@ -8,8 +8,9 @@ MLflow LangChain Autologging is verified to be compatible with LangChain version
 
 text
 
-```
+```text
 pip install mlflow[langchain] --upgrade
+
 ```
 
 ## Quickstart[​](#quickstart "Direct link to Quickstart")
@@ -18,7 +19,7 @@ To enable autologging for LangChain models, call [`mlflow.langchain.autolog()`](
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.langchain.autolog()
@@ -28,6 +29,7 @@ mlflow.langchain.autolog()
 
 # Your LangChain model code here
 ...
+
 ```
 
 Once you have invoked the chain, you can view the logged traces and artifacts in the MLflow UI.
@@ -49,10 +51,11 @@ For example, to disable logging of traces, and instead enable model logging, run
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.langchain.autolog(log_traces=False)
+
 ```
 
 note
@@ -63,7 +66,7 @@ MLflow does not support automatic model logging for chains that contain retrieve
 
 python
 
-```
+```python
 import os
 from operator import itemgetter
 
@@ -129,6 +132,7 @@ model_name = "lc_model"
 model_version = 1
 loaded_model = mlflow.pyfunc.load_model(f"models:/{model_name}/{model_version}")
 print(loaded_model.predict(inputs))
+
 ```
 
 ## Tracing LangGraph[​](#tracing-langgraph "Direct link to Tracing LangGraph")
@@ -137,7 +141,7 @@ MLflow support automatic tracing for LangGraph, an open-source library from Lang
 
 python
 
-```
+```python
 from typing import Literal
 
 import mlflow
@@ -171,6 +175,7 @@ graph = create_react_agent(llm, tools)
 result = graph.invoke(
     {"messages": [{"role": "user", "content": "what is the weather in sf?"}]}
 )
+
 ```
 
 note
@@ -191,7 +196,7 @@ Sometimes you may want to customize what information is logged in the traces. Yo
 
 python
 
-```
+```python
 from mlflow.langchain.langchain_tracer import MlflowLangchainTracer
 
 
@@ -226,6 +231,7 @@ class CustomLangchainTracer(MlflowLangchainTracer):
             inputs=messages,
             attributes=kwargs,
         )
+
 ```
 
 ### Patch Functions for Logging Artifacts[​](#patch-functions-for-logging-artifacts "Direct link to Patch Functions for Logging Artifacts")
@@ -255,12 +261,13 @@ MLflow Langchain Autologging calls various logging functions and LangChain utili
 
 python
 
-```
+```python
 import mlflow
 
 mlflow.langchain.autolog(silent=True)
 
 # No warning messages will be emitted from autologging
+
 ```
 
 ### I can't load the model logged by mlflow langchain autologging[​](#i-cant-load-the-model-logged-by-mlflow-langchain-autologging "Direct link to I can't load the model logged by mlflow langchain autologging")
@@ -284,7 +291,7 @@ By default, MLflow creates span names based on the class name in LangChain, such
 
 python
 
-```
+```python
 import mlflow
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
@@ -298,6 +305,7 @@ model = ChatOpenAI(name="custom-llm", model="gpt-4o-mini")
 runnable = (model | StrOutputParser()).with_config({"run_name": "custom-chain"})
 
 runnable.invoke("Hi")
+
 ```
 
 The above code will create a trace like the following:
@@ -310,7 +318,7 @@ You can record extra metadata to the span by passing the `metadata` parameter of
 
 python
 
-```
+```python
 import mlflow
 from langchain_openai import ChatOpenAI
 
@@ -322,6 +330,7 @@ model = ChatOpenAI(model="gpt-4o-mini").with_config({"metadata": {"key1": "value
 
 # Pass metadata at runtime using the `config` parameter
 model.invoke("Hi", config={"metadata": {"key2": "value2"}})
+
 ```
 
 The metadata can be accessed in the `Attributes` tab in the MLflow UI.
