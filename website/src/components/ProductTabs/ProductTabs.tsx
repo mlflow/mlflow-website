@@ -8,6 +8,7 @@ import {
   useEffect,
   useCallback,
 } from "react";
+import styles from "./ProductTabs.module.css";
 
 type Tab = {
   id: string;
@@ -30,6 +31,71 @@ type Hotspot = {
 
 type Props = {
   tabs: Tab[];
+};
+
+const Bubble = ({
+  label,
+  description,
+  direction = "top",
+}: {
+  label: string;
+  description?: string;
+  direction?: Hotspot["direction"];
+}) => {
+  const bubbleClass = clsx(styles.bubble, {
+    [styles.top]: direction === "top",
+    [styles.right]: direction === "right",
+    [styles.bottom]: direction === "bottom",
+    [styles.left]: direction === "left",
+  });
+
+  const arrowClass = clsx(styles.arrow, {
+    [styles.topArrow]: direction === "top",
+    [styles.rightArrow]: direction === "right",
+    [styles.bottomArrow]: direction === "bottom",
+    [styles.leftArrow]: direction === "left",
+  });
+
+  return (
+    <div className={bubbleClass}>
+      <div className={styles.content}>
+        <span className={styles.title}>
+          <span className={styles.hintIcon} aria-hidden>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 3.5c-2.9 0-5.25 2.27-5.25 5.07 0 1.82.92 3.43 2.32 4.36.37.25.6.66.6 1.1v.48c0 .41.34.75.75.75h3.16c.41 0 .75-.34.75-.75v-.48c0-.44.22-.85.6-1.1 1.4-.93 2.32-2.54 2.32-4.36 0-2.8-2.35-5.07-5.25-5.07Z"
+                stroke="white"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M10 19h4"
+                stroke="white"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+              />
+              <path
+                d="M11 21h2"
+                stroke="white"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+              />
+            </svg>
+          </span>
+          {label}
+        </span>
+        {description && <span className={styles.description}>{description}</span>}
+      </div>
+      <span className={arrowClass} aria-hidden />
+    </div>
+  );
 };
 
 export function ProductTabs({ tabs }: Props) {
@@ -125,10 +191,10 @@ export function ProductTabs({ tabs }: Props) {
           aria-hidden
         />
 
-        <div className="relative border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] rounded-2xl overflow-hidden shadow-[0_20px_80px_rgba(0,0,0,0.35)]">
+        <div className="relative border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] rounded-2xl overflow-visible shadow-[0_20px_80px_rgba(0,0,0,0.35)]">
           {/* outer glow behind the card */}
           <div
-            className="pointer-events-none absolute -inset-4 blur-[40px] z-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.18),transparent_55%),radial-gradient(circle_at_80%_0%,rgba(255,255,255,0.12),transparent_50%)]"
+            className="pointer-events-none absolute -inset-4 blur-[40px] z-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.18),transparent_55%),radial-gradient(circle_at_80%_0%,rgba(253, 137, 137, 0.12),transparent_50%)]"
             aria-hidden
           />
 
@@ -142,7 +208,7 @@ export function ProductTabs({ tabs }: Props) {
             <img
               src={activeTab.imageSrc}
               alt={`${activeTab.label} screenshot`}
-              className="w-full h-full object-cover shadow-[0_18px_50px_rgba(0,0,0,0.35)]"
+              className="w-full h-full object-cover shadow-[0_18px_50px_rgba(0,0,0,0.35)] rounded-2xl"
               loading="lazy"
             />
 
@@ -157,54 +223,14 @@ export function ProductTabs({ tabs }: Props) {
                   height: spot.height,
                 }}
               >
-                <div className="absolute inset-0 rounded-md border border-white/25 bg-white/10 opacity-0 group-hover:opacity-100 transition duration-200" />
-                {(() => {
-                  const dir = spot.direction ?? "top";
-                  const baseTooltip =
-                    "absolute min-w-[200px] min-h-[68px] max-w-[260px] px-4 py-3 rounded-xl bg-[rgba(14,20,22,0.7)] border border-white/20 text-white shadow-[0_12px_32px_rgba(0,0,0,0.45)] opacity-0 group-hover:opacity-100 transition duration-200 z-10";
-                  const arrowBase = "absolute h-3 w-3 rotate-45 bg-[rgba(14,20,22,0.7)] border border-white/20";
-
-                  const content = (
-                    <div className="flex flex-col gap-1 leading-snug">
-                      <span className="text-sm font-semibold">{spot.label}</span>
-                      {spot.description && (
-                        <span className="text-xs text-white/80">{spot.description}</span>
-                      )}
-                    </div>
-                  );
-
-                  switch (dir) {
-                    case "right":
-                      return (
-                        <div className={clsx(baseTooltip, "left-full top-1/2 -translate-y-1/2 ml-3 bg-[rgba(14,20,22,0.7)]")}> 
-                          {content}
-                          <span className={clsx(arrowBase, "left-[-6px] top-1/2 -translate-y-1/2 bg-[rgba(14,20,22,0.7)]")}></span>
-                        </div>
-                      );
-                    case "bottom":
-                      return (
-                        <div className={clsx(baseTooltip, "left-1/2 top-full -translate-x-1/2 mt-3 bg-[rgba(14,20,22,0.7)]")}> 
-                          {content}
-                          <span className={clsx(arrowBase, "left-1/2 -translate-x-1/2 top-[-6px] bg-[rgba(14,20,22,0.7)]")}></span>
-                        </div>
-                      );
-                    case "left":
-                      return (
-                        <div className={clsx(baseTooltip, "right-full top-1/2 -translate-y-1/2 mr-3 bg-[rgba(14,20,22,0.7)]")}> 
-                          {content}
-                          <span className={clsx(arrowBase, "right-[-6px] top-1/2 -translate-y-1/2 bg-[rgba(14,20,22,0.7)]")}></span>
-                        </div>
-                      );
-                    case "top":
-                    default:
-                      return (
-                        <div className={clsx(baseTooltip, "left-1/2 -top-3 -translate-x-1/2 -translate-y-full bg-[rgba(14,20,22,0.7)]")}> 
-                          {content}
-                          <span className={clsx(arrowBase, "left-1/2 -translate-x-1/2 -bottom-[6px] bg-[rgba(14,20,22,0.7)]")}></span>
-                        </div>
-                      );
-                  }
-                })()}
+                <div className="absolute inset-0 rounded-md border border-white/30 bg-white/10 opacity-0 group-hover:opacity-100 transition duration-200" />
+                <div className="relative h-full w-full pointer-events-none opacity-0 group-hover:opacity-100 transition duration-200">
+                  <Bubble
+                    label={spot.label}
+                    description={spot.description}
+                    direction={spot.direction}
+                  />
+                </div>
               </div>
             ))}
           </div>
