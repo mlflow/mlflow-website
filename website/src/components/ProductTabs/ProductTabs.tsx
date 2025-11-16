@@ -24,6 +24,8 @@ type Hotspot = {
   width: string; // percentage string
   height: string; // percentage string
   label: string;
+  description?: string;
+  direction?: "top" | "right" | "bottom" | "left";
 };
 
 type Props = {
@@ -156,13 +158,53 @@ export function ProductTabs({ tabs }: Props) {
                 }}
               >
                 <div className="absolute inset-0 rounded-md border border-white/25 bg-white/10 opacity-0 group-hover:opacity-100 transition duration-200" />
-                <div className="absolute -top-11 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-md bg-[#0E1416] text-white text-xs shadow-[0_8px_20px_rgba(0,0,0,0.35)] opacity-0 group-hover:opacity-100 transition duration-200 whitespace-nowrap">
-                  {spot.label}
-                  <span
-                    className="absolute left-1/2 -bottom-1 translate-x-[-50%] h-2 w-4 rotate-45 bg-[#0E1416]"
-                    aria-hidden
-                  />
-                </div>
+                {(() => {
+                  const dir = spot.direction ?? "top";
+                  const baseTooltip =
+                    "absolute min-w-[200px] min-h-[68px] max-w-[260px] px-4 py-3 rounded-xl bg-[rgba(14,20,22,0.7)] border border-white/20 text-white shadow-[0_12px_32px_rgba(0,0,0,0.45)] opacity-0 group-hover:opacity-100 transition duration-200 z-10";
+                  const arrowBase = "absolute h-3 w-3 rotate-45 bg-[rgba(14,20,22,0.7)] border border-white/20";
+
+                  const content = (
+                    <div className="flex flex-col gap-1 leading-snug">
+                      <span className="text-sm font-semibold">{spot.label}</span>
+                      {spot.description && (
+                        <span className="text-xs text-white/80">{spot.description}</span>
+                      )}
+                    </div>
+                  );
+
+                  switch (dir) {
+                    case "right":
+                      return (
+                        <div className={clsx(baseTooltip, "left-full top-1/2 -translate-y-1/2 ml-3 bg-[rgba(14,20,22,0.7)]")}> 
+                          {content}
+                          <span className={clsx(arrowBase, "left-[-6px] top-1/2 -translate-y-1/2 bg-[rgba(14,20,22,0.7)]")}></span>
+                        </div>
+                      );
+                    case "bottom":
+                      return (
+                        <div className={clsx(baseTooltip, "left-1/2 top-full -translate-x-1/2 mt-3 bg-[rgba(14,20,22,0.7)]")}> 
+                          {content}
+                          <span className={clsx(arrowBase, "left-1/2 -translate-x-1/2 top-[-6px] bg-[rgba(14,20,22,0.7)]")}></span>
+                        </div>
+                      );
+                    case "left":
+                      return (
+                        <div className={clsx(baseTooltip, "right-full top-1/2 -translate-y-1/2 mr-3 bg-[rgba(14,20,22,0.7)]")}> 
+                          {content}
+                          <span className={clsx(arrowBase, "right-[-6px] top-1/2 -translate-y-1/2 bg-[rgba(14,20,22,0.7)]")}></span>
+                        </div>
+                      );
+                    case "top":
+                    default:
+                      return (
+                        <div className={clsx(baseTooltip, "left-1/2 -top-3 -translate-x-1/2 -translate-y-full bg-[rgba(14,20,22,0.7)]")}> 
+                          {content}
+                          <span className={clsx(arrowBase, "left-1/2 -translate-x-1/2 -bottom-[6px] bg-[rgba(14,20,22,0.7)]")}></span>
+                        </div>
+                      );
+                  }
+                })()}
               </div>
             ))}
           </div>
