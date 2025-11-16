@@ -49,7 +49,22 @@ const MonitoringIcon = () => (
 const defaultTabImage = "/img/GenAI_home/GenAI_trace_darkmode.png";
 
 const productTabs = [
-  { id: "tracing", label: "Tracing", icon: "⎋", imageSrc: defaultTabImage },
+  {
+    id: "tracing",
+    label: "Tracing",
+    icon: "⎋",
+    imageSrc: defaultTabImage,
+    hotspots: [
+      {
+        id: "trace-breakdown",
+        left: "0%",
+        top: "22%",
+        width: "25%",
+        height: "80%",
+        label: "Trace breakdown: spans & tool calls",
+      },
+    ],
+  },
   {
     id: "evaluation",
     label: "Evaluation",

@@ -14,6 +14,16 @@ type Tab = {
   label: string;
   imageSrc: string;
   icon?: ReactNode;
+  hotspots?: Hotspot[];
+};
+
+type Hotspot = {
+  id: string;
+  left: string; // percentage string e.g. "30%"
+  top: string; // percentage string
+  width: string; // percentage string
+  height: string; // percentage string
+  label: string;
 };
 
 type Props = {
@@ -126,12 +136,36 @@ export function ProductTabs({ tabs }: Props) {
             aria-hidden
           />
 
-          <img
-            src={activeTab.imageSrc}
-            alt={`${activeTab.label} screenshot`}
-            className="relative z-10 w-full h-full object-cover shadow-[0_18px_50px_rgba(0,0,0,0.35)]"
-            loading="lazy"
-          />
+          <div className="relative z-10">
+            <img
+              src={activeTab.imageSrc}
+              alt={`${activeTab.label} screenshot`}
+              className="w-full h-full object-cover shadow-[0_18px_50px_rgba(0,0,0,0.35)]"
+              loading="lazy"
+            />
+
+            {activeTab.hotspots?.map((spot) => (
+              <div
+                key={spot.id}
+                className="group absolute"
+                style={{
+                  left: spot.left,
+                  top: spot.top,
+                  width: spot.width,
+                  height: spot.height,
+                }}
+              >
+                <div className="absolute inset-0 rounded-md border border-white/25 bg-white/10 opacity-0 group-hover:opacity-100 transition duration-200" />
+                <div className="absolute -top-11 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-md bg-[#0E1416] text-white text-xs shadow-[0_8px_20px_rgba(0,0,0,0.35)] opacity-0 group-hover:opacity-100 transition duration-200 whitespace-nowrap">
+                  {spot.label}
+                  <span
+                    className="absolute left-1/2 -bottom-1 translate-x-[-50%] h-2 w-4 rotate-45 bg-[#0E1416]"
+                    aria-hidden
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
