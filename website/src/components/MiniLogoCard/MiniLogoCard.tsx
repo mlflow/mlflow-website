@@ -15,7 +15,11 @@ const MiniLogoCard = ({
       <a href={href} className={styles.a}>
         <div className="card__body">
           <div className={styles.container}>
-            <img src={src} alt={title} className={styles.img} />
+            <img
+              src={src}
+              alt={title}
+              className={clsx(styles.img, title === "LangChain / LangGraph" && styles.imgLangChain)}
+            />
             <h4 className={styles.title}>{title}</h4>
           </div>
         </div>
