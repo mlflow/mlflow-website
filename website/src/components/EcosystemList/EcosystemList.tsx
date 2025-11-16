@@ -16,17 +16,17 @@ export const EcosystemList = () => {
                 {
                   title: "OpenAI",
                   src: "img/openai.svg",
-                  href: "https://mlflow.org/docs/latest/genai/flavors/openai/index.html",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/openai.html",
                 },
                 {
                   title: "Anthropic",
-                  src: "img/anthropic.svg",
+                  src: "img/anthropic.png",
                   href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/anthropic.html",
                 },
                 {
                   title: "LangChain / LangGraph",
                   src: "img/langchain.svg",
-                  href: "https://mlflow.org/docs/latest/genai/flavors/langchain/index.html",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/langchain.html",
                 },
                 {
                   title: "Vercel AI",
@@ -71,7 +71,7 @@ export const EcosystemList = () => {
                 {
                   title: "LlamaIndex",
                   src: "img/llamaindex.svg",
-                  href: "https://mlflow.org/docs/latest/genai/flavors/llama-index/index.html",
+                  href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/llamaindex.html",
                 },
                 {
                   title: "Agno",
