@@ -62,6 +62,8 @@ const productTabs = [
         width: "25%",
         height: "80%",
         label: "Trace breakdown: spans & tool calls",
+        description: "Spans, tool calls, timings, and inputs/outputs",
+        direction: "right",
       },
     ],
   },
