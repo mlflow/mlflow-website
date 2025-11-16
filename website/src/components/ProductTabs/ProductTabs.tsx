@@ -16,6 +16,7 @@ type Tab = {
   imageSrc: string;
   icon?: ReactNode;
   hotspots?: Hotspot[];
+  link?: string;
 };
 
 type Hotspot = {
@@ -27,6 +28,7 @@ type Hotspot = {
   label: string;
   description?: string;
   direction?: "top" | "right" | "bottom" | "left";
+  link?: string;
 };
 
 type Props = {
@@ -213,16 +215,7 @@ export function ProductTabs({ tabs }: Props) {
             />
 
             {activeTab.hotspots?.map((spot) => (
-              <div
-                key={spot.id}
-                className="group absolute"
-                style={{
-                  left: spot.left,
-                  top: spot.top,
-                  width: spot.width,
-                  height: spot.height,
-                }}
-              >
+              <SpotWithLink key={spot.id} spot={spot}>
                 <div className="absolute inset-0 rounded-md border border-white/30 bg-white/10 opacity-0 group-hover:opacity-100 transition duration-200" />
                 <div className="relative h-full w-full pointer-events-none opacity-0 group-hover:opacity-100 transition duration-200">
                   <Bubble
@@ -231,7 +224,7 @@ export function ProductTabs({ tabs }: Props) {
                     direction={spot.direction}
                   />
                 </div>
-              </div>
+              </SpotWithLink>
             ))}
           </div>
         </div>
@@ -239,3 +232,23 @@ export function ProductTabs({ tabs }: Props) {
     </div>
   );
 }
+
+const SpotWithLink = ({ spot, children }: { spot: Hotspot; children: React.ReactNode }) => {
+  const Wrapper = (props: any) => (spot.link ? <a {...props} /> : <div {...props} />);
+  return (
+    <Wrapper
+      className="group absolute"
+      href={spot.link}
+      target={spot.link ? "_blank" : undefined}
+      rel={spot.link ? "noreferrer noopener" : undefined}
+      style={{
+        left: spot.left,
+        top: spot.top,
+        width: spot.width,
+        height: spot.height,
+      }}
+    >
+      {children}
+    </Wrapper>
+  );
+};
