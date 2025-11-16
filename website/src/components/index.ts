@@ -24,4 +24,5 @@ export { ValuePropWidget } from "./ValuePropWidget/ValuePropWidget";
 export { EcosystemList } from "./EcosystemList/EcosystemList";
 export { StickyGrid } from "./StickyGrid";
 export { GradientWrapper } from "./GradientWrapper/GradientWrapper";
+export { StatsBand } from "./StatsBand/StatsBand";
 export { ProductTabs } from "./ProductTabs/ProductTabs";
