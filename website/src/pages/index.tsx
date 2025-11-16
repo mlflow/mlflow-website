@@ -14,6 +14,11 @@ import {
 } from "../components";
 import GenAI from "@site/static/img/Home_page_hybrid/GenAI Apps & Agents.png";
 import ModelTraining from "@site/static/img/Home_page_hybrid/Model Training.png";
+import EvaluationTabImg from "@site/static/img/GenAI_home/GenAI_evaluation_darkmode.png";
+import MonitoringTabImg from "@site/static/img/GenAI_home/GenAI_monitor_darkmode.png";
+import AnnotationTabImg from "@site/static/img/GenAI_home/GenAI_annotation_darkmode.png";
+import PromptTabImg from "@site/static/img/GenAI_home/GenAI_prompts_darkmode.png";
+import OptimizeTabImg from "@site/static/img/GenAI_home/GenAI_optimize_darkmode.png";
 
 const MonitoringIcon = () => (
   <svg
@@ -41,18 +46,38 @@ const MonitoringIcon = () => (
   </svg>
 );
 
-const tabImageSrc = "/img/GenAI_home/GenAI_trace_darkmode.png";
+const defaultTabImage = "/img/GenAI_home/GenAI_trace_darkmode.png";
 
 const productTabs = [
-  { id: "tracing", label: "Tracing", icon: "⎋" },
-  { id: "evaluation", label: "Evaluation", icon: "☑" },
-  { id: "monitoring", label: "Monitoring", icon: <MonitoringIcon /> },
-  { id: "annotation", label: "Annotation", icon: "☰" },
-  { id: "prompt", label: "Prompt", icon: "⌘" },
-  { id: "gateway", label: "Gateway", icon: "⇄" },
-  { id: "versioning", label: "Versioning", icon: "⟳" },
-  { id: "experiment", label: "Experiment", icon: "◉" },
-].map((tab) => ({ ...tab, imageSrc: tabImageSrc }));
+  { id: "tracing", label: "Tracing", icon: "⎋", imageSrc: defaultTabImage },
+  {
+    id: "evaluation",
+    label: "Evaluation",
+    icon: "☑",
+    imageSrc: EvaluationTabImg,
+  },
+  {
+    id: "monitoring",
+    label: "Monitoring",
+    icon: <MonitoringIcon />,
+    imageSrc: MonitoringTabImg,
+  },
+  {
+    id: "annotation",
+    label: "Annotation",
+    icon: "☰",
+    imageSrc: AnnotationTabImg,
+  },
+  { id: "prompt", label: "Prompt", icon: "⌘", imageSrc: PromptTabImg },
+  {
+    id: "optimize",
+    label: "Optimize",
+    icon: "⚙",
+    imageSrc: OptimizeTabImg,
+  },
+  { id: "gateway", label: "Gateway", icon: "⇄", imageSrc: defaultTabImage },
+  { id: "versioning", label: "Versioning", icon: "⟳", imageSrc: defaultTabImage },
+];
 
 export default function Home(): JSX.Element {
   return (
