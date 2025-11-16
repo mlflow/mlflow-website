@@ -7,9 +7,17 @@ type Props = PropsWithChildren<{
   title: string;
   body?: string;
   id?: string;
+  headingLevel?: 1 | 2 | 3 | 4 | 5;
 }>;
 
-export function Section({ id, label, title, body, children }: Props) {
+export function Section({
+  id,
+  label,
+  title,
+  body,
+  children,
+  headingLevel = 1,
+}: Props) {
   useBrokenLinks().collectAnchor(id);
   return (
     <div
@@ -18,7 +26,7 @@ export function Section({ id, label, title, body, children }: Props) {
     >
       <div className="flex flex-col w-full max-w-5xl items-center justify-center gap-6">
         {label && <SectionLabel label={label} />}
-        <Heading level={1} aria-level={2}>
+        <Heading level={headingLevel} aria-level={2}>
           {title}
         </Heading>
         {body && <Body size="l">{body}</Body>}

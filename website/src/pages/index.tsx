@@ -3,7 +3,7 @@ import {
   Layout,
   GlossyCard,
   GetStartedTagline,
-  Customers,
+  LogosCarousel,
   AboveTheFold,
   BelowTheFold,
   Card,
@@ -62,7 +62,7 @@ export default function Home(): JSX.Element {
         body="The open source developer platform to build AI applications and models with confidence."
         minHeight="small"
       />
-      <Customers />
+      <LogosCarousel />
 
       <Section
         title="End-to-End AIOps Platform"
