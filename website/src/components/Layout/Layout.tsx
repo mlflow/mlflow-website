@@ -67,7 +67,7 @@ export const Layout = ({ children }: Props) => {
             variant={variant}
             direction={direction}
           >
-            <div className="flex flex-col gap-24 w-full px-6 md:px-20 max-w-container">
+            <div className="flex flex-col gap-36 w-full px-6 md:px-20 max-w-container">
               {children}
             </div>
           </GradientWrapper>
