@@ -6,7 +6,7 @@ import MiniLogoCard from "../MiniLogoCard/MiniLogoCard";
 export const EcosystemList = () => {
   return (
     <div className="w-full px-4 md:px-8 lg:px-16">
-      <Section title="Integrates with 40+ apps and frameworks">
+      <Section title="No Vendor Lock-In" body="MLflow is 100% Open-Source and framework-agnostic. No vendor lock-in, no forced choices. You choose the best tools for your needs.">
         <BrowserOnly>
           {() => (
             <ExpandableGrid
