@@ -9,9 +9,50 @@ import {
   Card,
   GlossyCardContainer,
   EcosystemList,
+  ProductTabs,
+  Section,
 } from "../components";
 import GenAI from "@site/static/img/Home_page_hybrid/GenAI Apps & Agents.png";
 import ModelTraining from "@site/static/img/Home_page_hybrid/Model Training.png";
+
+const MonitoringIcon = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className="text-white/70"
+  >
+    <path
+      d="M10 3.5a5.5 5.5 0 0 0-5.5 5.5c0 2.2 1.24 4.12 3.05 5.02V15a2.45 2.45 0 0 0 2.45 2.45h0A2.45 2.45 0 0 0 12.45 15v-.98A5.48 5.48 0 0 0 15.5 9c0-3.03-2.47-5.5-5.5-5.5Z"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8 15h4"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+    />
+    <circle cx="10" cy="9" r="1" fill="currentColor" />
+  </svg>
+);
+
+const tabImageSrc = "/img/GenAI_home/GenAI_trace_darkmode.png";
+
+const productTabs = [
+  { id: "tracing", label: "Tracing", icon: "⎋" },
+  { id: "evaluation", label: "Evaluation", icon: "☑" },
+  { id: "monitoring", label: "Monitoring", icon: <MonitoringIcon /> },
+  { id: "annotation", label: "Annotation", icon: "☰" },
+  { id: "prompt", label: "Prompt", icon: "⌘" },
+  { id: "gateway", label: "Gateway", icon: "⇄" },
+  { id: "versioning", label: "Versioning", icon: "⟳" },
+  { id: "experiment", label: "Experiment", icon: "◉" },
+].map((tab) => ({ ...tab, imageSrc: tabImageSrc }));
 
 export default function Home(): JSX.Element {
   return (
@@ -20,8 +61,24 @@ export default function Home(): JSX.Element {
         title="Deliver production-ready AI"
         body="The open source developer platform to build AI applications and models with confidence."
         minHeight="small"
+      />
+      <Customers />
+
+      <Section
+        title="End-to-End AIOps Platform"
+        body="Toggle through the core product areas to preview the experience."
       >
-        <GlossyCardContainer>
+        <ProductTabs tabs={productTabs} />
+      </Section>
+
+      <EcosystemList />
+
+      <BelowTheFold>
+        <LatestNews />
+        <GetStartedTagline />
+      </BelowTheFold>
+
+      <GlossyCardContainer>
           <GlossyCard>
             <Card
               title="GenAI Apps & Agents"
@@ -55,15 +112,6 @@ export default function Home(): JSX.Element {
             />
           </GlossyCard>
         </GlossyCardContainer>
-      </AboveTheFold>
-
-      <Customers />
-      <EcosystemList />
-
-      <BelowTheFold>
-        <LatestNews />
-        <GetStartedTagline />
-      </BelowTheFold>
     </Layout>
   );
 }
