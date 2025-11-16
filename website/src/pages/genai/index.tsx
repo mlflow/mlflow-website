@@ -7,7 +7,6 @@ import {
   ValuePropWidget,
   StickyGrid,
 } from "../../components";
-import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import Card1 from "@site/static/img/GenAI_home/GenAI_home_1.png";
 import Card2 from "@site/static/img/GenAI_home/GenAI_home_2.png";
 import Card3 from "@site/static/img/GenAI_home/GenAI_home_3.png";
