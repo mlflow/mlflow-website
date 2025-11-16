@@ -11,6 +11,7 @@ import {
   EcosystemList,
   ProductTabs,
   Section,
+  StatsBand,
 } from "../components";
 import GenAI from "@site/static/img/Home_page_hybrid/GenAI Apps & Agents.png";
 import ModelTraining from "@site/static/img/Home_page_hybrid/Model Training.png";
@@ -140,10 +141,11 @@ export default function Home(): JSX.Element {
         minHeight="small"
       />
       <LogosCarousel />
+      <StatsBand />
 
       <Section
         title="End-to-End AIOps Platform"
-        body="Toggle through the core product areas to preview the experience."
+        body="One MLflow platform to design, ship, and operate GenAI/LLM apps and agents. From experimentation through observability, optimization, and production."
       >
         <ProductTabs tabs={productTabs} />
       </Section>
