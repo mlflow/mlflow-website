@@ -6,7 +6,7 @@ const wrapper = cva(
   "flex flex-col md:flex-row md:max-w-2xl mx-auto gap-6 md:gap-8 lg:gap-10 px-1 md:px-4 lg:pl-0 docs-submenu overflow-x-hidden",
 );
 
-const linkItem = cva("flex flex-col gap-1 md:gap-2 pb-4");
+const linkItem = cva("flex flex-col gap-1 md:gap-2 pb-4 flex-1");
 
 const linkTitle = cva("text-white");
 
