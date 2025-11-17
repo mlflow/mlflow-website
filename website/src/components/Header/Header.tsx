@@ -10,6 +10,7 @@ import { cn, getStartedLinkForPage } from "../../utils";
 import { Button } from "../Button/Button";
 import { HeaderMenuItem } from "../HeaderMenuItem/HeaderMenuItem";
 import { HeaderProductsSubmenu } from "../HeaderProductsSubmenu/HeaderProductsSubmenu";
+import { HeaderDocsSubmenu } from "../HeaderDocsSubmenu/HeaderDocsSubmenu";
 
 import "./Header.module.css";
 import { MLFLOW_DOCS_URL } from "@site/src/constants";
@@ -33,6 +34,8 @@ export const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProductItemHovered, setIsProductItemHovered] = useState(false);
   const [isProductSubmenuOpen, setIsProductSubmenuOpen] = useState(false);
+  const [isDocsItemHovered, setIsDocsItemHovered] = useState(false);
+  const [isDocsSubmenuOpen, setIsDocsSubmenuOpen] = useState(false);
   const location = useLocation();
   const classicalMLPath = useBaseUrl("/classical-ml");
   const genAIPath = useBaseUrl("/genai");
@@ -45,6 +48,7 @@ export const Header = () => {
 
   const handleProductItemHover = () => {
     setIsProductItemHovered(true);
+    setIsDocsItemHovered(false);
   };
 
   const handleProductSubmenuLeave = () => {
@@ -57,6 +61,23 @@ export const Header = () => {
 
   const handleProductItemClick = () => {
     setIsProductSubmenuOpen(!isProductSubmenuOpen);
+  };
+
+  const handleDocsItemHover = () => {
+    setIsDocsItemHovered(true);
+    setIsProductItemHovered(false);
+  };
+
+  const handleDocsSubmenuLeave = () => {
+    setIsDocsItemHovered(false);
+  };
+
+  const toggleDocsSubmenuHovered = () => {
+    setIsDocsItemHovered(!isDocsItemHovered);
+  };
+
+  const handleDocsItemClick = () => {
+    setIsDocsSubmenuOpen(!isDocsSubmenuOpen);
   };
 
   useLayoutEffect(() => {
@@ -159,8 +180,33 @@ export const Header = () => {
             <li className="w-full md:w-auto">
               <HeaderMenuItem href="/blog" label="Blog" />
             </li>
-            <li className="w-full md:w-auto">
-              <HeaderMenuItem href={MLFLOW_DOCS_URL} label="Docs" />
+            <li
+              className="w-full md:w-auto md:hidden"
+              onClick={handleDocsItemClick}
+            >
+              <span
+                className={
+                  "items-center gap-2 py-2 text-white text-[15px] w-full md:w-auto cursor-pointer hidden md:flex"
+                }
+              >
+                Docs
+                <DownIcon className="w-6 h-6" />
+              </span>
+              <div
+                className={cn(
+                  "transition-all duration-300 ease-in",
+                  "h-auto min-h-50",
+                )}
+              >
+                <HeaderDocsSubmenu />
+              </div>
+            </li>
+            <li
+              className="w-full md:w-auto hidden md:block"
+              onMouseEnter={handleDocsItemHover}
+              onClick={toggleDocsSubmenuHovered}
+            >
+              <HeaderMenuItem label="Docs" hasDropdown />
             </li>
             <li className="w-full md:w-auto">
               <HeaderMenuItem href="/ambassadors" label="Ambassador Program" />
@@ -184,6 +230,16 @@ export const Header = () => {
         onMouseLeave={handleProductSubmenuLeave}
       >
         <HeaderProductsSubmenu />
+      </div>
+
+      <div
+        className={cn(
+          "flex-col w-full py-6",
+          isDocsItemHovered ? "flex" : "hidden",
+        )}
+        onMouseLeave={handleDocsSubmenuLeave}
+      >
+        <HeaderDocsSubmenu />
       </div>
     </nav>
   );
