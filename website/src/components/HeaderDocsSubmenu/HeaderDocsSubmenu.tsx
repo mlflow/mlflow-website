@@ -19,14 +19,23 @@ export const HeaderDocsSubmenu = () => {
     <div className={wrapper()}>
       <div className={linkItem()}>
         <Link to={MLFLOW_ML_DOCS_URL}>
-          <h4 className={linkTitle()}>ML</h4>
-          <p className={linkSubtitle()}>Traditional ML documentation</p>
+          <h4 className={linkTitle()}>Model training</h4>
+          <p className={linkSubtitle()}>
+            Access comprehensive guides for experiment tracking, model
+            packaging, registry management, and deployment. Get started with the
+            core functionality for traditional machine learning workflows,
+            hyperparameter tuning, and model lifecycle management.
+          </p>
         </Link>
       </div>
       <div className={linkItem()}>
         <Link to={MLFLOW_GENAI_DOCS_URL}>
-          <h4 className={linkTitle()}>GenAI</h4>
-          <p className={linkSubtitle()}>Generative AI documentation</p>
+          <h4 className={linkTitle()}>GenAI Apps & Agents</h4>
+          <p className={linkSubtitle()}>
+            Explore tools for GenAI tracing, prompt management, foundation model
+            deployment, and evaluation frameworks. Learn how to track, evaluate,
+            and optimize your GenAI applications and agent workflows.
+          </p>
         </Link>
       </div>
     </div>
