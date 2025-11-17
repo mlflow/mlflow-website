@@ -23,7 +23,7 @@ export default function Observability() {
         sectionLabel="Observability"
         title="Observability for AI apps"
         body="Gain visibility into your app's logic to debug issues, improve quality and attach metadata to help you understand user behavior."
-        hasGetStartedButton="#get-started"
+        hasGetStartedButton="https://mlflow.org/docs/latest/genai/tracing/quickstart/python-openai/"
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>

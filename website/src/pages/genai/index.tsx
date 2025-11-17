@@ -22,7 +22,7 @@ export default function GenAi(): JSX.Element {
         body={[
           "Enhance your GenAI application with end-to-end tracking, observability, evaluations, all in one integrated platform.",
         ]}
-        hasGetStartedButton="#get-started"
+        hasGetStartedButton="https://mlflow.org/docs/latest/genai/getting-started/"
         bodyColor="white"
       />
 

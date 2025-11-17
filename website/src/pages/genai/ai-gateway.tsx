@@ -16,7 +16,7 @@ export default function AiGateway() {
         sectionLabel="AI gateway"
         title="Unified access to all AI models"
         body="Standardize how you interact with different LLM providers using one central interface."
-        hasGetStartedButton="#get-started"
+        hasGetStartedButton="https://mlflow.org/docs/latest/genai/governance/ai-gateway/setup/"
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
