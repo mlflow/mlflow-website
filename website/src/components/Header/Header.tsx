@@ -48,6 +48,7 @@ export const Header = () => {
 
   const handleProductItemHover = () => {
     setIsProductItemHovered(true);
+    setIsDocsItemHovered(false);
   };
 
   const handleProductSubmenuLeave = () => {
@@ -64,6 +65,7 @@ export const Header = () => {
 
   const handleDocsItemHover = () => {
     setIsDocsItemHovered(true);
+    setIsProductItemHovered(false);
   };
 
   const handleDocsSubmenuLeave = () => {
