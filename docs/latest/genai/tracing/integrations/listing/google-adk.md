@@ -36,7 +36,7 @@ Configure the OpenTelemetry tracer to export traces to the MLflow Tracking Serve
 bash
 
 ```bash
-export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:5000/v1/traces
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:5000
 export OTEL_EXPORTER_OTLP_HEADERS=x-mlflow-experiment-id=123
 
 ```

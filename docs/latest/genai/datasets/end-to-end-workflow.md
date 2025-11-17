@@ -6,21 +6,9 @@ note
 
 **Databricks Users**: To use Evaluation Datasets with Databricks Unity Catalog, MLflow requires the additional installation of the `databricks-agents` package. This package uses Unity Catalog to store datasets. Install it with: `pip install databricks-agents`
 
-## Workflow Overview[​](#workflow-overview "Direct link to Workflow Overview")
+SQL Backend Required
 
-### Evaluation-Driven Development
-
-Build & Trace
-
-Capture Traces
-
-Add Expectations
-
-Create Dataset
-
-Evaluate
-
-Analyze Results
+Evaluation Datasets require an MLflow Tracking Server with a **[SQL backend](/mlflow-website/docs/latest/self-hosting/architecture/backend-store.md#types-of-backend-stores)** (PostgreSQL, MySQL, SQLite, or MSSQL). This feature is **not available** with FileStore (local file system-based tracking).
 
 ## Prerequisites[​](#prerequisites "Direct link to Prerequisites")
 
@@ -113,7 +101,9 @@ for question in test_questions:
 
 ## Step 3: Add Ground Truth Expectations[​](#step-3-add-ground-truth-expectations "Direct link to Step 3: Add Ground Truth Expectations")
 
-Add expectations to your traces to define what constitutes correct behavior. Use [mlflow.log\_expectation()](/mlflow-website/docs/latest/api_reference/python_api/mlflow.html#mlflow.log_expectation) to annotate traces with ground truth values that will serve as your evaluation baseline.
+Add expectations to your traces to define what you expect as a response coming from your application. Use [mlflow.log\_expectation()](/mlflow-website/docs/latest/api_reference/python_api/mlflow.html#mlflow.log_expectation) to annotate traces with ground truth values that will serve as your evaluation baseline. You can also directly apply expectations within the UI.
+
+![Adding Expectations in UI](/mlflow-website/docs/latest/images/add-expectation-ui.png)
 
 python
 

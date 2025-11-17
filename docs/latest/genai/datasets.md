@@ -4,9 +4,19 @@
 
 Evaluation datasets are the foundation of systematic GenAI application testing. They provide a centralized way to manage test data, ground truth expectations, and evaluation results—enabling you to measure and improve the quality of your AI applications with confidence.
 
+SQL Backend Required
+
+Evaluation Datasets require an MLflow Tracking Server with a **[SQL backend](/mlflow-website/docs/latest/self-hosting/architecture/backend-store.md#types-of-backend-stores)** (PostgreSQL, MySQL, SQLite, or MSSQL). This feature is **not available** in FileStore (local file system-based tracking). If you need a simple local configuration for MLflow, use the sqlite option when starting MLflow.
+
 ## Quickstart: Build Your First Evaluation Dataset[​](#quickstart-build-your-first-evaluation-dataset "Direct link to Quickstart: Build Your First Evaluation Dataset")
 
-There are several ways to create evaluation datasets, each suited to different stages of your GenAI development process. **Expectations are the cornerstone of effective evaluation**—they define the ground truth against which your AI's outputs are measured, enabling systematic quality assessment across iterations.
+There are several ways to create evaluation datasets, each suited to different stages of your GenAI development process.
+
+The simplest way to create one is through MLflow's UI. Navigate to an Experiment that you want the evaluation dataset to be associated with and you can directly create a new one by supplying a unique name. After adding records to it, you can view the dataset's entries in the UI.
+
+![Evaluation Datasets Video](/mlflow-website/docs/latest/images/eval-datasets.gif)
+
+At its core, evaluation datasets are comprised of **inputs** and **expectations**. **Outputs** are an optional addition that can be added to an evaluation dataset for post-hoc evaluation with scorers. Adding these elements can be done either directly from traces, dictionaries, or via a Pandas DataFrame.
 
 * Build from Traces
 * From Dictionaries
@@ -16,7 +26,7 @@ python
 
 ```python
 import mlflow
-from mlflow.genai.datasets import create_dataset
+from mlflow.genai.datasets import create_dataset, set_dataset_tags
 
 # Create your evaluation dataset
 dataset = create_dataset(
@@ -25,34 +35,37 @@ dataset = create_dataset(
     tags={"team": "ml-platform", "stage": "validation"},
 )
 
+# Optionally, add additional tags to your dataset.
+# Tags can be used to search for datasets with search_datasets API
+set_dataset_tags(
+    dataset_id=dataset.dataset_id,
+    tags={"environment": "dev", "validation_version": "1.3"},
+)
+
 # First, retrieve traces that will become the basis of the dataset
-# Request list format to work with individual Trace objects
 traces = mlflow.search_traces(
     experiment_ids=["0"],
-    max_results=50,
+    max_results=20,
     filter_string="attributes.name = 'chat_completion'",
-    return_type="list",  # Returns list[Trace] for direct manipulation
+    return_type="list",  # Returns list[Trace]
 )
 
 # Add expectations to the traces
-for trace in traces[:20]:
-    # Expectations can be structured metrics
-    mlflow.log_expectation(
-        trace_id=trace.info.trace_id,
-        name="output_quality",
-        value={"relevance": 0.95, "accuracy": 1.0, "contains_citation": True},
-    )
-
-    # They can also be specific expected text
+for trace in traces:
     mlflow.log_expectation(
         trace_id=trace.info.trace_id,
         name="expected_answer",
-        value="The correct answer should include step-by-step instructions for password reset with email verification",
+        value=(
+            "The correct answer should include step-by-step instructions "
+            "for password reset with email verification"
+        ),
     )
 
 # Retrieve the traces with added expectations
 annotated_traces = mlflow.search_traces(
-    experiment_ids=["0"], max_results=100, return_type="list"  # Get list[Trace] objects
+    experiment_ids=["0"],
+    max_results=20,
+    return_type="list",
 )
 
 # Merge the list of Trace objects directly into your dataset
@@ -73,7 +86,7 @@ dataset = create_dataset(
     tags={"type": "regression", "priority": "critical"},
 )
 
-# Define test cases with expected outputs
+# Define test cases with expected outputs (ground truth)
 test_cases = [
     {
         "inputs": {
@@ -81,10 +94,12 @@ test_cases = [
             "context": "user_support",
         },
         "expectations": {
-            "answer": "To reset your password, click 'Forgot Password' on the login page, enter your email, and follow the link sent to your inbox",
-            "contains_steps": True,
-            "tone": "helpful",
-            "max_response_time": 2.0,
+            "expected_answer": (
+                "To reset your password, click 'Forgot Password' on the login page, "
+                "enter your email, and follow the link sent to your inbox"
+            ),
+            "must_contain_steps": True,
+            "expected_tone": "helpful",
         },
     },
     {
@@ -93,9 +108,12 @@ test_cases = [
             "context": "customer_service",
         },
         "expectations": {
-            "includes_timeframe": True,
-            "mentions_exceptions": True,
-            "accuracy": 1.0,
+            "expected_answer": (
+                "We offer full refunds within 30 days of purchase. "
+                "Refunds after 30 days are subject to approval."
+            ),
+            "must_include_timeframe": True,
+            "must_mention_exceptions": True,
         },
     },
 ]
@@ -108,49 +126,77 @@ python
 
 ```python
 import pandas as pd
-import mlflow
 from mlflow.genai.datasets import create_dataset
 
-# Create dataset from existing test data
+# Create dataset
 dataset = create_dataset(
     name="benchmark_dataset",
-    experiment_id=["0"],  # Use your experiment ID
+    experiment_id=["0"],
     tags={"source": "benchmark", "version": "2024.1"},
 )
 
-# Method 1: Use traces from search_traces (default returns DataFrame)
-# search_traces returns a pandas DataFrame by default when pandas is installed
-traces_df = mlflow.search_traces(
-    experiment_ids=["0"],  # Search in your experiment
-    max_results=100
-    # No return_type specified - defaults to "pandas"
+# Create DataFrame with inputs and expectations (ground truth)
+df = pd.DataFrame(
+    [
+        {
+            "inputs": {
+                "question": "What is MLflow?",
+                "domain": "general",
+            },
+            "expectations": {
+                "expected_answer": "MLflow is an open-source platform for ML",
+                "must_mention": ["tracking", "experiments", "models"],
+            },
+        },
+        {
+            "inputs": {
+                "question": "How do I track experiments?",
+                "domain": "technical",
+            },
+            "expectations": {
+                "expected_answer": "Use mlflow.start_run() and mlflow.log_params()",
+                "must_mention": ["log_params", "log_metrics"],
+            },
+        },
+        {
+            "inputs": {
+                "question": "Explain model versioning",
+                "domain": "technical",
+            },
+            "expectations": {
+                "expected_answer": "Model Registry provides versioning",
+                "must_mention": ["Model Registry", "versions"],
+            },
+        },
+    ]
 )
 
-# The DataFrame from search_traces can be passed directly
-dataset.merge_records(traces_df)
-
-# Method 2: Create your own DataFrame with inputs and expectations
-# You can also create a DataFrame with the expected structure
-custom_df = pd.DataFrame(
-    {
-        "inputs.question": [
-            "What is MLflow?",
-            "How do I track experiments?",
-            "Explain model versioning",
-        ],
-        "inputs.domain": ["general", "technical", "technical"],
-        "expectations.relevance": [1.0, 0.95, 0.9],
-        "expectations.technical_accuracy": [1.0, 1.0, 0.95],
-        "expectations.includes_examples": [True, True, False],
-        "tags.priority": ["high", "medium", "medium"],  # Optional tags
-        "tags.reviewed": [True, True, False],
-    }
-)
-
-# merge_records accepts DataFrames with inputs, expectations, and tags columns
-dataset.merge_records(custom_df)
+# Add records from DataFrame
+dataset.merge_records(df)
 
 ```
+
+## Understanding Source Types[​](#understanding-source-types "Direct link to Understanding Source Types")
+
+Every record in an evaluation dataset has a **source type** that tracks its provenance. This enables you to analyze model performance by data origin and understand which types of test data are most valuable.
+
+#### TRACE
+
+Records from production traces - automatically assigned when adding traces via mlflow\.search\_traces()
+
+#### HUMAN
+
+Subject matter expert annotations - automatically inferred for records with expectations (ground truth)
+
+#### CODE
+
+Programmatically generated test cases - automatically inferred for records without expectations
+
+#### DOCUMENT
+
+Test cases extracted from documentation or specs - must be explicitly specified with source metadata
+
+Source types are automatically inferred based on record characteristics but can be explicitly overridden when needed. See the [SDK Guide](/mlflow-website/docs/latest/genai/datasets/sdk-guide.md#source-type-inference) for detailed inference rules and examples.
 
 ## Why Evaluation Datasets?[​](#why-evaluation-datasets "Direct link to Why Evaluation Datasets?")
 
@@ -216,7 +262,9 @@ Monitor how your application performs against the same test data over time. Iden
 
 Link datasets to MLflow experiments for complete traceability. Understand which test data was used for each model evaluation.
 
-## Core Concepts[​](#core-concepts "Direct link to Core Concepts")
+## Next Steps[​](#next-steps "Direct link to Next Steps")
+
+Ready to improve your GenAI testing? Start with these resources:
 
 ### [Dataset Structure](/mlflow-website/docs/latest/genai/concepts/evaluation-datasets.md)
 
@@ -229,16 +277,6 @@ Link datasets to MLflow experiments for complete traceability. Understand which 
 [Complete guide to creating and managing evaluation datasets programmatically](/mlflow-website/docs/latest/genai/datasets/sdk-guide.md)
 
 [View SDK guide →](/mlflow-website/docs/latest/genai/datasets/sdk-guide.md)
-
-### [Evaluation Integration](/mlflow-website/docs/latest/genai/eval-monitor.md)
-
-[Learn how to use datasets with MLflow's evaluation framework](/mlflow-website/docs/latest/genai/eval-monitor.md)
-
-[Explore evaluation →](/mlflow-website/docs/latest/genai/eval-monitor.md)
-
-## Next Steps[​](#next-steps "Direct link to Next Steps")
-
-Ready to improve your GenAI testing? Start with these resources:
 
 ### [Setting Expectations](/mlflow-website/docs/latest/genai/assessments/expectations.md)
 

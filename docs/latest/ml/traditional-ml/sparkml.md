@@ -1,43 +1,28 @@
 # MLflow Spark MLlib Integration
 
-## Introduction[​](#introduction "Direct link to Introduction")
-
-**Apache Spark MLlib** is the distributed machine learning powerhouse that enables scalable ML across massive datasets. Built for big data environments, Spark MLlib provides high-performance, distributed algorithms that can process terabytes of data across clusters while maintaining the simplicity of familiar ML workflows.
-
-Spark MLlib's strength lies in its ability to seamlessly scale from prototype to production, handling everything from feature engineering pipelines to complex ensemble models across distributed computing environments. With its unified API for batch and streaming data, MLlib has become the standard for enterprise-scale machine learning.
-
-Why Spark MLlib Powers Enterprise ML
-
-#### Distributed Computing Excellence[​](#distributed-computing-excellence "Direct link to Distributed Computing Excellence")
-
-* 🌐 **Massive Scale**: Process datasets that don't fit on a single machine
-* ⚡ **In-Memory Computing**: Lightning-fast iterative distributed algorithms with intelligent caching
-* 🔄 **Unified Processing**: Batch and streaming ML in a single framework
-* 📊 **Data Pipeline Integration**: Native integration with Spark SQL and Spark DataFrames
-
-#### Production-Grade Architecture[​](#production-grade-architecture "Direct link to Production-Grade Architecture")
-
-* 🏗️ **Pipeline Framework**: Compose complex ML workflows with reusable transformers and estimators
-* 🔧 **Consistent APIs**: Unified interface across all algorithms and data processing steps
-* 🚀 **Fault Tolerance**: Built-in resilience for long-running ML workloads
-* 📈 **Auto-Scaling**: Dynamic resource allocation based on workload demands
+Apache Spark MLlib provides distributed machine learning algorithms for processing large-scale datasets across clusters. MLflow integrates with Spark MLlib to track distributed ML pipelines, manage models, and enable flexible deployment from cluster training to standalone inference.
 
 ## Why MLflow + Spark MLlib?[​](#why-mlflow--spark-mllib "Direct link to Why MLflow + Spark MLlib?")
 
-The integration of MLflow with Spark MLlib brings enterprise-grade ML lifecycle management to distributed computing:
+#### Pipeline Tracking
 
-* 🎯 **Seamless Model Tracking**: Log Spark MLlib pipelines and models with full metadata capture
-* 📊 **Pipeline Experiment Management**: Track complex ML pipelines from feature engineering to final model
-* 🔄 **Cross-Platform Compatibility**: Convert Spark models to PyFunc for deployment flexibility
-* 🚀 **Enterprise Deployment**: Production-ready model serving with MLflow's infrastructure
-* 👥 **Team Collaboration**: Share distributed ML experiments and models across data teams
-* 📈 **Hybrid Analytics**: Combine big data processing with traditional ML model management
+Automatically log Spark ML pipelines with all stages, transformers, and estimators. Track parameters from each pipeline component and maintain complete lineage.
 
-## Key Features[​](#key-features "Direct link to Key Features")
+#### Format Flexibility
 
-### Native Spark Pipeline Support[​](#native-spark-pipeline-support "Direct link to Native Spark Pipeline Support")
+Save models in native Spark format for distributed batch processing or PyFunc format for inference outside a Spark cluster with automatic DataFrame conversion.
 
-MLflow provides first-class support for Spark MLlib's Pipeline framework:
+#### Datasource Autologging
+
+Track data sources automatically with paths, formats, and versions. Maintain complete data lineage for distributed ML workflows.
+
+#### Cross-Platform Deployment
+
+Deploy Spark models with PyFunc wrappers for REST APIs and edge computing, or convert to ONNX for platform-independent inference.
+
+## Basic Model Logging[​](#basic-model-logging "Direct link to Basic Model Logging")
+
+Log Spark MLlib models with `mlflow.spark.log_model()`:
 
 python
 
@@ -47,139 +32,230 @@ import mlflow.spark
 from pyspark.ml.classification import LogisticRegression
 from pyspark.ml.feature import Tokenizer, HashingTF
 from pyspark.ml import Pipeline
+from pyspark.sql import SparkSession
 
-# Create a complex ML pipeline
+# Initialize Spark session
+spark = SparkSession.builder.appName("MLflowSparkExample").getOrCreate()
+
+# Prepare training data
+training = spark.createDataFrame(
+    [
+        (0, "a b c d e spark", 1.0),
+        (1, "b d", 0.0),
+        (2, "spark f g h", 1.0),
+        (3, "hadoop mapreduce", 0.0),
+    ],
+    ["id", "text", "label"],
+)
+
+# Create ML Pipeline
 tokenizer = Tokenizer(inputCol="text", outputCol="words")
 hashingTF = HashingTF(inputCol=tokenizer.getOutputCol(), outputCol="features")
 lr = LogisticRegression(maxIter=10, regParam=0.001)
 pipeline = Pipeline(stages=[tokenizer, hashingTF, lr])
 
-# Fit and log the entire pipeline
-model = pipeline.fit(training_df)
+# Train and log the model
+with mlflow.start_run():
+    model = pipeline.fit(training)
 
-model_info = mlflow.spark.log_model(model, artifact_path="spark-pipeline")
+    # Log the entire pipeline
+    model_info = mlflow.spark.log_model(
+        spark_model=model, artifact_path="spark-pipeline"
+    )
+
+    # Log parameters manually
+    mlflow.log_params(
+        {
+            "max_iter": lr.getMaxIter(),
+            "reg_param": lr.getRegParam(),
+            "num_features": hashingTF.getNumFeatures(),
+        }
+    )
+
+print(f"Model logged with URI: {model_info.model_uri}")
 
 ```
 
-Complete Pipeline Capture
+Automatically logs the complete pipeline with all stages, parameters, and model in both Spark native and PyFunc formats.
 
-#### Full Workflow Tracking[​](#full-workflow-tracking "Direct link to Full Workflow Tracking")
+## Model Formats and Loading[​](#model-formats-and-loading "Direct link to Model Formats and Loading")
 
-* 🔧 **Pipeline Stages**: Automatic logging of all transformers and estimators
-* 📊 **Stage Parameters**: Complete parameter capture for every pipeline component
-* 🔄 **Transformation Flow**: Visual representation of data flow through pipeline stages
-* 📋 **Model Metadata**: Schema inference and model signature generation
+* Native Spark Format
+* PyFunc Format
 
-#### Advanced Model Artifacts[​](#advanced-model-artifacts "Direct link to Advanced Model Artifacts")
+Preserves full Spark ML functionality for distributed processing:
 
-* 🤖 **Native Spark Format**: Preserve full Spark MLlib functionality
-* 🔄 **PyFunc Conversion**: Automatic Python function wrapper for universal deployment
-* 🎯 **ONNX Integration**: Convert Spark models to ONNX for cross-platform deployment
-* 📄 **Environment Capture**: Complete dependency and environment specification
+python
 
-### Flexible Deployment Options[​](#flexible-deployment-options "Direct link to Flexible Deployment Options")
+```python
+# Load as native Spark model (requires Spark session)
+spark_model = mlflow.spark.load_model(model_info.model_uri)
 
-MLflow bridges the gap between distributed training and flexible deployment:
+# Use for distributed batch scoring
+test_data = spark.createDataFrame(
+    [(4, "spark i j k"), (5, "l m n"), (6, "spark hadoop spark"), (7, "apache hadoop")],
+    ["id", "text"],
+)
 
-Universal Model Serving
+predictions = spark_model.transform(test_data)
+predictions.show()
 
-* 🌐 **PyFunc Wrapper**: Load Spark models as standard Python functions
-* 🔄 **Automatic Conversion**: Seamless Pandas to Spark DataFrame translation
-* 🎯 **ONNX Export**: Convert Spark models to ONNX for cross-platform deployment
-* 🚀 **Cloud Deployment**: Deploy to SageMaker, Azure ML, and other platforms
-* ⚡ **Local Inference**: Run Spark models without cluster infrastructure
-* 📊 **Batch Scoring**: Efficient batch prediction capabilities
-* 🔧 **Custom Serving**: Integrate with existing serving infrastructure
+```
 
-### ONNX Model Conversion[​](#onnx-model-conversion "Direct link to ONNX Model Conversion")
+Enables inference outside a Spark cluster:
 
-MLflow enables seamless conversion of Spark MLlib models to ONNX format for cross-platform deployment:
+python
 
-Modern Cross-Platform Deployment
+```python
+import pandas as pd
 
-#### ONNX Integration Benefits[​](#onnx-integration-benefits "Direct link to ONNX Integration Benefits")
+# Load as PyFunc model
+pyfunc_model = mlflow.pyfunc.load_model(model_info.model_uri)
 
-* 🌐 **Universal Compatibility**: Deploy Spark models on any ONNX-supported platform
-* ⚡ **High Performance**: Optimized inference with ONNX Runtime across different hardware
-* 🔄 **Language Flexibility**: Use trained Spark models in Python, C++, Java, and more
-* 📊 **Production Ready**: Enterprise-grade serving with consistent performance
+# Use with pandas DataFrame
+test_data = pd.DataFrame(
+    {"text": ["spark machine learning", "hadoop distributed computing"]}
+)
 
-#### Conversion Workflow[​](#conversion-workflow "Direct link to Conversion Workflow")
+predictions = pyfunc_model.predict(test_data)
+print(predictions)
 
-* 🎯 **Type Inference**: Automatic tensor type detection from DataFrame schemas
-* 🔧 **Pipeline Support**: Convert complex Spark ML pipelines to ONNX format
-* 📦 **Artifact Management**: Seamless integration with MLflow's model registry
-* 🚀 **Deployment Options**: Support for cloud and edge deployment scenarios
+```
 
-## Real-World Applications[​](#real-world-applications "Direct link to Real-World Applications")
+PyFunc automatically converts pandas DataFrames to Spark format and creates a local Spark session for inference. Note that the Apache Spark library is still required as a dependency.
 
-The MLflow-Spark MLlib integration excels across enterprise ML scenarios:
+## Datasource Autologging[​](#datasource-autologging "Direct link to Datasource Autologging")
 
-* 🏭 **Large-Scale Data Processing**: Track feature engineering pipelines processing terabytes of data across distributed clusters
-* 📊 **Real-Time Analytics**: Build and deploy streaming ML models for continuous data processing and prediction
-* 🔍 **Complex Text Processing**: Manage NLP pipelines with tokenization, feature extraction, and classification at scale
-* 📈 **Time Series Forecasting**: Track distributed time series models across multiple data partitions and time windows
-* 🎯 **Recommendation Systems**: Build collaborative filtering and content-based recommenders on massive user datasets
-* 🔄 **ETL Integration**: Seamlessly incorporate ML models into existing Spark-based data processing workflows
-* 📋 **Regulatory Compliance**: Maintain complete audit trails for distributed ML workflows in regulated industries
+Track data sources automatically during model training:
 
-## Advanced Capabilities[​](#advanced-capabilities "Direct link to Advanced Capabilities")
+python
 
-Our Spark MLlib integration provides enterprise-grade features for production ML:
+```python
+import mlflow.spark
 
-Enterprise ML Excellence
+mlflow.spark.autolog()
 
-#### Distributed Training Management[​](#distributed-training-management "Direct link to Distributed Training Management")
+with mlflow.start_run():
+    raw_data = spark.read.parquet("s3://my-bucket/training-data/")
+    model = pipeline.fit(raw_data)
+    mlflow.spark.log_model(model, artifact_path="model")
 
-* 🌐 Track experiments across multi-node Spark clusters with complete resource utilization metrics
-* ⚡ Monitor training performance and optimization for iterative algorithms at scale
-* 📊 Log distributed cross-validation results with statistical significance testing
-* 🔧 Capture cluster configuration and resource allocation for reproducible training
+```
 
-#### Production Deployment[​](#production-deployment "Direct link to Production Deployment")
+Requires Spark 3.0+, MLflow-Spark JAR configuration, and is not supported on Databricks shared/serverless clusters. Logs paths, formats, and versions for all datasource reads.
 
-* 🚀 Deploy Spark models to any environment with automatic dependency management
-* 📦 Optimize model serving performance with intelligent format selection
-* 🔄 Enable A/B testing and gradual rollouts for distributed ML models
-* 📈 Monitor model performance and drift in production environments
+## Model Signatures[​](#model-signatures "Direct link to Model Signatures")
 
-#### Team Collaboration[​](#team-collaboration "Direct link to Team Collaboration")
+Infer signatures automatically for Spark ML models:
 
-* 🏭 Share complex ML pipelines across data engineering and data science teams
-* 👥 Implement model governance workflows for enterprise-scale ML operations
-* 📋 Establish approval processes for distributed model deployment
-* 🔍 Provide comprehensive model lineage and audit capabilities
+python
 
-## Comprehensive Documentation[​](#comprehensive-documentation "Direct link to Comprehensive Documentation")
+```python
+from mlflow.models import infer_signature
+from pyspark.ml.functions import array_to_vector
 
-Our detailed guides cover every aspect of Spark MLlib-MLflow integration:
+vector_data = spark.createDataFrame(
+    [([3.0, 4.0], 0.0), ([5.0, 6.0], 1.0)], ["features_array", "label"]
+).select(array_to_vector("features_array").alias("features"), "label")
 
-Complete Learning Path
+lr = LogisticRegression(featuresCol="features", labelCol="label")
+model = lr.fit(vector_data)
 
-#### Getting Started[​](#getting-started "Direct link to Getting Started")
+predictions = model.transform(vector_data)
 
-* ⚡ Set up MLflow tracking for basic Spark MLlib models and pipelines
-* 🎛️ Understand the differences between native Spark and PyFunc model formats
-* 📊 Learn to log and load Spark models with proper schema inference
-* 🔧 Configure MLflow for distributed Spark environments and cluster deployments
+# Infer signature from pandas DataFrames
+signature = infer_signature(
+    vector_data.limit(2).toPandas(),
+    predictions.select("prediction").limit(2).toPandas(),
+)
 
-#### Advanced Integration[​](#advanced-integration "Direct link to Advanced Integration")
+with mlflow.start_run():
+    mlflow.spark.log_model(
+        spark_model=model,
+        artifact_path="vector_model",
+        signature=signature,
+    )
 
-* 🔍 Master complex pipeline tracking with multiple transformers and estimators
-* 📈 Implement hyperparameter tuning workflows for distributed algorithms
-* 🎯 Convert Spark models to ONNX format for cross-platform deployment
-* 🚀 Optimize model serving performance across different deployment targets
-* 📦 Work with tensor type inference and DataFrame-to-ONNX conversion workflows
+```
 
-#### Enterprise Deployment[​](#enterprise-deployment "Direct link to Enterprise Deployment")
+## ONNX Conversion[​](#onnx-conversion "Direct link to ONNX Conversion")
 
-* 🏭 Build production-ready ML pipelines with proper experiment management and model governance
-* 👥 Implement team workflows for collaborative distributed ML development
-* 🔍 Set up monitoring and performance tracking for Spark models in production
-* 📋 Establish model registry workflows for enterprise-scale ML operations
+Convert Spark models to ONNX (experimental):
 
-Ready to harness the power of distributed machine learning with comprehensive experiment tracking? Explore our complete Spark MLlib integration guide.
+python
 
-[View the Comprehensive Guide](/mlflow-website/docs/latest/ml/traditional-ml/sparkml/guide.md)
+```python
+import onnxmltools
 
-Whether you're processing massive datasets across distributed clusters or deploying enterprise-scale ML solutions, the MLflow-Spark MLlib integration provides the robust foundation needed for scalable, reproducible, and production-ready distributed machine learning.
+with mlflow.start_run():
+    model = pipeline.fit(training_data)
+    mlflow.spark.log_model(spark_model=model, artifact_path="spark_model")
+
+    onnx_model = onnxmltools.convert_sparkml(model, name="SparkMLPipeline")
+    onnxmltools.utils.save_model(onnx_model, "model.onnx")
+    mlflow.log_artifact("model.onnx")
+
+```
+
+## Model Registry[​](#model-registry "Direct link to Model Registry")
+
+Register and promote Spark models:
+
+python
+
+```python
+from mlflow import MlflowClient
+
+client = MlflowClient()
+
+with mlflow.start_run():
+    model = pipeline.fit(train_data)
+
+    mlflow.spark.log_model(
+        spark_model=model,
+        artifact_path="production_candidate",
+        registered_model_name="CustomerSegmentationModel",
+    )
+
+    mlflow.set_tags(
+        {
+            "validation_passed": "true",
+            "deployment_target": "batch_scoring",
+        }
+    )
+
+model_version = client.get_latest_versions(
+    "CustomerSegmentationModel", stages=["None"]
+)[0]
+
+client.transition_model_version_stage(
+    name="CustomerSegmentationModel", version=model_version.version, stage="Staging"
+)
+
+```
+
+## Learn More[​](#learn-more "Direct link to Learn More")
+
+### [Model Registry](/mlflow-website/docs/latest/ml/model-registry.md)
+
+[Manage model versions, aliases, and lifecycle stages for production deployment workflows.](/mlflow-website/docs/latest/ml/model-registry.md)
+
+[View registry docs →](/mlflow-website/docs/latest/ml/model-registry.md)
+
+### [Model Signatures](/mlflow-website/docs/latest/ml/model/signatures.md)
+
+[Define input and output schemas for model validation and type checking.](/mlflow-website/docs/latest/ml/model/signatures.md)
+
+[Learn about signatures →](/mlflow-website/docs/latest/ml/model/signatures.md)
+
+### [Model Deployment](/mlflow-website/docs/latest/ml/deployment.md)
+
+[Deploy Spark models with MLflow serving, batch inference, and cloud platforms.](/mlflow-website/docs/latest/ml/deployment.md)
+
+[Deploy models →](/mlflow-website/docs/latest/ml/deployment.md)
+
+### [MLflow Tracking](/mlflow-website/docs/latest/ml/tracking.md)
+
+[Track experiments, parameters, metrics, and artifacts across ML workflows.](/mlflow-website/docs/latest/ml/tracking.md)
+
+[View tracking docs →](/mlflow-website/docs/latest/ml/tracking.md)

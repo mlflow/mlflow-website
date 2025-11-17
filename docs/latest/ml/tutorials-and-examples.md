@@ -48,8 +48,6 @@ MLflow seamlessly integrates with a wide variety of training frameworks so you c
 
   * [LightGBM](https://github.com/mlflow/mlflow/tree/master/examples/lightgbm) for fast gradient boosting.
 
-  * [Diviner](https://github.com/mlflow/mlflow/tree/master/examples/diviner) for time series anomaly detection.
-
   * [SynapseML](https://github.com/mlflow/mlflow/tree/master/examples/synapseml) to see how MLflow integrates with Azure Synapse pipelines.
 
   * **scikit-learn Examples**:

@@ -2,43 +2,35 @@
 
 ## Introduction[​](#introduction "Direct link to Introduction")
 
-**Prophet** is Facebook's revolutionary time series forecasting library that democratizes high-quality forecasting for everyone. Built with simplicity and robustness in mind, Prophet enables analysts and data scientists to create accurate forecasts without deep expertise in time series methods, making sophisticated forecasting accessible to business users and technical teams alike.
+**Prophet** is Meta's open-source time series forecasting library designed for business forecasting tasks. It decomposes time series into trend, seasonality, and holiday effects, handling missing data and outliers while producing interpretable forecasts.
 
-Prophet's strength lies in its intuitive approach to complex time series patterns. By decomposing time series into trend, seasonality, and holiday effects, Prophet handles the messy realities of business data – missing values, outliers, and irregular patterns – while producing forecasts that are both accurate and interpretable.
+MLflow's Prophet integration provides experiment tracking, model versioning, and deployment capabilities for time series forecasting workflows.
 
-Why Prophet Transforms Time Series Forecasting
+No Autologging for Prophet
 
-#### Production-Ready Forecasting[​](#production-ready-forecasting "Direct link to Production-Ready Forecasting")
-
-* 🚀 **Business-Friendly**: Intuitive parameters that align with business understanding
-* 📊 **Handles Reality**: Robust to missing data, outliers, and trend changes
-* 🎯 **Automatic Seasonality**: Built-in daily, weekly, and yearly seasonal patterns
-* 📈 **Holiday Effects**: Native support for holiday and special event modeling
-
-#### Analyst-Focused Design[​](#analyst-focused-design "Direct link to Analyst-Focused Design")
-
-* 🔧 **Minimal Configuration**: Works well with default parameters out of the box
-* 📚 **Interpretable Components**: Clear decomposition of trend, seasonality, and holidays
-* 🎨 **Rich Visualizations**: Built-in plotting for forecast components and diagnostics
-* ⚡ **Fast and Scalable**: Optimized Stan implementation for quick iteration
+Prophet does not support autologging to prevent overwhelming the tracking server. Time series forecasting often involves training hundreds or thousands of models (e.g., one per product or location), which would create excessive load on the tracking server if autologging were enabled. Use manual logging with bulk APIs for large-scale forecasting workflows.
 
 ## Why MLflow + Prophet?[​](#why-mlflow--prophet "Direct link to Why MLflow + Prophet?")
 
-The integration of MLflow with Prophet creates a powerful combination for time series forecasting excellence:
+#### Model Tracking
 
-* ⚡ **Streamlined Forecasting Workflow**: Seamless logging of Prophet models with minimal configuration required
-* 📊 **Complete Forecast Tracking**: Automatically capture model parameters, cross-validation metrics, and forecast components
-* 🔄 **Experiment Reproducibility**: Track parameter tuning, seasonality configurations, and holiday effects
-* 📈 **Forecast Validation**: Built-in integration with Prophet's cross-validation and performance metrics
-* 🚀 **Production Deployment**: Convert forecasting experiments to deployable models with MLflow's serving capabilities
-* 👥 **Business Collaboration**: Share forecasting models and insights through MLflow's intuitive interface
-* 📋 **Forecast Governance**: Version control for forecasting models with proper lineage tracking
+Log Prophet models with parameters, cross-validation metrics, and forecast components for comprehensive experiment tracking.
 
-## Key Features[​](#key-features "Direct link to Key Features")
+#### Experiment Comparison
 
-### Simple Model Logging[​](#simple-model-logging "Direct link to Simple Model Logging")
+Compare different seasonality configurations, holiday effects, and hyperparameter combinations across forecasting experiments.
 
-MLflow's Prophet integration makes time series forecasting experiments effortless:
+#### Forecast Validation
+
+Integrate Prophet's cross-validation metrics directly into MLflow tracking for reproducible model evaluation.
+
+#### Model Registry
+
+Version and deploy Prophet forecasting models with MLflow's model registry and serving infrastructure.
+
+## Basic Model Logging[​](#basic-model-logging "Direct link to Basic Model Logging")
+
+Log Prophet models with MLflow to track forecasting experiments:
 
 python
 
@@ -49,176 +41,326 @@ import pandas as pd
 from prophet import Prophet
 from prophet.diagnostics import cross_validation, performance_metrics
 
-# Load your time series data
-df = pd.read_csv("your_timeseries_data.csv")
+# Load time series data (Prophet requires 'ds' and 'y' columns)
+url = "https://raw.githubusercontent.com/facebook/prophet/main/examples/example_wp_log_peyton_manning.csv"
+df = pd.read_csv(url)
 
 with mlflow.start_run():
     # Create and fit Prophet model
     model = Prophet(
         changepoint_prior_scale=0.05,
         seasonality_prior_scale=10,
-        holidays_prior_scale=10,
         yearly_seasonality=True,
         weekly_seasonality=True,
-        daily_seasonality=False,
     )
-
     model.fit(df)
 
-    # Log model parameters automatically
+    # Log model parameters
     mlflow.log_params(
         {
             "changepoint_prior_scale": 0.05,
             "seasonality_prior_scale": 10,
-            "holidays_prior_scale": 10,
+            "yearly_seasonality": True,
+            "weekly_seasonality": True,
         }
     )
 
-    # Cross-validation and metrics
+    # Cross-validation
     cv_results = cross_validation(
-        model, initial="730 days", period="180 days", horizon="365 days"
+        model,
+        initial="730 days",
+        period="180 days",
+        horizon="365 days",
     )
 
+    # Log performance metrics
     metrics = performance_metrics(cv_results)
-    avg_metrics = metrics[["mse", "rmse", "mae", "mape"]].mean().to_dict()
-    mlflow.log_metrics(avg_metrics)
+    mlflow.log_metrics(metrics[["mse", "rmse", "mae", "mape"]].mean().to_dict())
 
-    # Log the model
+    # Log model
     mlflow.prophet.log_model(
         pr_model=model, name="prophet_model", input_example=df[["ds"]].head()
     )
 
 ```
 
-What Gets Automatically Captured
+## Cross-Validation Tracking[​](#cross-validation-tracking "Direct link to Cross-Validation Tracking")
 
-#### Model Configuration[​](#model-configuration "Direct link to Model Configuration")
+Prophet's cross-validation results integrate with MLflow for comprehensive forecast evaluation:
 
-* ⚙️ **Core Parameters**: Changepoint detection, seasonality strength, holiday effects
-* 🎯 **Seasonality Settings**: Yearly, weekly, daily seasonality configurations
-* 🔧 **Advanced Options**: Custom seasonalities, additional regressors, growth models
+python
 
-#### Forecast Performance[​](#forecast-performance "Direct link to Forecast Performance")
+```python
+def validate_prophet_model(model, df):
+    """Track cross-validation across multiple forecast horizons."""
 
-* 📈 **Cross-Validation Metrics**: MSE, RMSE, MAE, MAPE across different forecast horizons
-* 📊 **Forecast Components**: Trend, seasonal patterns, holiday effects decomposition
-* 🎯 **Prediction Intervals**: Uncertainty quantification for forecast confidence
+    with mlflow.start_run():
+        # Multiple validation configurations
+        cv_configs = [
+            {
+                "name": "short",
+                "initial": "365 days",
+                "period": "90 days",
+                "horizon": "90 days",
+            },
+            {
+                "name": "medium",
+                "initial": "730 days",
+                "period": "180 days",
+                "horizon": "180 days",
+            },
+            {
+                "name": "long",
+                "initial": "1095 days",
+                "period": "180 days",
+                "horizon": "365 days",
+            },
+        ]
 
-#### Production Artifacts[​](#production-artifacts "Direct link to Production Artifacts")
+        for config in cv_configs:
+            cv_results = cross_validation(
+                model,
+                initial=config["initial"],
+                period=config["period"],
+                horizon=config["horizon"],
+            )
 
-* 🤖 **Serialized Models**: Prophet models in native format for deployment
-* 📋 **Model Signatures**: Automatic input/output schema inference
-* 📊 **Input Examples**: Sample data for model documentation and testing
+            metrics = performance_metrics(cv_results)
+            avg_metrics = metrics[["mse", "rmse", "mae", "mape"]].mean()
 
-### Advanced Time Series Features[​](#advanced-time-series-features "Direct link to Advanced Time Series Features")
+            # Log with horizon prefix
+            for metric, value in avg_metrics.items():
+                mlflow.log_metric(f"{config['name']}_{metric}", value)
 
-Prophet's sophisticated time series capabilities are fully supported:
+```
 
-Comprehensive Time Series Modeling
+## Hyperparameter Optimization[​](#hyperparameter-optimization "Direct link to Hyperparameter Optimization")
 
-* 📅 **Holiday Modeling**: Built-in support for country-specific holidays and custom events
-* 📈 **Growth Models**: Linear and logistic growth with capacity constraints
-* 🔄 **Changepoint Detection**: Automatic detection of trend changes with manual override options
-* 📊 **Custom Seasonalities**: Add business-specific seasonal patterns (monthly, quarterly)
-* 🎯 **Additional Regressors**: Include external variables that affect your time series
-* 📉 **Multiplicative Seasonality**: Handle seasonal effects that scale with trend magnitude
+Track Prophet hyperparameter tuning experiments with MLflow:
 
-### Business-Ready Forecasting[​](#business-ready-forecasting "Direct link to Business-Ready Forecasting")
+python
 
-Prophet's business-focused design principles are enhanced by MLflow's tracking:
+```python
+import optuna
 
-Enterprise Forecasting Capabilities
 
-#### Forecast Validation[​](#forecast-validation "Direct link to Forecast Validation")
+def objective(trial, df):
+    """Optuna objective for Prophet hyperparameter tuning."""
 
-* 🔍 **Cross-Validation**: Time series-aware validation with historical simulation
-* 📊 **Performance Metrics**: Business-relevant metrics like MAPE for percentage errors
-* 📈 **Horizon Analysis**: Performance evaluation across different forecast periods
-* 🎯 **Residual Analysis**: Systematic error pattern detection and diagnosis
+    with mlflow.start_run(nested=True):
+        # Define hyperparameter search space
+        params = {
+            "changepoint_prior_scale": trial.suggest_float(
+                "changepoint_prior_scale", 0.001, 0.5
+            ),
+            "seasonality_prior_scale": trial.suggest_float(
+                "seasonality_prior_scale", 0.01, 10
+            ),
+            "holidays_prior_scale": trial.suggest_float(
+                "holidays_prior_scale", 0.01, 10
+            ),
+            "seasonality_mode": trial.suggest_categorical(
+                "seasonality_mode", ["additive", "multiplicative"]
+            ),
+        }
 
-#### Business Integration[​](#business-integration "Direct link to Business Integration")
+        # Train model
+        model = Prophet(**params)
+        model.fit(df)
 
-* 📅 **Calendar Integration**: Automatic handling of business calendars and holidays
-* 💼 **Capacity Planning**: Logistic growth models for resource-constrained scenarios
-* 📊 **Scenario Analysis**: Multiple forecasts with different parameter configurations
-* 🔄 **Model Updates**: Easy retraining with new data while preserving experiment history
+        # Cross-validation
+        cv_results = cross_validation(
+            model, initial="730 days", period="180 days", horizon="365 days"
+        )
+        metrics = performance_metrics(cv_results)
+        mape = metrics["mape"].mean()
 
-### High-Volume Training Optimization[​](#high-volume-training-optimization "Direct link to High-Volume Training Optimization")
+        # Log parameters and metrics
+        mlflow.log_params(params)
+        mlflow.log_metric("mape", mape)
 
-For large-scale Prophet deployments with hundreds or thousands of models, some points will need to be considered to prevent creating instability with your Tracking Server.
+        return mape
 
-tip
 
-Bulk Logging for Performance
+# Run optimization
+with mlflow.start_run(run_name="Prophet HPO"):
+    study = optuna.create_study(direction="minimize")
+    study.optimize(lambda trial: objective(trial, df), n_trials=50)
 
-When training many Prophet models (e.g., individual forecasts for thousands of products or locations), avoid overwhelming the MLflow tracking server by using bulk logging approaches:
+    # Log best parameters
+    mlflow.log_params({f"best_{k}": v for k, v in study.best_params.items()})
+    mlflow.log_metric("best_mape", study.best_value)
 
-* 🚀 **In-Memory Aggregation**: Store metrics and parameters in lists/dictionaries during training
-* 📦 **Batch API Calls**: Use MLflow's bulk logging APIs (`log_metrics()`, `log_params()`) with dictionaries to reduce network overhead
-* ⚡ **Reduced I/O**: Minimize tracking server requests by batching logging operations
-* 🎯 **Selective Logging**: Log only essential metrics and parameters for large-scale experiments
+```
 
-## Real-World Applications[​](#real-world-applications "Direct link to Real-World Applications")
+## Model Registry Integration[​](#model-registry-integration "Direct link to Model Registry Integration")
 
-The MLflow-Prophet integration excels across diverse time series forecasting use cases:
+Register Prophet models for version control and deployment:
 
-* 📈 **Business Forecasting**: Revenue prediction, demand planning, and sales forecasting with comprehensive experiment tracking and model governance
-* 🛒 **E-commerce Analytics**: Customer traffic forecasting, inventory optimization, and seasonal demand prediction with automated model comparison
-* 📊 **Financial Planning**: Budget forecasting, cash flow prediction, and financial metric projections with robust validation frameworks
-* 🏭 **Operations Research**: Capacity planning, resource allocation, and supply chain optimization with scenario analysis capabilities
-* 📱 **Product Analytics**: User engagement forecasting, feature adoption prediction, and growth metric analysis with A/B testing integration
-* 🌐 **Marketing Intelligence**: Campaign effectiveness forecasting, customer acquisition prediction, and marketing spend optimization
-* 🏥 **Healthcare Analytics**: Patient volume forecasting, resource planning, and epidemiological modeling with regulatory compliance tracking
+python
 
-## Advanced Integration Features[​](#advanced-integration-features "Direct link to Advanced Integration Features")
+```python
+from mlflow import MlflowClient
 
-### Cross-Validation and Model Selection[​](#cross-validation-and-model-selection "Direct link to Cross-Validation and Model Selection")
+client = MlflowClient()
 
-Sophisticated Model Validation
+with mlflow.start_run():
+    # Train and log model
+    model = Prophet()
+    model.fit(df)
 
-* 🔄 **Time Series Cross-Validation**: Proper temporal validation avoiding data leakage
-* 📊 **Multiple Horizon Evaluation**: Performance assessment across short and long-term forecasts
-* 🎯 **Parameter Optimization**: Systematic hyperparameter tuning with MLflow tracking
-* 📈 **Model Comparison**: Side-by-side evaluation of different Prophet configurations
+    model_info = mlflow.prophet.log_model(
+        pr_model=model,
+        name="prophet_model",
+        registered_model_name="sales_forecast_model",
+    )
 
-### Forecast Visualization and Interpretation[​](#forecast-visualization-and-interpretation "Direct link to Forecast Visualization and Interpretation")
+    # Tag for deployment tracking
+    mlflow.set_tags(
+        {
+            "model_type": "prophet",
+            "forecast_horizon": "365_days",
+            "data_frequency": "daily",
+        }
+    )
 
-Rich Forecast Analysis
+# Transition to production
+client.transition_model_version_stage(
+    name="sales_forecast_model",
+    version=model_info.registered_model_version,
+    stage="Production",
+)
 
-* 📊 **Component Plots**: Automated logging of trend, seasonality, and holiday components
-* 📈 **Forecast Visualization**: Interactive plots showing predictions with uncertainty intervals
-* 🔍 **Diagnostic Charts**: Residual analysis and model fit assessment visualizations
-* 📅 **Calendar Heatmaps**: Seasonal pattern visualization for business insight
+```
 
-## Detailed Documentation[​](#detailed-documentation "Direct link to Detailed Documentation")
+## Model Loading and Inference[​](#model-loading-and-inference "Direct link to Model Loading and Inference")
 
-Our comprehensive developer guide covers the complete spectrum of Prophet-MLflow integration:
+Load and use logged Prophet models:
 
-Complete Learning Journey
+python
 
-#### Foundation Skills[​](#foundation-skills "Direct link to Foundation Skills")
+```python
+# Load as native Prophet model
+model_uri = "runs:/<run_id>/prophet_model"
+loaded_model = mlflow.prophet.load_model(model_uri)
 
-* ⚡ Set up Prophet model logging for immediate experiment tracking
-* 📊 Master time series data preparation and Prophet's data requirements
-* 🎯 Understand seasonality configuration and parameter tuning
-* 🔧 Configure cross-validation for proper time series model evaluation
+# Generate forecast
+future = loaded_model.make_future_dataframe(periods=365)
+forecast = loaded_model.predict(future)
 
-#### Advanced Techniques[​](#advanced-techniques "Direct link to Advanced Techniques")
+# Load as PyFunc for generic inference
+pyfunc_model = mlflow.pyfunc.load_model(model_uri)
+predictions = pyfunc_model.predict(pd.DataFrame({"ds": future_dates}))
 
-* 📅 Implement holiday and special event modeling for business calendars
-* 📈 Add custom seasonalities and external regressors for complex patterns
-* 🚀 Deploy Prophet models with MLflow's serving infrastructure
-* 📊 Build comprehensive forecast validation and monitoring pipelines
+```
 
-#### Production Excellence[​](#production-excellence "Direct link to Production Excellence")
+## Batch Forecasting Workflow[​](#batch-forecasting-workflow "Direct link to Batch Forecasting Workflow")
 
-* 🏭 Build production-ready forecasting systems with proper experiment governance
-* 👥 Implement team collaboration workflows for shared forecasting model development
-* 🔍 Set up automated model retraining and forecast monitoring
-* 📋 Establish forecasting model registry with business approval workflows
+Track multiple Prophet models for hierarchical forecasting:
 
-To learn more about the nuances of the `prophet` flavor in MLflow, explore the comprehensive guide below.
+python
 
-[View the Comprehensive Guide](/mlflow-website/docs/latest/ml/traditional-ml/prophet/guide.md)
+```python
+def train_hierarchical_forecasts(data_dict):
+    """Train separate Prophet models for multiple series."""
 
-Whether you're creating your first business forecast or deploying enterprise-scale time series prediction systems, the MLflow-Prophet integration provides the robust foundation needed for reliable, interpretable, and scalable forecasting that drives business decisions with confidence.
+    with mlflow.start_run(run_name="Hierarchical Forecasting"):
+        for series_name, series_data in data_dict.items():
+            with mlflow.start_run(run_name=f"Series_{series_name}", nested=True):
+                model = Prophet()
+                model.fit(series_data)
+
+                # Log series-specific info
+                mlflow.log_param("series_name", series_name)
+                mlflow.log_param("data_points", len(series_data))
+
+                # Cross-validation
+                cv_results = cross_validation(
+                    model, initial="365 days", period="90 days", horizon="180 days"
+                )
+                metrics = performance_metrics(cv_results)
+                mlflow.log_metrics(metrics[["mape", "rmse"]].mean().to_dict())
+
+                # Log model
+                mlflow.prophet.log_model(pr_model=model, name=f"model_{series_name}")
+
+```
+
+High-Volume Model Training
+
+When training many Prophet models (e.g., for thousands of products), use bulk logging to reduce tracking server load:
+
+python
+
+```python
+# Collect metrics in batch
+metrics_batch = {}
+params_batch = {}
+
+for series_name, series_data in data_dict.items():
+    model = Prophet()
+    model.fit(series_data)
+
+    # Collect metrics
+    cv_results = cross_validation(
+        model, initial="365 days", period="45 days", horizon="90 days"
+    )
+    perf_metrics = performance_metrics(cv_results)
+
+    metrics_batch[f"{series_name}_mape"] = perf_metrics["mape"].mean()
+    params_batch[f"{series_name}_n_points"] = len(series_data)
+
+# Bulk log after collection
+with mlflow.start_run():
+    mlflow.log_metrics(metrics_batch)
+    mlflow.log_params(params_batch)
+
+```
+
+## Forecast Component Logging[​](#forecast-component-logging "Direct link to Forecast Component Logging")
+
+Log Prophet forecast components as artifacts:
+
+python
+
+```python
+with mlflow.start_run():
+    model = Prophet()
+    model.fit(df)
+
+    # Generate forecast
+    future = model.make_future_dataframe(periods=365)
+    forecast = model.predict(future)
+
+    # Log component plots
+    fig_components = model.plot_components(forecast)
+    mlflow.log_figure(fig_components, "forecast_components.png")
+
+    # Log forecast plot
+    fig_forecast = model.plot(forecast)
+    mlflow.log_figure(fig_forecast, "forecast_plot.png")
+
+    # Log model
+    mlflow.prophet.log_model(pr_model=model, name="prophet_model")
+
+```
+
+## Learn More[​](#learn-more "Direct link to Learn More")
+
+### [Model Registry](/mlflow-website/docs/latest/ml/model-registry.md)
+
+[Version and deploy Prophet models](/mlflow-website/docs/latest/ml/model-registry.md)
+
+[Learn more →](/mlflow-website/docs/latest/ml/model-registry.md)
+
+### [MLflow Tracking](/mlflow-website/docs/latest/ml/tracking.md)
+
+[Track experiments and metrics](/mlflow-website/docs/latest/ml/tracking.md)
+
+[Learn more →](/mlflow-website/docs/latest/ml/tracking.md)
+
+### [Model Evaluation](/mlflow-website/docs/latest/ml/evaluation.md)
+
+[Evaluate forecasting performance](/mlflow-website/docs/latest/ml/evaluation.md)
+
+[Learn more →](/mlflow-website/docs/latest/ml/evaluation.md)

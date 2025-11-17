@@ -9,7 +9,8 @@
 bash
 
 ```bash
-npm create mastra@laster
+npm create mastra@latest
+npm install @mastra/otel-exporter
 
 ```
 
@@ -37,6 +38,8 @@ Open the `src/mastra/index.ts` file and add the `observability` configuration to
 typescript
 
 ```typescript
+import { OtelExporter } from "@mastra/otel-exporter";
+
 export const mastra = new Mastra({
   workflows: { weatherWorkflow },
   ...
