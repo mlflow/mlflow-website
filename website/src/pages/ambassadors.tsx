@@ -30,7 +30,7 @@ export default function Ambassadors() {
           </p>
           <p>Are you interested in becoming an official MLflow Ambassador?</p>
           <div className="pt-4 flex justify-center">
-            <Link href="https://docs.google.com/forms/d/e/1FAIpQLSefBkC-bBtk81ByRkM97ONnQ1DGwNR9hlEVa5yF2TLQmdQ9vA/viewform">
+            <Link href="https://docs.google.com/forms/d/e/1FAIpQLScJbdWwEsswZPT7078uyg_g_YmpHOUMZKKgyGwtU1kXlWpNlA/viewform">
               <Button variant="primary" size="small">
                 Apply
               </Button>
