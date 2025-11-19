@@ -26,3 +26,4 @@ export { StickyGrid } from "./StickyGrid";
 export { GradientWrapper } from "./GradientWrapper/GradientWrapper";
 export { StatsBand } from "./StatsBand/StatsBand";
 export { ProductTabs } from "./ProductTabs/ProductTabs";
+export { Challenges } from "./Challenges/Challenges";
