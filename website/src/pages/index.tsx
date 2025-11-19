@@ -2,7 +2,6 @@ import {
   LatestNews,
   Layout,
   GlossyCard,
-  GetStartedTagline,
   LogosCarousel,
   AboveTheFold,
   BelowTheFold,
@@ -12,6 +11,7 @@ import {
   ProductTabs,
   Section,
   StatsBand,
+  Challenges,
 } from "../components";
 import GenAI from "@site/static/img/Home_page_hybrid/GenAI Apps & Agents.png";
 import ModelTraining from "@site/static/img/Home_page_hybrid/Model Training.png";
@@ -25,25 +25,25 @@ export default function Home(): JSX.Element {
         title="Deliver production-ready AI"
         body="The open source developer platform to build AI applications and models with confidence."
         minHeight="small"
-      />
+      >
+      </AboveTheFold>
       <LogosCarousel />
 
+      <Challenges />
       <Section
-        title="End-to-End AIOps Platform"
+        title="Solution: End-to-End AIOps"
         body="One MLflow platform to build, test, and monitor GenAI/LLM apps and agents. From experimentation to production."
       >
         <ProductTabs tabs={productTabs} />
       </Section>
 
       <EcosystemList />
-
       <StatsBand />
 
       <Section
         label="For every team"
         title="One Platform, Every Role"
         body="Choose the MLflow workspace that matches how you build, whether you're shipping GenAI apps or training models."
-        headingLevel={2}
       >
         <GlossyCardContainer className="max-w-6xl">
           <GlossyCard className="github-stats-card">
@@ -85,7 +85,6 @@ export default function Home(): JSX.Element {
 
       <BelowTheFold>
         <LatestNews />
-        <GetStartedTagline />
       </BelowTheFold>
     </Layout>
   );

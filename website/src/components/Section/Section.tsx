@@ -1,11 +1,11 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, ReactNode } from "react";
 import { Body, Heading, SectionLabel } from "..";
 import useBrokenLinks from "@docusaurus/useBrokenLinks";
 
 type Props = PropsWithChildren<{
   label?: string;
-  title: string;
-  body?: string;
+  title: ReactNode;
+  body?: ReactNode;
   id?: string;
   headingLevel?: 1 | 2 | 3 | 4 | 5;
 }>;

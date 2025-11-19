@@ -17,6 +17,7 @@ import {
   MLFLOW_DBX_INSTALL_URL,
 } from "@site/src/constants";
 import { ContentType } from "../types";
+import { Section } from "../Section/Section";
 
 interface GetStartedWithMLflowProps {
   contentType?: ContentType;
@@ -87,7 +88,7 @@ export const GetStartedWithMLflow = ({
         <div className="flex flex-col gap-8">
           <div className="flex flex-row justify-between items-center gap-4">
             <div className="flex flex-row justify-center items-end gap-3 flex-wrap">
-              <h3 className="m-0 text-white">Managed hosting </h3>
+              <h3 className="m-0 text-white">MLflow Cloud</h3>
               <span className="text-gray-500 text-sm">ON</span>
               <DatabricksLogo />
             </div>
