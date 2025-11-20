@@ -8,6 +8,7 @@ import {
   useEffect,
   useCallback,
 } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import styles from "./ProductTabs.module.css";
 import EvaluationTabImg from "@site/static/img/GenAI_home/GenAI_evaluation_darkmode.png";
 import MonitoringTabImg from "@site/static/img/GenAI_home/GenAI_monitor_darkmode.png";
@@ -174,10 +175,39 @@ const Bubble = ({
   });
 
   return (
-    <div className={bubbleClass}>
+    <motion.div 
+      className={bubbleClass}
+      initial={{ opacity: 0, scale: 0.9, y: direction === "top" ? 10 : direction === "bottom" ? -10 : 0, x: direction === "left" ? 10 : direction === "right" ? -10 : 0 }}
+      animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {/* Animated glow effect */}
+      <motion.div
+        className="absolute inset-0 rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20 blur-md -z-10"
+        animate={{
+          scale: [1, 1.05, 1],
+          opacity: [0.5, 0.8, 0.5],
+        }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+      
       <div className={styles.content}>
         <span className={styles.title}>
-          <span className={styles.hintIcon} aria-hidden>
+          <motion.span 
+            className={styles.hintIcon} 
+            aria-hidden
+            animate={{
+              rotate: [0, -5, 5, -5, 0],
+            }}
+            transition={{
+              duration: 0.6,
+              ease: "easeInOut",
+            }}
+          >
             <svg
               width="14"
               height="14"
@@ -205,13 +235,22 @@ const Bubble = ({
                 strokeLinecap="round"
               />
             </svg>
-          </span>
+          </motion.span>
           {label}
         </span>
-        {description && <span className={styles.description}>{description}</span>}
+        {description && (
+          <motion.span 
+            className={styles.description}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+          >
+            {description}
+          </motion.span>
+        )}
       </div>
       <span className={arrowClass} aria-hidden />
-    </div>
+    </motion.div>
   );
 };
 
@@ -258,92 +297,261 @@ export function ProductTabs({ tabs }: Props) {
 
   return (
     <div className="w-full flex flex-col gap-8">
+      {/* Floating particles background */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {[...Array(15)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-blue-400/20 rounded-full"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -20, 0],
+              opacity: [0, 0.6, 0],
+              scale: [1, 1.5, 1],
+            }}
+            transition={{
+              duration: 2 + Math.random() * 2,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
+      </div>
+
       <div className="relative w-full" ref={containerRef}>
-        <div className="flex flex-wrap justify-center gap-6 md:gap-8 pb-4">
-          {tabs.map((tab) => {
+        <motion.div 
+          className="flex flex-wrap justify-center gap-6 md:gap-8 pb-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {tabs.map((tab, index) => {
             const isActive = tab.id === activeTab.id;
             return (
-              <button
+              <motion.button
                 key={tab.id}
                 type="button"
                 ref={(el) => {
                   tabRefs.current[tab.id] = el;
                 }}
                 onClick={() => setActiveTabId(tab.id)}
-                className="group flex items-center gap-2 text-md font-medium focus:outline-none"
+                className="group relative flex items-center gap-2 text-md font-medium focus:outline-none px-3 py-2 rounded-lg transition-all"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.98 }}
               >
-                {tab.icon && (
-                  <span className="text-white/60 text-base leading-none">
-                    {tab.icon}
-                  </span>
+                {/* Glow effect on hover */}
+                <motion.div
+                  className="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 via-cyan-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 blur-md"
+                  initial={false}
+                  animate={{
+                    opacity: isActive ? 0.3 : 0,
+                  }}
+                  transition={{ duration: 0.3 }}
+                />
+                
+                {/* Active background */}
+                {isActive && (
+                  <motion.div
+                    layoutId="activeTabBackground"
+                    className="absolute inset-0 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
                 )}
+
+                {/* Icon with animation */}
+                {tab.icon && (
+                  <motion.span 
+                    className={clsx(
+                      "text-base leading-none relative z-10 transition-all",
+                      isActive ? "text-blue-400" : "text-white/60 group-hover:text-blue-300"
+                    )}
+                    animate={{
+                      rotate: isActive ? [0, -10, 10, -10, 0] : 0,
+                    }}
+                    transition={{
+                      duration: 0.5,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    {tab.icon}
+                  </motion.span>
+                )}
+                
+                {/* Label */}
                 <span
                   className={clsx(
-                    "transition-colors",
-                    isActive ? "text-white" : "text-white/70 group-hover:text-white",
+                    "transition-all relative z-10 font-semibold",
+                    isActive 
+                      ? "text-white" 
+                      : "text-white/70 group-hover:text-white/90",
                   )}
                 >
                   {tab.label}
                 </span>
-              </button>
+
+                {/* Sparkle effect on active */}
+                {isActive && (
+                  <motion.div
+                    className="absolute -right-1 -top-1 w-1.5 h-1.5 rounded-full bg-blue-400"
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ 
+                      scale: [0, 1.2, 1],
+                      opacity: [0, 1, 0.8],
+                    }}
+                    transition={{ duration: 0.4 }}
+                  />
+                )}
+              </motion.button>
             );
           })}
-        </div>
+        </motion.div>
 
+        {/* Decorative line */}
         <div className="absolute left-0 right-0 bottom-0 border-b border-white/10" aria-hidden />
-        <div
+        
+        {/* Animated indicator with glow */}
+        <motion.div
           aria-hidden
-          className="absolute bottom-0 h-0.5 bg-[#3b82f6] transition-all duration-200"
+          className="absolute bottom-0 h-0.5 rounded-full"
           style={{
             width: indicator?.width ?? 0,
             transform: `translateX(${indicator?.left ?? 0}px)`,
           }}
-        />
+        >
+          {/* Main bar */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 rounded-full" />
+          
+          {/* Glow effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 rounded-full blur-sm opacity-70" />
+          
+          {/* Moving shimmer */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent rounded-full"
+            animate={{
+              x: ["-200%", "200%"],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          />
+        </motion.div>
       </div>
 
-      <div className="relative mx-16">
-        {/* halo around the frame (sits outside the clipped card) */}
-        <div
-          className="pointer-events-none absolute -inset-8 rounded-[30px] z-0 bg-[radial-gradient(circle_at_50%_40%,rgba(59,130,246,0.16),transparent_65%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.10),transparent_55%)] blur-[45px] shadow-[0_0_70px_rgba(59,130,246,0.08)]"
+      <motion.div 
+        className="relative mx-16"
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {/* Enhanced halo with animation */}
+        <motion.div
+          className="pointer-events-none absolute -inset-8 rounded-[30px] z-0"
+          style={{
+            background: "radial-gradient(circle at 50% 40%, rgba(59,130,246,0.16), transparent 65%), radial-gradient(circle at 80% 10%, rgba(255,255,255,0.10), transparent 55%)",
+            filter: "blur(45px)",
+            boxShadow: "0 0 70px rgba(59,130,246,0.08)",
+          }}
+          animate={{
+            scale: [1, 1.05, 1],
+            opacity: [0.8, 1, 0.8],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
           aria-hidden
         />
 
-        <div className="relative border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] rounded-2xl overflow-visible shadow-[0_20px_80px_rgba(0,0,0,0.35)]">
-          {/* outer glow behind the card */}
-          <div
-            className="pointer-events-none absolute -inset-4 blur-[40px] z-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.18),transparent_55%),radial-gradient(circle_at_80%_0%,rgba(253, 137, 137, 0.12),transparent_50%)]"
+        <motion.div 
+          className="relative border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] rounded-2xl overflow-visible shadow-[0_20px_80px_rgba(0,0,0,0.35)] group/card"
+          whileHover={{ scale: 1.01 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+        >
+          {/* Enhanced outer glow with animation */}
+          <motion.div
+            className="pointer-events-none absolute -inset-4 z-0"
+            style={{
+              background: "radial-gradient(circle at 30% 20%, rgba(59,130,246,0.18), transparent 55%), radial-gradient(circle at 80% 0%, rgba(253, 137, 137, 0.12), transparent 50%)",
+              filter: "blur(40px)",
+            }}
+            animate={{
+              opacity: [0.5, 0.8, 0.5],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
             aria-hidden
           />
 
-          {/* glare and sheen over the image */}
+          {/* Enhanced glare - static for better performance */}
           <div
-            className="pointer-events-none absolute inset-0 z-20 mix-blend-screen opacity-32 bg-[linear-gradient(130deg,rgba(96,165,250,0.16)_0%,rgba(255,255,255,0.04)_45%,transparent_60%),radial-gradient(120%_60%_at_20%_10%,rgba(59,130,246,0.16),transparent_55%)]"
+            className="pointer-events-none absolute inset-0 z-20 mix-blend-screen rounded-2xl"
+            style={{
+              background: "linear-gradient(130deg, rgba(96,165,250,0.16) 0%, rgba(255,255,255,0.04) 45%, transparent 60%), radial-gradient(120% 60% at 20% 10%, rgba(59,130,246,0.16), transparent 55%)",
+              opacity: 0.32,
+            }}
             aria-hidden
           />
 
-          <div className="relative z-10">
-            <img
-              src={activeTab.imageSrc}
-              alt={`${activeTab.label} screenshot`}
-              className="w-full h-full object-cover shadow-[0_18px_50px_rgba(0,0,0,0.35)] rounded-2xl"
-              loading="lazy"
-            />
+          <AnimatePresence mode="wait">
+            <motion.div 
+              key={activeTab.id}
+              className="relative z-10"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <img
+                src={activeTab.imageSrc}
+                alt={`${activeTab.label} screenshot`}
+                className="w-full h-full object-cover shadow-[0_18px_50px_rgba(0,0,0,0.35)] rounded-2xl"
+                loading="lazy"
+              />
 
-            {activeTab.hotspots?.map((spot) => (
-              <SpotWithLink key={spot.id} spot={spot}>
-                <div className="absolute inset-0 rounded-md border border-white/30 bg-white/6 opacity-0 group-hover:opacity-100 transition duration-200" />
-                <div className="relative h-full w-full pointer-events-none opacity-0 group-hover:opacity-100 transition duration-200">
-                  <Bubble
-                    label={spot.label}
-                    description={spot.description}
-                    direction={spot.direction}
-                  />
-                </div>
-              </SpotWithLink>
-            ))}
-          </div>
-        </div>
-      </div>
+              {activeTab.hotspots?.map((spot, index) => (
+                <motion.div
+                  key={spot.id}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: 0.4 + index * 0.05 }}
+                >
+                  <SpotWithLink spot={spot}>
+                    <motion.div 
+                      className="absolute inset-0 rounded-md border border-white/30 bg-white/6 opacity-0 group-hover:opacity-100"
+                      initial={false}
+                      whileHover={{
+                        backgroundColor: "rgba(255,255,255,0.12)",
+                        borderColor: "rgba(255,255,255,0.5)",
+                      }}
+                      transition={{ duration: 0.2 }}
+                    />
+                    <div className="relative h-full w-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <Bubble
+                        label={spot.label}
+                        description={spot.description}
+                        direction={spot.direction}
+                      />
+                    </div>
+                  </SpotWithLink>
+                </motion.div>
+              ))}
+            </motion.div>
+          </AnimatePresence>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

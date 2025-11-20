@@ -185,12 +185,12 @@ const ProblemSection = ({
         <div className="relative group">
           {/* Glow Effect */}
           <div className={`absolute -inset-1 bg-gradient-to-r ${colorConfig.gradient} rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500`} />
-          
+
           {/* Main Card */}
           <div className={`relative aspect-video rounded-2xl border ${colorConfig.border} bg-gradient-to-br from-white/10 via-white/5 to-transparent backdrop-blur-xl overflow-hidden shadow-2xl ${colorConfig.glow} group-hover:shadow-3xl transition-all duration-500`}>
             {/* Animated Border */}
             <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${colorConfig.gradient} opacity-0 group-hover:opacity-20 transition-opacity duration-500`} />
-            
+
             {/* Grid Pattern */}
             <div className="absolute inset-0 opacity-[0.02]" style={{
               backgroundImage: `linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent)`,
@@ -204,7 +204,7 @@ const ProblemSection = ({
 
             {/* Glass Overlay with Enhanced Gradient */}
             <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-white/5 pointer-events-none" />
-            
+
             {/* Shine Effect on Hover */}
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full"
@@ -495,7 +495,7 @@ const MeasuringVisual = () => {
               >
                 {/* Shimmer effect */}
                 <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                
+
                 {/* Value on hover */}
                 <div className="absolute top-2 inset-x-0 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <span className="text-xs font-bold text-white drop-shadow-lg">
