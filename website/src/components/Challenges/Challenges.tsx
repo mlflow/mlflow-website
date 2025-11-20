@@ -5,35 +5,10 @@ import { Section } from "../Section/Section";
 export const Challenges = () => {
   return (
     <div className="w-full py-24 relative overflow-hidden">
-      {/* Ambient Background Effects */}
+      {/* Ambient Background Effects - Subtle */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '3s', animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '0.5s' }} />
-      </div>
-
-      {/* Floating Particles */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-white/20 rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/4 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/3 rounded-full blur-3xl" />
       </div>
 
       <Section
@@ -59,13 +34,13 @@ export const Challenges = () => {
             visual={<MeasuringVisual />}
           />
 
-          {/* Problem 2: Traceability */}
+          {/* Problem 2: Reproducibility */}
           <ProblemSection
-            title="Traceability"
-            description="There are many components in LLM based apps, such as prompts, models, parameters, vector database, etc. Devs need lineage between them to debug and optimize effectively."
+            title="Reproducibility"
+            description="Reproducing AI application behavior across different environments and runs is challenging. Track all components, configurations, and dependencies to ensure consistent results."
             align="left"
             color="cyan"
-            visual={<TraceabilityVisual />}
+            visual={<ReproducibilityVisual />}
           />
         </div>
       </Section>
@@ -90,25 +65,25 @@ const ProblemSection = ({
 
   const colorConfig = {
     blue: {
-      text: "text-blue-400",
-      gradient: "from-blue-500/20 via-blue-400/10 to-transparent",
-      glow: "shadow-blue-500/20",
-      border: "border-blue-500/30",
-      accent: "bg-blue-500",
+      text: "text-blue-300/80",
+      gradient: "from-blue-500/8 via-blue-400/4 to-transparent",
+      glow: "shadow-blue-500/10",
+      border: "border-white/10",
+      accent: "bg-blue-400/60",
     },
     cyan: {
-      text: "text-cyan-400",
-      gradient: "from-cyan-500/20 via-cyan-400/10 to-transparent",
-      glow: "shadow-cyan-500/20",
-      border: "border-cyan-500/30",
-      accent: "bg-cyan-500",
+      text: "text-cyan-300/80",
+      gradient: "from-cyan-500/8 via-cyan-400/4 to-transparent",
+      glow: "shadow-cyan-500/10",
+      border: "border-white/10",
+      accent: "bg-cyan-400/60",
     },
     emerald: {
-      text: "text-emerald-400",
-      gradient: "from-emerald-500/20 via-emerald-400/10 to-transparent",
-      glow: "shadow-emerald-500/20",
-      border: "border-emerald-500/30",
-      accent: "bg-emerald-500",
+      text: "text-emerald-300/80",
+      gradient: "from-emerald-500/8 via-emerald-400/4 to-transparent",
+      glow: "shadow-emerald-500/10",
+      border: "border-white/10",
+      accent: "bg-emerald-400/60",
     },
   }[color];
 
@@ -124,54 +99,15 @@ const ProblemSection = ({
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         viewport={{ once: true, margin: "-100px" }}
       >
-        {/* Premium Badge */}
-        <motion.div
-          className="inline-flex items-center gap-2 w-fit"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          <div className={`h-1 w-1 rounded-full ${colorConfig.accent} animate-pulse`} />
-          <span className={`text-xs uppercase tracking-wider ${colorConfig.text} font-semibold`}>
-            Challenge
-          </span>
-        </motion.div>
-
-        {/* Title with Gradient */}
-        <h3 className="text-4xl md:text-6xl font-bold text-white relative">
-          <span className={`bg-gradient-to-br ${colorConfig.gradient} bg-clip-text`}>
-            {title}
-          </span>
-          {/* Animated underline */}
-          <motion.div
-            className={`absolute -bottom-2 left-0 h-1 ${colorConfig.accent} rounded-full`}
-            initial={{ width: 0 }}
-            whileInView={{ width: "100px" }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          />
+        {/* Title */}
+        <h3 className="text-4xl md:text-6xl font-bold text-white">
+          {title}
         </h3>
 
         {/* Description with better typography */}
         <p className="text-xl text-gray-300/90 leading-relaxed max-w-xl font-light">
           {description}
         </p>
-
-        {/* Feature highlights */}
-        <motion.div
-          className="flex flex-wrap gap-3 mt-4"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-        >
-          {["Real-time", "Automated", "Scalable"].map((tag, i) => (
-            <span
-              key={tag}
-              className={`px-4 py-1.5 rounded-full border ${colorConfig.border} bg-white/5 backdrop-blur-sm text-sm text-gray-300 font-medium`}
-            >
-              {tag}
-            </span>
-          ))}
-        </motion.div>
       </motion.div>
 
       {/* Visual Content with Enhanced Effects */}
@@ -183,13 +119,8 @@ const ProblemSection = ({
         viewport={{ once: true, margin: "-100px" }}
       >
         <div className="relative group">
-          {/* Glow Effect */}
-          <div className={`absolute -inset-1 bg-gradient-to-r ${colorConfig.gradient} rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500`} />
-
           {/* Main Card */}
-          <div className={`relative aspect-video rounded-2xl border ${colorConfig.border} bg-gradient-to-br from-white/10 via-white/5 to-transparent backdrop-blur-xl overflow-hidden shadow-2xl ${colorConfig.glow} group-hover:shadow-3xl transition-all duration-500`}>
-            {/* Animated Border */}
-            <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${colorConfig.gradient} opacity-0 group-hover:opacity-20 transition-opacity duration-500`} />
+          <div className={`relative aspect-video rounded-2xl border ${colorConfig.border} bg-gradient-to-br from-white/10 via-white/5 to-transparent backdrop-blur-xl overflow-hidden shadow-2xl transition-all duration-500`}>
 
             {/* Grid Pattern */}
             <div className="absolute inset-0 opacity-[0.02]" style={{
@@ -202,16 +133,8 @@ const ProblemSection = ({
               {visual}
             </div>
 
-            {/* Glass Overlay with Enhanced Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-white/5 pointer-events-none" />
-
-            {/* Shine Effect on Hover */}
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full"
-              initial={false}
-              whileHover={{ x: "200%" }}
-              transition={{ duration: 0.8, ease: "easeInOut" }}
-            />
+            {/* Glass Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/5 via-transparent to-white/3 pointer-events-none" />
           </div>
         </div>
       </motion.div>
@@ -294,12 +217,12 @@ const ObservabilityVisual = () => {
   );
 };
 
-const TraceabilityVisual = () => {
+const ReproducibilityVisual = () => {
   const nodes = [
-    { x: 80, y: 112, size: 24, label: "Prompt", icon: "📝" },
-    { x: 200, y: 80, size: 28, label: "Model", icon: "🤖" },
-    { x: 200, y: 145, size: 22, label: "Vector DB", icon: "🗄️" },
-    { x: 320, y: 112, size: 24, label: "Output", icon: "✨" },
+    { x: 80, y: 112, size: 24, label: "Code", icon: "📦" },
+    { x: 200, y: 80, size: 28, label: "Environment", icon: "⚙️" },
+    { x: 200, y: 145, size: 22, label: "Data", icon: "📊" },
+    { x: 320, y: 112, size: 24, label: "Results", icon: "✓" },
   ];
 
   const connections = [

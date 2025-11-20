@@ -1,4 +1,5 @@
 import LinuxFoundationLogo from "@site/static/img/linux-foundation.svg";
+import { motion } from "motion/react";
 import { Section } from "../Section/Section";
 
 type Stat = {
@@ -14,12 +15,101 @@ export const StatsBand = () => {
       title="The Most Used Open-Source MLOps Platform"
       body="Backed by Linux Foundation, MLflow is fully committed to open-source for 6 years."
     >
-      <div className="flex w-full flex-col items-center gap-16">
-        <a
+      <div className="flex w-full flex-col items-center gap-16 relative">
+        {/* Animated Background - Representing Openness */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Expanding circles - representing openness and transparency */}
+          {[...Array(3)].map((_, i) => (
+            <motion.div
+              key={`circle-${i}`}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-blue-500/20"
+              style={{
+                width: "200px",
+                height: "200px",
+              }}
+              animate={{
+                width: ["200px", "800px", "200px"],
+                height: ["200px", "800px", "200px"],
+                opacity: [0.3, 0, 0.3],
+              }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                delay: i * 2,
+                ease: "easeInOut",
+              }}
+            />
+          ))}
+          
+          {/* Moving light orbs */}
+          {[...Array(5)].map((_, i) => (
+            <motion.div
+              key={`orb-${i}`}
+              className="absolute w-32 h-32 rounded-full blur-2xl"
+              style={{
+                background: `radial-gradient(circle, ${
+                  i % 2 === 0 ? "rgba(59, 130, 246, 0.15)" : "rgba(147, 197, 253, 0.12)"
+                }, transparent 70%)`,
+              }}
+              animate={{
+                x: [
+                  `${Math.random() * 100}%`,
+                  `${Math.random() * 100}%`,
+                  `${Math.random() * 100}%`,
+                ],
+                y: [
+                  `${Math.random() * 100}%`,
+                  `${Math.random() * 100}%`,
+                  `${Math.random() * 100}%`,
+                ],
+                scale: [1, 1.5, 1],
+                opacity: [0.3, 0.6, 0.3],
+              }}
+              transition={{
+                duration: 15 + i * 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+          ))}
+          
+          {/* Radiating particles - symbolizing open-source spreading */}
+          {[...Array(8)].map((_, i) => {
+            const angle = (i / 8) * Math.PI * 2;
+            return (
+              <motion.div
+                key={`particle-${i}`}
+                className="absolute left-1/2 top-1/2 w-2 h-2 bg-blue-400/40 rounded-full"
+                animate={{
+                  x: [0, Math.cos(angle) * 300, 0],
+                  y: [0, Math.sin(angle) * 300, 0],
+                  opacity: [0, 0.8, 0],
+                  scale: [0, 1, 0],
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  delay: i * 0.5,
+                  ease: "easeOut",
+                }}
+              />
+            );
+          })}
+        </div>
+        <motion.a
           href="https://github.com/mlflow/mlflow"
-          className="github-stats-card relative flex items-center gap-4 rounded-2xl bg-[linear-gradient(135deg,#1f2f63,#1b2342)] px-6 py-4 text-white shadow-xl overflow-hidden"
+          className="github-stats-card relative flex items-center gap-4 rounded-2xl bg-[linear-gradient(135deg,#1f2f63,#1b2342)] px-6 py-4 text-white shadow-xl overflow-hidden z-10"
           target="_blank"
           rel="noreferrer noopener"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          whileHover={{ 
+            scale: 1.02,
+            y: -4,
+            transition: { duration: 0.2 }
+          }}
         >
           <div className="github-stats-icon">
             <div className="github-stats-icon-inner">
@@ -86,16 +176,58 @@ export const StatsBand = () => {
               </svg>
             </div>
           </div>
-        </a>
-        <div className="grid w-full max-w-4xl grid-cols-1 gap-6 text-center sm:grid-cols-3">
-          <LinuxFoundationLogo className="h-20 w-auto text-white" />
-            <div className="flex flex-col items-center gap-1.5">
-              <span className="text-3xl font-semibold leading-tight text-white sm:text-4xl">
-                25 Million+
-              </span>
-              <span className="text-xs text-white/70 sm:text-sm">Package Downloads / Month</span>
-            </div>
-          <div className="flex items-center gap-6 rounded-xl px-6 py-8 h-20 border border-gray-200 text-[22px] font-black font-weight-black uppercase text-white leading-tight">
+        </motion.a>
+        <motion.div 
+          className="grid w-full max-w-4xl grid-cols-1 gap-6 text-center sm:grid-cols-3 relative z-10"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <LinuxFoundationLogo className="h-20 w-auto text-white" />
+          </motion.div>
+          
+          <motion.div 
+            className="flex flex-col items-center gap-1.5"
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <motion.span 
+              className="text-3xl font-semibold leading-tight text-white sm:text-4xl"
+              whileInView={{
+                backgroundImage: [
+                  "linear-gradient(135deg, #ffffff, #e0e7ff)",
+                  "linear-gradient(135deg, #e0e7ff, #ffffff)",
+                  "linear-gradient(135deg, #ffffff, #e0e7ff)",
+                ],
+              }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              style={{
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              25 Million+
+            </motion.span>
+            <span className="text-xs text-white/70 sm:text-sm">Package Downloads / Month</span>
+          </motion.div>
+          
+          <motion.div 
+            className="flex items-center gap-6 rounded-xl px-6 py-8 h-20 border border-gray-200 text-[22px] font-black font-weight-black uppercase text-white leading-tight"
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          >
             <span className="flex h-8 w-8 items-center justify-center text-white/80">
               <svg
                 width="26"
@@ -112,8 +244,8 @@ export const StatsBand = () => {
               <span>Apache-2.0</span>
               <span>License</span>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </Section>
   );

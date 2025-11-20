@@ -8,7 +8,7 @@ import {
   useEffect,
   useCallback,
 } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import styles from "./ProductTabs.module.css";
 import EvaluationTabImg from "@site/static/img/GenAI_home/GenAI_evaluation_darkmode.png";
 import MonitoringTabImg from "@site/static/img/GenAI_home/GenAI_monitor_darkmode.png";
@@ -433,16 +433,20 @@ export function ProductTabs({ tabs }: Props) {
           
           {/* Moving shimmer */}
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent rounded-full"
-            animate={{
-              x: ["-200%", "200%"],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
+            className="absolute inset-0 rounded-full overflow-hidden"
+          >
+            <motion.div
+              className="absolute inset-y-0 w-[200%] bg-gradient-to-r from-transparent from-40% via-white via-50% to-transparent to-60%"
+              animate={{
+                x: ["-100%", "0%"],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            />
+          </motion.div>
         </motion.div>
       </div>
 
@@ -505,51 +509,35 @@ export function ProductTabs({ tabs }: Props) {
             aria-hidden
           />
 
-          <AnimatePresence mode="wait">
-            <motion.div 
-              key={activeTab.id}
-              className="relative z-10"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <img
-                src={activeTab.imageSrc}
-                alt={`${activeTab.label} screenshot`}
-                className="w-full h-full object-cover shadow-[0_18px_50px_rgba(0,0,0,0.35)] rounded-2xl"
-                loading="lazy"
-              />
+          <div className="relative z-10">
+            <img
+              src={activeTab.imageSrc}
+              alt={`${activeTab.label} screenshot`}
+              className="w-full h-full object-cover shadow-[0_18px_50px_rgba(0,0,0,0.35)] rounded-2xl"
+              loading="lazy"
+            />
 
-              {activeTab.hotspots?.map((spot, index) => (
-                <motion.div
-                  key={spot.id}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3, delay: 0.4 + index * 0.05 }}
-                >
-                  <SpotWithLink spot={spot}>
-                    <motion.div 
-                      className="absolute inset-0 rounded-md border border-white/30 bg-white/6 opacity-0 group-hover:opacity-100"
-                      initial={false}
-                      whileHover={{
-                        backgroundColor: "rgba(255,255,255,0.12)",
-                        borderColor: "rgba(255,255,255,0.5)",
-                      }}
-                      transition={{ duration: 0.2 }}
-                    />
-                    <div className="relative h-full w-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <Bubble
-                        label={spot.label}
-                        description={spot.description}
-                        direction={spot.direction}
-                      />
-                    </div>
-                  </SpotWithLink>
-                </motion.div>
-              ))}
-            </motion.div>
-          </AnimatePresence>
+            {activeTab.hotspots?.map((spot) => (
+              <SpotWithLink key={spot.id} spot={spot}>
+                <motion.div 
+                  className="absolute inset-0 rounded-md border border-white/30 bg-white/6 opacity-0 group-hover:opacity-100"
+                  initial={false}
+                  whileHover={{
+                    backgroundColor: "rgba(255,255,255,0.12)",
+                    borderColor: "rgba(255,255,255,0.5)",
+                  }}
+                  transition={{ duration: 0.2 }}
+                />
+                <div className="relative h-full w-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <Bubble
+                    label={spot.label}
+                    description={spot.description}
+                    direction={spot.direction}
+                  />
+                </div>
+              </SpotWithLink>
+            ))}
+          </div>
         </motion.div>
       </motion.div>
     </div>
