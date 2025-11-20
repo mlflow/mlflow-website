@@ -11,7 +11,7 @@ type Stat = {
 export const StatsBand = () => {
   return (
     <Section
-      title="The Most Popular Open-Source MLOps Platform"
+      title="The Most Used Open-Source MLOps Platform"
       body="Backed by Linux Foundation, MLflow is fully committed to open-source for 6 years."
     >
       <div className="flex w-full flex-col items-center gap-16">

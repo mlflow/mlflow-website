@@ -270,7 +270,7 @@ export function ProductTabs({ tabs }: Props) {
                   tabRefs.current[tab.id] = el;
                 }}
                 onClick={() => setActiveTabId(tab.id)}
-                className="group flex items-center gap-2 text-sm font-medium focus:outline-none"
+                className="group flex items-center gap-2 text-md font-medium focus:outline-none"
               >
                 {tab.icon && (
                   <span className="text-white/60 text-base leading-none">
