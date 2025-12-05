@@ -18,7 +18,7 @@ image: /img/blog/mlflow-typescript-enhancement.png
 
 TypeScript and JavaScript continue to dominate full-stack AI development, and MLflow 3.6 doubles down on that reality. In addition to the OpenAI SDK hooks we launched earlier this year, we now ship automatic tracing integrations for **Vercel AI SDK**, **LangChain.js**, **LangGraph.js**, **Mastra**, **Anthropic**, and **Gemini**.
 
-In practical terms, any traces emitted from modern JS LLM stacks now lands in the same MLflow experiment UI as your Python services, complete with prompt/response payloads, token usage, tool results, and error metadata.
+In practical terms, any traces emitted from modern JS LLM stacks now land in the same MLflow experiment UI as your Python services, complete with prompt/response payloads, token usage, tool results, and error metadata.
 
 <div style={{ display: "flex", justifyContent: "center" }}>
   <img
@@ -37,7 +37,7 @@ In practical terms, any traces emitted from modern JS LLM stacks now lands in th
 
 Getting MLflow running beside a JS stack no longer requires a Python environment:
 
-- [Docker Compose bundle](https://mlflow.org/docs/latest/self-hosting/#docker-compose) – For the easiest local or small-team deployment, MLflow's official Docker Compose setup is highly recommended. To get started, simply clone the [ GitHub repository](https://github.com/mlflow/mlflow), then navigate into the `docker-compose` directory provided in the repository. Run `docker compose up -d` to launch the entire MLflow Tracking stack: this automatically starts the MLflow Tracking server along with a pre-configured SQL backend (such as PostgreSQL), both pre-wired for seamless ingestion of OpenTelemetry Protocol (OTLP) traces.
+- [Docker Compose bundle](https://mlflow.org/docs/latest/self-hosting/#docker-compose) – For the easiest local or small-team deployment, MLflow's official Docker Compose setup is highly recommended. To get started, simply clone the [GitHub repository](https://github.com/mlflow/mlflow), then navigate into the `docker-compose` directory provided in the repository. Run `docker compose up -d` to launch the entire MLflow Tracking stack: this automatically starts the MLflow Tracking server along with a pre-configured SQL backend (such as PostgreSQL), both pre-wired for seamless ingestion of OpenTelemetry Protocol (OTLP) traces.
 
 - [Managed solutions](https://mlflow.org/docs/latest/self-hosting/#cloud-services) – MLflow is available on many cloud providers, such as Databricks, AWS SageMaker Experiments, Azure ML, Nebius, etc. You can point `MLFLOW_TRACKING_URI` at Databricks’ free edition or another managed MLflow service, and start emitting traces without hosting anything yourself.
 
@@ -62,6 +62,7 @@ export async function register() {
 ```
 
 ```typescript title="route.ts"
+import { openai } from '@ai-sdk/openai';
 import { generateText } from "ai";
 
 export async function POST(req: Request) {
@@ -97,7 +98,7 @@ export const mastra = new Mastra({
   observability: {
     configs: {
       otel: {
-        serviceName: "maestra-app",
+        serviceName: "mastra-app",
         exporters: [new OtelExporter({
           provider: {
             custom: {
@@ -105,7 +106,7 @@ export const mastra = new Mastra({
               endpoint: "http://localhost:5000/v1/traces",
               // Set the MLflow experiment ID in the header.
               headers: { "x-mlflow-experiment-id": "<your-experiment-id>"},
-              // MLflow support HTTP/Protobuf protocol.
+              // MLflow supports HTTP/Protobuf protocol.
               protocol: "http/protobuf"
             }
           }
@@ -184,7 +185,7 @@ mlflow.init({
 
 const client = tracedAnthropic(new Anthropic());
 const message = await client.messages.create({
-  model: "claude-sonnet-4-5-2025092",
+  model: "claude-sonnet-4-5-20250929",
   max_tokens: 1024,
   messages: [
     { role: "user", content: "Summarize the new TypeScript release." },
