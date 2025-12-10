@@ -15,12 +15,21 @@ export function getStartedLinkForPage(
     return "/classical-ml#get-started";
   }
   if (pathname.startsWith(genAIPath)) {
-    // For the main GenAI landing page, link to documentation
-    if (pathname === genAIPath || pathname === `${genAIPath}/`) {
-      return "/docs/latest/genai/";
-    }
-    // For GenAI subpages, link to the Get Started section
-    return "/genai#get-started";
+    // Map each GenAI page to its corresponding documentation link
+    // to match the hero section's "Get Started" button
+    const genAIRoutes: Record<string, string> = {
+      [`${genAIPath}`]: "https://mlflow.org/docs/latest/genai/",
+      [`${genAIPath}/`]: "https://mlflow.org/docs/latest/genai/",
+      [`${genAIPath}/observability`]: "https://mlflow.org/docs/latest/genai/tracing/quickstart/python-openai/",
+      [`${genAIPath}/evaluations`]: "https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/",
+      [`${genAIPath}/prompt-registry`]: "https://mlflow.org/docs/latest/genai/prompt-registry/create-and-edit-prompts/",
+      [`${genAIPath}/app-versioning`]: "https://mlflow.org/docs/latest/genai/version-tracking/quickstart/",
+      [`${genAIPath}/ai-gateway`]: "https://mlflow.org/docs/latest/genai/governance/ai-gateway/setup/",
+      [`${genAIPath}/governance`]: "https://mlflow.org/docs/latest/",
+      [`${genAIPath}/human-feedback`]: "https://mlflow.org/docs/latest/",
+    };
+    
+    return genAIRoutes[pathname] || "https://mlflow.org/docs/latest/genai/";
   }
   return "/#get-started";
 }
