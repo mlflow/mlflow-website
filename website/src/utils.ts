@@ -15,6 +15,11 @@ export function getStartedLinkForPage(
     return "/classical-ml#get-started";
   }
   if (pathname.startsWith(genAIPath)) {
+    // For the main GenAI landing page, link to documentation
+    if (pathname === genAIPath || pathname === `${genAIPath}/`) {
+      return "/docs/latest/genai/";
+    }
+    // For GenAI subpages, link to the Get Started section
     return "/genai#get-started";
   }
   return "/#get-started";
