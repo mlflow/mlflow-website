@@ -21,7 +21,7 @@ export const HeaderMenuItem = ({
     <Link
       href={href}
       className={cn(
-        "flex items-center gap-2 py-2 text-white text-lg w-full md:w-auto cursor-pointer transition-colors duration-200 hover:text-white/80",
+        "flex items-center gap-2 py-2 text-white text-lg w-full md:w-auto cursor-pointer transition-colors duration-200 hover:!text-white/60",
         className,
       )}
       {...props}
