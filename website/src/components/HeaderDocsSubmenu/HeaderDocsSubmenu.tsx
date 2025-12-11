@@ -8,7 +8,9 @@ const wrapper = cva(
 
 const linkItem = cva("flex flex-col gap-1 md:gap-2 pb-4 flex-1");
 
-const linkTitle = cva("text-white");
+const linkTitle = cva(
+  "text-white transition-colors duration-200 hover:text-white/80",
+);
 
 const linkSubtitle = cva("text-[#F7F8F8]/60 m-0");
 
