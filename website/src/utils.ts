@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { MLFLOW_DOCS_URL, MLFLOW_GENAI_DOCS_URL } from "./constants";
+import { MLFLOW_GENAI_DOCS_URL } from "./constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -26,8 +26,8 @@ export function getStartedLinkForPage(
       [`${genAIPath}/prompt-registry`]: `${MLFLOW_GENAI_DOCS_URL}prompt-registry/create-and-edit-prompts/`,
       [`${genAIPath}/app-versioning`]: `${MLFLOW_GENAI_DOCS_URL}version-tracking/quickstart/`,
       [`${genAIPath}/ai-gateway`]: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
-      [`${genAIPath}/governance`]: MLFLOW_DOCS_URL,
-      [`${genAIPath}/human-feedback`]: MLFLOW_DOCS_URL,
+      [`${genAIPath}/governance`]: MLFLOW_GENAI_DOCS_URL,
+      [`${genAIPath}/human-feedback`]: MLFLOW_GENAI_DOCS_URL,
     };
 
     return genAIRoutes[pathname] || MLFLOW_GENAI_DOCS_URL;
