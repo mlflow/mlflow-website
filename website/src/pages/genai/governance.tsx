@@ -1,3 +1,4 @@
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
   AboveTheFold,
@@ -5,7 +6,6 @@ import {
   HeroImage,
   StickyGrid,
 } from "../../components";
-import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import CardHero from "@site/static/img/GenAI_governance/GenAI_governance_hero.png";
 import Card1 from "@site/static/img/GenAI_governance/GenAI_governance_1.png";
 import Card2 from "@site/static/img/GenAI_governance/GenAI_governance_2.png";
