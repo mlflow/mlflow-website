@@ -29,7 +29,7 @@ export function getStartedLinkForPage(
       [`${genAIPath}/governance`]: MLFLOW_DOCS_URL,
       [`${genAIPath}/human-feedback`]: MLFLOW_DOCS_URL,
     };
-    
+
     return genAIRoutes[pathname] || MLFLOW_GENAI_DOCS_URL;
   }
   return "/#get-started";
