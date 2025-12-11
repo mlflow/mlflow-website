@@ -18,7 +18,7 @@ export default function PromptRegistryVersioning() {
         sectionLabel="Prompt registry"
         title="The single source of truth for your prompts"
         body="Create, store, and version prompts easily in the Prompt Registry."
-        hasGetStartedButton="https://mlflow.org/docs/latest/genai/prompt-registry/create-and-edit-prompts/"
+        hasGetStartedButton="/docs/latest/genai/prompt-registry/create-and-edit-prompts/"
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>

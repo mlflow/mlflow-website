@@ -18,18 +18,18 @@ export function getStartedLinkForPage(
     // Map each GenAI page to its corresponding documentation link
     // to match the hero section's "Get Started" button
     const genAIRoutes: Record<string, string> = {
-      [`${genAIPath}`]: "https://mlflow.org/docs/latest/genai/",
-      [`${genAIPath}/`]: "https://mlflow.org/docs/latest/genai/",
-      [`${genAIPath}/observability`]: "https://mlflow.org/docs/latest/genai/tracing/quickstart/python-openai/",
-      [`${genAIPath}/evaluations`]: "https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/",
-      [`${genAIPath}/prompt-registry`]: "https://mlflow.org/docs/latest/genai/prompt-registry/create-and-edit-prompts/",
-      [`${genAIPath}/app-versioning`]: "https://mlflow.org/docs/latest/genai/version-tracking/quickstart/",
-      [`${genAIPath}/ai-gateway`]: "https://mlflow.org/docs/latest/genai/governance/ai-gateway/setup/",
-      [`${genAIPath}/governance`]: "https://mlflow.org/docs/latest/",
-      [`${genAIPath}/human-feedback`]: "https://mlflow.org/docs/latest/",
+      [`${genAIPath}`]: "/docs/latest/genai/",
+      [`${genAIPath}/`]: "/docs/latest/genai/",
+      [`${genAIPath}/observability`]: "/docs/latest/genai/tracing/quickstart/",
+      [`${genAIPath}/evaluations`]: "/docs/latest/genai/eval-monitor/quickstart/",
+      [`${genAIPath}/prompt-registry`]: "/docs/latest/genai/prompt-registry/create-and-edit-prompts/",
+      [`${genAIPath}/app-versioning`]: "/docs/latest/genai/version-tracking/quickstart/",
+      [`${genAIPath}/ai-gateway`]: "/docs/latest/genai/governance/ai-gateway/setup/",
+      [`${genAIPath}/governance`]: "/docs/latest/",
+      [`${genAIPath}/human-feedback`]: "/docs/latest/",
     };
     
-    return genAIRoutes[pathname] || "https://mlflow.org/docs/latest/genai/";
+    return genAIRoutes[pathname] || "/docs/latest/genai/";
   }
   return "/#get-started";
 }

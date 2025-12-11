@@ -1,4 +1,3 @@
-import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
   AboveTheFold,
@@ -20,7 +19,7 @@ export default function Governance() {
         sectionLabel="Governance"
         title="Enterprise governance with Unity Catalog"
         body="MLflow is integrated with Unity Catalog to track the lifecycle and lineage of your app’s assets - models, prompts, datasets, and metrics - and apply access controls."
-        hasGetStartedButton={MLFLOW_DOCS_URL}
+        hasGetStartedButton="/docs/latest/"
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>

@@ -17,7 +17,7 @@ export default function AppVersioning() {
         sectionLabel="App versioning"
         title="Manage app versions with ease"
         body="Track and compare different versions of GenAI applications to ensure quality and maintainability."
-        hasGetStartedButton="https://mlflow.org/docs/latest/genai/version-tracking/quickstart/"
+        hasGetStartedButton="/docs/latest/genai/version-tracking/quickstart/"
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
