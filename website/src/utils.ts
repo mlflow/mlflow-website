@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { MLFLOW_DOCS_URL, MLFLOW_GENAI_DOCS_URL } from "./constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -18,18 +19,18 @@ export function getStartedLinkForPage(
     // Map each GenAI page to its corresponding documentation link
     // to match the hero section's "Get Started" button
     const genAIRoutes: Record<string, string> = {
-      [`${genAIPath}`]: "/docs/latest/genai/",
-      [`${genAIPath}/`]: "/docs/latest/genai/",
-      [`${genAIPath}/observability`]: "/docs/latest/genai/tracing/quickstart/",
-      [`${genAIPath}/evaluations`]: "/docs/latest/genai/eval-monitor/quickstart/",
-      [`${genAIPath}/prompt-registry`]: "/docs/latest/genai/prompt-registry/create-and-edit-prompts/",
-      [`${genAIPath}/app-versioning`]: "/docs/latest/genai/version-tracking/quickstart/",
-      [`${genAIPath}/ai-gateway`]: "/docs/latest/genai/governance/ai-gateway/setup/",
-      [`${genAIPath}/governance`]: "/docs/latest/",
-      [`${genAIPath}/human-feedback`]: "/docs/latest/",
+      [`${genAIPath}`]: MLFLOW_GENAI_DOCS_URL,
+      [`${genAIPath}/`]: MLFLOW_GENAI_DOCS_URL,
+      [`${genAIPath}/observability`]: `${MLFLOW_GENAI_DOCS_URL}tracing/quickstart/`,
+      [`${genAIPath}/evaluations`]: `${MLFLOW_GENAI_DOCS_URL}eval-monitor/quickstart/`,
+      [`${genAIPath}/prompt-registry`]: `${MLFLOW_GENAI_DOCS_URL}prompt-registry/create-and-edit-prompts/`,
+      [`${genAIPath}/app-versioning`]: `${MLFLOW_GENAI_DOCS_URL}version-tracking/quickstart/`,
+      [`${genAIPath}/ai-gateway`]: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
+      [`${genAIPath}/governance`]: MLFLOW_DOCS_URL,
+      [`${genAIPath}/human-feedback`]: MLFLOW_DOCS_URL,
     };
     
-    return genAIRoutes[pathname] || "/docs/latest/genai/";
+    return genAIRoutes[pathname] || MLFLOW_GENAI_DOCS_URL;
   }
   return "/#get-started";
 }

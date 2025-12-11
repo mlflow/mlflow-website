@@ -5,6 +5,7 @@ import {
   HeroImage,
   StickyGrid,
 } from "../../components";
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import CardHero from "@site/static/img/GenAI_humanfeedback/GenAI_humanfeedback_hero.png";
 import Card1 from "@site/static/img/GenAI_humanfeedback/GenAI_humanfeedback_1.png";
 import Card2 from "@site/static/img/GenAI_humanfeedback/GenAI_humanfeedback_2.png";
@@ -21,7 +22,7 @@ export default function HumanFeedback() {
           "Capture domain expert feedback to understand how your app should behave and align your custom LLM-judge metrics with those expert's judgement.",
           "Capture end user feedback to quickly pinpoint quality issues in production.",
         ]}
-        hasGetStartedButton="/docs/latest/"
+        hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>

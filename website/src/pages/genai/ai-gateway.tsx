@@ -5,6 +5,7 @@ import {
   HeroImage,
   StickyGrid,
 } from "../../components";
+import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import CardHero from "@site/static/img/GenAI_gateway/GenAI_gateway_hero.png";
 import Card1 from "@site/static/img/GenAI_gateway/GenAI_gateway_1.png";
 import Card2 from "@site/static/img/GenAI_gateway/GenAI_gateway_2.png";
@@ -16,7 +17,7 @@ export default function AiGateway() {
         sectionLabel="AI gateway"
         title="Unified access to all AI models"
         body="Standardize how you interact with different LLM providers using one central interface."
-        hasGetStartedButton="/docs/latest/genai/governance/ai-gateway/setup/"
+        hasGetStartedButton={`${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`}
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>

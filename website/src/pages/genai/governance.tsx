@@ -5,6 +5,7 @@ import {
   HeroImage,
   StickyGrid,
 } from "../../components";
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import CardHero from "@site/static/img/GenAI_governance/GenAI_governance_hero.png";
 import Card1 from "@site/static/img/GenAI_governance/GenAI_governance_1.png";
 import Card2 from "@site/static/img/GenAI_governance/GenAI_governance_2.png";
@@ -19,7 +20,7 @@ export default function Governance() {
         sectionLabel="Governance"
         title="Enterprise governance with Unity Catalog"
         body="MLflow is integrated with Unity Catalog to track the lifecycle and lineage of your app’s assets - models, prompts, datasets, and metrics - and apply access controls."
-        hasGetStartedButton="/docs/latest/"
+        hasGetStartedButton={MLFLOW_DOCS_URL}
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>

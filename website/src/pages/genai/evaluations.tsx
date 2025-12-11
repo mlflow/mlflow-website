@@ -6,6 +6,7 @@ import {
   HeroImage,
   StickyGrid,
 } from "../../components";
+import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import CardHero from "@site/static/img/GenAI_evaluations/GenAI_evaluations_hero.png";
 import Card1 from "@site/static/img/GenAI_evaluations/GenAI_evaluations_1.png";
 import Card2 from "@site/static/img/GenAI_evaluations/GenAI_evaluations_2.png";
@@ -21,7 +22,7 @@ export default function Evaluations() {
         sectionLabel="Evaluations"
         title="Evaluation to measure and improve quality"
         body="Confidently evaluate quality in development and production to identify issues and iteratively test improvements."
-        hasGetStartedButton="/docs/latest/genai/eval-monitor/quickstart/"
+        hasGetStartedButton={`${MLFLOW_GENAI_DOCS_URL}eval-monitor/quickstart/`}
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>

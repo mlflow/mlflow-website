@@ -6,6 +6,7 @@ import {
   HeroImage,
   StickyGrid,
 } from "../../components";
+import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import CardHero from "@site/static/img/GenAI_observability/GenAI_observability_hero.png";
 import Card1 from "@site/static/img/GenAI_observability/GenAI_observability_1.png";
 import Card2 from "@site/static/img/GenAI_observability/GenAI_observability_2.png";
@@ -23,7 +24,7 @@ export default function Observability() {
         sectionLabel="Observability"
         title="Observability for AI apps"
         body="Gain visibility into your app's logic to debug issues, improve quality and attach metadata to help you understand user behavior."
-        hasGetStartedButton="/docs/latest/genai/tracing/quickstart/"
+        hasGetStartedButton={`${MLFLOW_GENAI_DOCS_URL}tracing/quickstart/`}
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
