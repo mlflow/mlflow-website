@@ -5,6 +5,7 @@ import {
   HeroImage,
   StickyGrid,
 } from "../../components";
+import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import CardHero from "@site/static/img/GenAI_prompts/GenAI_prompts_hero.png";
 import Card1 from "@site/static/img/GenAI_prompts/GenAI_prompts_1.png";
 import Card2 from "@site/static/img/GenAI_prompts/GenAI_prompts_2.png";
@@ -18,7 +19,7 @@ export default function PromptRegistryVersioning() {
         sectionLabel="Prompt registry"
         title="The single source of truth for your prompts"
         body="Create, store, and version prompts easily in the Prompt Registry."
-        hasGetStartedButton="https://mlflow.org/docs/latest/genai/prompt-registry/create-and-edit-prompts/"
+        hasGetStartedButton={`${MLFLOW_GENAI_DOCS_URL}prompt-registry/create-and-edit-prompts/`}
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>

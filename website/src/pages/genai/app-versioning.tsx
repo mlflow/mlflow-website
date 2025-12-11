@@ -5,6 +5,7 @@ import {
   HeroImage,
   StickyGrid,
 } from "../../components";
+import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import CardHero from "@site/static/img/GenAI_app_versioning/GenAI_appversioning_hero.png";
 import Card1 from "@site/static/img/GenAI_app_versioning/GenAI_appversioning_1.png";
 import Card2 from "@site/static/img/GenAI_app_versioning/GenAI_appversioning_2.png";
@@ -17,7 +18,7 @@ export default function AppVersioning() {
         sectionLabel="App versioning"
         title="Manage app versions with ease"
         body="Track and compare different versions of GenAI applications to ensure quality and maintainability."
-        hasGetStartedButton="https://mlflow.org/docs/latest/genai/version-tracking/quickstart/"
+        hasGetStartedButton={`${MLFLOW_GENAI_DOCS_URL}version-tracking/quickstart/`}
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>
