@@ -9,10 +9,12 @@ const wrapper = cva(
 const component = cva("flex flex-col gap-4");
 
 const titleContainer = cva(
-  "flex flex-col gap-1 md:gap-4 border-b border-[#F7F8F8]/8 pb-4",
+  "flex flex-col gap-1 md:gap-4 border-b border-[#F7F8F8]/8 pb-4 group",
 );
 
-const title = cva("text-white");
+const title = cva(
+  "text-white transition-colors duration-200 group-hover:!text-white/60",
+);
 
 const subtitle = cva("text-[#F7F8F8]/60 m-0");
 
