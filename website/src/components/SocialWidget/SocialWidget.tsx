@@ -58,7 +58,7 @@ const socials = [
     label: "Slack",
     description: "Join our Slack",
     href: "https://go.mlflow.org/slack",
-  }
+  },
 ];
 
 export const SocialWidget = () => {
