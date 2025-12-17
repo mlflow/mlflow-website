@@ -13,7 +13,7 @@ export const EcosystemList = () => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/3 rounded-full blur-3xl" />
       </div>
 
-      <Section title="No Vendor Lock-In" body="MLflow is 100% Open-Source and framework-agnostic. No vendor lock-in, no forced choices. You choose the best tools for your needs. Supports Python, TypeScript/JavaScript, Java, and natively integrates with OpenTelemetry.">
+      <Section title="Open and Neutral" body="MLflow is 100% Open-Source and framework-agnostic. No vendor lock-in, no forced choices. You choose the best tools for your needs. Supports Python, TypeScript/JavaScript, Java, and natively integrates with OpenTelemetry." align="center">
         <div style={{ maxWidth: 1000 }} className="w-full">
           <BrowserOnly>
             {() => (

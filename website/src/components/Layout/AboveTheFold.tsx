@@ -1,14 +1,16 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, ReactNode } from "react";
 import { Heading, Body, SectionLabel, GetStartedButton } from "../index";
 import { cva, VariantProps } from "class-variance-authority";
 
 type Props = VariantProps<typeof innerWrapper> &
   PropsWithChildren<{
     title: string;
-    body: string | string[];
+    body: ReactNode | ReactNode[];
     sectionLabel?: string;
     hasGetStartedButton?: true | string;
+    actions?: ReactNode;
     bodyColor?: "default" | "white";
+    bodySize?: "s" | "m" | "l" | "xl";
   }>;
 
 const innerWrapper = cva(
@@ -29,6 +31,7 @@ export function AboveTheFold({
   body,
   sectionLabel,
   hasGetStartedButton,
+  actions,
   bodyColor,
   minHeight = "default",
 }: Props) {
@@ -54,6 +57,7 @@ export function AboveTheFold({
             }
           />
         )}
+        {actions && <div className="flex flex-wrap justify-center items-center gap-4">{actions}</div>}
       </div>
       {children}
     </div>

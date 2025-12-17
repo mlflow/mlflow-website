@@ -12,7 +12,11 @@ import {
   Section,
   StatsBand,
   Challenges,
+  GetStartedButton,
+  Button,
 } from "../components";
+import Link from "@docusaurus/Link";
+import { MLFLOW_DOCS_URL, MLFLOW_DBX_TRIAL_URL } from "../constants";
 import GenAI from "@site/static/img/Home_page_hybrid/GenAI Apps & Agents.png";
 import ModelTraining from "@site/static/img/Home_page_hybrid/Model Training.png";
 import { defaultProductTabs as productTabs } from "../components/ProductTabs/ProductTabs";
@@ -22,28 +26,51 @@ export default function Home(): JSX.Element {
   return (
     <Layout>
       <AboveTheFold
-        title="Deliver production-ready AI"
-        body="The open source developer platform to build AI applications and models with confidence."
+        title="Deliver Production-Ready AI"
+        body={
+          <>
+            The open source platform for <span className="text-white">developing</span>,{" "}
+            <span className="text-white">testing</span>, and{" "}
+            <span className="text-white">governing</span> AI applications and
+            agents.
+          </>
+        }
         minHeight="small"
+        actions={
+          <>
+            <GetStartedButton
+              link={`${MLFLOW_DOCS_URL}genai/index.html`}
+            />
+            <Link to={MLFLOW_DBX_TRIAL_URL}>
+              <Button variant="outline" size="medium">
+                Try in Cloud
+              </Button>
+            </Link>
+          </>
+        }
       >
       </AboveTheFold>
-      <LogosCarousel />
 
-      <Challenges />
       <Section
-        title="Solution: End-to-End AIOps"
-        body="One MLflow platform to build, test, and monitor GenAI/LLM apps and agents. From experimentation to production."
+        title="One Platform for AI Engineering"
+        headingLevel={2}
+        body="Build, test, and monitor LLM apps and agents in a single platform. MLflow accelerates your end-to-end AI projects from experimentation to production. You don't need to switch between tools."
+        align="center"
       >
         <ProductTabs tabs={productTabs} />
       </Section>
 
+      <div className="flex flex-col gap-32"></div>
       <EcosystemList />
+      <div className="flex flex-col gap-32"></div>
       <StatsBand />
 
+      <div className="flex flex-col gap-32"></div>
       <Section
         label="For every team"
-        title="One Platform, Every Role"
+        title="No More Tool Silos"
         body="Choose the MLflow workspace that matches how you build, whether you're shipping GenAI apps or training models."
+        align="center"
       >
         <GlossyCardContainer className="max-w-6xl">
           <GlossyCard className="github-stats-card">
@@ -53,7 +80,7 @@ export default function Home(): JSX.Element {
                 GenAI builders
               </div>
               <Card
-                title="GenAI Apps & Agents"
+                title="LLM Apps & Agents"
                 bodySize="m"
                 body="Enhance GenAI applications with end-to-end observability, evaluations, gateway routing, and tracking in a single integrated platform."
                 padded={false}
@@ -82,6 +109,7 @@ export default function Home(): JSX.Element {
           </GlossyCard>
         </GlossyCardContainer>
       </Section>
+      <div className="flex flex-col gap-16"></div>
 
       <BelowTheFold>
         <LatestNews />
