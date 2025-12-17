@@ -1,6 +1,7 @@
 import LinuxFoundationLogo from "@site/static/img/linux-foundation.svg";
 import { motion } from "motion/react";
 import { Section } from "../Section/Section";
+import { LogosCarousel } from "../LogosCarousel/LogosCarousel";
 
 type Stat = {
   value: string;
@@ -12,8 +13,9 @@ type Stat = {
 export const StatsBand = () => {
   return (
     <Section
-      title="The Most Used Open-Source MLOps Platform"
-      body="Backed by Linux Foundation, MLflow is fully committed to open-source for 6 years."
+      title="Most Trusted Open-Source MLOps Platform"
+      body="Backed by Linux Foundation, MLflow has been fully committed to open-source for 5+ years. Now trusted by thousands of organizations and research teams worldwide."
+      align="center"
     >
       <div className="flex w-full flex-col items-center gap-16 relative">
         {/* Animated Background - Representing Openness */}
@@ -96,20 +98,46 @@ export const StatsBand = () => {
             );
           })}
         </div>
-        <motion.a
+        <motion.div 
+          className="grid w-full max-w-4xl grid-cols-1 gap-6 text-center sm:grid-cols-3 relative z-10"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <LinuxFoundationLogo className="h-20 w-auto text-white" />
+          </motion.div>
+
+          <motion.div 
+            className="flex items-center gap-6 rounded-xl px-6 py-8 h-20 border border-gray-200 text-[22px] font-black font-weight-black uppercase text-white leading-tight"
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <span className="flex h-8 w-8 items-center justify-center text-white/80">
+              <svg
+                width="26"
+                height="24"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path d="M8.75.75V2h.985c.304 0 .603.08.867.231l1.29.736c.038.022.08.033.124.033h2.234a.75.75 0 0 1 0 1.5h-.427l2.111 4.692a.75.75 0 0 1-.154.838l-.53-.53.529.531-.001.002-.002.002-.006.006-.006.005-.01.01-.045.04c-.21.176-.441.327-.686.45C14.556 10.78 13.88 11 13 11a4.498 4.498 0 0 1-2.023-.454 3.544 3.544 0 0 1-.686-.45l-.045-.04-.016-.015-.006-.006-.004-.004v-.001a.75.75 0 0 1-.154-.838L12.178 4.5h-.162c-.305 0-.604-.079-.868-.231l-1.29-.736a.245.245 0 0 0-.124-.033H8.75V13h2.5a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1 0-1.5h2.5V3.5h-.984a.245.245 0 0 0-.124.033l-1.289.737c-.265.15-.564.23-.869.23h-.162l2.112 4.692a.75.75 0 0 1-.154.838l-.53-.53.529.531-.001.002-.002.002-.006.006-.016.015-.045.04c-.21.176-.441.327-.686.45C4.556 10.78 3.88 11 3 11a4.498 4.498 0 0 1-2.023-.454 3.544 3.544 0 0 1-.686-.45l-.045-.04-.016-.015-.006-.006-.004-.004v-.001a.75.75 0 0 1-.154-.838L2.178 4.5H1.75a.75.75 0 0 1 0-1.5h2.234a.249.249 0 0 0 .125-.033l1.288-.737c.265-.15.564-.23.869-.23h.984V.75a.75.75 0 0 1 1.5 0Zm2.945 8.477c.285.135.718.273 1.305.273s1.02-.138 1.305-.273L13 6.327Zm-10 0c.285.135.718.273 1.305.273s1.02-.138 1.305-.273L3 6.327Z" />
+              </svg>
+            </span>
+            <a
           href="https://github.com/mlflow/mlflow"
           className="github-stats-card relative flex items-center gap-4 rounded-2xl bg-[linear-gradient(135deg,#1f2f63,#1b2342)] px-6 py-4 text-white shadow-xl overflow-hidden z-10"
           target="_blank"
           rel="noreferrer noopener"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          whileHover={{ 
-            scale: 1.02,
-            y: -4,
-            transition: { duration: 0.2 }
-          }}
         >
           <div className="github-stats-icon">
             <div className="github-stats-icon-inner">
@@ -176,23 +204,9 @@ export const StatsBand = () => {
               </svg>
             </div>
           </div>
-        </motion.a>
-        <motion.div 
-          className="grid w-full max-w-4xl grid-cols-1 gap-6 text-center sm:grid-cols-3 relative z-10"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <LinuxFoundationLogo className="h-20 w-auto text-white" />
+        </a>
           </motion.div>
-          
+
           <motion.div 
             className="flex flex-col items-center gap-1.5"
             initial={{ opacity: 0, scale: 0.9 }}
@@ -220,33 +234,10 @@ export const StatsBand = () => {
             </motion.span>
             <span className="text-xs text-white/70 sm:text-sm">Package Downloads / Month</span>
           </motion.div>
-          
-          <motion.div 
-            className="flex items-center gap-6 rounded-xl px-6 py-8 h-20 border border-gray-200 text-[22px] font-black font-weight-black uppercase text-white leading-tight"
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <span className="flex h-8 w-8 items-center justify-center text-white/80">
-              <svg
-                width="26"
-                height="24"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <path d="M8.75.75V2h.985c.304 0 .603.08.867.231l1.29.736c.038.022.08.033.124.033h2.234a.75.75 0 0 1 0 1.5h-.427l2.111 4.692a.75.75 0 0 1-.154.838l-.53-.53.529.531-.001.002-.002.002-.006.006-.006.005-.01.01-.045.04c-.21.176-.441.327-.686.45C14.556 10.78 13.88 11 13 11a4.498 4.498 0 0 1-2.023-.454 3.544 3.544 0 0 1-.686-.45l-.045-.04-.016-.015-.006-.006-.004-.004v-.001a.75.75 0 0 1-.154-.838L12.178 4.5h-.162c-.305 0-.604-.079-.868-.231l-1.29-.736a.245.245 0 0 0-.124-.033H8.75V13h2.5a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1 0-1.5h2.5V3.5h-.984a.245.245 0 0 0-.124.033l-1.289.737c-.265.15-.564.23-.869.23h-.162l2.112 4.692a.75.75 0 0 1-.154.838l-.53-.53.529.531-.001.002-.002.002-.006.006-.016.015-.045.04c-.21.176-.441.327-.686.45C4.556 10.78 3.88 11 3 11a4.498 4.498 0 0 1-2.023-.454 3.544 3.544 0 0 1-.686-.45l-.045-.04-.016-.015-.006-.006-.004-.004v-.001a.75.75 0 0 1-.154-.838L2.178 4.5H1.75a.75.75 0 0 1 0-1.5h2.234a.249.249 0 0 0 .125-.033l1.288-.737c.265-.15.564-.23.869-.23h.984V.75a.75.75 0 0 1 1.5 0Zm2.945 8.477c.285.135.718.273 1.305.273s1.02-.138 1.305-.273L13 6.327Zm-10 0c.285.135.718.273 1.305.273s1.02-.138 1.305-.273L3 6.327Z" />
-              </svg>
-            </span>
-            <div className="flex flex-col items-start gap-1">
-              <span>Apache-2.0</span>
-              <span>License</span>
-            </div>
-          </motion.div>
+
         </motion.div>
       </div>
+        <LogosCarousel />
     </Section>
   );
 };
