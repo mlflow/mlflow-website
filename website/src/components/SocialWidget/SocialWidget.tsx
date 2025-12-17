@@ -2,6 +2,8 @@ import GithubIcon from "@site/static/img/social/github.svg";
 import YoutubeIcon from "@site/static/img/social/youtube.svg";
 import BookIcon from "@site/static/img/social/book.svg";
 import LinkedinIcon from "@site/static/img/social/linkedin.svg";
+import XIcon from "@site/static/img/social/x.svg";
+import SlackIcon from "@site/static/img/social/slack.svg";
 
 import { SectionLabel } from "../Section/SectionLabel";
 import { SocialWidgetItem } from "../SocialWidgetItem/SocialWidgetItem";
@@ -19,7 +21,7 @@ const socials = [
       </div>
     ),
     label: "Documentation",
-    description: "Read documentation",
+    description: "Read Docs",
     href: MLFLOW_DOCS_URL,
   },
   {
@@ -42,6 +44,20 @@ const socials = [
     label: "YouTube",
     description: "View tutorials",
     href: "https://www.youtube.com/@mlflowoss",
+  },
+  {
+    key: "x",
+    icon: <XIcon />,
+    label: "X",
+    description: "Follow us on X",
+    href: "https://x.com/mlflow",
+  },
+  {
+    key: "slack",
+    icon: <SlackIcon />,
+    label: "Slack",
+    description: "Join our Slack",
+    href: "https://go.mlflow.org/slack",
   },
 ];
 
