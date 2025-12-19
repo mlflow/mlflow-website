@@ -19,7 +19,7 @@ Currently, MLflow is used by approximately 40 services, and it handles more than
 
 ![Aipf](/img/blog/ly-utilizes-mlflow/AIPF.png)
 
-# Managed MLflow Service on Kubernetes
+## Managed MLflow Service on Kubernetes
 When each user independently runs their own MLflow server, it can lead to inefficient use of computing resources.
 To address this, we centralized MLflow as a managed service running on our Kubernetes-based computing infrastructure.
 
