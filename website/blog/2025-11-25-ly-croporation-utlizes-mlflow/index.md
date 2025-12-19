@@ -75,7 +75,7 @@ OAuth 2.0 leaves the detailed specification of authorization scopes to each impl
 
 By leveraging this capability, we are able to apply Athenz role-based access control directly to MLflow API operations.
 
-The overall flow of MLflow API access control—combining access tokens and the Authorization Proxy—is summarized in the diagram below.
+The overall flow of MLflow API access control combining access tokens and the Authorization Proxy is summarized in the diagram below.
 
 The term Model Trainer Container refers to the container running the model training program.
 
