@@ -63,7 +63,7 @@ On the MLflow side, we need a mechanism to validate access tokens and perform au
 
 To achieve this, we adopted [Authorization Proxy](https://github.com/AthenZ/authorization-proxy), one of the components provided by Athenz. Authorization Proxy runs as a reverse proxy in a Kubernetes sidecar container, validates access tokens and enforces authorization policies. From an OAuth 2.0 perspective, Authorization Proxy takes the role of performing authentication and authorization checks on behalf of the Resource Server.
 
-Because we regularly upgrade MLflow, our policy is to avoid adding custom features directly to the MLflow OSS codebase, as doing so would increase operational complexity. The Authorization Proxy aligns well with this policy, since it allows us to add authentication and authorization features externally without modifying MLflow itself.
+Since we regularly upgrade MLflow version, our policy is to avoid adding custom features directly to the MLflow OSS codebase, as this would increase operational overhead. The Authorization Proxy aligns well with this policy and allows us to add authentication and authorization features without modifying MLflow itself.
 
 In our deployment, each MLflow Pod includes the Authorization Proxy as a sidecar that enforces authentication and authorization for all MLflow API requests.
 
