@@ -77,7 +77,7 @@ By leveraging this capability, we are able to apply Athenz role-based access con
 
 The overall flow of MLflow API access control combining access tokens and the Authorization Proxy is summarized in the diagram below.
 
-The term Model Trainer Container refers to the container running the model training program.
+*(Here, Model Trainer Container refers to the container running the model training program.)*
 
 ![Authorizationflow](/img/blog/ly-utilizes-mlflow/authorization_flow.png)
 
