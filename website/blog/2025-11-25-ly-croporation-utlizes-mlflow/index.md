@@ -55,7 +55,7 @@ Athenz provides a feature called [Athenz Copper Argos](https://athenz.github.io/
 
 By using an Instance Certificate issued through Copper Argos, a service can perform mTLS communication with the Authorization Server and prove that it is a legitimate service.
 
-In our model training platform, we leverage Athenz Copper Argos so that each Pod performs mTLS authentication with the Authorization Server at startup and automatically obtains an access token. As a result, model training programs running inside the Pod can use the issued access token transparently, without having to implement any token acquisition logic themselves.
+In our model training platform, each Pod uses Athenz Copper Argos to perform mTLS authentication with the Authorization Server at startup and automatically obtains an access token. As a result, model training programs inside the Pod can use the issued access token transparently, without having to implement any token acquisition logic themselves.
 
 
 ## Authorization Checks Based on Access Tokens Using the Authorization Proxy
