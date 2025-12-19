@@ -7,13 +7,15 @@ thumbnail: img/blog/ly-utilizes-mlflow/AIPF.png
 ---
 
 # How LY Corporation Uses MLflow: An Overview
-Hello, I’m Motoki Yuhara from [LY Corporation](https://www.lycorp.co.jp/en/company/overview/), and I’m responsible for building and operating the Managed MLflow service for our internal AI platform.
+I’m responsible for building and operating the Managed MLflow service for the internal AI platform at [LY Corporation](https://www.lycorp.co.jp/en/company/overview/).
 
 LY Corporation is one of Japan’s leading tech companies, operating a wide range of online services including advertising, e-commerce, and digital membership platforms. Through its group companies, LY continues to advance innovation across different digital domains.
 
 At LY Corporation, we have developed an in-house AI platform that supports the entire lifecycle of AI and machine learning–based services (MLOps) across more than 100 products and services.
 
 This platform provides end-to-end MLOPs capabilities from model development to deployment and operation. MLflow is a core component of the platform for managing model training, evaluation, and model lifecycle.
+
+Currently, MLflow is used by approximately 40 services, and it handles more than 600,000 access requests per day on average.
 
 ![Aipf](/img/blog/ly-utilizes-mlflow/AIPF.png)
 
@@ -125,9 +127,7 @@ As shown above, when accessing an MLflow server without the proper permissions, 
 With these mechanisms in place, we have built a managed MLflow environment that integrates seamlessly with our Kubernetes-based training platform while ensuring secure and reliable service-to-service usage.
 
 # MLflow Usage at LY Corporation
-Currently, around 40 MLflow instances are actively running across different services within LY Corporation.
-
-To monitor the health and performance of these instances, we’ve installed a Prometheus exporter on each MLflow server and built a monitoring system using Prometheus and Alertmanager.
+To monitor the health and performance of each MLflow server provided as part of the Managed MLflow service, we have installed a Prometheus exporter on each server and built a monitoring system using Prometheus and Alertmanager.
 This setup allows us to track service availability and request processing performance.
 
 Since collecting metrics for all API endpoints would have a negative impact on performance, we only collect metrics from a limited set of APIs. However, this means the monitoring metrics alone do not let us understand the complete usage patterns of MLflow.
