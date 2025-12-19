@@ -1,5 +1,5 @@
 ---
-title: "Introducing How LY Corporation Utilizes MLflow"
+title: "Enterprise-Scale MLflow Operations and Security Practices at LY Corporation"
 slug: ly-corporation-utilizes-mlflow
 tags: [mlflow, authorization]
 authors: [motoki-yuhara,  mlflow-maintainers]
