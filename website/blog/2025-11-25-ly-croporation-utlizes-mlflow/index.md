@@ -18,8 +18,8 @@ This platform provides end-to-end MLOPs capabilities from model development to d
 ![Aipf](/img/blog/ly-utilizes-mlflow/AIPF.png)
 
 # Managed MLflow Service on Kubernetes
-When each user independently builds their own MLflow server, it can lead to inefficient use of computing resources.
-To improve efficiency, we decided to provide MLflow as a managed service running on our Kubernetes-based computing infrastructure.
+When each user independently runs their own MLflow server, it can lead to inefficient use of computing resources.
+To address this, we centralized MLflow as a managed service running on our Kubernetes-based computing infrastructure.
 
 Since multiple services within LY Corporation use MLflow, we needed to ensure both stability and data isolation.
 To achieve this, we provide a dedicated MLflow server instance for each service.
