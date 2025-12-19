@@ -43,9 +43,8 @@ The flow works as follows:
 
 In our environment, the flow works between the model training program and MLflow as follows:
 
-The model training program (corresponding to Service A) obtains an access token and attaches it to API requests via the Authorization header.
-
-MLflow (corresponding to Service B / Resource Server) validates the access token included in the request and performs authorization checks based on configured policies.
+1. The model training program (corresponding to Service A) obtains an access token and attaches it to API requests via the Authorization header.
+2. MLflow (corresponding to Service B / Resource Server) validates the access token included in the request and performs authorization checks based on configured policies.
 
 At LY Corporation, we provide an internal authentication and authorization platform built on [Athenz](https://www.athenz.io/), which is compliant with OAuth 2.0. Athenz is a service-to-service authentication and authorization system co-developed by Yahoo Inc. (US) and LY Corporation, and is currently a [Sandbox project under the Cloud Native Computing Foundation (CNCF)](https://www.cncf.io/projects/athenz/).
 
