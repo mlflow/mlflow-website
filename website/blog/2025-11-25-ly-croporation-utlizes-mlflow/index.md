@@ -31,8 +31,7 @@ In addition, model training runs on our Kubernetes-based training environment an
 # Implementing Service-to-Service Authentication and Authorization Based on OAuth 2.0
 In OAuth 2.0, the standard specification for authorization, the Client Credentials Grant Flow is defined as the authentication and authorization mechanism for service-to-service communication.
 
-This flow allows a service to authenticate itself—without any end-user involvement—obtain an access token, and use that token to call protected APIs.
-
+This flow allows a service to authenticate itself without any end-user involvement, obtain an access token, and use that token to call protected APIs.
 The flow works as follows:
 
 ```
