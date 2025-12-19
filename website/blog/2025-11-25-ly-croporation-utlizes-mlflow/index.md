@@ -130,8 +130,7 @@ Currently, around 40 MLflow instances are actively running across different serv
 To monitor the health and performance of these instances, we’ve installed a Prometheus exporter on each MLflow server and built a monitoring system using Prometheus and Alertmanager.
 This setup allows us to track service availability and request processing performance.
 
-However, collecting metrics for all API endpoints would have a negative impact on performance, so we currently limit data collection to specific APIs.
-As a result, we found that our monitoring system alone was not sufficient to fully understand the overall usage patterns of MLflow.
+Since collecting metrics for all API endpoints would have a negative impact on performance, we only collect metrics from a limited set of APIs. However, this means the monitoring metrics alone do not let us understand the complete usage patterns of MLflow.
 
 To address this, we developed a system that analyzes Ingress access logs to identify which MLflow servers and endpoints are being accessed.
 This enables us to aggregate and visualize user activity and usage trends across services.
