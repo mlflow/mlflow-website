@@ -13,9 +13,7 @@ LY Corporation is one of Japan’s leading tech companies, operating a wide rang
 
 At LY Corporation, we have developed an in-house AI platform that supports the entire lifecycle of AI and machine learning–based services (MLOps) across more than 100 products and services.
 
-This platform provides end-to-end support for the MLOps lifecycle, from model development to deployment and operation.
-
-As part of this platform, we use MLflow as a core component for managing model training, evaluation, and model lifecycle management.
+This platform provides end-to-end MLOPs capabilities from model development to deployment and operation. MLflow is a core component of the platform for managing model training, evaluation, and model lifecycle.
 
 ![Aipf](/img/blog/ly-utilizes-mlflow/AIPF.png)
 
