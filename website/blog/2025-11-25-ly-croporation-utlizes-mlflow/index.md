@@ -132,10 +132,7 @@ This setup allows us to track service availability and request processing perfor
 
 Since collecting metrics for all API endpoints would have a negative impact on performance, we only collect metrics from a limited set of APIs. However, this means the monitoring metrics alone do not let us understand the complete usage patterns of MLflow.
 
-To address this, we developed a system that analyzes Ingress access logs to identify which MLflow servers and endpoints are being accessed.
-This enables us to aggregate and visualize user activity and usage trends across services.
-
-Based on this data, we can now provide an overview of how MLflow is being used at LY Corporation.
+To compensate for this, we analyze Ingress access logs and identify which MLflow servers and endpoints are being accessed, which gives us an overview of how MLflow is being used at LY Corporation.
 
 The following graph shows the trend of average daily API access counts from April 2024 to the present.
 Although usage fluctuates significantly, the overall number of API requests has increased roughly fourfold over the past year and a half — indicating growing adoption of MLflow across our internal AI platform.
