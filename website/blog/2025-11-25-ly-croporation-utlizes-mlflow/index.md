@@ -42,7 +42,7 @@ The flow works as follows:
 [Service A] → [Service B (Resource Server)] accesses API (Access Token validation and authorization check)
 ```
 
-Applying this flow to our environment, the relationship between the model training program and MLflow can be described as follows:
+In our environment, the flow works between the model training program and MLflow as follows:
 
 The model training program (corresponding to Service A) obtains an access token and attaches it to API requests via the Authorization header.
 
