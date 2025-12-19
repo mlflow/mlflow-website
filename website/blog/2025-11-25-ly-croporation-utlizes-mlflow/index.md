@@ -65,7 +65,7 @@ To achieve this, we adopted [Authorization Proxy](https://github.com/AthenZ/auth
 
 Because we regularly upgrade MLflow, our policy is to avoid adding custom features directly to the MLflow OSS codebase, as doing so would increase operational complexity. The Authorization Proxy aligns well with this policy, since it allows us to add authentication and authorization features externally without modifying MLflow itself.
 
-In our deployment, the Authorization Proxy runs as a sidecar attached to each MLflow Pod, and it enforces authentication and authorization for all MLflow API requests.
+In our deployment, each MLflow Pod includes the Authorization Proxy as a sidecar that enforces authentication and authorization for all MLflow API requests.
 
 OAuth 2.0 leaves the detailed specification of authorization scopes to each implementation. In Athenz, access permissions are assigned to roles based on an RBAC (Role-Based Access Control) model, and these role definitions can be used as OAuth access token scopes.
 
