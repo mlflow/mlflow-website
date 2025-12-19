@@ -27,8 +27,7 @@ Since multiple services within LY Corporation use MLflow, we needed to ensure bo
 To achieve this, we provide a dedicated MLflow server instance for each service.
 However, this also requires strict access control so that only the authorized project members of a given service can use the corresponding MLflow instance.
 
-In addition, model training is executed on our Kubernetes-based training environment. This means that training programs running in Pods must be able to access the MLflow API, requiring us to implement a machine-to-machine authentication and authorization flow between services.
-
+In addition, model training runs on our Kubernetes-based training environment and the training programs must have access the MLflow API from the pod. This required us to implement a machine-to-machine authentication and authorization flow between services.
 # Implementing Service-to-Service Authentication and Authorization Based on OAuth 2.0
 In OAuth 2.0, the standard specification for authorization, the Client Credentials Grant Flow is defined as the authentication and authorization mechanism for service-to-service communication.
 
