@@ -9,7 +9,7 @@ thumbnail: img/blog/ly-utilizes-mlflow/AIPF.png
 # How LY Corporation Uses MLflow: An Overview
 Hello, I’m Motoki Yuhara from [LY Corporation](https://www.lycorp.co.jp/en/company/overview/), and I’m responsible for building and operating the Managed MLflow service for our internal AI platform.
 
-LY Corporation is one of Japan’s major tech companies, running various online services such as advertising, e-commerce, and digital membership platforms. The company also manages several group companies, driving innovation across different digital domains.
+LY Corporation is one of Japan’s leading tech companies, operating a wide range of online services including advertising, e-commerce, and digital membership platforms. Through its group companies, LY continues to advance innovation across different digital domains.
 
 At LY Corporation, we have developed an in-house AI platform that supports the entire lifecycle of AI and machine learning–based services (MLOps) across more than 100 products and services.
 
