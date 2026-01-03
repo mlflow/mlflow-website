@@ -100,7 +100,16 @@ export function ProcessSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            {steps.map((step, index) => (
+            {steps.map((step, index) => {
+              // Red → Purple → Blue gradient theme (darkened) - each step gets a gradient segment
+              const stepColors = [
+                { bg: 'linear-gradient(135deg, #8a2a4a 0%, #6a2850 50%, #4a3366 100%)', shadow: 'rgba(138, 42, 74, 0.4)', pulse: 'rgba(138, 42, 74, 0.5)' },
+                { bg: 'linear-gradient(135deg, #702848 0%, #4a3366 50%, #3a4080 100%)', shadow: 'rgba(74, 51, 102, 0.4)', pulse: 'rgba(74, 51, 102, 0.5)' },
+                { bg: 'linear-gradient(135deg, #4a3366 0%, #3a4580 50%, #2a4a7a 100%)', shadow: 'rgba(42, 74, 122, 0.4)', pulse: 'rgba(42, 74, 122, 0.5)' },
+              ];
+              const colors = stepColors[index] || stepColors[0];
+
+              return (
               <motion.div
                 key={step.number}
                 className="relative flex flex-col items-center text-center"
@@ -111,14 +120,19 @@ export function ProcessSection() {
               >
                 {/* Step number */}
                 <motion.div
-                  className="relative z-10 w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-2xl font-bold text-white shadow-lg shadow-blue-500/30 mb-6"
+                  className="relative z-10 w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-6"
+                  style={{
+                    background: colors.bg,
+                    boxShadow: `0 10px 15px -3px ${colors.shadow}, 0 4px 6px -4px ${colors.shadow}`,
+                  }}
                   whileHover={{ scale: 1.1 }}
                   transition={{ type: "spring", stiffness: 400 }}
                 >
                   {step.number}
                   {/* Pulse animation */}
                   <motion.div
-                    className="absolute inset-0 rounded-full bg-blue-500/50"
+                    className="absolute inset-0 rounded-full"
+                    style={{ backgroundColor: colors.pulse }}
                     animate={{
                       scale: [1, 1.3, 1],
                       opacity: [0.5, 0, 0.5],
@@ -150,7 +164,7 @@ export function ProcessSection() {
                       <CopyButton code={step.code} />
                     </div>
                     <div className="p-3">
-                      <code className="text-xs text-green-400 font-mono whitespace-pre !bg-transparent">
+                      <code className="text-xs text-sky-300 font-mono whitespace-pre !bg-transparent">
                         {step.code}
                       </code>
                     </div>
@@ -197,7 +211,8 @@ export function ProcessSection() {
                   </div>
                 )}
               </motion.div>
-            ))}
+            );
+            })}
           </motion.div>
         </div>
       </div>
