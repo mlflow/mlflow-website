@@ -84,7 +84,7 @@ export function BenefitsSection() {
       align="center"
     >
       <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px max-w-6xl mx-auto bg-white/10"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
@@ -93,36 +93,28 @@ export function BenefitsSection() {
         {benefits.map((benefit, index) => (
           <motion.div
             key={benefit.title}
-            className="group relative p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all"
+            className="relative p-6 bg-[#0E1416]"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
-            whileHover={{ y: -4 }}
           >
-            {/* Gradient background on hover */}
+            {/* Icon */}
             <div
-              className={`absolute inset-0 rounded-xl bg-gradient-to-br ${benefit.color} opacity-0 group-hover:opacity-100 transition-opacity`}
-            />
-
-            <div className="relative z-10">
-              {/* Icon */}
-              <div
-                className={`w-12 h-12 rounded-lg ${benefit.iconBg} ${benefit.iconColor} flex items-center justify-center mb-4`}
-              >
-                {benefit.icon}
-              </div>
-
-              {/* Title */}
-              <h3 className="text-lg font-semibold text-white mb-2">
-                {benefit.title}
-              </h3>
-
-              {/* Description */}
-              <p className="text-sm text-white/60 leading-relaxed">
-                {benefit.description}
-              </p>
+              className={`w-12 h-12 ${benefit.iconBg} ${benefit.iconColor} flex items-center justify-center mb-4`}
+            >
+              {benefit.icon}
             </div>
+
+            {/* Title */}
+            <h3 className="text-lg font-semibold text-white mb-2">
+              {benefit.title}
+            </h3>
+
+            {/* Description */}
+            <p className="text-sm text-white/60 leading-relaxed">
+              {benefit.description}
+            </p>
           </motion.div>
         ))}
       </motion.div>
