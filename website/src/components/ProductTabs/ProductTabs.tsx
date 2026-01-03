@@ -1,138 +1,259 @@
 import clsx from "clsx";
-import {
-  ReactNode,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-} from "react";
+import { ReactNode, useMemo, useState } from "react";
 import { motion } from "motion/react";
+import { Highlight, themes } from "prism-react-renderer";
 import styles from "./ProductTabs.module.css";
+import TracingTabImg from "@site/static/img/GenAI_home/GenAI_trace_darkmode.png";
 import EvaluationTabImg from "@site/static/img/GenAI_home/GenAI_evaluation_darkmode.png";
-import MonitoringTabImg from "@site/static/img/GenAI_home/GenAI_monitor_darkmode.png";
-import AnnotationTabImg from "@site/static/img/GenAI_home/GenAI_annotation_darkmode.png";
 import PromptTabImg from "@site/static/img/GenAI_home/GenAI_prompts_darkmode.png";
-import OptimizeTabImg from "@site/static/img/GenAI_home/GenAI_optimize_darkmode.png";
+import ModelTrainingTabImg from "@site/static/img/GenAI_home/model_training_darkmode.png";
 
-const defaultTabImage = "/img/GenAI_home/GenAI_trace_darkmode.png";
-
-const MonitoringIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 20 20"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className="text-white/70"
-  >
-    <path
-      d="M10 3.5a5.5 5.5 0 0 0-5.5 5.5c0 2.2 1.24 4.12 3.05 5.02V15a2.45 2.45 0 0 0 2.45 2.45h0A2.45 2.45 0 0 0 12.45 15v-.98A5.48 5.48 0 0 0 15.5 9c0-3.03-2.47-5.5-5.5-5.5Z"
-      stroke="currentColor"
-      strokeWidth="1.4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path d="M8 15h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-    <circle cx="10" cy="9" r="1" fill="currentColor" />
+// Icons for tabs
+const TracingIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3 12h4l3-9 4 18 3-9h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
-export const defaultProductTabs: Tab[] = [
+const PromptIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M14 2v6h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M8 13h8M8 17h5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const EvaluationIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3 3v18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M7 16l4-4 4 4 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const GatewayIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 6h16M4 6v12a2 2 0 002 2h12a2 2 0 002-2V6M4 6l2-4h12l2 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <circle cx="9" cy="12" r="1.5" fill="currentColor"/>
+    <circle cx="15" cy="12" r="1.5" fill="currentColor"/>
+  </svg>
+);
+
+const TrainingIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+// Homepage tabs - the 5 core features shown on the homepage
+export const homepageTabs: Tab[] = [
   {
-    id: "tracing",
-    label: "Tracing",
-    icon: "⎋",
-    imageSrc: defaultTabImage,
-    link: "https://mlflow.org/docs/latest/genai/tracing/",
-    hotspots: [
-      {
-        id: "trace-breakdown",
-        left: "0%",
-        top: "22%",
-        width: "25%",
-        height: "78%",
-        label: "Trace breakdown",
-        description:
-          "MLflow visualized the execution flow of your GenAI applications, including LLM calls, tool invocations, retrieval steps, and more.",
-        direction: "right",
-        link: "https://mlflow.org/docs/latest/genai/tracing/",
-      },
-      {
-        id: "span-details",
-        left: "25%",
-        top: "22%",
-        width: "52.5%",
-        height: "78%",
-        label: "Span details",
-        description:
-          "Each span represents a single step in the execution flow. They capture the inputs, outputs, token usage, latency, and many more metadata about the step.",
-        direction: "top",
-        link: "https://mlflow.org/docs/latest/genai/tracing/",
-      },
-      {
-        id: "trace-assessment",
-        left: "77.5%",
-        top: "22%",
-        width: "22.5%",
-        height: "78%",
-        label: "Feedback collection",
-        description:
-          "MLflow provides an UI and APIs for you to collect feedback from your users or domain experts on the quality of the application's output.",
-        direction: "left",
-        link: "https://mlflow.org/docs/latest/genai/tracing/collect-user-feedback/",
-      },
-      {
-        id: "trace-info",
-        left: "0%",
-        top: "0%",
-        width: "100%",
-        height: "22%",
-        label: "Trace info",
-        description:
-          "The trace header panel provides a summary of the trace, including the the latency, token usage, session ID, and more.",
-        direction: "bottom",
-        link: "https://mlflow.org/docs/latest/genai/tracing/",
-      },
+    id: "observability",
+    label: "Observability",
+    icon: <TracingIcon />,
+    imageSrc: TracingTabImg,
+    imageZoom: 160,
+    title: "Observability",
+    description: "Capture complete traces of your LLM applications/agents. Use traces to inspect failures and build eval datasets. Built on OpenTelemetry and support for 30+ popular LLM providers and agent frameworks.",
+    docLink: "https://mlflow.org/docs/latest/genai/tracing/",
+    quickstartLink: "https://mlflow.org/docs/latest/genai/tracing/quickstart/",
+    codeSnippets: {
+      python: `import mlflow
+import openai
+
+# Enable auto-tracing for OpenAI - just 1 line!
+mlflow.openai.autolog()
+
+# All OpenAI calls are now automatically traced
+client = openai.OpenAI()
+client.responses.create(
+    model="gpt-5",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "What is MLflow?"},
     ],
+)`,
+      typescript: `import mlflow from "mlflow";
+import OpenAI from "openai";
+
+// Enable auto-tracing for OpenAI
+mlflow.openai.autolog();
+
+const client = new OpenAI();
+
+// All OpenAI calls are now automatically traced
+async function handleRequest(text: string): Promise<string> {
+  const res = await client.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      { role: "system", content: "Summarize in one sentence." },
+      { role: "user", content: text },
+    ],
+  });
+  return res.choices[0].message.content ?? "";
+}`,
+    },
   },
   {
     id: "evaluation",
     label: "Evaluation",
-    icon: "☑",
+    icon: <EvaluationIcon />,
     imageSrc: EvaluationTabImg,
+    title: "Evaluation",
+    description: "Run systematic evaluations using LLM-as-judge, custom scorers, and human feedback. Track quality metrics over time and catch regressions.",
+    docLink: "https://mlflow.org/docs/latest/genai/eval/",
+    quickstartLink: "https://mlflow.org/docs/latest/genai/eval/",
+    codeSnippets: {
+      python: `import mlflow
+from mlflow.genai.judges import Correctness, Guidelines
+
+# Define a simple Q&A dataset with questions and expected answers
+eval_dataset = [
+    {
+        "inputs": {"question": "What is the capital of France?"},
+        "outputs": "Paris",
+        "expectations": {"expected_response": "Paris"},
+    },
+    {
+        "inputs": {"question": "Who was the first person to build an airplane?"},
+        "outputs": "I don't know",
+        "expectations": {"expected_response": "Wright Brothers"},
+    },
+]
+
+# Define evaluation criteria
+correctness = Correctness(model="openai:/gpt-5")
+is_english = Guidelines(guidelines="Response should be in English.", model="openai:/gpt-5", )
+
+# Run evaluation
+results = mlflow.genai.evaluate(
+    data=eval_dataset,
+    scorers=[correctness, is_english]
+)`,
+      typescriptComingSoon: true,
+    },
   },
   {
-    id: "monitoring",
-    label: "Monitoring",
-    icon: <MonitoringIcon />,
-    imageSrc: MonitoringTabImg,
+    id: "prompt",
+    label: "Prompt Management",
+    icon: <PromptIcon />,
+    imageSrc: PromptTabImg,
+    imageZoom: 150,
+    title: "Prompt Management",
+    description: "Version, test, and deploy prompts with full lineage tracking. Compare prompt performance across versions and collaborate with your team.",
+    docLink: "https://mlflow.org/docs/latest/genai/prompt-engineering/",
+    quickstartLink: "https://mlflow.org/docs/latest/genai/prompt-engineering/",
+    codeSnippets: {
+      python: `import mlflow
+
+# Use double curly braces for variables in the template
+initial_template = """
+Summarize content you are provided with in {{ num_sentences }} sentences.
+Sentences: {{ sentences }}
+"""
+
+# Register a new prompt
+mlflow.genai.register_prompt(
+    name="summarization",
+    template=initial_template,
+    # Optional: Provide a commit message to describe the changes
+    commit_message="Initial commit",
+    # Optional: Set tags applies to the prompt (across versions)
+    tags={"task": "summarization", "language": "en"},
+)
+
+# Load and use prompts in your app
+loaded = mlflow.genai.load_prompt("prompts:/summarization@latest")
+`,
+      typescriptComingSoon: true,
+    },
   },
   {
-    id: "annotation",
-    label: "Annotation",
-    icon: "☰",
-    imageSrc: AnnotationTabImg,
+    id: "gateway",
+    label: "AI Gateway",
+    icon: <GatewayIcon />,
+    imageSrc: "/img/GenAI_home/GenAI_trace_darkmode.png",
+    title: "AI Gateway",
+    description: "Unified API gateway for all your LLM providers. Route requests, manage rate limits, handle fallbacks, and control costs through a single interface.",
+    docLink: "https://mlflow.org/docs/latest/genai/gateway/",
+    quickstartLink: "https://mlflow.org/docs/latest/genai/gateway/",
+    codeSnippets: {
+      python: `from openai import OpenAI
+
+# Set the base URL to the MLflow Gateway URL
+client = OpenAI(
+    base_url="<Your MLflow Server URL>/gateway/mlflow/v1",
+    api_key="dummy",
+)
+
+# Query an endpoint via the MLflow Gateway in the same way as you would with OpenAI
+# Gateway handles rate limiting, fallback, payload transformation, etc.
+client.chat.completions.create(
+    model="claude-opus-4-5",
+    messages=[{"role": "user", "content": "Hi, how are you?"}]
+)`,
+      typescript: `import OpenAI from "openai";
+
+// Set the base URL to the MLflow Gateway URL
+const client = new OpenAI(
+    base_url="<Your MLflow Server URL>/gateway/mlflow/v1",
+    api_key="dummy",
+)
+
+//Query an endpoint via the MLflow Gateway in the same way as you would with OpenAI
+// Gateway handles rate limiting, fallback, payload transformation, etc.
+const response = await client.chat.completions.create({
+    model="claude-opus-4-5",
+    messages=[{"role": "user", "content": "Hi, how are you?"}]
+})`,
+    },
   },
-  { id: "prompt", label: "Prompt", icon: "⌘", imageSrc: PromptTabImg },
   {
-    id: "optimize",
-    label: "Optimize",
-    icon: "⚙",
-    imageSrc: OptimizeTabImg,
+    id: "training",
+    label: "Model Training",
+    icon: <TrainingIcon />,
+    imageSrc: ModelTrainingTabImg,
+    imageZoom: 150,
+    title: "Model Training",
+    description: "Track experiments, log parameters, metrics, and artifacts. Compare runs, reproduce results, and manage the full ML lifecycle from training to deployment.",
+    docLink: "https://mlflow.org/docs/latest/ml/index.html",
+    quickstartLink: "https://mlflow.org/docs/latest/getting-started/index.html",
+    codeSnippets: {
+      python: `import mlflow
+
+# Enable autologging for training
+mlflow.sklearn.autolog()
+
+# Load the Iris dataset
+X, y = datasets.load_iris(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Just train the model normally. MLflow will automatically
+# log the parameters, metrics, and model.
+lr = LogisticRegression(solver="lbfgs", max_iter=100)
+lr.fit(X_train, y_train)`,
+    },
   },
-  { id: "gateway", label: "Gateway", icon: "⇄", imageSrc: defaultTabImage },
-  { id: "versioning", label: "Versioning", icon: "⟳", imageSrc: defaultTabImage },
 ];
 
-type Tab = {
+export type Tab = {
   id: string;
   label: string;
   imageSrc: string;
   icon?: ReactNode;
+  title?: string;
+  description?: string;
+  docLink?: string;
+  quickstartLink?: string;
+  codeSnippets?: {
+    python: string;
+    typescript?: string;
+    /** Show "Coming Soon!" for TypeScript SDK */
+    typescriptComingSoon?: boolean;
+  };
   hotspots?: Hotspot[];
   link?: string;
+  /** Zoom level for the screenshot image (e.g., 115 = 115%). Default: 115 */
+  imageZoom?: number;
 };
 
 type Hotspot = {
@@ -145,6 +266,78 @@ type Hotspot = {
   description?: string;
   direction?: "top" | "right" | "bottom" | "left";
   link?: string;
+};
+
+// Code block component with prism-react-renderer syntax highlighting
+const CodeBlock = ({ code, language }: { code: string; language: "python" | "typescript" }) => {
+  const prismLanguage = language === "typescript" ? "tsx" : "python";
+
+  return (
+    <Highlight theme={themes.nightOwl} code={code.trim()} language={prismLanguage}>
+      {({ className, style, tokens, getLineProps, getTokenProps }) => (
+        <div className="relative h-full" style={{ backgroundColor: '#011627' }}>
+          <pre
+            className="h-full overflow-auto leading-snug font-mono p-4 m-0 dark-scrollbar"
+            style={{ ...style, backgroundColor: '#011627', fontSize: '14px', lineHeight: '1.5' }}
+          >
+            {tokens.map((line, i) => (
+              <div key={i} {...getLineProps({ line })}>
+                {line.map((token, key) => (
+                  <span key={key} {...getTokenProps({ token })} />
+                ))}
+              </div>
+            ))}
+          </pre>
+        </div>
+      )}
+    </Highlight>
+  );
+};
+
+// QuickstartLink component with animated glow effect
+const QuickstartLink = ({ href }: { href: string }) => {
+  return (
+    <motion.a
+      href={href}
+      target="_blank"
+      rel="noreferrer noopener"
+      className="relative inline-flex items-center gap-1 text-sm font-medium"
+      whileHover="hover"
+    >
+      {/* Pulsing glow background */}
+      <motion.span
+        className="absolute inset-0 rounded-md -z-10"
+        style={{
+          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(168, 85, 247, 0.3))',
+          filter: 'blur(8px)',
+        }}
+        animate={{
+          opacity: [0.4, 0.8, 0.4],
+          scale: [1, 1.1, 1],
+        }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+      <span className="relative z-10 text-white px-3 py-1">Quickstart</span>
+      <motion.span
+        className="relative z-10 text-white"
+        variants={{
+          hover: { x: 4 },
+        }}
+        animate={{ x: [0, 4, 0] }}
+        transition={{
+          duration: 1,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      >
+        →
+      </motion.span>
+    </motion.a>
+  );
 };
 
 type Props = {
@@ -256,290 +449,223 @@ const Bubble = ({
 
 export function ProductTabs({ tabs }: Props) {
   const [activeTabId, setActiveTabId] = useState(tabs[0]?.id);
-  const [indicator, setIndicator] = useState<{ width: number; left: number }>();
-
-  const containerRef = useRef<HTMLDivElement>(null);
-  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [codeLanguage, setCodeLanguage] = useState<"python" | "typescript">("python");
 
   const activeTab = useMemo(
     () => tabs.find((tab) => tab.id === activeTabId) ?? tabs[0],
     [activeTabId, tabs],
   );
 
-  const updateIndicator = useCallback(() => {
-    if (!activeTab) return;
-    const btn = tabRefs.current[activeTab.id];
-    const container = containerRef.current;
-    if (btn && container) {
-      const btnRect = btn.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-      setIndicator({
-        width: btnRect.width,
-        left: btnRect.left - containerRect.left,
-      });
-    }
-  }, [activeTab]);
-
-  useLayoutEffect(() => {
-    updateIndicator();
-  }, [activeTab, updateIndicator]);
-
-  // Recompute on resize to keep indicator aligned
-  useEffect(() => {
-    const handler = () => updateIndicator();
-    window.addEventListener("resize", handler);
-    return () => window.removeEventListener("resize", handler);
-  }, [updateIndicator]);
-
   if (!activeTab) {
     return null;
   }
 
   return (
-    <div className="w-full flex flex-col gap-8">
-      {/* Floating particles background */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(15)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-blue-400/20 rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -20, 0],
-              opacity: [0, 0.6, 0],
-              scale: [1, 1.5, 1],
-            }}
-            transition={{
-              duration: 2 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="relative w-full" ref={containerRef}>
-        <motion.div 
-          className="flex flex-wrap justify-center gap-6 md:gap-8 pb-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {tabs.map((tab, index) => {
-            const isActive = tab.id === activeTab.id;
-            return (
-              <motion.button
-                key={tab.id}
-                type="button"
-                ref={(el) => {
-                  tabRefs.current[tab.id] = el;
-                }}
-                onClick={() => setActiveTabId(tab.id)}
-                className="group relative flex items-center gap-2 text-md font-medium focus:outline-none px-3 py-2 rounded-lg transition-all"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {/* Glow effect on hover */}
-                <motion.div
-                  className="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 via-cyan-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 blur-md"
-                  initial={false}
-                  animate={{
-                    opacity: isActive ? 0.3 : 0,
-                  }}
-                  transition={{ duration: 0.3 }}
-                />
-                
-                {/* Active background */}
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTabBackground"
-                    className="absolute inset-0 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                  />
-                )}
-
-                {/* Icon with animation */}
-                {tab.icon && (
-                  <motion.span 
-                    className={clsx(
-                      "text-base leading-none relative z-10 transition-all",
-                      isActive ? "text-blue-400" : "text-white/60 group-hover:text-blue-300"
-                    )}
-                    animate={{
-                      rotate: isActive ? [0, -10, 10, -10, 0] : 0,
-                    }}
-                    transition={{
-                      duration: 0.5,
-                      ease: "easeInOut",
-                    }}
-                  >
-                    {tab.icon}
-                  </motion.span>
-                )}
-                
-                {/* Label */}
+    <div className="w-full flex flex-col gap-6 p-8 rounded-2xl border border-white/10 bg-white/[0.02]">
+      {/* Tab Navigation */}
+      <div className="flex flex-wrap justify-center gap-6 md:gap-8 border-b border-white/10 pb-0">
+        {tabs.map((tab) => {
+          const isActive = tab.id === activeTab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTabId(tab.id)}
+              className="group relative flex items-center gap-2 text-base font-medium focus:outline-none px-1 py-3 transition-all"
+            >
+              {/* Icon */}
+              {tab.icon && (
                 <span
                   className={clsx(
-                    "transition-all relative z-10 font-semibold",
-                    isActive 
-                      ? "text-white" 
-                      : "text-white/70 group-hover:text-white/90",
+                    "transition-colors",
+                    !isActive && "text-white/40 group-hover:text-white/60"
                   )}
+                  style={isActive ? { color: '#9066cc' } : undefined}
                 >
-                  {tab.label}
+                  {tab.icon}
                 </span>
+              )}
 
-                {/* Sparkle effect on active */}
-                {isActive && (
-                  <motion.div
-                    className="absolute -right-1 -top-1 w-1.5 h-1.5 rounded-full bg-blue-400"
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ 
-                      scale: [0, 1.2, 1],
-                      opacity: [0, 1, 0.8],
-                    }}
-                    transition={{ duration: 0.4 }}
-                  />
+              {/* Label */}
+              <span
+                className={clsx(
+                  "transition-colors font-semibold",
+                  isActive
+                    ? "text-white"
+                    : "text-white/50 group-hover:text-white/70",
                 )}
-              </motion.button>
-            );
-          })}
-        </motion.div>
+              >
+                {tab.label}
+              </span>
 
-        {/* Decorative line */}
-        <div className="absolute left-0 right-0 bottom-0 border-b border-white/10" aria-hidden />
-        
-        {/* Animated indicator with glow */}
-        <motion.div
-          aria-hidden
-          className="absolute bottom-0 h-0.5 rounded-full"
-          style={{
-            width: indicator?.width ?? 0,
-            transform: `translateX(${indicator?.left ?? 0}px)`,
-          }}
-        >
-          {/* Main bar */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 rounded-full" />
-          
-          {/* Glow effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 rounded-full blur-sm opacity-70" />
-          
-          {/* Moving shimmer */}
-          <motion.div
-            className="absolute inset-0 rounded-full overflow-hidden"
-          >
-            <motion.div
-              className="absolute inset-y-0 w-[200%] bg-gradient-to-r from-transparent from-40% via-white via-50% to-transparent to-60%"
-              animate={{
-                x: ["-100%", "0%"],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            />
-          </motion.div>
-        </motion.div>
+              {/* Active indicator line */}
+              {isActive && (
+                <motion.div
+                  layoutId="activeTab"
+                  className="absolute bottom-0 left-0 right-0 h-[2px]"
+                  style={{
+                    background: 'linear-gradient(90deg, #e05585, #9066cc, #5a8fd4)',
+                  }}
+                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                />
+              )}
+            </button>
+          );
+        })}
       </div>
 
-      <motion.div 
-        className="relative mx-16"
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-      >
-        {/* Enhanced halo with animation */}
-        <motion.div
-          className="pointer-events-none absolute -inset-8 rounded-[30px] z-0"
-          style={{
-            background: "radial-gradient(circle at 50% 40%, rgba(59,130,246,0.16), transparent 65%), radial-gradient(circle at 80% 10%, rgba(255,255,255,0.10), transparent 55%)",
-            filter: "blur(45px)",
-            boxShadow: "0 0 70px rgba(59,130,246,0.08)",
-          }}
-          animate={{
-            scale: [1, 1.05, 1],
-            opacity: [0.8, 1, 0.8],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          aria-hidden
-        />
+      {/* Title and Description with Left/Right Navigation */}
+      <div className="flex items-center gap-4 py-2">
+          {/* Left Arrow */}
+          <button
+            onClick={() => {
+              const currentIndex = tabs.findIndex(t => t.id === activeTab.id);
+              const prevIndex = currentIndex > 0 ? currentIndex - 1 : tabs.length - 1;
+              setActiveTabId(tabs[prevIndex].id);
+            }}
+            className="shrink-0 w-10 h-10 flex items-center justify-center text-white/40 hover:text-white transition-all"
+            aria-label="Previous tab"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
 
-        <motion.div 
-          className="relative border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] rounded-2xl overflow-visible shadow-[0_20px_80px_rgba(0,0,0,0.35)] group/card"
-          whileHover={{ scale: 1.01 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-        >
-          {/* Enhanced outer glow with animation */}
-          <motion.div
-            className="pointer-events-none absolute -inset-4 z-0"
-            style={{
-              background: "radial-gradient(circle at 30% 20%, rgba(59,130,246,0.18), transparent 55%), radial-gradient(circle at 80% 0%, rgba(253, 137, 137, 0.12), transparent 50%)",
-              filter: "blur(40px)",
-            }}
-            animate={{
-              opacity: [0.5, 0.8, 0.5],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            aria-hidden
-          />
+          {/* Title and Description */}
+          <div className="flex-1 min-w-0">
+            <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
+              {activeTab.title || activeTab.label}
+            </h3>
+            <p className="text-gray-400 leading-relaxed mb-3" style={{ marginTop: '4px' }}>
+              {activeTab.description}
+            </p>
+            {activeTab.quickstartLink && (
+              <QuickstartLink href={activeTab.quickstartLink} />
+            )}
+          </div>
 
-          {/* Enhanced glare - static for better performance */}
-          <div
-            className="pointer-events-none absolute inset-0 z-20 mix-blend-screen rounded-2xl"
-            style={{
-              background: "linear-gradient(130deg, rgba(96,165,250,0.16) 0%, rgba(255,255,255,0.04) 45%, transparent 60%), radial-gradient(120% 60% at 20% 10%, rgba(59,130,246,0.16), transparent 55%)",
-              opacity: 0.32,
+          {/* Right Arrow */}
+          <button
+            onClick={() => {
+              const currentIndex = tabs.findIndex(t => t.id === activeTab.id);
+              const nextIndex = currentIndex < tabs.length - 1 ? currentIndex + 1 : 0;
+              setActiveTabId(tabs[nextIndex].id);
             }}
-            aria-hidden
-          />
+            className="shrink-0 w-10 h-10 flex items-center justify-center text-white/40 hover:text-white transition-all"
+            aria-label="Next tab"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        </div>
 
-          <div className="relative z-10">
-            <img
-              src={activeTab.imageSrc}
-              alt={`${activeTab.label} screenshot`}
-              className="w-full h-full object-cover shadow-[0_18px_50px_rgba(0,0,0,0.35)] rounded-2xl"
-              loading="lazy"
+      {/* Main Content: Code Left, Screenshot Right */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 px-2">
+          {/* Left: Code Snippet */}
+          <div className="relative">
+            <div className="rounded-xl bg-black overflow-hidden h-[400px] flex flex-col">
+              {/* Code language tabs */}
+              <div className="flex border-b border-white/10" style={{ backgroundColor: '#000' }}>
+                <button
+                  onClick={() => setCodeLanguage("python")}
+                  className={clsx(
+                    "px-4 py-2.5 text-sm font-medium transition-colors",
+                    codeLanguage === "python"
+                      ? "text-white bg-white/10 border-b-2 border-blue-400"
+                      : "text-white/60 hover:text-white/80"
+                  )}
+                >
+                  Python SDK
+                </button>
+                {(activeTab.codeSnippets?.typescript || activeTab.codeSnippets?.typescriptComingSoon) && (
+                  <button
+                    onClick={() => setCodeLanguage("typescript")}
+                    className={clsx(
+                      "px-4 py-2.5 text-sm font-medium transition-colors",
+                      codeLanguage === "typescript"
+                        ? "text-white bg-white/10 border-b-2 border-blue-400"
+                        : "text-white/60 hover:text-white/80"
+                    )}
+                  >
+                    JS/TS SDK
+                  </button>
+                )}
+              </div>
+
+              {/* Code content */}
+              <div className="flex-1 overflow-auto">
+                {activeTab.codeSnippets && (
+                  codeLanguage === "typescript" && activeTab.codeSnippets.typescriptComingSoon && !activeTab.codeSnippets.typescript ? (
+                    <div className="flex items-center justify-center h-full text-white/60">
+                      <div className="text-center">
+                        <div className="text-2xl mb-2">Coming Soon!</div>
+                        <div className="text-sm text-white/40">JS/TS SDK support is in development</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <CodeBlock
+                      code={codeLanguage === "typescript" && activeTab.codeSnippets.typescript
+                        ? activeTab.codeSnippets.typescript
+                        : activeTab.codeSnippets.python}
+                      language={codeLanguage === "typescript" && activeTab.codeSnippets.typescript ? "typescript" : "python"}
+                    />
+                  )
+                )}
+              </div>
+
+            </div>
+          </div>
+
+          {/* Right: Screenshot with gradient background */}
+          <div className="relative rounded-xl overflow-hidden h-[400px]">
+            {/* Dark gradient background */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background: 'linear-gradient(135deg, #0d0d1a 0%, #0e1526 25%, #0a2340 50%, #0d0d1a 100%)',
+              }}
             />
 
-            {activeTab.hotspots?.map((spot) => (
-              <SpotWithLink key={spot.id} spot={spot}>
-                <motion.div 
-                  className="absolute inset-0 rounded-md border border-white/30 bg-white/6 opacity-0 group-hover:opacity-100"
-                  initial={false}
-                  whileHover={{
-                    backgroundColor: "rgba(255,255,255,0.12)",
-                    borderColor: "rgba(255,255,255,0.5)",
+            {/* Subtle grid pattern */}
+            <div
+              className="absolute inset-0 opacity-30"
+              style={{
+                backgroundImage: `
+                  linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
+                `,
+                backgroundSize: '50px 50px',
+              }}
+            />
+
+            {/* Blurred orbs for visual interest */}
+            <div className="absolute -top-20 -left-20 w-64 h-64 rounded-full opacity-30" style={{ background: 'radial-gradient(circle, rgba(102,126,234,0.5) 0%, transparent 70%)' }} />
+            <div className="absolute -bottom-20 -right-20 w-56 h-56 rounded-full opacity-25" style={{ background: 'radial-gradient(circle, rgba(240,147,251,0.4) 0%, transparent 70%)' }} />
+            <div className="absolute top-1/4 -right-10 w-48 h-48 rounded-full opacity-25" style={{ background: 'radial-gradient(circle, rgba(79,172,254,0.4) 0%, transparent 70%)' }} />
+
+            {/* Screenshot image with gradient border (top-left only) */}
+            <div
+              className="absolute bottom-0 right-0 w-[95%] h-[95%] z-10 rounded-tl-lg pt-[1px] pl-[1px]"
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)',
+              }}
+            >
+              <div className="w-full h-full rounded-tl-lg pt-[4px] pl-[4px] overflow-hidden" style={{ backgroundColor: '#11171d' }}>
+                <img
+                  src={activeTab.imageSrc}
+                  alt={`${activeTab.label} screenshot`}
+                  className="rounded-tl object-cover object-left-top"
+                  style={{
+                    width: `${activeTab.imageZoom ?? 115}%`,
+                    height: `${activeTab.imageZoom ?? 115}%`,
                   }}
-                  transition={{ duration: 0.2 }}
+                  loading="lazy"
                 />
-                <div className="relative h-full w-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  <Bubble
-                    label={spot.label}
-                    description={spot.description}
-                    direction={spot.direction}
-                  />
-                </div>
-              </SpotWithLink>
-            ))}
+              </div>
+            </div>
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
     </div>
   );
 }
