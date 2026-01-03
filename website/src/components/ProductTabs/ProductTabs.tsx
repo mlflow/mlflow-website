@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import { ReactNode, useMemo, useState } from "react";
-import { motion } from "motion/react";
+import { ReactNode, useMemo, useState, useCallback } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { Highlight, themes } from "prism-react-renderer";
 import styles from "./ProductTabs.module.css";
 import TracingTabImg from "@site/static/img/GenAI_home/GenAI_trace_darkmode.png";
@@ -268,17 +268,77 @@ type Hotspot = {
   link?: string;
 };
 
+// Copy button component
+const CopyButton = ({ code }: { code: string }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  }, [code]);
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="absolute top-3 right-3 p-2 rounded-md bg-white/10 hover:bg-white/20 transition-colors z-10 group"
+      aria-label={copied ? "Copied!" : "Copy code"}
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        {copied ? (
+          <motion.svg
+            key="check"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
+            className="w-4 h-4 text-green-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </motion.svg>
+        ) : (
+          <motion.svg
+            key="copy"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
+            className="w-4 h-4 text-white/60 group-hover:text-white/90"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </motion.svg>
+        )}
+      </AnimatePresence>
+    </button>
+  );
+};
+
+// Color scheme for code blocks - Jettwave Dark for all tabs
+const codeColorScheme = { theme: themes.jettwaveDark, bg: '#16162e', headerBg: '#16162e' };
+
 // Code block component with prism-react-renderer syntax highlighting
-const CodeBlock = ({ code, language }: { code: string; language: "python" | "typescript" }) => {
+const CodeBlock = ({ code, language }: {
+  code: string;
+  language: "python" | "typescript";
+}) => {
   const prismLanguage = language === "typescript" ? "tsx" : "python";
 
   return (
-    <Highlight theme={themes.nightOwl} code={code.trim()} language={prismLanguage}>
+    <Highlight theme={codeColorScheme.theme} code={code.trim()} language={prismLanguage}>
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
-        <div className="relative h-full" style={{ backgroundColor: '#011627' }}>
+        <div className="relative h-full" style={{ backgroundColor: codeColorScheme.bg }}>
+          <CopyButton code={code.trim()} />
           <pre
             className="h-full overflow-auto leading-snug font-mono p-4 m-0 dark-scrollbar"
-            style={{ ...style, backgroundColor: '#011627', fontSize: '14px', lineHeight: '1.5' }}
+            style={{ ...style, backgroundColor: codeColorScheme.bg, fontSize: '14px', lineHeight: '1.5' }}
           >
             {tokens.map((line, i) => (
               <div key={i} {...getLineProps({ line })}>
@@ -461,7 +521,7 @@ export function ProductTabs({ tabs }: Props) {
   }
 
   return (
-    <div className="w-full flex flex-col gap-6 p-8 rounded-2xl border border-white/10 bg-white/[0.02]">
+    <div className="w-full flex flex-col gap-6 p-8 rounded-2xl border border-white/10 bg-white/[0.01]">
       {/* Tab Navigation */}
       <div className="flex flex-wrap justify-center gap-6 md:gap-8 border-b border-white/10 pb-0">
         {tabs.map((tab) => {
@@ -561,12 +621,18 @@ export function ProductTabs({ tabs }: Props) {
         </div>
 
       {/* Main Content: Code Left, Screenshot Right */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 px-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 px-4">
           {/* Left: Code Snippet */}
           <div className="relative">
-            <div className="rounded-xl bg-black overflow-hidden h-[400px] flex flex-col">
+            <div
+              className="overflow-hidden h-[400px] flex flex-col"
+              style={{ backgroundColor: codeColorScheme.bg }}
+            >
               {/* Code language tabs */}
-              <div className="flex border-b border-white/10" style={{ backgroundColor: '#000' }}>
+              <div
+                className="flex border-b border-white/10"
+                style={{ backgroundColor: codeColorScheme.headerBg }}
+              >
                 <button
                   onClick={() => setCodeLanguage("python")}
                   className={clsx(
@@ -618,12 +684,12 @@ export function ProductTabs({ tabs }: Props) {
           </div>
 
           {/* Right: Screenshot with gradient background */}
-          <div className="relative rounded-xl overflow-hidden h-[400px]">
-            {/* Dark gradient background */}
+          <div className="relative overflow-hidden h-[400px]">
+            {/* Dark gradient background with red-to-blue theme */}
             <div
               className="absolute inset-0"
               style={{
-                background: 'linear-gradient(135deg, #0d0d1a 0%, #0e1526 25%, #0a2340 50%, #0d0d1a 100%)',
+                background: 'linear-gradient(135deg, #1a0d15 0%, #1a0e1f 25%, #0e1526 50%, #0d1a2a 100%)',
               }}
             />
 
@@ -639,10 +705,10 @@ export function ProductTabs({ tabs }: Props) {
               }}
             />
 
-            {/* Blurred orbs for visual interest */}
-            <div className="absolute -top-20 -left-20 w-64 h-64 rounded-full opacity-30" style={{ background: 'radial-gradient(circle, rgba(102,126,234,0.5) 0%, transparent 70%)' }} />
-            <div className="absolute -bottom-20 -right-20 w-56 h-56 rounded-full opacity-25" style={{ background: 'radial-gradient(circle, rgba(240,147,251,0.4) 0%, transparent 70%)' }} />
-            <div className="absolute top-1/4 -right-10 w-48 h-48 rounded-full opacity-25" style={{ background: 'radial-gradient(circle, rgba(79,172,254,0.4) 0%, transparent 70%)' }} />
+            {/* Blurred orbs for visual interest - red to blue theme */}
+            <div className="absolute -top-20 -left-20 w-64 h-64 rounded-full opacity-30" style={{ background: 'radial-gradient(circle, rgba(224,85,133,0.5) 0%, transparent 70%)' }} />
+            <div className="absolute -bottom-20 -right-20 w-56 h-56 rounded-full opacity-25" style={{ background: 'radial-gradient(circle, rgba(90,143,212,0.5) 0%, transparent 70%)' }} />
+            <div className="absolute top-1/4 -right-10 w-48 h-48 rounded-full opacity-25" style={{ background: 'radial-gradient(circle, rgba(144,102,204,0.4) 0%, transparent 70%)' }} />
 
             {/* Screenshot image with gradient border (top-left only) */}
             <div
