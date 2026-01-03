@@ -107,6 +107,7 @@ export function FAQSection() {
       title="Frequently Asked Questions"
       body="Everything you need to know about MLflow. Can't find what you're looking for? Join our community."
       align="center"
+      ambient
     >
       <div className="w-full max-w-3xl mx-auto space-y-4">
         {faqs.map((faq, index) => (

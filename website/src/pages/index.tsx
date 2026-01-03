@@ -46,7 +46,7 @@ export default function Home(): JSX.Element {
       />
 
       {/* 2. FEATURES SECTION - 5 core capabilities with tabs */}
-      <div className="w-full px-4 md:px-8 lg:px-16 py-8">
+      <div className="w-full px-4 md:px-8 lg:px-16 pb-36">
         <div className="max-w-7xl mx-auto">
           <ProductTabs tabs={homepageTabs} />
         </div>
@@ -67,9 +67,9 @@ export default function Home(): JSX.Element {
       <div className="flex flex-col gap-16"></div>
       <ProcessSection />
 
-      {/* 7. RUNNING ANYWHERE - Cloud platform logos */}
+      {/* 7. RUNNING ANYWHERE - Cloud platform logos
       <div className="flex flex-col gap-16"></div>
-      <RunningAnywhere />
+      <RunningAnywhere /> */}
 
       {/* 10. FAQ SECTION - Common questions */}
       <div className="flex flex-col gap-16"></div>

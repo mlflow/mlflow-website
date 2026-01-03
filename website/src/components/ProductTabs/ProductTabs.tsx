@@ -321,8 +321,20 @@ const CopyButton = ({ code }: { code: string }) => {
   );
 };
 
-// Color scheme for code blocks - Jettwave Dark for all tabs
-const codeColorScheme = { theme: themes.jettwaveDark, bg: '#16162e', headerBg: '#16162e' };
+// Custom Night Owl theme with modified string color
+const customNightOwl = {
+  ...themes.nightOwl,
+  styles: themes.nightOwl.styles.map((style) => {
+    // Change string color from light green to a different color
+    if (style.types.includes('string')) {
+      return { ...style, style: { ...style.style, color: '#58a6ff' } }; // Vivid blue
+    }
+    return style;
+  }),
+};
+
+// Color scheme for code blocks
+const codeColorScheme = { theme: customNightOwl, bg: '#0d1117', headerBg: '#0d1117' };
 
 // Code block component with prism-react-renderer syntax highlighting
 const CodeBlock = ({ code, language }: {
@@ -685,34 +697,34 @@ export function ProductTabs({ tabs }: Props) {
 
           {/* Right: Screenshot with gradient background */}
           <div className="relative overflow-hidden h-[400px]">
-            {/* Dark gradient background with red-to-blue theme */}
+            {/* Dark gradient background with vivid red-to-blue theme */}
             <div
               className="absolute inset-0"
               style={{
-                background: 'linear-gradient(135deg, #1a0d15 0%, #1a0e1f 25%, #0e1526 50%, #0d1a2a 100%)',
+                background: 'linear-gradient(135deg, #2a1020 0%, #251535 25%, #152040 50%, #102545 100%)',
               }}
             />
 
             {/* Subtle grid pattern */}
             <div
-              className="absolute inset-0 opacity-30"
+              className="absolute inset-0 opacity-40"
               style={{
                 backgroundImage: `
-                  linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                  linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
+                  linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)
                 `,
                 backgroundSize: '50px 50px',
               }}
             />
 
-            {/* Blurred orbs for visual interest - red to blue theme */}
-            <div className="absolute -top-20 -left-20 w-64 h-64 rounded-full opacity-30" style={{ background: 'radial-gradient(circle, rgba(224,85,133,0.5) 0%, transparent 70%)' }} />
-            <div className="absolute -bottom-20 -right-20 w-56 h-56 rounded-full opacity-25" style={{ background: 'radial-gradient(circle, rgba(90,143,212,0.5) 0%, transparent 70%)' }} />
-            <div className="absolute top-1/4 -right-10 w-48 h-48 rounded-full opacity-25" style={{ background: 'radial-gradient(circle, rgba(144,102,204,0.4) 0%, transparent 70%)' }} />
+            {/* Blurred orbs for visual interest - more vivid */}
+            <div className="absolute -top-20 -left-20 w-72 h-72 rounded-full opacity-50" style={{ background: 'radial-gradient(circle, rgba(224,85,133,0.5) 0%, transparent 70%)' }} />
+            <div className="absolute -bottom-20 -right-20 w-64 h-64 rounded-full opacity-45" style={{ background: 'radial-gradient(circle, rgba(79,172,254,0.5) 0%, transparent 70%)' }} />
+            <div className="absolute top-1/3 -right-10 w-56 h-56 rounded-full opacity-40" style={{ background: 'radial-gradient(circle, rgba(168,85,247,0.4) 0%, transparent 70%)' }} />
 
             {/* Screenshot image with gradient border (top-left only) */}
             <div
-              className="absolute bottom-0 right-0 w-[95%] h-[95%] z-10 rounded-tl-lg pt-[1px] pl-[1px]"
+              className="absolute bottom-0 right-0 w-[93%] h-[93%] z-10 rounded-tl-lg pt-[1px] pl-[1px]"
               style={{
                 background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)',
               }}

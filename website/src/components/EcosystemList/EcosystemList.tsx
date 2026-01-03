@@ -6,11 +6,11 @@ import MiniLogoCard from "../MiniLogoCard/MiniLogoCard";
 export const EcosystemList = () => {
   return (
     <div className="w-full px-4 md:px-8 lg:px-16 flex justify-center relative overflow-hidden">
-      {/* Ambient Background Glows - Static */}
+      {/* Ambient Background Glows - Blue-purple theme */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-purple-500/4 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/4 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/3 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/4 w-80 h-80 rounded-full blur-3xl" style={{ background: 'rgba(120, 110, 220, 0.06)' }} />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-3xl" style={{ background: 'rgba(130, 100, 230, 0.06)' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl" style={{ background: 'rgba(110, 120, 240, 0.05)' }} />
       </div>
 
       <Section title="Open and Neutral" body="MLflow is 100% Open-Source and framework-agnostic. No vendor lock-in, no forced choices. You choose the best tools for your needs. Supports Python, TypeScript/JavaScript, Java, and natively integrates with OpenTelemetry." align="center">
