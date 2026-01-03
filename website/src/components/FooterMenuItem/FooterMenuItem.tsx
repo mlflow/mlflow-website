@@ -1,12 +1,12 @@
 import Link from "@docusaurus/Link";
 import { ComponentProps } from "react";
 
-import "./FooterMenuItem.module.css";
+import styles from "./FooterMenuItem.module.css";
 
 export const FooterMenuItem = (props: ComponentProps<typeof Link>) => {
   return (
     <div>
-      <Link {...props} />
+      <Link {...props} className={styles.link} />
     </div>
   );
 };
