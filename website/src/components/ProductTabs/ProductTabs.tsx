@@ -5,6 +5,7 @@ import { Highlight, themes } from "prism-react-renderer";
 import styles from "./ProductTabs.module.css";
 import TracingTabImg from "@site/static/img/GenAI_home/GenAI_trace_darkmode.png";
 import EvaluationTabImg from "@site/static/img/GenAI_home/GenAI_evaluation_darkmode.png";
+import GatewayTabImg from "@site/static/img/GenAI_home/GenAI_gateway_darkmode.png";
 import PromptTabImg from "@site/static/img/GenAI_home/GenAI_prompts_darkmode.png";
 import ModelTrainingTabImg from "@site/static/img/GenAI_home/model_training_darkmode.png";
 
@@ -99,7 +100,7 @@ async function handleRequest(text: string): Promise<string> {
     icon: <EvaluationIcon />,
     imageSrc: EvaluationTabImg,
     title: "Evaluation",
-    description: "Run systematic evaluations using LLM-as-judge, custom scorers, and human feedback. Track quality metrics over time and catch regressions.",
+    description: "Run systematic evaluations using LLM-as-judge, custom metrics, and human feedback. Track quality metrics over time and catch regressions.",
     docLink: "https://mlflow.org/docs/latest/genai/eval/",
     quickstartLink: "https://mlflow.org/docs/latest/genai/eval/",
     codeSnippets: {
@@ -171,9 +172,9 @@ loaded = mlflow.genai.load_prompt("prompts:/summarization@latest")
     id: "gateway",
     label: "AI Gateway",
     icon: <GatewayIcon />,
-    imageSrc: "/img/GenAI_home/GenAI_trace_darkmode.png",
+    imageSrc: GatewayTabImg,
     title: "AI Gateway",
-    description: "Unified API gateway for all your LLM providers. Route requests, manage rate limits, handle fallbacks, and control costs through a single interface.",
+    description: "Unified API gateway for all LLM providers. Route requests, manage rate limits, handle fallbacks, and control costs through a single interface.",
     docLink: "https://mlflow.org/docs/latest/genai/gateway/",
     quickstartLink: "https://mlflow.org/docs/latest/genai/gateway/",
     codeSnippets: {

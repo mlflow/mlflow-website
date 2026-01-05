@@ -4,30 +4,30 @@ import { Section } from "../Section/Section";
 
 const faqs = [
   {
-    question: "Is MLflow really free?",
+    question: "Is MLflow free?",
     answer:
       "Yes! MLflow is 100% open source under the Apache 2.0 license. You can use it for any purpose, including commercial applications, without any licensing fees. The project is backed by the Linux Foundation, ensuring it remains open and community-driven.",
   },
   {
-    question: "How does MLflow compare to other MLOps tools?",
+    question: "How does MLflow compare to other MLOps/LLMOps tools?",
     answer:
       "MLflow stands out with its vendor-neutral approach, comprehensive feature set, and massive community support. Unlike proprietary alternatives, MLflow doesn't lock you into any specific cloud or vendor. With 50M+ monthly downloads and 20K+ GitHub stars, it's the most widely adopted open-source MLOps platform.",
   },
   {
-    question: "Can I use MLflow with my existing ML infrastructure?",
+    question: "Can I use MLflow with my existing AI infrastructure?",
     answer:
-      "Absolutely. MLflow integrates seamlessly with 30+ frameworks and tools including PyTorch, TensorFlow, scikit-learn, LangChain, OpenAI, and more. It works with any cloud provider (AWS, Azure, GCP, Databricks) or on-premises infrastructure.",
+      "Absolutely. MLflow works on any major cloud provider (AWS, Azure, GCP, Databricks) or on-premises infrastructure. Regardless of which platform and framework you use, MLflow can be used to track, evaluate, and deploy your AI projects.",
   },
   {
-    question: "Is MLflow compatible with OpenTelemetry?",
+    question: "Do I need to use Python to use MLflow?",
     answer:
-      "Yes, MLflow Tracing is fully compatible with OpenTelemetry, the industry standard for observability. This means you can easily integrate MLflow traces with your existing observability stack and avoid vendor lock-in.",
+      "No, MLflow provides native SDKs for other languages such as TypeScript/JavaScript, Java, and R. If you use other languages, you can use MLflow's REST API and OpenTelemetry integrations to connect your projects to MLflow.",
   },
   {
-    question: "What LLM providers does MLflow support?",
+    question: "Can I use MLflow in my enterprise organization?",
     answer:
-      "MLflow supports all major LLM providers including OpenAI, Anthropic, Google (Gemini), AWS Bedrock, Azure OpenAI, Mistral, Groq, and many more. You can also use any OpenAI-compatible API or self-hosted models through Ollama.",
-  },
+      "Yes, MLflow is trusted by many enterprise organizations who operate at scale. If you don't want to manage MLflow infrastructure yourself, try managed MLflow services provided by Databricks, AWS SageMaker, Nebius or others.",
+  }
 ];
 
 function FAQItem({

@@ -32,7 +32,7 @@ export default function Home(): JSX.Element {
           <>
           Building AI products is all about iteration.<br/>
           MLflow lets you move 10x faster by simplifying how you <br/>
-          <HighlightedKeyword>debug</HighlightedKeyword>, <HighlightedKeyword>test</HighlightedKeyword>, and <HighlightedKeyword>deploy</HighlightedKeyword> your LLM applications and Agents.
+          <HighlightedKeyword>debug</HighlightedKeyword>, <HighlightedKeyword>test</HighlightedKeyword>, and <HighlightedKeyword>evaluate</HighlightedKeyword> your LLM applications and Agents.
           </>
         }
         primaryCTA={{
