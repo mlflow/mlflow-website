@@ -41,7 +41,10 @@ export const RunningAnywhere = () => {
       body="Local development, on-premises clusters, cloud platforms, or managed services. Being open-source, MLflow is vendor-neutral and runs wherever you need it."
       align="center"
     >
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-6 justify-items-center mx-auto" style={{ maxWidth: 1200 }}>
+      <div
+        className="grid grid-cols-2 md:grid-cols-6 gap-6 justify-items-center mx-auto"
+        style={{ maxWidth: 1200 }}
+      >
         {platforms.map((platform) => (
           <div key={platform.title} style={{ width: 160, height: 160 }}>
             <MiniLogoCard

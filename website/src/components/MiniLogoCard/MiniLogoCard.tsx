@@ -12,7 +12,12 @@ const MiniLogoCard = ({
 }) => {
   return (
     <div className={clsx("card", styles.card)}>
-      <a href={href} className={styles.a} target="_blank" rel="noreferrer noopener">
+      <a
+        href={href}
+        className={styles.a}
+        target="_blank"
+        rel="noreferrer noopener"
+      >
         <div className={clsx(styles.inner, "card__body")}>
           <div className={styles.container}>
             <div className={styles.logoFlip}>

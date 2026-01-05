@@ -100,9 +100,7 @@ const ProblemSection = ({
         viewport={{ once: true, margin: "-100px" }}
       >
         {/* Title */}
-        <h3 className="text-4xl md:text-6xl font-bold text-white">
-          {title}
-        </h3>
+        <h3 className="text-4xl md:text-6xl font-bold text-white">{title}</h3>
 
         {/* Description with better typography */}
         <p className="text-xl text-gray-300/90 leading-relaxed max-w-xl font-light">
@@ -120,13 +118,17 @@ const ProblemSection = ({
       >
         <div className="relative group">
           {/* Main Card */}
-          <div className={`relative aspect-video rounded-2xl border ${colorConfig.border} bg-gradient-to-br from-white/10 via-white/5 to-transparent backdrop-blur-xl overflow-hidden shadow-2xl transition-all duration-500`}>
-
+          <div
+            className={`relative aspect-video rounded-2xl border ${colorConfig.border} bg-gradient-to-br from-white/10 via-white/5 to-transparent backdrop-blur-xl overflow-hidden shadow-2xl transition-all duration-500`}
+          >
             {/* Grid Pattern */}
-            <div className="absolute inset-0 opacity-[0.02]" style={{
-              backgroundImage: `linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent)`,
-              backgroundSize: '50px 50px'
-            }} />
+            <div
+              className="absolute inset-0 opacity-[0.02]"
+              style={{
+                backgroundImage: `linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent)`,
+                backgroundSize: "50px 50px",
+              }}
+            />
 
             {/* Content */}
             <div className="absolute inset-0 flex items-center justify-center">
@@ -161,7 +163,9 @@ const ObservabilityVisual = () => {
       >
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-          <span className="text-xs text-blue-300 font-semibold">Live Trace</span>
+          <span className="text-xs text-blue-300 font-semibold">
+            Live Trace
+          </span>
         </div>
         <span className="text-xs text-gray-400 font-mono">347ms total</span>
       </motion.div>
@@ -177,15 +181,23 @@ const ObservabilityVisual = () => {
             transition={{ duration: 0.6, delay: i * 0.15 }}
           >
             <div className="flex items-center gap-3 mb-1">
-              <span className="text-xs text-gray-400 w-28 truncate">{trace.label}</span>
-              <span className="text-xs text-gray-500 font-mono ml-auto">{trace.time}</span>
+              <span className="text-xs text-gray-400 w-28 truncate">
+                {trace.label}
+              </span>
+              <span className="text-xs text-gray-500 font-mono ml-auto">
+                {trace.time}
+              </span>
             </div>
             <div className="relative h-2 bg-blue-950/30 rounded-full overflow-hidden">
               <motion.div
                 className="absolute inset-y-0 left-0 bg-gradient-to-r from-blue-500 via-blue-400 to-blue-500 rounded-full"
                 initial={{ width: "0%" }}
                 whileInView={{ width: `${trace.width}%` }}
-                transition={{ duration: 1.2, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
+                transition={{
+                  duration: 1.2,
+                  delay: i * 0.15,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
               </motion.div>
@@ -203,12 +215,19 @@ const ObservabilityVisual = () => {
       >
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-1">
-            <span className="text-[10px] text-gray-400 uppercase tracking-wider">Trace ID</span>
-            <span className="text-sm text-blue-300 font-mono font-semibold">8f9a2b4c...</span>
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider">
+              Trace ID
+            </span>
+            <span className="text-sm text-blue-300 font-mono font-semibold">
+              8f9a2b4c...
+            </span>
           </div>
           <div className="flex gap-1">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="w-1 h-1 rounded-full bg-blue-400/50 group-hover:bg-blue-400 transition-colors" />
+              <div
+                key={i}
+                className="w-1 h-1 rounded-full bg-blue-400/50 group-hover:bg-blue-400 transition-colors"
+              />
             ))}
           </div>
         </div>
@@ -296,7 +315,12 @@ const ReproducibilityVisual = () => {
             key={i}
             initial={{ opacity: 0, scale: 0 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: i * 0.15, type: "spring", stiffness: 200 }}
+            transition={{
+              duration: 0.5,
+              delay: i * 0.15,
+              type: "spring",
+              stiffness: 200,
+            }}
           >
             <circle
               cx={node.x}
@@ -414,7 +438,11 @@ const MeasuringVisual = () => {
                 className="absolute bottom-0 w-full bg-gradient-to-t from-emerald-500 via-emerald-400 to-emerald-300 rounded-t-lg shadow-lg shadow-emerald-500/50 group-hover:shadow-emerald-500/70 transition-shadow overflow-hidden"
                 initial={{ height: "0%" }}
                 whileInView={{ height: `${metric.value}%` }}
-                transition={{ duration: 1, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                transition={{
+                  duration: 1,
+                  delay: i * 0.1,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
               >
                 {/* Shimmer effect */}
                 <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -429,7 +457,9 @@ const MeasuringVisual = () => {
             </div>
 
             {/* Label */}
-            <span className="text-xs text-gray-400 font-medium">{metric.label}</span>
+            <span className="text-xs text-gray-400 font-medium">
+              {metric.label}
+            </span>
           </motion.div>
         ))}
       </div>

@@ -11,37 +11,115 @@ import ModelTrainingTabImg from "@site/static/img/GenAI_home/model_training_dark
 
 // Icons for tabs
 const TracingIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M3 12h4l3-9 4 18 3-9h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M3 12h4l3-9 4 18 3-9h4"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
 const PromptIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M14 2v6h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M8 13h8M8 17h5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M14 2v6h6"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8 13h8M8 17h5"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
 const EvaluationIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M3 3v18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M7 16l4-4 4 4 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M3 3v18h18"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M7 16l4-4 4 4 6-6"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
 const GatewayIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M4 6h16M4 6v12a2 2 0 002 2h12a2 2 0 002-2V6M4 6l2-4h12l2 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <circle cx="9" cy="12" r="1.5" fill="currentColor"/>
-    <circle cx="15" cy="12" r="1.5" fill="currentColor"/>
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M4 6h16M4 6v12a2 2 0 002 2h12a2 2 0 002-2V6M4 6l2-4h12l2 4"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle cx="9" cy="12" r="1.5" fill="currentColor" />
+    <circle cx="15" cy="12" r="1.5" fill="currentColor" />
   </svg>
 );
 
 const TrainingIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
@@ -54,7 +132,8 @@ export const homepageTabs: Tab[] = [
     imageSrc: TracingTabImg,
     imageZoom: 160,
     title: "Observability",
-    description: "Capture complete traces of your LLM applications/agents. Use traces to inspect failures and build eval datasets. Built on OpenTelemetry and support for 30+ popular LLM providers and agent frameworks.",
+    description:
+      "Capture complete traces of your LLM applications/agents. Use traces to inspect failures and build eval datasets. Built on OpenTelemetry and support for 30+ popular LLM providers and agent frameworks.",
     docLink: "https://mlflow.org/docs/latest/genai/tracing/",
     quickstartLink: "https://mlflow.org/docs/latest/genai/tracing/quickstart/",
     codeSnippets: {
@@ -100,7 +179,8 @@ async function handleRequest(text: string): Promise<string> {
     icon: <EvaluationIcon />,
     imageSrc: EvaluationTabImg,
     title: "Evaluation",
-    description: "Run systematic evaluations using LLM-as-judge, custom metrics, and human feedback. Track quality metrics over time and catch regressions.",
+    description:
+      "Run systematic evaluations using LLM-as-judge, custom metrics, and human feedback. Track quality metrics over time and catch regressions.",
     docLink: "https://mlflow.org/docs/latest/genai/eval/",
     quickstartLink: "https://mlflow.org/docs/latest/genai/eval/",
     codeSnippets: {
@@ -140,7 +220,8 @@ results = mlflow.genai.evaluate(
     imageSrc: PromptTabImg,
     imageZoom: 150,
     title: "Prompt Management",
-    description: "Version, test, and deploy prompts with full lineage tracking. Compare prompt performance across versions and collaborate with your team.",
+    description:
+      "Version, test, and deploy prompts with full lineage tracking. Compare prompt performance across versions and collaborate with your team.",
     docLink: "https://mlflow.org/docs/latest/genai/prompt-engineering/",
     quickstartLink: "https://mlflow.org/docs/latest/genai/prompt-engineering/",
     codeSnippets: {
@@ -174,7 +255,8 @@ loaded = mlflow.genai.load_prompt("prompts:/summarization@latest")
     icon: <GatewayIcon />,
     imageSrc: GatewayTabImg,
     title: "AI Gateway",
-    description: "Unified API gateway for all LLM providers. Route requests, manage rate limits, handle fallbacks, and control costs through a single interface.",
+    description:
+      "Unified API gateway for all LLM providers. Route requests, manage rate limits, handle fallbacks, and control costs through a single interface.",
     docLink: "https://mlflow.org/docs/latest/genai/gateway/",
     quickstartLink: "https://mlflow.org/docs/latest/genai/gateway/",
     codeSnippets: {
@@ -215,7 +297,8 @@ const response = await client.chat.completions.create({
     imageSrc: ModelTrainingTabImg,
     imageZoom: 150,
     title: "Model Training",
-    description: "Track experiments, log parameters, metrics, and artifacts. Compare runs, reproduce results, and manage the full ML lifecycle from training to deployment.",
+    description:
+      "Track experiments, log parameters, metrics, and artifacts. Compare runs, reproduce results, and manage the full ML lifecycle from training to deployment.",
     docLink: "https://mlflow.org/docs/latest/ml/index.html",
     quickstartLink: "https://mlflow.org/docs/latest/getting-started/index.html",
     codeSnippets: {
@@ -279,7 +362,7 @@ const CopyButton = ({ code }: { code: string }) => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy:', err);
+      console.error("Failed to copy:", err);
     }
   }, [code]);
 
@@ -301,7 +384,12 @@ const CopyButton = ({ code }: { code: string }) => {
             viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 13l4 4L19 7"
+            />
           </motion.svg>
         ) : (
           <motion.svg
@@ -314,7 +402,12 @@ const CopyButton = ({ code }: { code: string }) => {
             viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+            />
           </motion.svg>
         )}
       </AnimatePresence>
@@ -327,31 +420,50 @@ const customNightOwl = {
   ...themes.nightOwl,
   styles: themes.nightOwl.styles.map((style) => {
     // Change string color from light green to a different color
-    if (style.types.includes('string')) {
-      return { ...style, style: { ...style.style, color: '#58a6ff' } }; // Vivid blue
+    if (style.types.includes("string")) {
+      return { ...style, style: { ...style.style, color: "#58a6ff" } }; // Vivid blue
     }
     return style;
   }),
 };
 
 // Color scheme for code blocks
-const codeColorScheme = { theme: customNightOwl, bg: '#0d1117', headerBg: '#0d1117' };
+const codeColorScheme = {
+  theme: customNightOwl,
+  bg: "#0d1117",
+  headerBg: "#0d1117",
+};
 
 // Code block component with prism-react-renderer syntax highlighting
-const CodeBlock = ({ code, language }: {
+const CodeBlock = ({
+  code,
+  language,
+}: {
   code: string;
   language: "python" | "typescript";
 }) => {
   const prismLanguage = language === "typescript" ? "tsx" : "python";
 
   return (
-    <Highlight theme={codeColorScheme.theme} code={code.trim()} language={prismLanguage}>
+    <Highlight
+      theme={codeColorScheme.theme}
+      code={code.trim()}
+      language={prismLanguage}
+    >
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
-        <div className="relative h-full" style={{ backgroundColor: codeColorScheme.bg }}>
+        <div
+          className="relative h-full"
+          style={{ backgroundColor: codeColorScheme.bg }}
+        >
           <CopyButton code={code.trim()} />
           <pre
             className="h-full overflow-auto leading-snug font-mono p-4 m-0 dark-scrollbar"
-            style={{ ...style, backgroundColor: codeColorScheme.bg, fontSize: '14px', lineHeight: '1.5' }}
+            style={{
+              ...style,
+              backgroundColor: codeColorScheme.bg,
+              fontSize: "14px",
+              lineHeight: "1.5",
+            }}
           >
             {tokens.map((line, i) => (
               <div key={i} {...getLineProps({ line })}>
@@ -381,8 +493,9 @@ const QuickstartLink = ({ href }: { href: string }) => {
       <motion.span
         className="absolute inset-0 rounded-md -z-10"
         style={{
-          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(168, 85, 247, 0.3))',
-          filter: 'blur(8px)',
+          background:
+            "linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(168, 85, 247, 0.3))",
+          filter: "blur(8px)",
         }}
         animate={{
           opacity: [0.4, 0.8, 0.4],
@@ -441,9 +554,14 @@ const Bubble = ({
   });
 
   return (
-    <motion.div 
+    <motion.div
       className={bubbleClass}
-      initial={{ opacity: 0, scale: 0.9, y: direction === "top" ? 10 : direction === "bottom" ? -10 : 0, x: direction === "left" ? 10 : direction === "right" ? -10 : 0 }}
+      initial={{
+        opacity: 0,
+        scale: 0.9,
+        y: direction === "top" ? 10 : direction === "bottom" ? -10 : 0,
+        x: direction === "left" ? 10 : direction === "right" ? -10 : 0,
+      }}
       animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
     >
@@ -460,11 +578,11 @@ const Bubble = ({
           ease: "easeInOut",
         }}
       />
-      
+
       <div className={styles.content}>
         <span className={styles.title}>
-          <motion.span 
-            className={styles.hintIcon} 
+          <motion.span
+            className={styles.hintIcon}
             aria-hidden
             animate={{
               rotate: [0, -5, 5, -5, 0],
@@ -505,7 +623,7 @@ const Bubble = ({
           {label}
         </span>
         {description && (
-          <motion.span 
+          <motion.span
             className={styles.description}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -522,7 +640,9 @@ const Bubble = ({
 
 export function ProductTabs({ tabs }: Props) {
   const [activeTabId, setActiveTabId] = useState(tabs[0]?.id);
-  const [codeLanguage, setCodeLanguage] = useState<"python" | "typescript">("python");
+  const [codeLanguage, setCodeLanguage] = useState<"python" | "typescript">(
+    "python",
+  );
 
   const activeTab = useMemo(
     () => tabs.find((tab) => tab.id === activeTabId) ?? tabs[0],
@@ -551,9 +671,9 @@ export function ProductTabs({ tabs }: Props) {
                 <span
                   className={clsx(
                     "transition-colors",
-                    !isActive && "text-white/40 group-hover:text-white/60"
+                    !isActive && "text-white/40 group-hover:text-white/60",
                   )}
-                  style={isActive ? { color: '#9066cc' } : undefined}
+                  style={isActive ? { color: "#9066cc" } : undefined}
                 >
                   {tab.icon}
                 </span>
@@ -577,7 +697,8 @@ export function ProductTabs({ tabs }: Props) {
                   layoutId="activeTab"
                   className="absolute bottom-0 left-0 right-0 h-[2px]"
                   style={{
-                    background: 'linear-gradient(90deg, #e05585, #9066cc, #5a8fd4)',
+                    background:
+                      "linear-gradient(90deg, #e05585, #9066cc, #5a8fd4)",
                   }}
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />
@@ -589,168 +710,238 @@ export function ProductTabs({ tabs }: Props) {
 
       {/* Title and Description with Left/Right Navigation */}
       <div className="flex items-center gap-4 py-2">
-          {/* Left Arrow */}
-          <button
-            onClick={() => {
-              const currentIndex = tabs.findIndex(t => t.id === activeTab.id);
-              const prevIndex = currentIndex > 0 ? currentIndex - 1 : tabs.length - 1;
-              setActiveTabId(tabs[prevIndex].id);
-            }}
-            className="shrink-0 w-10 h-10 flex items-center justify-center text-white/40 hover:text-white transition-all"
-            aria-label="Previous tab"
+        {/* Left Arrow */}
+        <button
+          onClick={() => {
+            const currentIndex = tabs.findIndex((t) => t.id === activeTab.id);
+            const prevIndex =
+              currentIndex > 0 ? currentIndex - 1 : tabs.length - 1;
+            setActiveTabId(tabs[prevIndex].id);
+          }}
+          className="shrink-0 w-10 h-10 flex items-center justify-center text-white/40 hover:text-white transition-all"
+          aria-label="Previous tab"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
+            <path
+              d="M15 18l-6-6 6-6"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
 
-          {/* Title and Description */}
-          <div className="flex-1 min-w-0">
-            <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
-              {activeTab.title || activeTab.label}
-            </h3>
-            <p className="text-gray-400 leading-relaxed mb-3" style={{ marginTop: '4px' }}>
-              {activeTab.description}
-            </p>
-            {activeTab.quickstartLink && (
-              <QuickstartLink href={activeTab.quickstartLink} />
-            )}
-          </div>
-
-          {/* Right Arrow */}
-          <button
-            onClick={() => {
-              const currentIndex = tabs.findIndex(t => t.id === activeTab.id);
-              const nextIndex = currentIndex < tabs.length - 1 ? currentIndex + 1 : 0;
-              setActiveTabId(tabs[nextIndex].id);
-            }}
-            className="shrink-0 w-10 h-10 flex items-center justify-center text-white/40 hover:text-white transition-all"
-            aria-label="Next tab"
+        {/* Title and Description */}
+        <div className="flex-1 min-w-0">
+          <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
+            {activeTab.title || activeTab.label}
+          </h3>
+          <p
+            className="text-gray-400 leading-relaxed mb-3"
+            style={{ marginTop: "4px" }}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
+            {activeTab.description}
+          </p>
+          {activeTab.quickstartLink && (
+            <QuickstartLink href={activeTab.quickstartLink} />
+          )}
         </div>
+
+        {/* Right Arrow */}
+        <button
+          onClick={() => {
+            const currentIndex = tabs.findIndex((t) => t.id === activeTab.id);
+            const nextIndex =
+              currentIndex < tabs.length - 1 ? currentIndex + 1 : 0;
+            setActiveTabId(tabs[nextIndex].id);
+          }}
+          className="shrink-0 w-10 h-10 flex items-center justify-center text-white/40 hover:text-white transition-all"
+          aria-label="Next tab"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9 18l6-6-6-6"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
 
       {/* Main Content: Code Left, Screenshot Right */}
       <div className="grid grid-cols-1 lg:grid-cols-2 px-4">
-          {/* Left: Code Snippet */}
-          <div className="relative">
+        {/* Left: Code Snippet */}
+        <div className="relative">
+          <div
+            className="overflow-hidden h-[400px] flex flex-col"
+            style={{ backgroundColor: codeColorScheme.bg }}
+          >
+            {/* Code language tabs */}
             <div
-              className="overflow-hidden h-[400px] flex flex-col"
-              style={{ backgroundColor: codeColorScheme.bg }}
+              className="flex border-b border-white/10"
+              style={{ backgroundColor: codeColorScheme.headerBg }}
             >
-              {/* Code language tabs */}
-              <div
-                className="flex border-b border-white/10"
-                style={{ backgroundColor: codeColorScheme.headerBg }}
+              <button
+                onClick={() => setCodeLanguage("python")}
+                className={clsx(
+                  "px-4 py-2.5 text-sm font-medium transition-colors",
+                  codeLanguage === "python"
+                    ? "text-white bg-white/10 border-b-2 border-blue-400"
+                    : "text-white/60 hover:text-white/80",
+                )}
               >
+                Python SDK
+              </button>
+              {(activeTab.codeSnippets?.typescript ||
+                activeTab.codeSnippets?.typescriptComingSoon) && (
                 <button
-                  onClick={() => setCodeLanguage("python")}
+                  onClick={() => setCodeLanguage("typescript")}
                   className={clsx(
                     "px-4 py-2.5 text-sm font-medium transition-colors",
-                    codeLanguage === "python"
+                    codeLanguage === "typescript"
                       ? "text-white bg-white/10 border-b-2 border-blue-400"
-                      : "text-white/60 hover:text-white/80"
+                      : "text-white/60 hover:text-white/80",
                   )}
                 >
-                  Python SDK
+                  JS/TS SDK
                 </button>
-                {(activeTab.codeSnippets?.typescript || activeTab.codeSnippets?.typescriptComingSoon) && (
-                  <button
-                    onClick={() => setCodeLanguage("typescript")}
-                    className={clsx(
-                      "px-4 py-2.5 text-sm font-medium transition-colors",
-                      codeLanguage === "typescript"
-                        ? "text-white bg-white/10 border-b-2 border-blue-400"
-                        : "text-white/60 hover:text-white/80"
-                    )}
-                  >
-                    JS/TS SDK
-                  </button>
-                )}
-              </div>
+              )}
+            </div>
 
-              {/* Code content */}
-              <div className="flex-1 overflow-auto">
-                {activeTab.codeSnippets && (
-                  codeLanguage === "typescript" && activeTab.codeSnippets.typescriptComingSoon && !activeTab.codeSnippets.typescript ? (
-                    <div className="flex items-center justify-center h-full text-white/60">
-                      <div className="text-center">
-                        <div className="text-2xl mb-2">Coming Soon!</div>
-                        <div className="text-sm text-white/40">JS/TS SDK support is in development</div>
+            {/* Code content */}
+            <div className="flex-1 overflow-auto">
+              {activeTab.codeSnippets &&
+                (codeLanguage === "typescript" &&
+                activeTab.codeSnippets.typescriptComingSoon &&
+                !activeTab.codeSnippets.typescript ? (
+                  <div className="flex items-center justify-center h-full text-white/60">
+                    <div className="text-center">
+                      <div className="text-2xl mb-2">Coming Soon!</div>
+                      <div className="text-sm text-white/40">
+                        JS/TS SDK support is in development
                       </div>
                     </div>
-                  ) : (
-                    <CodeBlock
-                      code={codeLanguage === "typescript" && activeTab.codeSnippets.typescript
+                  </div>
+                ) : (
+                  <CodeBlock
+                    code={
+                      codeLanguage === "typescript" &&
+                      activeTab.codeSnippets.typescript
                         ? activeTab.codeSnippets.typescript
-                        : activeTab.codeSnippets.python}
-                      language={codeLanguage === "typescript" && activeTab.codeSnippets.typescript ? "typescript" : "python"}
-                    />
-                  )
-                )}
-              </div>
-
-            </div>
-          </div>
-
-          {/* Right: Screenshot with gradient background */}
-          <div className="relative overflow-hidden h-[400px]">
-            {/* Dark gradient background with vivid red-to-blue theme */}
-            <div
-              className="absolute inset-0"
-              style={{
-                background: 'linear-gradient(135deg, #2a1020 0%, #251535 25%, #152040 50%, #102545 100%)',
-              }}
-            />
-
-            {/* Subtle grid pattern */}
-            <div
-              className="absolute inset-0 opacity-40"
-              style={{
-                backgroundImage: `
-                  linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-                  linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)
-                `,
-                backgroundSize: '50px 50px',
-              }}
-            />
-
-            {/* Blurred orbs for visual interest - more vivid */}
-            <div className="absolute -top-20 -left-20 w-72 h-72 rounded-full opacity-50" style={{ background: 'radial-gradient(circle, rgba(224,85,133,0.5) 0%, transparent 70%)' }} />
-            <div className="absolute -bottom-20 -right-20 w-64 h-64 rounded-full opacity-45" style={{ background: 'radial-gradient(circle, rgba(79,172,254,0.5) 0%, transparent 70%)' }} />
-            <div className="absolute top-1/3 -right-10 w-56 h-56 rounded-full opacity-40" style={{ background: 'radial-gradient(circle, rgba(168,85,247,0.4) 0%, transparent 70%)' }} />
-
-            {/* Screenshot image with gradient border (top-left only) */}
-            <div
-              className="absolute bottom-0 right-0 w-[93%] h-[93%] z-10 rounded-tl-lg pt-[1px] pl-[1px]"
-              style={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)',
-              }}
-            >
-              <div className="w-full h-full rounded-tl-lg pt-[4px] pl-[4px] overflow-hidden" style={{ backgroundColor: '#11171d' }}>
-                <img
-                  src={activeTab.imageSrc}
-                  alt={`${activeTab.label} screenshot`}
-                  className="rounded-tl object-cover object-left-top"
-                  style={{
-                    width: `${activeTab.imageZoom ?? 115}%`,
-                    height: `${activeTab.imageZoom ?? 115}%`,
-                  }}
-                  loading="lazy"
-                />
-              </div>
+                        : activeTab.codeSnippets.python
+                    }
+                    language={
+                      codeLanguage === "typescript" &&
+                      activeTab.codeSnippets.typescript
+                        ? "typescript"
+                        : "python"
+                    }
+                  />
+                ))}
             </div>
           </div>
         </div>
+
+        {/* Right: Screenshot with gradient background */}
+        <div className="relative overflow-hidden h-[400px]">
+          {/* Dark gradient background with vivid red-to-blue theme */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(135deg, #2a1020 0%, #251535 25%, #152040 50%, #102545 100%)",
+            }}
+          />
+
+          {/* Subtle grid pattern */}
+          <div
+            className="absolute inset-0 opacity-40"
+            style={{
+              backgroundImage: `
+                  linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)
+                `,
+              backgroundSize: "50px 50px",
+            }}
+          />
+
+          {/* Blurred orbs for visual interest - more vivid */}
+          <div
+            className="absolute -top-20 -left-20 w-72 h-72 rounded-full opacity-50"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(224,85,133,0.5) 0%, transparent 70%)",
+            }}
+          />
+          <div
+            className="absolute -bottom-20 -right-20 w-64 h-64 rounded-full opacity-45"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(79,172,254,0.5) 0%, transparent 70%)",
+            }}
+          />
+          <div
+            className="absolute top-1/3 -right-10 w-56 h-56 rounded-full opacity-40"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(168,85,247,0.4) 0%, transparent 70%)",
+            }}
+          />
+
+          {/* Screenshot image with gradient border (top-left only) */}
+          <div
+            className="absolute bottom-0 right-0 w-[93%] h-[93%] z-10 rounded-tl-lg pt-[1px] pl-[1px]"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)",
+            }}
+          >
+            <div
+              className="w-full h-full rounded-tl-lg pt-[4px] pl-[4px] overflow-hidden"
+              style={{ backgroundColor: "#11171d" }}
+            >
+              <img
+                src={activeTab.imageSrc}
+                alt={`${activeTab.label} screenshot`}
+                className="rounded-tl object-cover object-left-top"
+                style={{
+                  width: `${activeTab.imageZoom ?? 115}%`,
+                  height: `${activeTab.imageZoom ?? 115}%`,
+                }}
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-const SpotWithLink = ({ spot, children }: { spot: Hotspot; children: React.ReactNode }) => {
-  const Wrapper = (props: any) => (spot.link ? <a {...props} /> : <div {...props} />);
+const SpotWithLink = ({
+  spot,
+  children,
+}: {
+  spot: Hotspot;
+  children: React.ReactNode;
+}) => {
+  const Wrapper = (props: any) =>
+    spot.link ? <a {...props} /> : <div {...props} />;
   return (
     <Wrapper
       className="group absolute"

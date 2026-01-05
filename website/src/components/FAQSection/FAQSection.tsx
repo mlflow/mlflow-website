@@ -27,7 +27,7 @@ const faqs = [
     question: "Can I use MLflow in my enterprise organization?",
     answer:
       "Yes, MLflow is trusted by many enterprise organizations who operate at scale. If you don't want to manage MLflow infrastructure yourself, try managed MLflow services provided by Databricks, AWS SageMaker, Nebius or others.",
-  }
+  },
 ];
 
 function FAQItem({

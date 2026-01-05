@@ -73,7 +73,13 @@ export function HeroSection({
 }
 
 // Helper component for highlighted/underlined keywords - inherits font size from parent
-export function HighlightedKeyword({ children, href }: { children: ReactNode; href?: string }) {
+export function HighlightedKeyword({
+  children,
+  href,
+}: {
+  children: ReactNode;
+  href?: string;
+}) {
   if (href) {
     return (
       <Link to={href}>

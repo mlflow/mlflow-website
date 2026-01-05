@@ -21,7 +21,6 @@ import GenAI from "@site/static/img/Home_page_hybrid/GenAI Apps & Agents.png";
 import ModelTraining from "@site/static/img/Home_page_hybrid/Model Training.png";
 import { homepageTabs } from "../components/ProductTabs/ProductTabs";
 
-
 export default function Home(): JSX.Element {
   return (
     <Layout>
@@ -30,9 +29,13 @@ export default function Home(): JSX.Element {
         title="Deliver High-Quality AI, Fast"
         subtitle={
           <>
-          Building AI products is all about iteration.<br/>
-          MLflow lets you move 10x faster by simplifying how you <br/>
-          <HighlightedKeyword>debug</HighlightedKeyword>, <HighlightedKeyword>test</HighlightedKeyword>, and <HighlightedKeyword>evaluate</HighlightedKeyword> your LLM applications and Agents.
+            Building AI products is all about iteration.
+            <br />
+            MLflow lets you move 10x faster by simplifying how you <br />
+            <HighlightedKeyword>debug</HighlightedKeyword>,{" "}
+            <HighlightedKeyword>test</HighlightedKeyword>, and{" "}
+            <HighlightedKeyword>evaluate</HighlightedKeyword> your LLM
+            applications and Agents.
           </>
         }
         primaryCTA={{
@@ -75,9 +78,8 @@ export default function Home(): JSX.Element {
       <div className="flex flex-col gap-16"></div>
       <FAQSection />
 
-
       {/* 12. COMMUNITY & LATEST NEWS */}
-      <BelowTheFold>
+      <BelowTheFold hideGetStarted>
         <LatestNews />
       </BelowTheFold>
     </Layout>

@@ -40,7 +40,10 @@ export const StatsBand = () => {
                     </svg>
                   </span>
                 </div>
-                <div className="github-stats-face github-stats-face-back" aria-hidden>
+                <div
+                  className="github-stats-face github-stats-face-back"
+                  aria-hidden
+                >
                   <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
                     <svg
                       width="20"
@@ -75,9 +78,10 @@ export const StatsBand = () => {
             <span className="text-3xl font-semibold leading-tight text-white sm:text-4xl">
               25 Million+
             </span>
-            <span className="text-xs text-white/70 sm:text-sm">Package Downloads / Month</span>
+            <span className="text-xs text-white/70 sm:text-sm">
+              Package Downloads / Month
+            </span>
           </div>
-
         </div>
       </div>
       <LogosCarousel />

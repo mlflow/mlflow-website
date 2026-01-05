@@ -57,7 +57,11 @@ export function AboveTheFold({
             }
           />
         )}
-        {actions && <div className="flex flex-wrap justify-center items-center gap-4">{actions}</div>}
+        {actions && (
+          <div className="flex flex-wrap justify-center items-center gap-4">
+            {actions}
+          </div>
+        )}
       </div>
       {children}
     </div>

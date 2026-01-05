@@ -4,12 +4,17 @@ import { ContentType } from "../types";
 
 interface BelowTheFoldProps extends PropsWithChildren {
   contentType?: ContentType;
+  hideGetStarted?: boolean;
 }
 
-export function BelowTheFold({ children, contentType }: BelowTheFoldProps) {
+export function BelowTheFold({
+  children,
+  contentType,
+  hideGetStarted,
+}: BelowTheFoldProps) {
   return (
     <>
-      <GetStartedWithMLflow contentType={contentType} />
+      {!hideGetStarted && <GetStartedWithMLflow contentType={contentType} />}
       {children}
       <SocialWidget />
     </>
