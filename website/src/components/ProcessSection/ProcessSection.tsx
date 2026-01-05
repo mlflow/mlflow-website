@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useCallback } from "react";
+import Link from "@docusaurus/Link";
 import { Section } from "../Section/Section";
 
 // Copy button component for code snippets
@@ -97,8 +98,20 @@ const steps = [
 export function ProcessSection() {
   return (
     <Section
+      id="get-started"
       title="Get Started in 3 Simple Steps"
-      body="From zero to production-ready AI in minutes. No complex setup or major code changes required."
+      body={
+        <div className="flex flex-col items-center gap-4">
+          <span>From zero to full-stack LLMOps in minutes. No complex setup or major code changes required.</span>
+          <Link
+            to="https://mlflow.org/docs/latest/genai/tracing/quickstart/"
+            style={{ textDecoration: "underline" }}
+            className="hover:opacity-80"
+          >
+            Get Started →
+          </Link>
+        </div>
+      }
       align="center"
     >
       <div className="max-w-5xl mx-auto">
