@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import { ReactNode, useState, useCallback } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { ReactNode, useState, useRef } from "react";
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "motion/react";
 import { Highlight, themes } from "prism-react-renderer";
 import TracingTabImg from "@site/static/img/GenAI_home/GenAI_trace_darkmode.png";
 import EvaluationTabImg from "@site/static/img/GenAI_home/GenAI_evaluation_darkmode.png";
@@ -19,6 +19,7 @@ type Feature = {
   imageZoom?: number;
   imagePosition?: string; // Custom object-position value (e.g., "30% top")
   docLink: string;
+  quickstartLink?: string;
   codeSnippet: string;
   codeLanguage?: "python" | "typescript";
 };
@@ -33,6 +34,7 @@ const llmAgentFeatures: Feature[] = [
     imageSrc: TracingTabImg,
     imageZoom: 160,
     docLink: "https://mlflow.org/docs/latest/genai/tracing/",
+    quickstartLink: "https://mlflow.org/docs/latest/genai/tracing/quickstart/",
     codeSnippet: `import mlflow
 import openai
 
@@ -55,6 +57,7 @@ response = client.chat.completions.create(
       "Run systematic evaluations using LLM-as-judge, custom metrics, and human feedback. Track quality metrics over time and catch regressions before they reach production.",
     imageSrc: EvaluationTabImg,
     docLink: "https://mlflow.org/docs/latest/genai/eval-monitor/",
+    quickstartLink: "https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/",
     codeSnippet: `import mlflow
 from mlflow.genai.scorers import Correctness
 
@@ -81,6 +84,7 @@ results = mlflow.genai.evaluate(
     imageSrc: PromptTabImg,
     imageZoom: 150,
     docLink: "https://mlflow.org/docs/latest/genai/prompt-registry/",
+    quickstartLink: "https://mlflow.org/docs/latest/genai/prompt-registry/quickstart/",
     codeSnippet: `import mlflow
 
 # Register a prompt template
@@ -105,6 +109,7 @@ formatted = prompt.format(num_sentences=2, content="...")`,
     imageSrc: GatewayTabImg,
     imagePosition: "0% top",
     docLink: "https://mlflow.org/docs/latest/genai/gateway/",
+    quickstartLink: "https://mlflow.org/docs/latest/genai/gateway/quickstart/",
     codeSnippet: `from openai import OpenAI
 
 # Point to MLflow AI Gateway - OpenAI compatible API
@@ -132,6 +137,7 @@ const modelTrainingFeatures: Feature[] = [
     imageSrc: ExperimentTrackingImg,
     imageZoom: 150,
     docLink: "https://mlflow.org/docs/latest/tracking/",
+    quickstartLink: "https://mlflow.org/docs/latest/getting-started/",
     codeSnippet: `import mlflow
 
 # Enable autologging for your ML framework
@@ -153,6 +159,7 @@ model.fit(X, y)  # Parameters, metrics, model logged automatically`,
     imageSrc: ModelRegistryImg,
     imageZoom: 130,
     docLink: "https://mlflow.org/docs/latest/model-registry/",
+    quickstartLink: "https://mlflow.org/docs/latest/model-registry/quickstart/",
     codeSnippet: `import mlflow
 
 # Register a model from a run
@@ -175,6 +182,7 @@ predictions = model.predict(new_data)`,
     imageSrc: ModelDeploymentImg,
     imageZoom: 130,
     docLink: "https://mlflow.org/docs/latest/deployment/",
+    quickstartLink: "https://mlflow.org/docs/latest/deployment/quickstart/",
     codeSnippet: `# Serve model as REST API
 mlflow models serve -m "models:/my-model@champion" -p 5000
 
@@ -315,6 +323,47 @@ const CodeBlock = ({ code, language = "python" }: { code: string; language?: "py
         </div>
       )}
     </Highlight>
+  );
+};
+
+// QuickstartLink component with animated glow effect
+const QuickstartLink = ({ href }: { href: string }) => {
+  return (
+    <motion.a
+      href={href}
+      target="_blank"
+      rel="noreferrer noopener"
+      className="relative inline-flex items-center gap-1 text-sm font-medium w-fit"
+      whileHover="hover"
+    >
+      {/* Pulsing glow background - sized to fit content */}
+      <motion.span
+        className="absolute inset-0 rounded-md -z-10"
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(168, 85, 247, 0.3))",
+          filter: "blur(8px)",
+        }}
+        animate={{
+          opacity: [0.4, 0.8, 0.4],
+          scale: [1, 1.05, 1],
+        }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+      <span className="relative z-10 text-white px-3 py-1">Quickstart</span>
+      <motion.span
+        className="relative z-10 text-white pr-2"
+        variants={{
+          hover: { x: 4 },
+        }}
+      >
+        →
+      </motion.span>
+    </motion.a>
   );
 };
 
@@ -470,7 +519,143 @@ const FeatureMediaCard = ({ feature, imageOnLeft = false }: { feature: Feature; 
   );
 };
 
-// Feature card component - two-column layout
+// Helper to interpolate between two hex colors
+const interpolateColor = (color1: string, color2: string, factor: number) => {
+  const hex = (c: string) => parseInt(c, 16);
+  const r1 = hex(color1.slice(1, 3)), g1 = hex(color1.slice(3, 5)), b1 = hex(color1.slice(5, 7));
+  const r2 = hex(color2.slice(1, 3)), g2 = hex(color2.slice(3, 5)), b2 = hex(color2.slice(5, 7));
+  const r = Math.round(r1 + (r2 - r1) * factor);
+  const g = Math.round(g1 + (g2 - g1) * factor);
+  const b = Math.round(b1 + (b2 - b1) * factor);
+  return `rgb(${r}, ${g}, ${b})`;
+};
+
+// Feature text section component - sticky card with QuickstartLink
+const FeatureTextSection = ({
+  feature,
+  showMobileImage = true,
+  visibility = 1, // 0 = fully dark, 1 = fully visible
+}: {
+  feature: Feature;
+  showMobileImage?: boolean;
+  visibility?: number;
+}) => {
+  // Interpolate colors based on visibility (0 to 1)
+  const titleColor = interpolateColor('#1a1a1a', '#ffffff', visibility);
+  const descColor = interpolateColor('#1a1a1a', '#9ca3af', visibility);
+
+  return (
+    <div
+      className="border-[rgba(255,255,255,0.08)] border-t border-b min-h-[350px] w-full lg:sticky top-24 bg-brand-black flex flex-col justify-center gap-y-8 py-10"
+    >
+      {/* Text content */}
+      <div className="flex flex-col gap-4">
+        <h3
+          className="text-2xl font-bold"
+          style={{ color: titleColor }}
+        >
+          {feature.title}
+        </h3>
+        <p
+          className="leading-relaxed"
+          style={{ color: descColor }}
+        >
+          {feature.description}
+        </p>
+        {feature.quickstartLink && (
+          <div style={{ opacity: visibility }}>
+            <QuickstartLink href={feature.quickstartLink} />
+          </div>
+        )}
+      </div>
+
+      {/* Mobile: Show image inline */}
+      {showMobileImage && (
+        <div className="lg:hidden">
+          <FeatureMediaCard feature={feature} imageOnLeft={false} />
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Sticky features grid component (like StickyGrid with original spacing)
+const StickyFeaturesGrid = ({ features }: { features: Feature[] }) => {
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start 40vh", "end 40vh"],
+  });
+
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    setScrollProgress(latest);
+  });
+
+  // Calculate visibility for each card based on distance from current scroll position
+  // Uses a trapezoid shape: fade in -> plateau at 1.0 -> fade out
+  const getVisibility = (index: number) => {
+    const cardPosition = index / features.length;
+    const distance = Math.abs(scrollProgress - cardPosition);
+
+    // Plateau range where visibility stays at 1.0 (when card matches right image)
+    const plateauRange = 0.08;
+    // Fade range for transitioning in/out
+    const fadeRange = 0.25;
+
+    if (distance <= plateauRange) {
+      // In the plateau zone - full visibility
+      return 1;
+    } else {
+      // Fading zone - calculate based on distance from plateau edge
+      const distanceFromPlateau = distance - plateauRange;
+      const visibility = Math.max(0, 1 - distanceFromPlateau / fadeRange);
+      return visibility;
+    }
+  };
+
+  // Determine active feature for the image panel
+  const activeFeatureIndex = Math.min(
+    features.length - 1,
+    Math.max(0, Math.round(scrollProgress * features.length))
+  );
+  const activeFeature = features[activeFeatureIndex];
+
+  return (
+    <div className="w-full flex flex-row gap-8" ref={ref}>
+      {/* Left: Stacking sticky text sections */}
+      <div className="relative flex flex-col items-start lg:w-1/2">
+        {features.map((feature, index) => (
+          <FeatureTextSection
+            key={feature.id}
+            feature={feature}
+            visibility={getVisibility(index)}
+          />
+        ))}
+      </div>
+
+      {/* Right: Sticky image panel (desktop only) - positioned at 40% viewport height */}
+      <div className="sticky top-[40vh] right-0 hidden h-[350px] w-1/2 lg:block">
+        <AnimatePresence mode="popLayout">
+          <motion.div
+            key={activeFeatureIndex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="h-full"
+          >
+            {activeFeature && (
+              <FeatureMediaCard feature={activeFeature} imageOnLeft={false} />
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+};
+
+// Feature card component - two-column layout (original, kept for reference)
 const FeatureCard = ({ feature, index }: { feature: Feature; index: number }) => {
   const isEven = index % 2 === 0;
 
@@ -934,7 +1119,7 @@ export function ProductTabs() {
       {/* Top-level category tabs */}
       <UnderlineTabs activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
 
-      {/* Features list - stacked vertically */}
+      {/* Features - sticky scroll layout */}
       <div className="px-4">
         <AnimatePresence mode="wait">
           <motion.div
@@ -944,9 +1129,7 @@ export function ProductTabs() {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3 }}
           >
-            {activeFeatures.map((feature, index) => (
-              <FeatureCard key={feature.id} feature={feature} index={index} />
-            ))}
+            <StickyFeaturesGrid features={activeFeatures} />
           </motion.div>
         </AnimatePresence>
       </div>
