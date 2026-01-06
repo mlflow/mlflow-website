@@ -102,7 +102,10 @@ export function ProcessSection() {
       title="Get Started in 3 Simple Steps"
       body={
         <div className="flex flex-col items-center gap-4">
-          <span>From zero to full-stack LLMOps in minutes. No complex setup or major code changes required.</span>
+          <span>
+            From zero to full-stack LLMOps in minutes. No complex setup or major
+            code changes required.
+          </span>
           <Link
             to="https://mlflow.org/docs/latest/genai/tracing/quickstart/"
             style={{ textDecoration: "underline" }}
