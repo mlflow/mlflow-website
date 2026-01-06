@@ -1,143 +1,39 @@
 import clsx from "clsx";
-import { ReactNode, useMemo, useState, useCallback } from "react";
+import { ReactNode, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Highlight, themes } from "prism-react-renderer";
-import styles from "./ProductTabs.module.css";
 import TracingTabImg from "@site/static/img/GenAI_home/GenAI_trace_darkmode.png";
 import EvaluationTabImg from "@site/static/img/GenAI_home/GenAI_evaluation_darkmode.png";
 import GatewayTabImg from "@site/static/img/GenAI_home/GenAI_gateway_darkmode.png";
 import PromptTabImg from "@site/static/img/GenAI_home/GenAI_prompts_darkmode.png";
-import ModelTrainingTabImg from "@site/static/img/GenAI_home/model_training_darkmode.png";
+import ExperimentTrackingImg from "@site/static/img/GenAI_home/model_training_darkmode.png";
+import ModelRegistryImg from "@site/static/img/Classical_registry/classical_registry_hero.png";
+import ModelDeploymentImg from "@site/static/img/Classical_models/classical_models_hero.png";
 
-// Icons for tabs
-const TracingIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M3 12h4l3-9 4 18 3-9h4"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
+// Feature type definition
+type Feature = {
+  id: string;
+  title: string;
+  description: string;
+  imageSrc: string;
+  imageZoom?: number;
+  imagePosition?: string; // Custom object-position value (e.g., "30% top")
+  docLink: string;
+  codeSnippet: string;
+  codeLanguage?: "python" | "typescript";
+};
 
-const PromptIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M14 2v6h6"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M8 13h8M8 17h5"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-const EvaluationIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M3 3v18h18"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M7 16l4-4 4 4 6-6"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-const GatewayIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M4 6h16M4 6v12a2 2 0 002 2h12a2 2 0 002-2V6M4 6l2-4h12l2 4"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <circle cx="9" cy="12" r="1.5" fill="currentColor" />
-    <circle cx="15" cy="12" r="1.5" fill="currentColor" />
-  </svg>
-);
-
-const TrainingIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-// Homepage tabs - the 5 core features shown on the homepage
-export const homepageTabs: Tab[] = [
+// LLMs & Agents features
+const llmAgentFeatures: Feature[] = [
   {
     id: "observability",
-    label: "Observability",
-    icon: <TracingIcon />,
-    imageSrc: TracingTabImg,
-    imageZoom: 160,
     title: "Observability",
     description:
-      "Capture complete traces of your LLM applications/agents. Use traces to inspect failures and build eval datasets. Built on OpenTelemetry and support for 30+ popular LLM providers and agent frameworks.",
+      "Capture complete traces of your LLM applications and agents. Inspect failures, debug issues, and build evaluation datasets. Built on OpenTelemetry with support for 30+ LLM providers and agent frameworks.",
+    imageSrc: TracingTabImg,
+    imageZoom: 160,
     docLink: "https://mlflow.org/docs/latest/genai/tracing/",
-    quickstartLink: "https://mlflow.org/docs/latest/genai/tracing/quickstart/",
-    codeSnippets: {
-      python: `import mlflow
+    codeSnippet: `import mlflow
 import openai
 
 # Enable auto-tracing for OpenAI - just 1 line!
@@ -145,212 +41,171 @@ mlflow.openai.autolog()
 
 # All OpenAI calls are now automatically traced
 client = openai.OpenAI()
-client.responses.create(
-    model="gpt-5",
+response = client.chat.completions.create(
+    model="gpt-4o",
     messages=[
-        {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": "What is MLflow?"},
     ],
 )`,
-      typescript: `import mlflow from "mlflow";
-import OpenAI from "openai";
-
-// Enable auto-tracing for OpenAI
-mlflow.openai.autolog();
-
-const client = new OpenAI();
-
-// All OpenAI calls are now automatically traced
-async function handleRequest(text: string): Promise<string> {
-  const res = await client.chat.completions.create({
-    model: "gpt-4o",
-    messages: [
-      { role: "system", content: "Summarize in one sentence." },
-      { role: "user", content: text },
-    ],
-  });
-  return res.choices[0].message.content ?? "";
-}`,
-    },
   },
   {
     id: "evaluation",
-    label: "Evaluation",
-    icon: <EvaluationIcon />,
-    imageSrc: EvaluationTabImg,
     title: "Evaluation",
     description:
-      "Run systematic evaluations using LLM-as-judge, custom metrics, and human feedback. Track quality metrics over time and catch regressions.",
-    docLink: "https://mlflow.org/docs/latest/genai/eval/",
-    quickstartLink: "https://mlflow.org/docs/latest/genai/eval/",
-    codeSnippets: {
-      python: `import mlflow
-from mlflow.genai.judges import Correctness, Guidelines
+      "Run systematic evaluations using LLM-as-judge, custom metrics, and human feedback. Track quality metrics over time and catch regressions before they reach production.",
+    imageSrc: EvaluationTabImg,
+    docLink: "https://mlflow.org/docs/latest/genai/eval-monitor/",
+    codeSnippet: `import mlflow
+from mlflow.genai.scorers import Correctness
 
-# Define a simple Q&A dataset with questions and expected answers
-eval_dataset = [
+# Define evaluation dataset
+eval_data = [
     {
         "inputs": {"question": "What is the capital of France?"},
-        "outputs": "Paris",
+        "outputs": {"response": "Paris"},
         "expectations": {"expected_response": "Paris"},
-    },
-    {
-        "inputs": {"question": "Who was the first person to build an airplane?"},
-        "outputs": "I don't know",
-        "expectations": {"expected_response": "Wright Brothers"},
     },
 ]
 
-# Define evaluation criteria
-correctness = Correctness(model="openai:/gpt-5")
-is_english = Guidelines(guidelines="Response should be in English.", model="openai:/gpt-5", )
-
-# Run evaluation
+# Run evaluation with LLM-as-judge
 results = mlflow.genai.evaluate(
-    data=eval_dataset,
-    scorers=[correctness, is_english]
+    data=eval_data,
+    scorers=[Correctness()]
 )`,
-      typescriptComingSoon: true,
-    },
   },
   {
     id: "prompt",
-    label: "Prompt Management",
-    icon: <PromptIcon />,
+    title: "Prompt Registry",
+    description:
+      "Version, test, and deploy prompts with full lineage tracking. Compare prompt performance across versions and collaborate with your team on prompt engineering.",
     imageSrc: PromptTabImg,
     imageZoom: 150,
-    title: "Prompt Management",
-    description:
-      "Version, test, and deploy prompts with full lineage tracking. Compare prompt performance across versions and collaborate with your team.",
-    docLink: "https://mlflow.org/docs/latest/genai/prompt-engineering/",
-    quickstartLink: "https://mlflow.org/docs/latest/genai/prompt-engineering/",
-    codeSnippets: {
-      python: `import mlflow
+    docLink: "https://mlflow.org/docs/latest/genai/prompt-registry/",
+    codeSnippet: `import mlflow
 
-# Use double curly braces for variables in the template
-initial_template = """
-Summarize content you are provided with in {{ num_sentences }} sentences.
-Sentences: {{ sentences }}
-"""
-
-# Register a new prompt
+# Register a prompt template
 mlflow.genai.register_prompt(
     name="summarization",
-    template=initial_template,
-    # Optional: Provide a commit message to describe the changes
-    commit_message="Initial commit",
-    # Optional: Set tags applies to the prompt (across versions)
-    tags={"task": "summarization", "language": "en"},
+    template="""
+Summarize the following content in {{ num_sentences }} sentences.
+Content: {{ content }}
+""",
+    commit_message="Initial version",
 )
 
 # Load and use prompts in your app
-loaded = mlflow.genai.load_prompt("prompts:/summarization@latest")
-`,
-      typescriptComingSoon: true,
-    },
+prompt = mlflow.genai.load_prompt("prompts:/summarization@latest")
+formatted = prompt.format(num_sentences=2, content="...")`,
   },
   {
     id: "gateway",
-    label: "AI Gateway",
-    icon: <GatewayIcon />,
-    imageSrc: GatewayTabImg,
     title: "AI Gateway",
     description:
-      "Unified API gateway for all LLM providers. Route requests, manage rate limits, handle fallbacks, and control costs through a single interface.",
+      "Unified API gateway for all LLM providers. Route requests, manage rate limits, handle fallbacks, and control costs through a single OpenAI-compatible interface.",
+    imageSrc: GatewayTabImg,
+    imagePosition: "0% top",
     docLink: "https://mlflow.org/docs/latest/genai/gateway/",
-    quickstartLink: "https://mlflow.org/docs/latest/genai/gateway/",
-    codeSnippets: {
-      python: `from openai import OpenAI
+    codeSnippet: `from openai import OpenAI
 
-# Set the base URL to the MLflow Gateway URL
+# Point to MLflow AI Gateway - OpenAI compatible API
 client = OpenAI(
-    base_url="<Your MLflow Server URL>/gateway/mlflow/v1",
-    api_key="dummy",
+    base_url="http://localhost:5000/gateway/v1",
+    api_key="mlflow",  # Gateway handles auth
 )
 
-# Query an endpoint via the MLflow Gateway in the same way as you would with OpenAI
-# Gateway handles rate limiting, fallback, payload transformation, etc.
-client.chat.completions.create(
-    model="claude-opus-4-5",
-    messages=[{"role": "user", "content": "Hi, how are you?"}]
+# Gateway routes to configured providers
+# with rate limiting, fallbacks, and cost tracking
+response = client.chat.completions.create(
+    model="gpt-4o",  # or "claude-sonnet", "llama-3", etc.
+    messages=[{"role": "user", "content": "Hello!"}]
 )`,
-      typescript: `import OpenAI from "openai";
-
-// Set the base URL to the MLflow Gateway URL
-const client = new OpenAI(
-    base_url="<Your MLflow Server URL>/gateway/mlflow/v1",
-    api_key="dummy",
-)
-
-//Query an endpoint via the MLflow Gateway in the same way as you would with OpenAI
-// Gateway handles rate limiting, fallback, payload transformation, etc.
-const response = await client.chat.completions.create({
-    model="claude-opus-4-5",
-    messages=[{"role": "user", "content": "Hi, how are you?"}]
-})`,
-    },
-  },
-  {
-    id: "training",
-    label: "Model Training",
-    icon: <TrainingIcon />,
-    imageSrc: ModelTrainingTabImg,
-    imageZoom: 150,
-    title: "Model Training",
-    description:
-      "Track experiments, log parameters, metrics, and artifacts. Compare runs, reproduce results, and manage the full ML lifecycle from training to deployment.",
-    docLink: "https://mlflow.org/docs/latest/ml/index.html",
-    quickstartLink: "https://mlflow.org/docs/latest/getting-started/index.html",
-    codeSnippets: {
-      python: `import mlflow
-
-# Enable autologging for training
-mlflow.sklearn.autolog()
-
-# Load the Iris dataset
-X, y = datasets.load_iris(return_X_y=True)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Just train the model normally. MLflow will automatically
-# log the parameters, metrics, and model.
-lr = LogisticRegression(solver="lbfgs", max_iter=100)
-lr.fit(X_train, y_train)`,
-    },
   },
 ];
 
-export type Tab = {
-  id: string;
-  label: string;
-  imageSrc: string;
-  icon?: ReactNode;
-  title?: string;
-  description?: string;
-  docLink?: string;
-  quickstartLink?: string;
-  codeSnippets?: {
-    python: string;
-    typescript?: string;
-    /** Show "Coming Soon!" for TypeScript SDK */
-    typescriptComingSoon?: boolean;
-  };
-  hotspots?: Hotspot[];
-  link?: string;
-  /** Zoom level for the screenshot image (e.g., 115 = 115%). Default: 115 */
-  imageZoom?: number;
-};
+// Model Training features
+const modelTrainingFeatures: Feature[] = [
+  {
+    id: "experiment-tracking",
+    title: "Experiment Tracking",
+    description:
+      "Track experiments, log parameters, metrics, and artifacts. Compare runs side-by-side, reproduce results, and collaborate with your team on ML experiments.",
+    imageSrc: ExperimentTrackingImg,
+    imageZoom: 150,
+    docLink: "https://mlflow.org/docs/latest/tracking/",
+    codeSnippet: `import mlflow
 
-type Hotspot = {
-  id: string;
-  left: string; // percentage string e.g. "30%"
-  top: string; // percentage string
-  width: string; // percentage string
-  height: string; // percentage string
-  label: string;
-  description?: string;
-  direction?: "top" | "right" | "bottom" | "left";
-  link?: string;
-};
+# Enable autologging for your ML framework
+mlflow.sklearn.autolog()
+
+# Train your model - MLflow automatically logs everything
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.datasets import load_iris
+
+X, y = load_iris(return_X_y=True)
+model = RandomForestClassifier(n_estimators=100)
+model.fit(X, y)  # Parameters, metrics, model logged automatically`,
+  },
+  {
+    id: "model-registry",
+    title: "Model Registry",
+    description:
+      "Central hub to manage the full lifecycle of ML models. Version models, track lineage, manage stage transitions, and collaborate on model development.",
+    imageSrc: ModelRegistryImg,
+    imageZoom: 130,
+    docLink: "https://mlflow.org/docs/latest/model-registry/",
+    codeSnippet: `import mlflow
+
+# Register a model from a run
+model_uri = f"runs:/{run_id}/model"
+mlflow.register_model(model_uri, "fraud-detection-model")
+
+# Load a registered model for inference
+model = mlflow.pyfunc.load_model(
+    "models:/fraud-detection-model@champion"
+)
+
+# Make predictions
+predictions = model.predict(new_data)`,
+  },
+  {
+    id: "model-deployment",
+    title: "Model Serving",
+    description:
+      "Deploy models to production with a single command. Serve models as REST APIs, batch inference jobs, or integrate with cloud platforms like AWS, Azure, and Databricks.",
+    imageSrc: ModelDeploymentImg,
+    imageZoom: 130,
+    docLink: "https://mlflow.org/docs/latest/deployment/",
+    codeSnippet: `# Serve model as REST API
+mlflow models serve -m "models:/my-model@champion" -p 5000
+
+# Or deploy to cloud platforms
+mlflow deployments create -t sagemaker \\
+    -m "models:/my-model@champion" \\
+    --name my-deployment
+
+# Query the deployed model
+import requests
+response = requests.post(
+    "http://localhost:5000/invocations",
+    json={"inputs": [[1, 2, 3, 4]]}
+)`,
+    codeLanguage: "python",
+  },
+];
+
+// Category tabs
+const categories = [
+  {
+    id: "llm-agents",
+    label: "LLMs & Agents",
+    features: llmAgentFeatures,
+  },
+  {
+    id: "model-training",
+    label: "Model Training",
+    features: modelTrainingFeatures,
+  },
+];
 
 // Copy button component
 const CopyButton = ({ code }: { code: string }) => {
@@ -419,49 +274,33 @@ const CopyButton = ({ code }: { code: string }) => {
 const customNightOwl = {
   ...themes.nightOwl,
   styles: themes.nightOwl.styles.map((style) => {
-    // Change string color from light green to a different color
     if (style.types.includes("string")) {
-      return { ...style, style: { ...style.style, color: "#58a6ff" } }; // Vivid blue
+      return { ...style, style: { ...style.style, color: "#58a6ff" } };
     }
     return style;
   }),
 };
 
-// Color scheme for code blocks
 const codeColorScheme = {
   theme: customNightOwl,
   bg: "#0d1117",
-  headerBg: "#0d1117",
 };
 
-// Code block component with prism-react-renderer syntax highlighting
-const CodeBlock = ({
-  code,
-  language,
-}: {
-  code: string;
-  language: "python" | "typescript";
-}) => {
+// Code block component
+const CodeBlock = ({ code, language = "python" }: { code: string; language?: "python" | "typescript" }) => {
   const prismLanguage = language === "typescript" ? "tsx" : "python";
 
   return (
-    <Highlight
-      theme={codeColorScheme.theme}
-      code={code.trim()}
-      language={prismLanguage}
-    >
-      {({ className, style, tokens, getLineProps, getTokenProps }) => (
-        <div
-          className="relative h-full"
-          style={{ backgroundColor: codeColorScheme.bg }}
-        >
+    <Highlight theme={codeColorScheme.theme} code={code.trim()} language={prismLanguage}>
+      {({ style, tokens, getLineProps, getTokenProps }) => (
+        <div className="relative h-full" style={{ backgroundColor: codeColorScheme.bg }}>
           <CopyButton code={code.trim()} />
           <pre
             className="h-full overflow-auto leading-snug font-mono p-4 m-0 dark-scrollbar"
             style={{
               ...style,
               backgroundColor: codeColorScheme.bg,
-              fontSize: "14px",
+              fontSize: "13px",
               lineHeight: "1.5",
             }}
           >
@@ -479,483 +318,659 @@ const CodeBlock = ({
   );
 };
 
-// QuickstartLink component with animated glow effect
-const QuickstartLink = ({ href }: { href: string }) => {
+// Code icon component
+const CodeIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="16 18 22 12 16 6" />
+    <polyline points="8 6 2 12 8 18" />
+  </svg>
+);
+
+// Screenshot icon component
+const ScreenshotIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+    <circle cx="8.5" cy="8.5" r="1.5" />
+    <polyline points="21 15 16 10 5 21" />
+  </svg>
+);
+
+// Feature Media Card with hover toggle button
+const FeatureMediaCard = ({ feature, imageOnLeft = false }: { feature: Feature; imageOnLeft?: boolean }) => {
+  const [showCode, setShowCode] = useState(false);
+
   return (
-    <motion.a
-      href={href}
-      target="_blank"
-      rel="noreferrer noopener"
-      className="relative inline-flex items-center gap-1 text-sm font-medium"
-      whileHover="hover"
-    >
-      {/* Pulsing glow background */}
-      <motion.span
-        className="absolute inset-0 rounded-md -z-10"
-        style={{
-          background:
-            "linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(168, 85, 247, 0.3))",
-          filter: "blur(8px)",
-        }}
-        animate={{
-          opacity: [0.4, 0.8, 0.4],
-          scale: [1, 1.1, 1],
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <span className="relative z-10 text-white px-3 py-1">Quickstart</span>
-      <motion.span
-        className="relative z-10 text-white"
-        variants={{
-          hover: { x: 4 },
-        }}
-        animate={{ x: [0, 4, 0] }}
-        transition={{
-          duration: 1,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
+    <div className="relative h-[350px] rounded-xl overflow-hidden border border-white/10 group">
+      {/* Content area */}
+      <AnimatePresence mode="wait">
+        {!showCode ? (
+          <motion.div
+            key="screenshot"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0"
+          >
+            {/* Dark gradient background with vivid red-to-blue theme */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(135deg, #2a1020 0%, #251535 25%, #152040 50%, #102545 100%)",
+              }}
+            />
+
+            {/* Subtle grid pattern */}
+            <div
+              className="absolute inset-0 opacity-40"
+              style={{
+                backgroundImage: `
+                  linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)
+                `,
+                backgroundSize: "50px 50px",
+              }}
+            />
+
+            {/* Blurred orbs for visual interest - more vivid */}
+            <div
+              className="absolute -top-20 -left-20 w-72 h-72 rounded-full opacity-50"
+              style={{
+                background:
+                  "radial-gradient(circle, rgba(224,85,133,0.5) 0%, transparent 70%)",
+              }}
+            />
+            <div
+              className="absolute -bottom-20 -right-20 w-64 h-64 rounded-full opacity-45"
+              style={{
+                background:
+                  "radial-gradient(circle, rgba(79,172,254,0.5) 0%, transparent 70%)",
+              }}
+            />
+            <div
+              className="absolute top-1/3 -right-10 w-56 h-56 rounded-full opacity-40"
+              style={{
+                background:
+                  "radial-gradient(circle, rgba(168,85,247,0.4) 0%, transparent 70%)",
+              }}
+            />
+
+            {/* Screenshot image with gradient border */}
+            <div
+              className={clsx(
+                "absolute bottom-0 w-[93%] h-[93%] z-10 pt-[1px]",
+                imageOnLeft
+                  ? "left-0 rounded-tr-lg pr-[1px]"
+                  : "right-0 rounded-tl-lg pl-[1px]"
+              )}
+              style={{
+                background: imageOnLeft
+                  ? "linear-gradient(225deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)"
+                  : "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)",
+              }}
+            >
+              <div
+                className={clsx(
+                  "w-full h-full pt-[4px] overflow-hidden",
+                  imageOnLeft ? "rounded-tr-lg pr-[4px]" : "rounded-tl-lg pl-[4px]"
+                )}
+                style={{ backgroundColor: "#11171d" }}
+              >
+                <img
+                  src={feature.imageSrc}
+                  alt={`${feature.title} screenshot`}
+                  className={clsx(
+                    "object-cover",
+                    imageOnLeft ? "rounded-tr" : "rounded-tl"
+                  )}
+                  style={{
+                    width: `${feature.imageZoom ?? 115}%`,
+                    height: `${feature.imageZoom ?? 115}%`,
+                    objectPosition: feature.imagePosition ?? (imageOnLeft ? "right top" : "left top"),
+                  }}
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="code"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0"
+          >
+            <CodeBlock code={feature.codeSnippet} language={feature.codeLanguage} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Toggle button - bottom right */}
+      <button
+        onClick={() => setShowCode(!showCode)}
+        className="absolute bottom-3 right-3 z-20 px-3 py-1.5 rounded-lg bg-black/60 hover:bg-black/80 text-white/70 hover:text-white transition-all backdrop-blur-sm border border-white/10 flex items-center gap-1.5 text-xs font-medium"
+        aria-label={showCode ? "Show screenshot" : "Show code"}
       >
-        →
-      </motion.span>
-    </motion.a>
+        {showCode ? (
+          <>
+            <ScreenshotIcon />
+            <span>Screenshot</span>
+          </>
+        ) : (
+          <>
+            <CodeIcon />
+            <span>Code</span>
+          </>
+        )}
+      </button>
+    </div>
   );
 };
 
-type Props = {
-  tabs: Tab[];
-};
-
-const Bubble = ({
-  label,
-  description,
-  direction = "top",
-}: {
-  label: string;
-  description?: string;
-  direction?: Hotspot["direction"];
-}) => {
-  const bubbleClass = clsx(styles.bubble, {
-    [styles.top]: direction === "top",
-    [styles.right]: direction === "right",
-    [styles.bottom]: direction === "bottom",
-    [styles.left]: direction === "left",
-  });
-
-  const arrowClass = clsx(styles.arrow, {
-    [styles.topArrow]: direction === "top",
-    [styles.rightArrow]: direction === "right",
-    [styles.bottomArrow]: direction === "bottom",
-    [styles.leftArrow]: direction === "left",
-  });
+// Feature card component - two-column layout
+const FeatureCard = ({ feature, index }: { feature: Feature; index: number }) => {
+  const isEven = index % 2 === 0;
 
   return (
     <motion.div
-      className={bubbleClass}
-      initial={{
-        opacity: 0,
-        scale: 0.9,
-        y: direction === "top" ? 10 : direction === "bottom" ? -10 : 0,
-        x: direction === "left" ? 10 : direction === "right" ? -10 : 0,
-      }}
-      animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
-      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      className="grid grid-cols-1 lg:grid-cols-2 gap-8 py-10 border-b border-white/10 last:border-b-0"
     >
-      {/* Animated glow effect */}
-      <motion.div
-        className="absolute inset-0 rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20 blur-md -z-10"
-        animate={{
-          scale: [1, 1.05, 1],
-          opacity: [0.5, 0.8, 0.5],
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-
-      <div className={styles.content}>
-        <span className={styles.title}>
-          <motion.span
-            className={styles.hintIcon}
-            aria-hidden
-            animate={{
-              rotate: [0, -5, 5, -5, 0],
-            }}
-            transition={{
-              duration: 0.6,
-              ease: "easeInOut",
-            }}
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M12 3.5c-2.9 0-5.25 2.27-5.25 5.07 0 1.82.92 3.43 2.32 4.36.37.25.6.66.6 1.1v.48c0 .41.34.75.75.75h3.16c.41 0 .75-.34.75-.75v-.48c0-.44.22-.85.6-1.1 1.4-.93 2.32-2.54 2.32-4.36 0-2.8-2.35-5.07-5.25-5.07Z"
-                stroke="white"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M10 19h4"
-                stroke="white"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
-              <path
-                d="M11 21h2"
-                stroke="white"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
-            </svg>
-          </motion.span>
-          {label}
-        </span>
-        {description && (
-          <motion.span
-            className={styles.description}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-          >
-            {description}
-          </motion.span>
-        )}
+      {/* Text content */}
+      <div className={clsx("flex flex-col justify-center", !isEven && "lg:order-2")}>
+        <h3 className="text-2xl font-bold text-white mb-4">{feature.title}</h3>
+        <p className="text-gray-400 leading-relaxed mb-6">{feature.description}</p>
+        <a
+          href={feature.docLink}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="inline-flex items-center gap-1 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
+        >
+          Learn more
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
       </div>
-      <span className={arrowClass} aria-hidden />
+
+      {/* Media card (screenshot/code toggle) */}
+      <div className={clsx(!isEven && "lg:order-1")}>
+        <FeatureMediaCard feature={feature} imageOnLeft={!isEven} />
+      </div>
     </motion.div>
   );
 };
 
-export function ProductTabs({ tabs }: Props) {
-  const [activeTabId, setActiveTabId] = useState(tabs[0]?.id);
-  const [codeLanguage, setCodeLanguage] = useState<"python" | "typescript">(
-    "python",
-  );
+// Tab style variants
+type TabStyle = "underline" | "segmented" | "glassmorphism" | "minimal";
 
-  const activeTab = useMemo(
-    () => tabs.find((tab) => tab.id === activeTabId) ?? tabs[0],
-    [activeTabId, tabs],
-  );
+// Underline tabs component
+const UnderlineTabs = ({
+  activeCategory,
+  setActiveCategory
+}: {
+  activeCategory: string;
+  setActiveCategory: (id: string) => void;
+}) => (
+  <div className="flex justify-center">
+    <div className="flex gap-8">
+      {categories.map((category) => {
+        const isActive = category.id === activeCategory;
+        return (
+          <button
+            key={category.id}
+            onClick={() => setActiveCategory(category.id)}
+            className={clsx(
+              "relative px-2 py-3 text-base font-medium transition-colors",
+              isActive ? "text-white" : "text-white/50 hover:text-white/70"
+            )}
+          >
+            {category.label}
+            {isActive && (
+              <motion.div
+                layoutId="activeUnderline"
+                className="absolute bottom-0 left-0 right-0 h-[2px]"
+                style={{
+                  background: "linear-gradient(90deg, #e05585, #9066cc, #5a8fd4)",
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              />
+            )}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
 
-  if (!activeTab) {
-    return null;
-  }
+// Segmented control component (iOS style)
+const SegmentedTabs = ({
+  activeCategory,
+  setActiveCategory
+}: {
+  activeCategory: string;
+  setActiveCategory: (id: string) => void;
+}) => (
+  <div className="flex justify-center">
+    <div className="inline-flex rounded-lg p-1 bg-white/5 border border-white/10">
+      {categories.map((category) => {
+        const isActive = category.id === activeCategory;
+        return (
+          <button
+            key={category.id}
+            onClick={() => setActiveCategory(category.id)}
+            className={clsx(
+              "relative px-6 py-2 text-sm font-medium rounded-md transition-colors",
+              isActive ? "text-white" : "text-white/50 hover:text-white/70"
+            )}
+          >
+            {isActive && (
+              <motion.div
+                layoutId="activeSegment"
+                className="absolute inset-0 rounded-md bg-white/10"
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              />
+            )}
+            <span className="relative z-10">{category.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
 
-  return (
-    <div className="w-full flex flex-col gap-6 p-8 rounded-2xl border border-white/10 bg-white/[0.01]">
-      {/* Tab Navigation */}
-      <div className="flex flex-wrap justify-center gap-6 md:gap-8 border-b border-white/10 pb-0">
-        {tabs.map((tab) => {
-          const isActive = tab.id === activeTab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTabId(tab.id)}
-              className="group relative flex items-center gap-2 text-base font-medium focus:outline-none px-1 py-3 transition-all"
-            >
-              {/* Icon */}
-              {tab.icon && (
-                <span
-                  className={clsx(
-                    "transition-colors",
-                    !isActive && "text-white/40 group-hover:text-white/60",
-                  )}
-                  style={isActive ? { color: "#9066cc" } : undefined}
-                >
-                  {tab.icon}
-                </span>
-              )}
+// Glassmorphism tabs component
+const GlassmorphismTabs = ({
+  activeCategory,
+  setActiveCategory
+}: {
+  activeCategory: string;
+  setActiveCategory: (id: string) => void;
+}) => (
+  <div className="flex justify-center">
+    <div className="inline-flex gap-3">
+      {categories.map((category) => {
+        const isActive = category.id === activeCategory;
+        return (
+          <button
+            key={category.id}
+            onClick={() => setActiveCategory(category.id)}
+            className={clsx(
+              "relative px-6 py-2.5 text-sm font-medium rounded-xl transition-all",
+              isActive
+                ? "text-white bg-white/10 backdrop-blur-md border border-white/20 shadow-lg"
+                : "text-white/50 hover:text-white/70 hover:bg-white/5 border border-transparent"
+            )}
+          >
+            {isActive && (
+              <motion.div
+                layoutId="activeGlass"
+                className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border border-white/20"
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              />
+            )}
+            <span className="relative z-10">{category.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
 
-              {/* Label */}
-              <span
-                className={clsx(
-                  "transition-colors font-semibold",
-                  isActive
-                    ? "text-white"
-                    : "text-white/50 group-hover:text-white/70",
-                )}
+// Minimal text tabs component
+const MinimalTabs = ({
+  activeCategory,
+  setActiveCategory
+}: {
+  activeCategory: string;
+  setActiveCategory: (id: string) => void;
+}) => (
+  <div className="flex justify-center">
+    <div className="flex gap-6">
+      {categories.map((category, index) => {
+        const isActive = category.id === activeCategory;
+        return (
+          <button
+            key={category.id}
+            onClick={() => setActiveCategory(category.id)}
+            className={clsx(
+              "relative text-base transition-all",
+              isActive
+                ? "text-white font-semibold"
+                : "text-white/40 hover:text-white/60 font-normal"
+            )}
+          >
+            {category.label}
+            {index < categories.length - 1 && (
+              <span className="absolute -right-3 top-1/2 -translate-y-1/2 text-white/20">|</span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
+
+// Gradient border tabs
+const GradientBorderTabs = ({
+  activeCategory,
+  setActiveCategory
+}: {
+  activeCategory: string;
+  setActiveCategory: (id: string) => void;
+}) => (
+  <div className="flex justify-center">
+    <div className="flex gap-4">
+      {categories.map((category) => {
+        const isActive = category.id === activeCategory;
+        return (
+          <button
+            key={category.id}
+            onClick={() => setActiveCategory(category.id)}
+            className={clsx(
+              "relative px-5 py-2 text-sm font-medium rounded-full transition-all",
+              isActive ? "text-white" : "text-white/50 hover:text-white/70"
+            )}
+          >
+            {isActive && (
+              <motion.div
+                layoutId="activeGradientBorder"
+                className="absolute inset-0 rounded-full p-[1px]"
+                style={{
+                  background: "linear-gradient(135deg, #e05585, #9066cc, #5a8fd4)",
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
               >
-                {tab.label}
-              </span>
+                <div className="w-full h-full rounded-full bg-[#0d0d1a]" />
+              </motion.div>
+            )}
+            <span className="relative z-10">{category.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
 
-              {/* Active indicator line */}
+// Neon glow tabs
+const NeonTabs = ({
+  activeCategory,
+  setActiveCategory
+}: {
+  activeCategory: string;
+  setActiveCategory: (id: string) => void;
+}) => (
+  <div className="flex justify-center">
+    <div className="flex gap-6">
+      {categories.map((category) => {
+        const isActive = category.id === activeCategory;
+        return (
+          <button
+            key={category.id}
+            onClick={() => setActiveCategory(category.id)}
+            className={clsx(
+              "relative px-5 py-2 text-sm font-medium transition-all",
+              isActive ? "text-cyan-400" : "text-white/50 hover:text-white/70"
+            )}
+            style={isActive ? {
+              textShadow: "0 0 10px rgba(34,211,238,0.8), 0 0 20px rgba(34,211,238,0.5), 0 0 30px rgba(34,211,238,0.3)",
+            } : undefined}
+          >
+            {category.label}
+            {isActive && (
+              <motion.div
+                layoutId="activeNeon"
+                className="absolute bottom-0 left-0 right-0 h-[2px] bg-cyan-400"
+                style={{
+                  boxShadow: "0 0 10px rgba(34,211,238,0.8), 0 0 20px rgba(34,211,238,0.5)",
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              />
+            )}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
+
+// Pill outline tabs
+const PillOutlineTabs = ({
+  activeCategory,
+  setActiveCategory
+}: {
+  activeCategory: string;
+  setActiveCategory: (id: string) => void;
+}) => (
+  <div className="flex justify-center">
+    <div className="flex gap-3">
+      {categories.map((category) => {
+        const isActive = category.id === activeCategory;
+        return (
+          <button
+            key={category.id}
+            onClick={() => setActiveCategory(category.id)}
+            className={clsx(
+              "relative px-5 py-2 text-sm font-medium rounded-full border transition-all",
+              isActive
+                ? "text-white border-white/40 bg-white/10"
+                : "text-white/50 border-white/10 hover:border-white/20 hover:text-white/70"
+            )}
+          >
+            {category.label}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
+
+// Floating elevated tabs
+const FloatingTabs = ({
+  activeCategory,
+  setActiveCategory
+}: {
+  activeCategory: string;
+  setActiveCategory: (id: string) => void;
+}) => (
+  <div className="flex justify-center">
+    <div className="flex gap-2 p-1.5 rounded-2xl bg-black/40 backdrop-blur-sm border border-white/5">
+      {categories.map((category) => {
+        const isActive = category.id === activeCategory;
+        return (
+          <button
+            key={category.id}
+            onClick={() => setActiveCategory(category.id)}
+            className={clsx(
+              "relative px-5 py-2 text-sm font-medium rounded-xl transition-all",
+              isActive ? "text-white" : "text-white/50 hover:text-white/70"
+            )}
+          >
+            {isActive && (
+              <motion.div
+                layoutId="activeFloating"
+                className="absolute inset-0 rounded-xl bg-white/15 shadow-lg"
+                style={{
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)",
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              />
+            )}
+            <span className="relative z-10">{category.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
+
+// Chip/tag style tabs
+const ChipTabs = ({
+  activeCategory,
+  setActiveCategory
+}: {
+  activeCategory: string;
+  setActiveCategory: (id: string) => void;
+}) => (
+  <div className="flex justify-center">
+    <div className="flex gap-2">
+      {categories.map((category) => {
+        const isActive = category.id === activeCategory;
+        return (
+          <motion.button
+            key={category.id}
+            onClick={() => setActiveCategory(category.id)}
+            className={clsx(
+              "px-4 py-1.5 text-sm font-medium rounded-full transition-colors",
+              isActive
+                ? "bg-white text-black"
+                : "bg-white/10 text-white/60 hover:bg-white/15 hover:text-white/80"
+            )}
+            layout
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+          >
+            {category.label}
+          </motion.button>
+        );
+      })}
+    </div>
+  </div>
+);
+
+// Dot indicator tabs
+const DotTabs = ({
+  activeCategory,
+  setActiveCategory
+}: {
+  activeCategory: string;
+  setActiveCategory: (id: string) => void;
+}) => (
+  <div className="flex justify-center">
+    <div className="flex gap-8">
+      {categories.map((category) => {
+        const isActive = category.id === activeCategory;
+        return (
+          <button
+            key={category.id}
+            onClick={() => setActiveCategory(category.id)}
+            className={clsx(
+              "relative flex flex-col items-center gap-2 text-sm font-medium transition-colors",
+              isActive ? "text-white" : "text-white/50 hover:text-white/70"
+            )}
+          >
+            {category.label}
+            <div className="relative h-1.5 w-1.5">
               {isActive && (
                 <motion.div
-                  layoutId="activeTab"
-                  className="absolute bottom-0 left-0 right-0 h-[2px]"
-                  style={{
-                    background:
-                      "linear-gradient(90deg, #e05585, #9066cc, #5a8fd4)",
-                  }}
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  layoutId="activeDot"
+                  className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 to-blue-500"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 />
               )}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Title and Description with Left/Right Navigation */}
-      <div className="flex items-center gap-4 py-2">
-        {/* Left Arrow */}
-        <button
-          onClick={() => {
-            const currentIndex = tabs.findIndex((t) => t.id === activeTab.id);
-            const prevIndex =
-              currentIndex > 0 ? currentIndex - 1 : tabs.length - 1;
-            setActiveTabId(tabs[prevIndex].id);
-          }}
-          className="shrink-0 w-10 h-10 flex items-center justify-center text-white/40 hover:text-white transition-all"
-          aria-label="Previous tab"
-        >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M15 18l-6-6 6-6"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-
-        {/* Title and Description */}
-        <div className="flex-1 min-w-0">
-          <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
-            {activeTab.title || activeTab.label}
-          </h3>
-          <p
-            className="text-gray-400 leading-relaxed mb-3"
-            style={{ marginTop: "4px" }}
-          >
-            {activeTab.description}
-          </p>
-          {activeTab.quickstartLink && (
-            <QuickstartLink href={activeTab.quickstartLink} />
-          )}
-        </div>
-
-        {/* Right Arrow */}
-        <button
-          onClick={() => {
-            const currentIndex = tabs.findIndex((t) => t.id === activeTab.id);
-            const nextIndex =
-              currentIndex < tabs.length - 1 ? currentIndex + 1 : 0;
-            setActiveTabId(tabs[nextIndex].id);
-          }}
-          className="shrink-0 w-10 h-10 flex items-center justify-center text-white/40 hover:text-white transition-all"
-          aria-label="Next tab"
-        >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M9 18l6-6-6-6"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-      </div>
-
-      {/* Main Content: Code Left, Screenshot Right */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 px-4">
-        {/* Left: Code Snippet */}
-        <div className="relative">
-          <div
-            className="overflow-hidden h-[400px] flex flex-col"
-            style={{ backgroundColor: codeColorScheme.bg }}
-          >
-            {/* Code language tabs */}
-            <div
-              className="flex border-b border-white/10"
-              style={{ backgroundColor: codeColorScheme.headerBg }}
-            >
-              <button
-                onClick={() => setCodeLanguage("python")}
-                className={clsx(
-                  "px-4 py-2.5 text-sm font-medium transition-colors",
-                  codeLanguage === "python"
-                    ? "text-white bg-white/10 border-b-2 border-blue-400"
-                    : "text-white/60 hover:text-white/80",
-                )}
-              >
-                Python SDK
-              </button>
-              {(activeTab.codeSnippets?.typescript ||
-                activeTab.codeSnippets?.typescriptComingSoon) && (
-                <button
-                  onClick={() => setCodeLanguage("typescript")}
-                  className={clsx(
-                    "px-4 py-2.5 text-sm font-medium transition-colors",
-                    codeLanguage === "typescript"
-                      ? "text-white bg-white/10 border-b-2 border-blue-400"
-                      : "text-white/60 hover:text-white/80",
-                  )}
-                >
-                  JS/TS SDK
-                </button>
-              )}
             </div>
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
 
-            {/* Code content */}
-            <div className="flex-1 overflow-auto">
-              {activeTab.codeSnippets &&
-                (codeLanguage === "typescript" &&
-                activeTab.codeSnippets.typescriptComingSoon &&
-                !activeTab.codeSnippets.typescript ? (
-                  <div className="flex items-center justify-center h-full text-white/60">
-                    <div className="text-center">
-                      <div className="text-2xl mb-2">Coming Soon!</div>
-                      <div className="text-sm text-white/40">
-                        JS/TS SDK support is in development
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <CodeBlock
-                    code={
-                      codeLanguage === "typescript" &&
-                      activeTab.codeSnippets.typescript
-                        ? activeTab.codeSnippets.typescript
-                        : activeTab.codeSnippets.python
-                    }
-                    language={
-                      codeLanguage === "typescript" &&
-                      activeTab.codeSnippets.typescript
-                        ? "typescript"
-                        : "python"
-                    }
-                  />
-                ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Right: Screenshot with gradient background */}
-        <div className="relative overflow-hidden h-[400px]">
-          {/* Dark gradient background with vivid red-to-blue theme */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(135deg, #2a1020 0%, #251535 25%, #152040 50%, #102545 100%)",
-            }}
-          />
-
-          {/* Subtle grid pattern */}
-          <div
-            className="absolute inset-0 opacity-40"
-            style={{
-              backgroundImage: `
-                  linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-                  linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)
-                `,
-              backgroundSize: "50px 50px",
-            }}
-          />
-
-          {/* Blurred orbs for visual interest - more vivid */}
-          <div
-            className="absolute -top-20 -left-20 w-72 h-72 rounded-full opacity-50"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(224,85,133,0.5) 0%, transparent 70%)",
-            }}
-          />
-          <div
-            className="absolute -bottom-20 -right-20 w-64 h-64 rounded-full opacity-45"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(79,172,254,0.5) 0%, transparent 70%)",
-            }}
-          />
-          <div
-            className="absolute top-1/3 -right-10 w-56 h-56 rounded-full opacity-40"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(168,85,247,0.4) 0%, transparent 70%)",
-            }}
-          />
-
-          {/* Screenshot image with gradient border (top-left only) */}
-          <div
-            className="absolute bottom-0 right-0 w-[93%] h-[93%] z-10 rounded-tl-lg pt-[1px] pl-[1px]"
-            style={{
-              background:
-                "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)",
-            }}
+// Bracket tabs
+const BracketTabs = ({
+  activeCategory,
+  setActiveCategory
+}: {
+  activeCategory: string;
+  setActiveCategory: (id: string) => void;
+}) => (
+  <div className="flex justify-center">
+    <div className="flex gap-6">
+      {categories.map((category) => {
+        const isActive = category.id === activeCategory;
+        return (
+          <button
+            key={category.id}
+            onClick={() => setActiveCategory(category.id)}
+            className={clsx(
+              "relative px-3 py-1 text-sm font-medium transition-colors",
+              isActive ? "text-white" : "text-white/50 hover:text-white/70"
+            )}
           >
-            <div
-              className="w-full h-full rounded-tl-lg pt-[4px] pl-[4px] overflow-hidden"
-              style={{ backgroundColor: "#11171d" }}
-            >
-              <img
-                src={activeTab.imageSrc}
-                alt={`${activeTab.label} screenshot`}
-                className="rounded-tl object-cover object-left-top"
-                style={{
-                  width: `${activeTab.imageZoom ?? 115}%`,
-                  height: `${activeTab.imageZoom ?? 115}%`,
-                }}
-                loading="lazy"
-              />
-            </div>
-          </div>
-        </div>
+            {isActive && (
+              <>
+                <motion.span
+                  layoutId="bracketLeft"
+                  className="absolute left-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-pink-500 to-purple-500"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+                <motion.span
+                  layoutId="bracketRight"
+                  className="absolute right-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-purple-500 to-blue-500"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+              </>
+            )}
+            {category.label}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
+
+// Main component
+export function ProductTabs() {
+  const [activeCategory, setActiveCategory] = useState(categories[0].id);
+  const activeFeatures = categories.find((c) => c.id === activeCategory)?.features ?? [];
+
+  return (
+    <div className="w-full flex flex-col gap-8">
+      {/* Top-level category tabs */}
+      <UnderlineTabs activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
+
+      {/* Features list - stacked vertically */}
+      <div className="px-4">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeCategory}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+          >
+            {activeFeatures.map((feature, index) => (
+              <FeatureCard key={feature.id} feature={feature} index={index} />
+            ))}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
 }
 
-const SpotWithLink = ({
-  spot,
-  children,
-}: {
-  spot: Hotspot;
-  children: React.ReactNode;
-}) => {
-  const Wrapper = (props: any) =>
-    spot.link ? <a {...props} /> : <div {...props} />;
-  return (
-    <Wrapper
-      className="group absolute"
-      href={spot.link}
-      target={spot.link ? "_blank" : undefined}
-      rel={spot.link ? "noreferrer noopener" : undefined}
-      style={{
-        left: spot.left,
-        top: spot.top,
-        width: spot.width,
-        height: spot.height,
-      }}
-    >
-      {children}
-    </Wrapper>
-  );
+// Export for backwards compatibility
+export type Tab = {
+  id: string;
+  label: string;
+  imageSrc: string;
+  icon?: ReactNode;
+  title?: string;
+  description?: string;
+  docLink?: string;
+  quickstartLink?: string;
+  codeSnippets?: {
+    python: string;
+    typescript?: string;
+    typescriptComingSoon?: boolean;
+  };
+  link?: string;
+  imageZoom?: number;
 };
+
+export const homepageTabs: Tab[] = [];

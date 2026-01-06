@@ -17,9 +17,6 @@ import {
   FAQSection,
 } from "../components";
 import { MLFLOW_DOCS_URL, MLFLOW_DBX_TRIAL_URL } from "../constants";
-import GenAI from "@site/static/img/Home_page_hybrid/GenAI Apps & Agents.png";
-import ModelTraining from "@site/static/img/Home_page_hybrid/Model Training.png";
-import { homepageTabs } from "../components/ProductTabs/ProductTabs";
 
 export default function Home(): JSX.Element {
   return (
@@ -35,7 +32,7 @@ export default function Home(): JSX.Element {
             <HighlightedKeyword>debug</HighlightedKeyword>,{" "}
             <HighlightedKeyword>test</HighlightedKeyword>, and{" "}
             <HighlightedKeyword>evaluate</HighlightedKeyword> your LLM
-            applications and Agents.
+            applications, Agents, and Models.
           </>
         }
         primaryCTA={{
@@ -48,10 +45,10 @@ export default function Home(): JSX.Element {
         }}
       />
 
-      {/* 2. FEATURES SECTION - 5 core capabilities with tabs */}
+      {/* 2. FEATURES SECTION - Two categories with features */}
       <div className="w-full px-4 md:px-8 lg:px-16 pb-36">
         <div className="max-w-7xl mx-auto">
-          <ProductTabs tabs={homepageTabs} />
+          <ProductTabs />
         </div>
       </div>
 
