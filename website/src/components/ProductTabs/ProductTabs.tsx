@@ -788,7 +788,7 @@ const UnderlineTabs = ({
             key={category.id}
             onClick={() => setActiveCategory(category.id)}
             className={clsx(
-              "relative px-2 py-3 text-base font-medium transition-colors",
+              "relative px-2 py-3 text-lg font-medium transition-colors",
               isActive ? "text-white" : "text-white/50 hover:text-white/70",
             )}
           >
