@@ -5,7 +5,7 @@ import { LogosCarousel } from "../LogosCarousel/LogosCarousel";
 export const StatsBand = () => {
   return (
     <Section
-      title="Most Trusted Open-Source MLOps Platform"
+      title="The Most Adopted Open-Source MLOps Platform"
       body="Backed by Linux Foundation, MLflow has been fully committed to open-source for 5+ years. Now trusted by thousands of organizations and research teams worldwide."
       align="center"
     >

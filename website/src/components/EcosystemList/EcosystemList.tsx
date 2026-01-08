@@ -23,8 +23,8 @@ export const EcosystemList = () => {
       </div>
 
       <Section
-        title="Open and Neutral"
-        body="MLflow is 100% Open-Source and framework-agnostic. No vendor lock-in, no forced choices. You choose the best tools for your needs. Supports Python, TypeScript/JavaScript, Java, and natively integrates with OpenTelemetry."
+        title="Works with Any LLM App and Model"
+        body="From LLM providers to agent frameworks to traditional ML libraries—MLflow integrates seamlessly with 40+ tools across the AI ecosystem. Supports Python, TypeScript/JavaScript, Java, and natively integrates with OpenTelemetry."
         align="center"
       >
         <div style={{ maxWidth: 1000 }} className="w-full">
