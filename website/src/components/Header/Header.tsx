@@ -105,8 +105,9 @@ export const Header = () => {
           <Link
             href="/"
             className="flex items-center space-x-3 rtl:space-x-reverse grow basis-0"
+            aria-label="MLflow Home"
           >
-            <Logo className="h-[36px]" />
+            <Logo className="h-[36px]" aria-hidden="true" />
           </Link>
           <div className="flex flex-row items-center gap-6 md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse grow justify-end basis-0">
             <Link href={getStartedHref} className="hidden md:block">
