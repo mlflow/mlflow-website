@@ -11,7 +11,7 @@ We're excited to announce that MLflow 3.9.0 brings new feature of **distributed 
 
 <img
 src={require("./hero.png").default}
-alt="MLflow OpenTelemetry Hero"
+alt="Distributed tracing"
 width="100%"
 />
 
