@@ -18,7 +18,7 @@ width="100%"
 
 ## What's New?
 
-When your application spans multiple services, you may want to connect spans from these services into a single trace for tracking the end to end execution in one place. MLflow supports this via **Distributed Tracing**, by propagating the active trace context over HTTP so that spans recorded in different services can be connected into a single trace.
+When your application spans multiple services, you may want to connect spans from these services into a single trace for tracking the end-to-end execution in one place. MLflow supports this via **Distributed Tracing**, by propagating the active trace context over HTTP so that spans recorded in different services can be connected into a single trace.
 
 ## Using MLflow distributed tracing
 
