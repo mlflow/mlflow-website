@@ -1,0 +1,65 @@
+---
+title: "Distributed tracing"
+slug: distributed-tracing
+tags: [tracing, genai, agents]
+authors: [mlflow-maintainers]
+thumbnail: /img/blog/distributed-tracing-thumbnail.png
+image: /img/blog/distributed-tracing-thumbnail.png
+---
+
+We're excited to announce that MLflow 3.9.0 brings new feature of **distributed tracing**, which supports to connect spans from multiple services into a single trace.
+
+<img
+src={require("./hero.png").default}
+alt="MLflow OpenTelemetry Hero"
+width="100%"
+/>
+
+## What's New?
+
+When your application spans multiple services, you may want to connect spans from these services into a single trace for tracking the end to end execution in one place. MLflow supports this via **Distributed Tracing**, by propagating the active trace context over HTTP so spans recorded in different services.
+
+## Using MLflow distributed tracing
+
+The following is a simple example of distributed tracing. There is a simple LLM application that is made up of two services: a client and a server. The client will create the trace and the parent span, while the server will add a nested span. In order to do this, the trace context (including the trace id and the parent span id) will be formatted according to the W3C TraceContext specification and passed in the headers of the request from the client to the server, MLflow provides two APIs to make it easier to fetch headers in the client and ingest them in the server:
+
+- Use the [mlflow.tracing.get_tracing_context_headers_for_http_request](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.tracing#mlflow.tracing.get_tracing_context_headers_for_http_request) API in the client to fetch headers.
+- Use the [mlflow.tracing.set_tracing_context_from_http_request_headers](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.tracing#mlflow.tracing.set_tracing_context_from_http_request_headers) in the server to extract the trace and span information from the request headers and set them to current trac context.
+
+## Client example
+
+```python
+import requests
+import mlflow
+from mlflow.tracing import get_tracing_context_headers_for_http_request
+
+with mlflow.start_span("client-root"):
+    headers = get_tracing_context_headers_for_http_request()
+    requests.post(
+        "https://your.service/handle", headers=headers, json={"input": "hello"}
+    )
+```
+
+## Server handler example
+
+```python
+import mlflow
+from flask import Flask, request
+from mlflow.tracing import set_tracing_context_from_http_request_headers
+
+app = Flask(__name__)
+
+
+@app.post("/handle")
+def handle():
+    headers = dict(request.headers)
+    with set_tracing_context_from_http_request_headers(headers):
+        with mlflow.start_span("server-handler") as span:
+            # ... your logic ...
+            span.set_attribute("status", "ok")
+    return {"ok": True}
+```
+
+## Limitation in Databricks
+
+If you set up MLflow tracking to Databricks, to make distributed tracing work, the trace destination must be set to Unity Catalog. Please refer to [Store MLflow traces in Unity Catalog](https://docs.databricks.com/aws/en/mlflow3/genai/tracing/trace-unity-catalog) for details.
