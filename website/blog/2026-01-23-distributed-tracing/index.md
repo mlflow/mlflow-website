@@ -26,7 +26,7 @@ The following is a simple example of distributed tracing. There is a simple LLM 
 - Use the [mlflow.tracing.get_tracing_context_headers_for_http_request](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.tracing#mlflow.tracing.get_tracing_context_headers_for_http_request) API in the client to fetch headers.
 - Use the [mlflow.tracing.set_tracing_context_from_http_request_headers](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.tracing#mlflow.tracing.set_tracing_context_from_http_request_headers) in the server to extract the trace and span information from the request headers and set them to current trac context.
 
-## Client example
+### Client example
 
 ```python
 import requests
@@ -40,7 +40,7 @@ with mlflow.start_span("client-root"):
     )
 ```
 
-## Server handler example
+### Server handler example
 
 ```python
 import mlflow
@@ -60,6 +60,6 @@ def handle():
     return {"ok": True}
 ```
 
-## Limitation in Databricks
+### Limitation in Databricks
 
 If you set up MLflow tracking to Databricks, to make distributed tracing work, the trace destination must be set to Unity Catalog. Please refer to [Store MLflow traces in Unity Catalog](https://docs.databricks.com/aws/en/mlflow3/genai/tracing/trace-unity-catalog) for details.
