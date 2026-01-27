@@ -10,7 +10,7 @@ image: /img/blog/third-party-scorers-thumbnail.png
 
 Building the initial version of an agent is easier than ever, thanks to coding assistants and dedicated agent development toolkits. However, ensuring that an agent meets production quality standards remains a significant challenge. To meet quality standards, developers need to spend substantial time and effort identifying bugs in agents and addressing them.
 
-A common technique for identifying quality issues is LLM-as-a-judge, where a language model evaluates the outputs of another model or agent. This approach reduces reliance on costly human review while providing consistent, scalable evaluation. Evaluation frameworks like DeepEval, RAGAS, and Arize Phoenix provide LLM-as-a-judge with specialized metrics. However, if you've used them, you've likely hit these pain points:
+A common technique for identifying quality issues is LLM-as-a-judge, where a language model evaluates the outputs of another model or agent. This approach reduces reliance on costly human review while providing consistent, scalable evaluation. Evaluation frameworks like DeepEval, RAGAS, Arize Phoenix, as well as MLflow provide LLM-as-a-judge with specialized metrics. However, if you've used them, you've likely hit these pain points:
 
 - **Can't combine frameworks.** You might find that one evaluation framework works well for RAG metrics, but using it in another framework means writing custom wrappers or reimplementing metrics yourself.
 - **Can't compare across frameworks.** Comparing results side-by-side requires stitching together outputs from different tools.
@@ -18,7 +18,7 @@ A common technique for identifying quality issues is LLM-as-a-judge, where a lan
 
 To turn evaluation results into actionable insights and real improvements, agent developers need more than just metrics. They need a complete GenAI platform with a visual UI, search and filtering capabilities, datasets for reproducing issues and testing fixes, and tools for iterating on fixes. MLflow provides exactly this.
 
-Over the last few releases, MLflow has integrated DeepEval, RAGAS, and Arize Phoenix into the MLflow Scorer API. You can now use over 50 metrics from these evaluation frameworks through `mlflow.genai.evaluate`, all in one API and one UI. After this integration, you can:
+Over the last few releases, MLflow has integrated DeepEval, RAGAS, and Arize Phoenix into the MLflow `Scorer` API. You can now use over 50 metrics from these evaluation frameworks through `mlflow.genai.evaluate`, all in one API and one UI. After this integration, you can:
 
 - Access all metrics through one interface
 - Run metrics from different evaluation frameworks together in a single evaluation
@@ -33,7 +33,7 @@ First, let's understand what these evaluation frameworks offer:
 
 **DeepEval** is an open-source LLM evaluation framework similar to Pytest but specialized for unit testing LLM outputs. It incorporates the latest research to evaluate LLM applications—whether AI agents, RAG pipelines, or chatbots—using metrics such as G-Eval, task completion, answer relevance, and hallucination detection. MLflow integrates a subset of DeepEval's extensive metrics covering conversational agents, RAG systems, safety, and agentic workflows.
 
-**RAGAS** (Retrieval Augmented Generation Assessment) is a specialized evaluation framework for RAG evaluation. Based on research by Shahul Es et al., RAGAS provides metrics such as Faithfulness, ContextRecall, and ContextPrecision specifically designed to evaluate retrieval quality and answer generation. MLflow integrates RAGAS metrics, including those for RAG and agent evaluation.
+**RAGAS** (Retrieval Augmented Generation Assessment) is a specialized evaluation framework for RAG evaluation. Based on [research by Shahul Es et al.](https://arxiv.org/abs/2309.15217), RAGAS provides metrics such as Faithfulness, ContextRecall, and ContextPrecision specifically designed to evaluate retrieval quality and answer generation. MLflow integrates RAGAS metrics, including those for RAG and agent evaluation.
 
 **Phoenix** (Arize) provides an open-source evaluation library with multiple LLM-as-a-judge metrics for assessing LLM application quality. MLflow integrates Phoenix's core evaluation metrics, including Hallucination detection, Relevance, Toxicity, QA correctness, and Summarization quality.
 
@@ -106,7 +106,7 @@ With over 70 judges now available across MLflow native judges and third-party in
 
 3. **Compare and experiment.** MLflow's UI lets you easily compare results across different judges and different judge models side-by-side, so you can pick the judge and model that best suit your use case.
 
-4. **Customize when needed.** For domain-specific requirements, MLflow provides the `make_judge` and `guidelines` APIs, allowing you to create judges tailored to your specific business logic or evaluation criteria.
+4. **Customize when needed.** For domain-specific requirements, MLflow provides the [make_judge](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/make-judge/) and [guidelines](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/guidelines/) APIs, allowing you to create judges tailored to your specific business logic or evaluation criteria.
 
 ```python
 from typing import Literal
@@ -124,7 +124,7 @@ However simple or complex your agent's workflow trajectory, this provides you wi
 
 ## Example: Evaluate Multi-turn Conversations with DeepEval
 
-This example illustrates how to use some of the DeepEval MLflow judges within a conversational bot, such as a customer technical support system, particularly in multi-turn scenarios. It helps gauge metrics like Conversational Completeness, Knowledge Retention, and Topic Adherence.
+This example illustrates how to use some of the DeepEval MLflow judges within a conversational bot, such as a customer technical support system, particularly in multi-turn scenarios. It helps gauge metrics like [Conversational Completeness](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.deepeval.ConversationCompleteness), [Knowledge Retention](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.deepeval.KnowledgeRetention), and [Topic Adherence](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.deepeval.TopicAdherence).
 
 <img
   src={require("./deepeval_multiturn.gif").default}
@@ -134,7 +134,7 @@ This example illustrates how to use some of the DeepEval MLflow judges within a 
 
 The idea is simple: evaluate the entire conversation traces in a single session using MLflow-integrated DeepEval Metrics. This code snippet demonstrates how to define the three judges and utilize them with `mlflow.genai.evaluate`.
 
-The complete example and instructions on how to use it can be found in [this GitHub Repository](https://github.com/TODO), along with an IPython Notebook.
+The complete example and instructions on how to use it can be found in [this GitHub Repository](https://github.com/dmatrix/mlflow-misc/tree/main/genai/agents/deepeval), along with an [IPython Notebook](https://github.com/dmatrix/mlflow-misc/blob/main/genai/agents/deepeval/customer_support_deepeval_demo.ipynb).
 
 ```python
 import mlflow
@@ -170,7 +170,7 @@ eval_results = mlflow.genai.evaluate(
 )
 ```
 
-Here is the run from our Customer Support Agent session, where a user interacts with the agent about why she can't log in to our account.
+Here is the run from our Customer Support Agent session, where a user interacts with the agent about why she can’t log into her account. 
 
 ```bash
 uv run python customer_support_simple_deepeval_agent.py --scenario account
@@ -235,16 +235,16 @@ We'd love to hear your experience with these new evaluation capabilities. Share 
 - **GitHub Issues:** [Report bugs or request features and enhancements](https://github.com/mlflow/mlflow/issues)
 - **Discussions:** [Share your experiences](https://github.com/mlflow/mlflow/discussions)
 
-Join us for an MLflow webinar where we'll deep-dive into MLflow 3.9 features and showcase some of them.
+Join us for an [MLflow webinar](https://luma.com/mlflow-204) where we'll deep-dive into MLflow 3.9 features and showcase some of them.
 
-We continually improve our MLflow GenAI capabilities, including even more judge integrations coming out soon! Stay tuned for discussions on GitHub for roadmap updates. For more information, check out the documentation and references below.
+We continually improve our MLflow GenAI capabilities, including even more judge integrations coming out soon! Stay tuned for discussions on [GitHub for roadmap updates](https://github.com/mlflow/mlflow/discussions/19855). For more information, check out the documentation and references below.
 
 ## Resources and References
 
-- [MLflow Third-party Judges](https://mlflow.org/docs/latest/genai/eval-monitor/judges/)
-- [Ragas: Automated Evaluation of Retrieval Augmented Generation](https://arxiv.org/abs/2309.15217)
-- [Introduction to DeepEval Metrics](https://docs.confident-ai.com/docs/metrics-introduction)
-- [RAGAS: List of Available Metrics](https://docs.ragas.io/en/stable/concepts/metrics/index.html)
+- [MLflow Third-party Judges](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/third-party/)
+- [Ragas: Automated Evaluation of Retrieval Augmented Generation](https://arxiv.org/pdf/2309.15217)
+- [Introduction to DeepEval Metrics](https://deepeval.com/docs/metrics-introduction)
+- [RAGAS: List of Available Metrics](https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/)
 - [DeepEval: The LLM Evaluation Framework](https://github.com/confident-ai/deepeval)
-- [MLflow DeepEval Multiturn Example](https://github.com/TODO)
-- [Arize Phoenix: List of Available Metrics](https://docs.arize.com/phoenix/evaluation/llm-as-a-judge)
+- [MLflow DeepEval Multiturn Example](https://github.com/dmatrix/mlflow-misc/tree/main/genai/agents/deepeval)
+- [Arize Phoenix: List of Available Metrics](https://arize.com/docs/phoenix/evaluation/running-pre-tested-evals)
