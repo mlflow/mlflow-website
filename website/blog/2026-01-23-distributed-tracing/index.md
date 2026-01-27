@@ -23,6 +23,7 @@ When your application spans multiple services, you may want to connect spans fro
 ## Using MLflow distributed tracing
 
 The following is a simple example of distributed tracing. There is a simple LLM application that is made up of two services: a client and a server. The client will create the trace and the parent span, while the server will add a nested span. In order to do this, the trace context (including the trace id and the parent span id) will be formatted according to the W3C TraceContext specification and passed in the headers of the request from the client to the server. MLflow provides two APIs to make it easier to fetch headers in the client and ingest them in the server:
+
 - Use the [mlflow.tracing.get_tracing_context_headers_for_http_request](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.tracing#mlflow.tracing.get_tracing_context_headers_for_http_request) API in the client to fetch headers.
 - Use the [mlflow.tracing.set_tracing_context_from_http_request_headers](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.tracing#mlflow.tracing.set_tracing_context_from_http_request_headers) in the server to extract the trace and span information from the request headers and set them to current trace context.
 
