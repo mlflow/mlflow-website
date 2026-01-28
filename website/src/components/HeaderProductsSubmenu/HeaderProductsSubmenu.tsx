@@ -45,12 +45,12 @@ export const HeaderProductsSubmenu = () => {
                 label="Observability"
               />
               <HeaderMenuItem href="/genai/evaluations" label="Evaluations" />
+            </div>
+            <div className={column()}>
               <HeaderMenuItem
                 href="/genai/prompt-registry"
                 label="Prompt Registry"
               />
-            </div>
-            <div className={column()}>
               <HeaderMenuItem href="/genai/ai-gateway" label="AI Gateway" />
             </div>
           </div>
