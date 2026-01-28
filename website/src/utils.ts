@@ -24,7 +24,7 @@ export function getStartedLinkForPage(
       [`${genAIPath}/observability`]: `${MLFLOW_GENAI_DOCS_URL}tracing/quickstart/`,
       [`${genAIPath}/evaluations`]: `${MLFLOW_GENAI_DOCS_URL}eval-monitor/quickstart/`,
       [`${genAIPath}/prompt-registry`]: `${MLFLOW_GENAI_DOCS_URL}prompt-registry/create-and-edit-prompts/`,
-      [`${genAIPath}/app-versioning`]: `${MLFLOW_GENAI_DOCS_URL}version-tracking/quickstart/`,
+
       [`${genAIPath}/ai-gateway`]: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
       [`${genAIPath}/governance`]: MLFLOW_GENAI_DOCS_URL,
       [`${genAIPath}/human-feedback`]: MLFLOW_GENAI_DOCS_URL,

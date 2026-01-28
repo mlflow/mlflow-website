@@ -51,10 +51,6 @@ export const HeaderProductsSubmenu = () => {
               />
             </div>
             <div className={column()}>
-              <HeaderMenuItem
-                href="/genai/app-versioning"
-                label="App versioning"
-              />
               <HeaderMenuItem href="/genai/ai-gateway" label="AI Gateway" />
             </div>
           </div>
