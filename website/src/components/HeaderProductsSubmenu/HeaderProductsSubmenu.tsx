@@ -32,7 +32,7 @@ export const HeaderProductsSubmenu = () => {
       <div className={component()}>
         <div className={titleContainer()}>
           <Link to="/genai">
-            <h3 className={title()}>Gen AI</h3>
+            <h3 className={title()}>GenAI</h3>
             <p className={subtitle()}>Ship high-quality GenAI, fast</p>
           </Link>
         </div>
@@ -59,7 +59,7 @@ export const HeaderProductsSubmenu = () => {
       <div className={component()}>
         <div className={titleContainer()}>
           <Link to="/classical-ml">
-            <h3 className={title()}>Model training</h3>
+            <h3 className={title()}>Model Training</h3>
             <p className={subtitle()}>Mastering the ML lifecycle</p>
           </Link>
         </div>

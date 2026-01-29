@@ -18,21 +18,21 @@ export const HeaderDocsSubmenu = () => {
   return (
     <div className={wrapper()}>
       <div className={linkItem()}>
+        <Link to={MLFLOW_GENAI_DOCS_URL}>
+          <h3 className={linkTitle()}>GenAI Apps & Agents</h3>
+          <p className={linkSubtitle()}>
+            Learn how to track, evaluate, and optimize your GenAI applications
+            and agent workflows.
+          </p>
+        </Link>
+      </div>
+      <div className={linkItem()}>
         <Link to={MLFLOW_ML_DOCS_URL}>
           <h3 className={linkTitle()}>Model Training</h3>
           <p className={linkSubtitle()}>
             Get started with the core functionality for traditional machine
             learning workflows, hyperparameter tuning, and model lifecycle
             management.
-          </p>
-        </Link>
-      </div>
-      <div className={linkItem()}>
-        <Link to={MLFLOW_GENAI_DOCS_URL}>
-          <h3 className={linkTitle()}>GenAI Apps & Agents</h3>
-          <p className={linkSubtitle()}>
-            Learn how to track, evaluate, and optimize your GenAI applications
-            and agent workflows.
           </p>
         </Link>
       </div>
