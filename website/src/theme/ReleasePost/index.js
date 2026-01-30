@@ -15,12 +15,12 @@ export default function ReleasePost({
     <ThemeLayout {...layoutProps}>
       <Layout>
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-row">
+          <div className="flex flex-row gap-12">
             <div className="contents text-white **:[nav_ul]:!mb-6">
               <BlogSidebar sidebar={sidebar} />
             </div>
             <BlogPostProvider content={BlogPostContent}>
-              <BlogPostItem className="max-w-prose **:[h2>a]:!text-2xl">
+              <BlogPostItem className="max-w-4xl **:[h2>a]:!text-2xl">
                 <BlogPostContent />
               </BlogPostItem>
             </BlogPostProvider>
