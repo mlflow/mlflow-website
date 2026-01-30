@@ -26,7 +26,7 @@ const config: Config = {
 
   onBrokenLinks: "throw",
   onBrokenAnchors: "throw",
-  
+
   markdown: {
     hooks: {
       onBrokenMarkdownLinks: "throw",
