@@ -105,6 +105,9 @@ export const Header = () => {
       document.body.classList.add("noScroll");
     } else {
       document.body.classList.remove("noScroll");
+      // Reset submenus when menu closes
+      setIsProductSubmenuOpen(false);
+      setIsDocsSubmenuOpen(false);
     }
   }, [isOpen]);
 
