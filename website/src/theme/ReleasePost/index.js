@@ -15,7 +15,7 @@ export default function ReleasePost({
     <ThemeLayout {...layoutProps}>
       <Layout>
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-row gap-12">
+          <div className="flex flex-row gap-16">
             <div className="contents text-white **:[nav_ul]:!mb-6">
               <BlogSidebar sidebar={sidebar} />
             </div>
