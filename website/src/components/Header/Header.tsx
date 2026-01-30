@@ -60,7 +60,12 @@ export const Header = () => {
   };
 
   const handleProductItemClick = () => {
-    setIsProductSubmenuOpen(!isProductSubmenuOpen);
+    const newState = !isProductSubmenuOpen;
+    setIsProductSubmenuOpen(newState);
+    // Accordion behavior: close Docs when Components opens
+    if (newState) {
+      setIsDocsSubmenuOpen(false);
+    }
   };
 
   const handleDocsItemHover = () => {
@@ -77,7 +82,12 @@ export const Header = () => {
   };
 
   const handleDocsItemClick = () => {
-    setIsDocsSubmenuOpen(!isDocsSubmenuOpen);
+    const newState = !isDocsSubmenuOpen;
+    setIsDocsSubmenuOpen(newState);
+    // Accordion behavior: close Components when Docs opens
+    if (newState) {
+      setIsProductSubmenuOpen(false);
+    }
   };
 
   useLayoutEffect(() => {
@@ -146,22 +156,23 @@ export const Header = () => {
           )}
         >
           <ul className="flex flex-col font-medium md:flex-row gap-y-6 gap-x-4 lg:gap-x-10 w-full md:w-auto">
-            <li
-              className="w-full md:w-auto md:hidden"
-              onClick={handleProductItemClick}
-            >
-              <span
-                className={
-                  "items-center gap-2 py-2 text-white text-[15px] w-full md:w-auto cursor-pointer hidden md:flex"
-                }
+            <li className="w-full md:w-auto md:hidden">
+              <button
+                onClick={handleProductItemClick}
+                className="flex items-center justify-between gap-2 py-2 text-white text-lg w-full cursor-pointer transition-colors duration-200 hover:text-white/60"
               >
                 Components
-                <DownIcon className="w-6 h-6" />
-              </span>
+                <DownIcon
+                  className={cn(
+                    "w-6 h-6 transition-transform duration-300",
+                    isProductSubmenuOpen && "rotate-180",
+                  )}
+                />
+              </button>
               <div
                 className={cn(
-                  "transition-all duration-300 ease-in",
-                  "h-auto min-h-50",
+                  "transition-all duration-300 ease-in-out overflow-hidden",
+                  isProductSubmenuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0",
                 )}
               >
                 <HeaderProductsSubmenu />
@@ -180,22 +191,23 @@ export const Header = () => {
             <li className="w-full md:w-auto">
               <HeaderMenuItem href="/blog" label="Blog" />
             </li>
-            <li
-              className="w-full md:w-auto md:hidden"
-              onClick={handleDocsItemClick}
-            >
-              <span
-                className={
-                  "items-center gap-2 py-2 text-white text-[15px] w-full md:w-auto cursor-pointer hidden md:flex"
-                }
+            <li className="w-full md:w-auto md:hidden">
+              <button
+                onClick={handleDocsItemClick}
+                className="flex items-center justify-between gap-2 py-2 text-white text-lg w-full cursor-pointer transition-colors duration-200 hover:text-white/60"
               >
                 Docs
-                <DownIcon className="w-6 h-6" />
-              </span>
+                <DownIcon
+                  className={cn(
+                    "w-6 h-6 transition-transform duration-300",
+                    isDocsSubmenuOpen && "rotate-180",
+                  )}
+                />
+              </button>
               <div
                 className={cn(
-                  "transition-all duration-300 ease-in",
-                  "h-auto min-h-50",
+                  "transition-all duration-300 ease-in-out overflow-hidden",
+                  isDocsSubmenuOpen ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0",
                 )}
               >
                 <HeaderDocsSubmenu />
