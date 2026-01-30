@@ -172,7 +172,9 @@ export const Header = () => {
               <div
                 className={cn(
                   "transition-all duration-300 ease-in-out overflow-hidden",
-                  isProductSubmenuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0",
+                  isProductSubmenuOpen
+                    ? "max-h-[600px] opacity-100"
+                    : "max-h-0 opacity-0",
                 )}
               >
                 <HeaderProductsSubmenu />
@@ -207,7 +209,9 @@ export const Header = () => {
               <div
                 className={cn(
                   "transition-all duration-300 ease-in-out overflow-hidden",
-                  isDocsSubmenuOpen ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0",
+                  isDocsSubmenuOpen
+                    ? "max-h-[300px] opacity-100"
+                    : "max-h-0 opacity-0",
                 )}
               >
                 <HeaderDocsSubmenu />
