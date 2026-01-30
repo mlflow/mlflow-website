@@ -32,7 +32,7 @@ export const HeaderProductsSubmenu = () => {
       <div className={component()}>
         <div className={titleContainer()}>
           <Link to="/genai">
-            <h3 className={title()}>GenAI</h3>
+            <h3 className={title()}>GenAI Apps & Agents</h3>
             <p className={subtitle()}>Ship high-quality GenAI, fast</p>
           </Link>
         </div>
