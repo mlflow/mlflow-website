@@ -13,7 +13,7 @@ export default function ReleaseLayout(props) {
   return (
     <ThemeLayout {...layoutProps}>
       <Layout>
-        <div className="max-w-7xl mx-auto">
+        <div className="release-page max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row gap-6 md:gap-12">
             {isDesktop && (
               <div className="contents text-white **:[nav_ul]:!mb-6">
