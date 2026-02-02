@@ -9,7 +9,7 @@
 bash
 
 ```bash
-pip install mlflow>=3.6.0 google-adk opentelemetry-exporter-otlp-proto-http
+pip install 'mlflow[genai]>=3.6.0' google-adk opentelemetry-exporter-otlp-proto-http
 
 ```
 

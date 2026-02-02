@@ -1,5 +1,45 @@
 # MLflow Tracing UI
 
+## GenAI Experiment Overview[​](#genai-experiment-overview "Direct link to GenAI Experiment Overview")
+
+The **Overview** tab in GenAI experiments provides comprehensive analytics and visualizations for your GenAI application traces. This tab is organized into three sub-tabs to help you monitor different aspects of your application.
+
+All tabs include a **time range selector** and **time unit selector** to customize the granularity and range of the displayed data.
+
+[](/mlflow-website/docs/latest/images/llms/tracing/overview_demo.mp4)
+
+### Usage[​](#usage "Direct link to Usage")
+
+The Usage tab displays key metrics about your trace requests over time:
+
+* **Requests**: Shows the total number of trace requests, with an average reference line
+* **Latency**: Visualizes response time distribution to help identify performance bottlenecks
+* **Errors**: Tracks error rates to quickly spot issues
+* **Token Usage & Token Stats**: Monitors token consumption across your traces
+
+![Experiment Overview Usage Tab](/mlflow-website/docs/latest/assets/images/overview_usage_tab-3f972858bec76adaebb876f6c93c1fd7.png)
+
+### Quality[​](#quality "Direct link to Quality")
+
+The Quality tab provides insights into the quality of your GenAI outputs:
+
+* **Quality Summary**: Provides overview of scorers result
+* **Quality Insights**: Displays metrics computed by [scorers](/mlflow-website/docs/latest/genai/eval-monitor/scorers.md), with a dedicated chart for each assessment type
+* Charts are dynamically generated based on the assessments available in your traces
+
+![Experiment Overview Quality Tab](/mlflow-website/docs/latest/assets/images/overview_quality_tab-2b09e28d9fb24da7c01b85ac8fc912ca.png)
+
+### Tool Calls[​](#tool-calls "Direct link to Tool Calls")
+
+The Tool Calls tab provides insights into agent tool usage:
+
+* **Statistics Cards**: Shows at-a-glance metrics including total tool calls, average latency, success rate, and failed calls
+* **Tool Performance Summary**: Provides an overview of how each tool is performing
+* **Tool Usage & Latency**: Visualizes tool invocation patterns and response times
+* **Tool Error Rate**: Tracks error rates per tool
+
+![Experiment Overview Tool Calls Tab](/mlflow-website/docs/latest/assets/images/overview_tool_calls_tab-52fa54220793d89710cde32b4cb00def.png)
+
 ## Traces within MLflow Experiments[​](#traces-within-mlflow-experiments "Direct link to Traces within MLflow Experiments")
 
 After logging your traces, you can view them in the [MLflow UI](/mlflow-website/docs/latest/genai/tracing/observe-with-traces/ui.md), under the "Traces" tab in the main experiment page. This tab is also available within the individual run pages, if your trace was logged within a run context.
@@ -14,21 +54,21 @@ This table includes high-level information about the traces, such as the trace I
 
 Using the search bar in the UI, you can easily filter your traces based on name, tags, or other metadata. Check out the [search docs](/mlflow-website/docs/latest/genai/tracing/search-traces.md) for details about the query string format.
 
-![Searching traces](/mlflow-website/docs/latest/assets/images/trace-session-id-ff53d036ab1d8fdc14b703fc5f0bc107.gif)
+[](/mlflow-website/docs/latest/images/llms/tracing/trace-session-id.mp4)
 
 The UI supports bulk deletion of traces. Simply select the traces you want to delete by checking the checkboxes, and then pressing the "Delete" button.
 
-![Deleting traces](/mlflow-website/docs/latest/assets/images/trace-delete-07f75d2aa0b7ea03c14d35fe3ec0bad3.gif)
+[](/mlflow-website/docs/latest/images/llms/tracing/trace-delete.mp4)
 
 You can also edit key-value tags on your traces via the UI.
 
-![Traces tag update](/mlflow-website/docs/latest/assets/images/trace-set-tag-c0cbad6b75c04328db03a8f1eb4c3a09.gif)
+[](/mlflow-website/docs/latest/images/llms/tracing/trace-set-tag.mp4)
 
 ## Browsing span data[​](#browsing-span-data "Direct link to Browsing span data")
 
 In order to browse the span data of an individual trace, simply click on the link in the "Trace ID" or "Trace name" columns to open the trace viewer:
 
-![Trace Browser](/mlflow-website/docs/latest/assets/images/tracing-top-dcca046565ab33be6afe0447dd328c22.gif)
+[](/mlflow-website/docs/latest/images/llms/tracing/tracing-top.mp4)
 
 ## Jupyter Notebook integration[​](#jupyter-notebook-integration "Direct link to Jupyter Notebook integration")
 

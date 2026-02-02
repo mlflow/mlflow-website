@@ -391,11 +391,11 @@ print(f"Reading Level: {results.metrics.get('reading_level/mode', 'N/A')}")
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")
 
-### [LLM-based Scorers](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge.md)
+### [LLM-based Scorers](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges.md)
 
-[Learn about using LLMs as judges for evaluation](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge.md)
+[Learn about using LLMs as judges for evaluation](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges.md)
 
-[Explore LLM judges →](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge.md)
+[Explore LLM judges →](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges.md)
 
 ### [Judge Alignment](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/alignment.md)
 

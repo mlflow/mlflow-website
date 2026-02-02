@@ -16,7 +16,7 @@ This tutorial walk through the basic LLMOps and GenAI capabilities of MLflow, su
 
 [→ Getting Started with MLflow for GenAI](/mlflow-website/docs/latest/genai/getting-started.md)
 
-[![MLflow GenAI Quickstart](/mlflow-website/docs/latest/images/llms/tracing/tracing-top.gif)](/mlflow-website/docs/latest/genai/getting-started.md)
+[[](/mlflow-website/docs/latest/images/llms/tracing/tracing-top.mp4)](/mlflow-website/docs/latest/genai/getting-started.md)
 
 ## Hyperparameter Tuning Tutorial[​](#hyperparameter-tuning-tutorial "Direct link to Hyperparameter Tuning Tutorial")
 

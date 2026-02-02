@@ -23,7 +23,7 @@ First, we must ensure we have the required dependecies and environment variables
 python
 
 ```python
-%pip install mlflow>=2.15 llama-index>=0.10.44 -q
+%pip install 'mlflow[genai]>=2.15' llama-index>=0.10.44 -q
 
 ```
 

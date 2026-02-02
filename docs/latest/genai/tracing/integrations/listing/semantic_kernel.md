@@ -26,7 +26,7 @@ To get started, let's install the requisite libraries. Note that we will use Ope
 bash
 
 ```bash
-pip install 'mlflow>=3.2.0' semantic_kernel openai
+pip install 'mlflow[genai]>=3.2.0' semantic_kernel openai
 
 ```
 

@@ -15,7 +15,7 @@ Set up a dev environment following the [CONTRIBUTING.md](https://github.com/mlfl
 First, get a solid understanding of what MLflow Tracing does and how it works. Check out these docs to get up to speed:
 
 * [Tracing Concepts](/mlflow-website/docs/latest/genai/concepts/trace.md) - Understand what tracing is and the specific benefits for MLflow users.
-* [MLflow Tracing API Guide](/mlflow-website/docs/latest/genai/tracing/app-instrumentation.md) - Practical guide to auto-instrumentation and APIs for manually creating traces.
+* [MLflow Tracing API Guide](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/automatic.md) - Practical guide to auto-instrumentation and APIs for manually creating traces.
 
 📝 **Quick Quiz**: Before moving on to the next step, let's challenge your understanding with a few questions. If you are not sure about the answers, revisit the docs for a quick refresh.
 

@@ -21,7 +21,7 @@ Before running the script, let's start the MLflow UI on a local host:
 bash
 
 ```bash
-mlflow ui
+mlflow server
 
 ```
 

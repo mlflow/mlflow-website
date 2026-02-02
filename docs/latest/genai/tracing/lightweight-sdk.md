@@ -1,8 +1,8 @@
-# Lightweight Tracing SDK Optimized for Production Usage
+# Production Tracing SDK
 
-MLflow offers a lightweight tracing SDK package called `mlflow-tracing` that includes only the essential functionality for tracing and monitoring of your GenAI applications. This package is designed for production environments where minimizing dependencies and deployment size is critical.
+MLflow offers a Production Tracing SDK package called `mlflow-tracing` that includes only the essential functionality for tracing and monitoring of your GenAI applications. This package is designed for production environments where minimizing dependencies and deployment size is critical.
 
-## Why Use the Lightweight SDK?[​](#why-use-the-lightweight-sdk "Direct link to Why Use the Lightweight SDK?")
+## Why Use the Production Tracing SDK?[​](#why-use-the-production-tracing-sdk "Direct link to Why Use the Production Tracing SDK?")
 
 🏎️ Faster Deployment
 
@@ -10,27 +10,15 @@ MLflow offers a lightweight tracing SDK package called `mlflow-tracing` that inc
 
 The package size and dependencies are significantly smaller than the full MLflow package, allowing for faster deployment times in dynamic environments such as Docker containers, serverless functions, and cloud-based applications.
 
-🔧 Simplified Dependency Management
-
-***
-
-A smaller set of dependencies means less work keeping up with dependency updates, security patches, and potential breaking changes from upstream libraries. It also reduces the chances of dependency collisions and incompatibilities.
-
 📦 Enhanced Portability
 
 ***
 
 With fewer dependencies, MLflow Tracing can be seamlessly deployed across different environments and platforms, without worrying about compatibility issues.
 
-🔒 Reduced Security Risk
-
-***
-
-Each dependency potentially introduces security vulnerabilities. By reducing the number of dependencies, MLflow Tracing minimizes the attack surface and reduces the risk of security breaches.
-
 ## Installation[​](#installation "Direct link to Installation")
 
-Install the lightweight SDK using pip:
+Install the Production Tracing SDK using pip:
 
 bash
 
@@ -41,11 +29,11 @@ pip install mlflow-tracing
 
 warning
 
-Do not install the full `mlflow` package together with the lightweight `mlflow-tracing` SDK, as this may cause version conflicts and namespace resolution issues.
+Do not install the full `mlflow` package together with the `mlflow-tracing` package, as this may cause version conflicts and namespace resolution issues.
 
 ## Quickstart[​](#quickstart "Direct link to Quickstart")
 
-Here's a simple example using the lightweight SDK with OpenAI for logging traces to an experiment on a remote MLflow server:
+Here's a simple example using the Production Tracing SDK with OpenAI for logging traces to an experiment on a remote MLflow server:
 
 python
 
@@ -72,7 +60,7 @@ print(response.choices[0].message.content)
 
 ## Choose Your Backend[​](#choose-your-backend "Direct link to Choose Your Backend")
 
-The lightweight SDK works with various observability platforms. Choose your preferred option and follow the instructions to set up your tracing backend.
+The Production Tracing SDK works with various observability platforms. Choose your preferred option and follow the instructions to set up your tracing backend.
 
 * Self-Hosted MLflow
 * Databricks
@@ -93,7 +81,7 @@ In self-hosting mode, you will be responsible for running the tracking server in
 
 Refer to the [tracking server setup guide](/mlflow-website/docs/latest/ml/tracking.md#tracking-setup) for detailed guidance.
 
-![OSS Tracing](/mlflow-website/docs/latest/assets/images/tracing-top-dcca046565ab33be6afe0447dd328c22.gif)
+[](/mlflow-website/docs/latest/images/llms/tracing/tracing-top.mp4)
 
 [Databricks Lakehouse Monitoring for GenAI](https://docs.databricks.com/aws/en/generative-ai/agent-evaluation/monitoring) is a go-to solution for monitoring your GenAI application with MLflow Tracing. It provides access to a robust, fully functional monitoring dashboard for operational excellence and quality analysis.
 
@@ -101,7 +89,7 @@ Lakehouse Monitoring for GenAI can be used regardless of whether your applicatio
 
 [Sign up for free](https://signup.databricks.com/?destination_url=/ml/experiments-signup?source=OSS_DOCS\&dbx_source=TRY_MLFLOW\&signup_experience_step=EXPRESS\&provider=MLFLOW\&utm_source=OSS_DOCS) and [get started in a minute](https://docs.databricks.com/aws/en/generative-ai/agent-evaluation/monitoring) to run your GenAI application with complete observability.
 
-![Monitoring](https://assets.docs.databricks.com/_static/images/generative-ai/monitoring/monitoring-hero.gif)
+[](https://assets.docs.databricks.com/_static/images/generative-ai/monitoring/monitoring-hero.mp4)
 
 MLflow Tracing is **built on the OpenTelemetry tracing spec**, an industry-standard framework for observability, making it a vendor-neutral solution for monitoring your GenAI applications.
 
@@ -142,9 +130,9 @@ Refer to the [Nebius documentation](https://nebius.com/services/managed-mlflow) 
 
 ## Supported Features[​](#supported-features "Direct link to Supported Features")
 
-The lightweight SDK includes all essential tracing functionalities for monitoring your GenAI applications. Click the cards below to learn more about each supported feature.
+The Production Tracing SDK includes all essential tracing functionalities for monitoring your GenAI applications. Click the cards below to learn more about each supported feature.
 
-[⚡️ Automatic Tracing for 15+ AI Libraries](/mlflow-website/docs/latest/genai/tracing/integrations.md)
+[⚡️ Automatic Tracing for AI Libraries](/mlflow-website/docs/latest/genai/tracing/integrations.md)
 
 ***
 
@@ -176,7 +164,7 @@ The lightweight SDK includes all essential tracing functionalities for monitorin
 
 ## Production Configuration Example[​](#production-configuration-example "Direct link to Production Configuration Example")
 
-Here's a complete example of setting up the lightweight SDK for production use:
+Here's a complete example of setting up the Production Tracing SDK for production use:
 
 python
 
@@ -233,7 +221,7 @@ def handle_user_request(user_id: str, session_id: str, message: str):
 
 ## Features Not Included[​](#features-not-included "Direct link to Features Not Included")
 
-The following MLflow features are not available in the lightweight package:
+The following MLflow features are not available in the Production Tracing SDK:
 
 * **MLflow Tracking Server and UI** - Use the full MLflow package to run the server
 * **Run Management APIs** - `mlflow.start_run()`, `mlflow.log_metric()`, etc.
@@ -247,7 +235,7 @@ For these features, use the full MLflow package: `pip install mlflow`
 
 ## Migration from Full MLflow[​](#migration-from-full-mlflow "Direct link to Migration from Full MLflow")
 
-If you're currently using the full MLflow package and want to switch to the lightweight SDK for production:
+If you're currently using the full MLflow package and want to switch to the Production Tracing SDK for production:
 
 ### 1. Update Dependencies[​](#1-update-dependencies "Direct link to 1. Update Dependencies")
 
@@ -257,7 +245,7 @@ bash
 # Remove full MLflow
 pip uninstall mlflow
 
-# Install lightweight SDK
+# Install Production Tracing SDK
 pip install mlflow-tracing
 
 ```
@@ -308,7 +296,7 @@ def your_function():
 | `mlflow`         | \~1000MB | 20+ packages | Development, experimentation, full ML lifecycle |
 | `mlflow-tracing` | \~5MB    | 5-8 packages | Production tracing, monitoring, observability   |
 
-The lightweight SDK is **95% smaller** than the full MLflow package, making it ideal for:
+The Production Tracing SDK is **95% smaller** than the full MLflow package, making it ideal for:
 
 * Container deployments
 * Serverless functions
@@ -326,4 +314,4 @@ The MLflow Tracing SDK provides a production-optimized solution for monitoring G
 * **Easy migration path** from full MLflow package
 * **Production-ready features** including async logging and error handling
 
-Whether you're running a small prototype or a large-scale production system, the lightweight SDK provides the observability you need without the overhead you don't.
+Whether you're running a small prototype or a large-scale production system, the Production Tracing SDK provides the observability you need without the overhead you don't.

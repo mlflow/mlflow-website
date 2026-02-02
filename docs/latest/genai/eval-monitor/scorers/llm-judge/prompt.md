@@ -9,7 +9,7 @@ The `custom_prompt_judge` API is being phased out. We strongly recommend using t
 * Support for both field-based and Agent-as-a-Judge evaluation
 * Alignment capabilities with human feedback
 
-See the [make\_judge documentation](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/make-judge.md) for migration guidance.
+See the [make\_judge documentation](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges.md) for migration guidance.
 
 The [custom\_prompt\_judge](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.judges.custom_prompt_judge) API is designed to help you quickly and easily create LLM scorers when you need full control over the judge's prompt or need to return multiple output values beyond "pass" / "fail", for example, "great", "ok", "bad".
 
@@ -94,7 +94,7 @@ register_prompt(
 
 ## Selecting Judge Models[​](#selecting-judge-models "Direct link to Selecting Judge Models")
 
-MLflow supports all major LLM providers, such as OpenAI, Anthropic, Google, xAI, and more. See [Supported Models](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge.md#supported-models) for more details.
+MLflow supports all major LLM providers, such as OpenAI, Anthropic, Google, xAI, and more. See [Supported Models](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/supported-models.md) for more details.
 
 python
 

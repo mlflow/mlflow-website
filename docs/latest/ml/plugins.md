@@ -571,9 +571,11 @@ python
 import mlflow
 
 # Evaluate with Giskard
-result = mlflow.evaluate(
+result = mlflow.models.evaluate(
     model,
     eval_data,
+    targets="label",
+    model_type="classifier",
     evaluators=["giskard"],
     evaluator_config={
         "giskard": {

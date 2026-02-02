@@ -12,7 +12,7 @@ Unlike static test files, evaluation datasets are **living validation collection
 
 They can be viewed directly within the MLflow UI.
 
-![Evaluation Datasets Video](/mlflow-website/docs/latest/images/eval-datasets.gif)
+[](/mlflow-website/docs/latest/images/eval-datasets.mp4)
 
 ## Core Components[​](#core-components "Direct link to Core Components")
 

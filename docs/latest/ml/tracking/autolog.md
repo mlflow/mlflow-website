@@ -76,7 +76,7 @@ Once your training job finishes, you can run following command to launch the MLf
 bash
 
 ```bash
-mlflow ui --port 8080
+mlflow server --port 8080
 
 ```
 

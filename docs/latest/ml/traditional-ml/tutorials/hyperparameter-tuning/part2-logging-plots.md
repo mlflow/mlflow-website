@@ -241,7 +241,7 @@ with mlflow.start_run() as run:
 
 If we head over to the MLflow UI after executing this training cell, we can see all of our plots that have been defined within the artifact viewer pane. Whether the plots were logged with the `log_figure()` API or were fetched from the local file system and logged via `log_artifacts()`, we're able to see the run-relevant plots associated with our data and our trained model, capturing the state at which the run was conducted.
 
-![Viewing plots in the UI](/mlflow-website/docs/latest/assets/images/plots-in-ui-a58dbe250b71f76b1c59fa89e871ea56.gif)
+[](/mlflow-website/docs/latest/images/guides/introductory/hyperparameter-tuning-with-child-runs/plots-in-ui.mp4)
 
 Viewing logged plots and figures in the MLflow UI
 

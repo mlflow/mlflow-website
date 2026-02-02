@@ -18,6 +18,7 @@ mlflow.pydantic_ai.autolog()
 MLflow trace automatically captures the following information about ​PydanticAI agents:
 
 * Agent calls with prompts, kwargs & output responses
+* Streaming operations via `run_stream` (async) and `run_stream_sync` (sync)
 * LLM requests logging model name, prompt, parameters & response
 * Tool runs capturing tool name, arguments & usage metrics
 * MCP server calls & listings for tool-invocation tracing
@@ -25,7 +26,7 @@ MLflow trace automatically captures the following information about ​PydanticA
 
 note
 
-Currently, MLflow's PydanticAI integration supports tracing for both synchronous and asynchronous executions, but does not yet support streaming operations.
+MLflow's PydanticAI integration supports tracing for synchronous, asynchronous, and streaming executions. The `run_stream_sync` method requires PydanticAI version 1.10.0 or later.
 
 ### Example Usage[​](#example-usage "Direct link to Example Usage")
 
@@ -239,6 +240,69 @@ await main()
 # asyncio.run(main())
 
 ```
+
+## Streaming Support[​](#streaming-support "Direct link to Streaming Support")
+
+MLflow supports tracing for PydanticAI's streaming APIs, including both async (`run_stream`) and sync (`run_stream_sync`) methods. When using streaming, MLflow captures the complete trace including all LLM calls and tool invocations.
+
+### Async Streaming with `run_stream`[​](#async-streaming-with-run_stream "Direct link to async-streaming-with-run_stream")
+
+![PydanticAI run\_stream Tracing](/mlflow-website/docs/latest/assets/images/pydanticai-run-stream-tracing-5506a5fe5cae34f5d7aad05e0e990b07.png)
+
+python
+
+```python
+import mlflow
+import asyncio
+from pydantic_ai import Agent
+
+mlflow.pydantic_ai.autolog()
+
+agent = Agent("openai:gpt-4o", instrument=True)
+
+
+async def main():
+    async with agent.run_stream("Tell me a joke") as response:
+        # Stream the text as it arrives
+        async for chunk in response.stream_text(delta=True):
+            print(chunk, end="", flush=True)
+        print()
+
+
+asyncio.run(main())
+
+```
+
+### Sync Streaming with `run_stream_sync`[​](#sync-streaming-with-run_stream_sync "Direct link to sync-streaming-with-run_stream_sync")
+
+![PydanticAI run\_stream\_sync Tracing](/mlflow-website/docs/latest/assets/images/pydanticai-run-stream-sync-tracing-83a16166f581b65ae7e40f97147d48af.png)
+
+The `run_stream_sync` method (available in PydanticAI 1.10.0+) provides synchronous streaming:
+
+python
+
+```python
+import mlflow
+from pydantic_ai import Agent
+
+mlflow.pydantic_ai.autolog()
+
+agent = Agent("openai:gpt-4o", instrument=True)
+
+# Synchronous streaming
+result = agent.run_stream_sync("Tell me a joke")
+for chunk in result.stream_text():
+    print(chunk, end="", flush=True)
+print()
+print(f"Final output: {result.get_output()}")
+
+```
+
+Both streaming methods will create traces that include:
+
+* The root `Agent.run_stream` or `Agent.run_stream_sync` span
+* Child `InstrumentedModel.request_stream` spans for each LLM call
+* Any tool invocation spans if tools are used during the conversation
 
 ## Token usage[​](#token-usage "Direct link to Token usage")
 

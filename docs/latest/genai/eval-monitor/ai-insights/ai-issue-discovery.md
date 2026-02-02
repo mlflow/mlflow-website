@@ -64,7 +64,7 @@ mlflow ai-commands run genai/analyze_experiment
 ### Prerequisites[​](#prerequisites-1 "Direct link to Prerequisites")
 
 * A coding agent with MCP support (e.g., Claude Code, Cursor, Windsurf, etc.)
-* MLflow 3.4 or later: `pip install mlflow>=3.4`
+* MLflow 3.4 or later: `pip install 'mlflow[genai]>=3.4'`
 * Access to MLflow tracking server with logged traces
 
 ## Analysis Workflow[​](#analysis-workflow "Direct link to Analysis Workflow")

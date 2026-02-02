@@ -23,7 +23,7 @@ MLflow's integration with LlamaIndex's Workflow API is available in MLflow >= 2.
 python
 
 ```python
-%pip install mlflow>=2.17.0 llama-index>=0.11.16 -qqqU
+%pip install 'mlflow[genai]>=2.17.0' llama-index>=0.11.16 -qqqU
 # Workflow util is required for rendering Workflow as HTML
 %pip install llama-index-utils-workflow -qqqU
 
@@ -379,7 +379,7 @@ await agent.run(input="What is (123 + 456) * 789?")
 
 The generated traces are automatically recorded to your MLflow Experiment.
 
-1. Open a terminal, run `mlflow ui --port 5000` within the current directory (and keep it running).
+1. Open a terminal, run `mlflow server --port 5000` within the current directory (and keep it running).
 2. Navigate to `http://127.0.0.1:5000` in your browser.
 3. Open the experiment "MLflow LlamaIndex Workflow Tutorial".
 4. Navigate to the "Trace" tab below the experiment name header.

@@ -1,6 +1,6 @@
 # Tracing LangChain🦜⛓️
 
-![LangChain Tracing via autolog](/mlflow-website/docs/latest/assets/images/tracing-top-dcca046565ab33be6afe0447dd328c22.gif)
+[](/mlflow-website/docs/latest/images/llms/tracing/tracing-top.mp4)
 
 [LangChain](https://www.langchain.com/) is an open-source framework for building LLM-powered applications.
 
@@ -37,7 +37,7 @@ Start the MLflow server following the [Self-Hosting Guide](/mlflow-website/docs/
 bash
 
 ```bash
-pip install langchain langchain-openai mlflow
+pip install langchain langchain-openai 'mlflow[genai]'
 
 ```
 

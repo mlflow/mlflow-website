@@ -177,7 +177,7 @@ System metrics are available within the MLflow UI under the metrics section. In 
 bash
 
 ```bash
-mlflow ui
+mlflow server
 
 ```
 

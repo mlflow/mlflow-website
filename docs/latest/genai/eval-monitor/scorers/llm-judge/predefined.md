@@ -1,20 +1,27 @@
-# Predefined LLM Scorers
+# Built-in LLM Judges
 
-MLflow provides several pre-configured LLM judge scorers optimized for common evaluation scenarios.
-
-tip
-
-Typically, you can get started with evaluation using predefined scorers. However, every AI application is unique and has domain-specific quality criteria. At some point, you'll need to create your own custom LLM scorers.
-
-* Your application has complex inputs/outputs that predefined scorers can't parse
-* You need to evaluate specific business logic or domain-specific criteria
-* You want to combine multiple evaluation aspects into a single scorer
-
-See [custom LLM scorers](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/guidelines.md) guide for detailed examples.
+MLflow provides several pre-configured LLM judges optimized for common evaluation scenarios.
 
 ## Example Usage[​](#example-usage "Direct link to Example Usage")
 
-To use the predefined LLM scorers, select the scorer class from the [available scorers](#available-scorers) and pass it to the `scorers` argument of the [evaluate](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.evaluate) function.
+* UI
+* SDK
+
+Version Requirements
+
+The Judge Builder UI requires **MLflow >= 3.9.0**.
+
+The MLflow UI provides a visual Judge Builder that lets you create custom LLM judges without writing code.
+
+1. Navigate to your experiment and select the **Judges** tab, then click **New LLM judge**
+
+2. **LLM judge**: Select a built-in judge. We're using the `RelevanceToQuery` and `Correctness` judges in this example.
+
+![RelevanceToQuery Judge UI](/mlflow-website/docs/latest/images/mlflow-3/eval-monitor/scorers/relevance-create-judge-ui.png)
+
+3. Click **Create judge** to save your new LLM judge
+
+To use the built-in LLM judges, select the judge class from the [available judges](#available-judges) and pass it to the `scorers` argument of the [evaluate](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.evaluate) function.
 
 python
 
@@ -26,7 +33,7 @@ eval_dataset = [
     {
         "inputs": {"query": "What is the most common aggregate function in SQL?"},
         "outputs": "The most common aggregate function in SQL is SUM().",
-        # Correctness scorer requires an "expected_facts" field.
+        # Correctness judge requires an "expected_facts" field.
         "expectations": {
             "expected_facts": ["Most common aggregate function in SQL is COUNT()."],
         },
@@ -48,129 +55,93 @@ results = mlflow.genai.evaluate(
     scorers=[
         Correctness(),
         RelevanceToQuery(),
-        # Guidelines is a special scorer that takes user-defined criteria for evaluation.
-        # See the "Customizing LLM Judges" section below for more details.
-        Guidelines(
-            name="is_concise",
-            guidelines="The answer must be concise and straight to the point.",
-        ),
     ],
 )
 
 ```
 
-![Predefined LLM scorers result](/mlflow-website/docs/latest/images/mlflow-3/eval-monitor/scorers/predefined-scorers-results.png)
+![Built-in judges result](/mlflow-website/docs/latest/images/mlflow-3/eval-monitor/scorers/builtin-judges-results.png)
 
-## Available Scorers[​](#available-scorers "Direct link to Available Scorers")
+## Available Judges[​](#available-judges "Direct link to Available Judges")
 
-| Scorer                                                                                                                                       | What does it evaluate?                                       | Requires ground-truth? | Requires traces?      |
-| -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | ---------------------- | --------------------- |
-| [RelevanceToQuery](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.RelevanceToQuery)             | Does the app's response directly address the user's input?   | No                     | No                    |
-| [Correctness](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.Correctness)                       | Is the app's response correct compared to ground-truth?      | Yes\*                  | No                    |
-| [Guidelines](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.Guidelines)                         | Does the response adhere to provided guidelines?             | Yes\*                  | No                    |
-| [ExpectationsGuidelines](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.ExpectationsGuidelines) | Does the response meet specific expectations and guidelines? | Yes\*                  | No                    |
-| [Safety](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.Safety)                                 | Does the app's response avoid harmful or toxic content?      | No                     | No                    |
-| [Equivalence](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.Equivalence)                       | Is the app's response equivalent to the expected output?     | Yes                    | No                    |
-| [RetrievalGroundedness](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.RetrievalGroundedness)   | Is the app's response grounded in retrieved information?     | No                     | ⚠️ **Trace Required** |
-| [RetrievalRelevance](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.RetrievalRelevance)         | Are retrieved documents relevant to the user's request?      | No                     | ⚠️ **Trace Required** |
-| [RetrievalSufficiency](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.RetrievalSufficiency)     | Do retrieved documents contain all necessary information?    | Yes                    | ⚠️ **Trace Required** |
+### Response Quality[​](#response-quality "Direct link to Response Quality")
+
+| Judge                                                                                                                                                               | What does it evaluate?                                        | Requires ground-truth? | Requires traces? |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ---------------------- | ---------------- |
+| [RelevanceToQuery](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/rag/relevance.md#relevancetoquery-judge)                                        | Does the app's response directly address the user's input?    | No                     | No               |
+| [Correctness](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/response-quality/correctness.md)                                                     | Are the expected facts supported by the app's response?       | Yes\*                  | No               |
+| [Completeness](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.Completeness)\*\*                                        | Does the agent address all questions in a single user prompt? | No                     | No               |
+| [Fluency](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.Fluency)                                                      | Is the response grammatically correct and naturally flowing?  | No                     | No               |
+| [Safety](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/response-quality/safety.md)                                                               | Does the app's response avoid harmful or toxic content?       | No                     | No               |
+| [Equivalence](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.Equivalence)                                              | Is the app's response equivalent to the expected output?      | Yes                    | No               |
+| [Guidelines](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/guidelines.md#1-built-in-guidelines-judge-global-guidelines)                          | Does the response adhere to provided guidelines?              | Yes\*                  | No               |
+| [ExpectationsGuidelines](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/guidelines.md#2-built-in-expectationsguidelines-judge-per-row-guidelines) | Does the response meet specific expectations and guidelines?  | Yes\*                  | No               |
+
+### RAG[​](#rag "Direct link to RAG")
+
+| Judge                                                                                                                            | What does it evaluate?                                    | Requires ground-truth? | Requires traces?      |
+| -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ---------------------- | --------------------- |
+| [RetrievalRelevance](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/rag/relevance.md#retrievalrelevance-judge) | Are retrieved documents relevant to the user's request?   | No                     | ⚠️ **Trace Required** |
+| [RetrievalGroundedness](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/rag/groundedness.md)                    | Is the app's response grounded in retrieved information?  | No                     | ⚠️ **Trace Required** |
+| [RetrievalSufficiency](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/rag/context-sufficiency.md)              | Do retrieved documents contain all necessary information? | Yes                    | ⚠️ **Trace Required** |
+
+### Tool Call[​](#tool-call "Direct link to Tool Call")
+
+| Judge                                                                                                                | What does it evaluate?                                       | Requires ground-truth? | Requires traces?      |
+| -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | ---------------------- | --------------------- |
+| [ToolCallCorrectness](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/tool-call/correctness.md)\*\* | Are the tool calls and arguments correct for the user query? | No                     | ⚠️ **Trace Required** |
+| [ToolCallEfficiency](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/tool-call/efficiency.md)\*\*   | Are the tool calls efficient without redundancy?             | No                     | ⚠️ **Trace Required** |
 
 \*Can extract expectations from trace assessments if available.
 
+\*\*Indicates experimental features that may change in future releases.
+
+### Multi-Turn[​](#multi-turn "Direct link to Multi-Turn")
+
+Multi-turn judges evaluate entire conversation sessions rather than individual turns. They require traces with session IDs and are experimental in MLflow 3.7.0. See [Track Users and Sessions](/mlflow-website/docs/latest/genai/tracing/track-users-sessions.md)
+
+Multi-Turn Evaluation Requirements
+
+Multi-turn judges require:
+
+1. **Session IDs**: Traces must have `mlflow.trace.session` metadata
+2. **List or DataFrame input**: Currently only supports pre-collected traces (no `predict_fn` support yet)
+
+| Judge                                                                                                                                                                | What does it evaluate?                                                     | Requires Session? |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------- |
+| [ConversationCompleteness](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.ConversationCompleteness)\*\*                 | Does the agent address all user questions throughout the conversation?     | Yes               |
+| [ConversationalGuidelines](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.ConversationalGuidelines)\*\*                 | Do the assistant's responses comply with provided guidelines?              | Yes               |
+| [ConversationalRoleAdherence](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.ConversationalRoleAdherence)\*\*           | Does the assistant maintain its assigned role throughout the conversation? | Yes               |
+| [ConversationalSafety](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.ConversationalSafety)\*\*                         | Are the assistant's responses safe and free of harmful content?            | Yes               |
+| [ConversationalToolCallEfficiency](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.ConversationalToolCallEfficiency)\*\* | Was tool usage across the conversation efficient and appropriate?          | Yes               |
+| [KnowledgeRetention](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.KnowledgeRetention)\*\*                             | Does the assistant correctly retain information from earlier user inputs?  | Yes               |
+| [UserFrustration](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.UserFrustration)\*\*                                   | Is the user frustrated? Was the frustration resolved?                      | Yes               |
+
 Availability
 
-Safety and RetrievalRelevance scorers are currently only available in [Databricks managed MLflow](https://docs.databricks.com/mlflow3/genai/eval-monitor/) and will be open-sourced soon.
+Safety and RetrievalRelevance judges are currently only available in [Databricks managed MLflow](https://docs.databricks.com/mlflow3/genai/eval-monitor/) and will be open-sourced soon.
 
-## Using Traces with Built-in Scorers[​](#using-traces-with-built-in-scorers "Direct link to Using Traces with Built-in Scorers")
+tip
 
-All built-in scorers, such as Guidelines, RelevanceToQuery, Safety, Correctness, and ExpectationsGuidelines, can extract inputs and outputs directly from traces:
+Typically, you can get started with evaluation using built-in judges. However, every AI application is unique and has domain-specific quality criteria. At some point, you'll need to create your own custom LLM judges.
 
-python
+* Your application has complex inputs/outputs that built-in judges can't parse
+* You need to evaluate specific business logic or domain-specific criteria
+* You want to combine multiple evaluation aspects into a single judge
 
-```python
-from mlflow.genai.scorers import Correctness
-
-trace = mlflow.get_trace("<your-trace-id>")
-scorer = Correctness()
-
-# Extracts inputs/outputs from trace automatically
-result = scorer(trace=trace)
-
-# Override specific fields as needed
-result = scorer(trace=trace, expectations={"expected_facts": ["Custom fact"]})
-
-```
-
-### Automatic Fallback for Complex Traces[​](#automatic-fallback-for-complex-traces "Direct link to Automatic Fallback for Complex Traces")
-
-For complex traces or those that do not contain inputs and outputs in the root span, the scorer will use tool calling to provide the trace information to an LLM judge.
-
-Retrieval Scorers Require Traces
-
-**Retrieval scorers will NOT work with static pandas DataFrames** that only contain inputs/outputs/expectations fields.
-
-These scorers require:
-
-1. **Active traces** with spans of type `RETRIEVER`
-2. Either a `predict_fn` that generates traces during evaluation, OR pre-collected traces in your dataset
-
-**Common Error:** If you're trying to use retrieval scorers with a static dataset and getting errors about missing traces or RETRIEVER spans, you need to either:
-
-* Switch to scorers that work with static data (marked with ✅ in the table above)
-* Modify your evaluation to use a `predict_fn` that generates traces
-* Use [automatic tracing integration](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/automatic.md) with your application
-
-## Selecting Judge Models[​](#selecting-judge-models "Direct link to Selecting Judge Models")
-
-MLflow supports all major LLM providers, such as OpenAI, Anthropic, Google, xAI, and more.
-
-See [Supported Models](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge.md#supported-models) for more details.
-
-## Output Format[​](#output-format "Direct link to Output Format")
-
-Predefined LLM-based scorers in MLflow return structured assessments with three key components:
-
-* **Score**: Binary output (`yes`/`no`) renders as
-
-  Pass
-
-  or
-
-  Fail
-
-  in the UI.
-
-* **Rationale**: Detailed explanation of why the judge made its decision
-
-* **Source**: Metadata about the evaluation source
-
-text
-
-```text
-score: "yes"  # or "no"
-rationale: "The response accurately addresses the user's question about machine learning concepts, providing clear definitions and relevant examples. The information is factually correct and well-structured."
-source: AssessmentSource(
-    source_type="LLM_JUDGE",
-    source_id="openai:/gpt-4o-mini"
-)
-
-```
-
-Why Binary Scores?
-
-Binary scoring provides clearer, more consistent evaluations compared to numeric scales (1-5). Research shows that LLMs produce more reliable judgments when asked to make binary decisions rather than rating on a scale. Binary outputs also simplify threshold-based decision making in production systems.
+See [custom LLM judges](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/guidelines.md) guide for detailed examples.
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")
 
-### [Guidelines Scorer](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/guidelines.md)
+### [Guidelines Judge](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/guidelines.md)
 
-[Learn how to use the Guidelines scorer to evaluate responses against custom criteria](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/guidelines.md)
+[Learn how to use the Guidelines judge to evaluate responses against custom criteria](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/guidelines.md)
 
 [Learn more →](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/guidelines.md)
 
 ### [Evaluate Agents](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/agents.md)
 
-[Learn how to evaluate AI agents with specialized techniques and scorers](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/agents.md)
+[Learn how to evaluate AI agents with specialized techniques and judges](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/agents.md)
 
 [Learn more →](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/agents.md)
 

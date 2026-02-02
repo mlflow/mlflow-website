@@ -4,7 +4,7 @@
 
 ## Using the MLflow Tracing SDK[​](#using-the-mlflow-tracing-sdk "Direct link to Using the MLflow Tracing SDK")
 
-The MLflow Tracing SDK is built on top of the OpenTelemetry SDK. If you want to instrument your AI applications with minimal effort, use the [MLflow Tracing SDK](/mlflow-website/docs/latest/genai/tracing/quickstart/python-openai.md).
+The MLflow Tracing SDK is built on top of the OpenTelemetry SDK. If you want to instrument your AI applications with minimal effort, use the [MLflow Tracing SDK](/mlflow-website/docs/latest/genai/tracing/quickstart.md).
 
 python
 
@@ -37,7 +37,7 @@ For more details about the MLflow OpenTelemetry integration, see [Collect OpenTe
 
 ## Combining the OpenTelemetry SDK and the MLflow Tracing SDK[​](#combining-the-opentelemetry-sdk-and-the-mlflow-tracing-sdk "Direct link to Combining the OpenTelemetry SDK and the MLflow Tracing SDK")
 
-Since the MLflow Tracing SDK is built on top of the OpenTelemetry SDK, you can combine them to get the best of both worlds. To use both SDKs in a single application, set the `MLFLOW_USE_DEFAULT_TRACER_PROVIDER` environment variable to `false`.
+Since the MLflow Tracing SDK is built on top of the OpenTelemetry SDK, you can combine them to get the best of both worlds. To use both SDKs in a single application, set the `MLFLOW_USE_DEFAULT_TRACER_PROVIDER` environment variable to `false`. Then, you should invoke [`mlflow.tracing.set_destination()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.tracing.html#mlflow.tracing.set_destination) to add MLflow's span processors to the existing trace provider, ensuring spans from both OpenTelemetry and MLflow to be combined into a single trace.
 
 The following example shows how to combine MLflow's OpenAI auto-tracing with OpenTelemetry's native FastAPI instrumentation.
 
@@ -46,6 +46,7 @@ python
 ```python
 import os
 import mlflow
+from mlflow.entities.trace_location import MlflowExperimentLocation
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, Response
 from openai import OpenAI
@@ -59,7 +60,9 @@ os.environ["MLFLOW_USE_DEFAULT_TRACER_PROVIDER"] = "false"
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     mlflow.set_tracking_uri("http://localhost:5000")
-    mlflow.set_experiment("FastAPI")
+    exp_id = mlflow.set_experiment("FastAPI").experiment_id
+    # this ensures mlflow spans and FastAPI instrumentation spans are combined
+    mlflow.tracing.set_destination(MlflowExperimentLocation(exp_id))
     mlflow.openai.autolog()
     yield
 
@@ -79,3 +82,52 @@ async def answer_question(query: Request) -> Response:
 Spans generated from both SDKs will be merged into a single trace.
 
 ![The MLflow UI showing the MLflow and OpenTelemetry combined spans](/mlflow-website/docs/latest/images/llms/tracing/opentelemetry/mlflow-otel-combined.png)
+
+### Setting Up TraceProvider By Yourself[​](#setting-up-traceprovider-by-yourself "Direct link to Setting Up TraceProvider By Yourself")
+
+You can explicitly configure your own `TracerProvider` (for example, to add custom processors or exporters). Setting `MLFLOW_USE_DEFAULT_TRACER_PROVIDER` to `false` and calling [`mlflow.tracing.set_destination()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.tracing.html#mlflow.tracing.set_destination) ensures MLflow and OpenTelemetry spans are combined into a single trace.
+
+important
+
+[`mlflow.tracing.set_destination()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.tracing.html#mlflow.tracing.set_destination) must be invoked after you explicitly configured the trace provider.
+
+python
+
+```python
+import os
+import mlflow
+from mlflow.entities.trace_location import MlflowExperimentLocation
+from opentelemetry import trace as otel_trace
+from opentelemetry.sdk.trace import TracerProvider
+
+# Use the OpenTelemetry tracer provider instead of MLflow's default tracer provider.
+os.environ["MLFLOW_USE_DEFAULT_TRACER_PROVIDER"] = "false"
+
+# Set up the MLflow experiment
+mlflow.set_tracking_uri("http://localhost:5000")
+experiment_id = mlflow.set_experiment("my_experiment").experiment_id
+
+# Create and set your own TracerProvider
+external_provider = TracerProvider()
+otel_trace.set_tracer_provider(external_provider)
+
+# Set MLflow tracing destination to the experiment (or UC schema), this ensures mlflow
+# span processors are added to the tracer provider
+mlflow.tracing.set_destination(MlflowExperimentLocation(experiment_id))
+
+# Now you can use both OpenTelemetry and MLflow tracing together
+otel_tracer = otel_trace.get_tracer("my_app")
+
+with otel_tracer.start_as_current_span("http_request") as external_span:
+    external_span.set_attribute("http.method", "GET")
+
+    # MLflow spans will be nested under the OpenTelemetry span
+    with mlflow.start_span("model_prediction") as mlflow_span:
+        mlflow_span.set_inputs({"query": "test"})
+        mlflow_span.set_outputs({"result": "success"})
+
+```
+
+Both the OpenTelemetry span (`http_request`) and the MLflow span (`model_prediction`) will appear in the same trace in the MLflow UI.
+
+![The MLflow UI showing the MLflow and OpenTelemetry combined spans when trace provider is set](/mlflow-website/docs/latest/images/llms/tracing/opentelemetry/mlflow-otel-trace-provider.png)

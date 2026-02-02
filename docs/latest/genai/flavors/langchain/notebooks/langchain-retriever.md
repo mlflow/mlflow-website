@@ -147,8 +147,7 @@ def fetch_federal_document(url, div_class):
       soup = BeautifulSoup(response.text, "html.parser")
 
       # Finding the transcript section by its HTML structure
-      transcript_section = soup.find("div", class_=div_class)
-      if transcript_section:
+      if transcript_section := soup.find("div", class_=div_class):
           transcript_text = transcript_section.get_text(separator="
 ", strip=True)
           return transcript_text

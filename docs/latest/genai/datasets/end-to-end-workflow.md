@@ -15,7 +15,7 @@ Evaluation Datasets require an MLflow Tracking Server with a **[SQL backend](/ml
 bash
 
 ```bash
-pip install --upgrade mlflow>=3.4 openai
+pip install --upgrade 'mlflow[genai]>=3.4' openai
 
 ```
 

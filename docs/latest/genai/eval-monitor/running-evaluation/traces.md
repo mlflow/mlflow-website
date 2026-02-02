@@ -33,95 +33,54 @@ First, install the required packages by running the following command:
 bash
 
 ```bash
-pip install --upgrade mlflow>=3.3 openai
+pip install --upgrade 'mlflow[genai]>=3.3' openai
 
 ```
 
 MLflow stores evaluation results in a tracking server. Connect your local environment to the tracking server by one of the following methods.
 
+* Local (uv)
 * Local (pip)
 * Local (docker)
-* Remote MLflow Server
-* Databricks
 
-For the fastest setup, you can install the [mlflow](https://pypi.org/project/mlflow/) Python package and run MLflow locally:
+Install the Python package manager [uv](https://docs.astral.sh/uv/getting-started/installation/) (that will also install [`uvx` command](https://docs.astral.sh/uv/guides/tools/) to invoke Python tools without installing them).
 
-bash
+Start a MLflow server locally.
 
-```bash
-mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5000
+shell
 
-```
-
-This will start the server at port 5000 on your local machine. Connect your notebook/IDE to the server by setting the tracking URI. You can also access to the MLflow UI at <http://localhost:5000>.
-
-python
-
-```python
-import mlflow
-
-mlflow.set_tracking_uri("http://localhost:5000")
+```shell
+uvx mlflow server
 
 ```
 
-You can also brows the MLflow UI at <http://localhost:5000>.
+**Python Environment**: Python 3.10+
 
-MLflow provides a Docker Compose file to start a local MLflow server with a postgres database and a minio server.
+Install the `mlflow` Python package via `pip` and start a MLflow server locally.
 
-bash
+shell
 
-```bash
-git clone https://github.com/mlflow/mlflow.git
+```shell
+pip install --upgrade 'mlflow[genai]'
+mlflow server
+
+```
+
+MLflow provides a Docker Compose file to start a local MLflow server with a PostgreSQL database and a MinIO server.
+
+shell
+
+```shell
+git clone --depth 1 --filter=blob:none --sparse https://github.com/mlflow/mlflow.git
+cd mlflow
+git sparse-checkout set docker-compose
 cd docker-compose
 cp .env.dev.example .env
 docker compose up -d
 
 ```
 
-This will start the server at port 5000 on your local machine. Connect your notebook/IDE to the server by setting the tracking URI. You can also access to the MLflow UI at <http://localhost:5000>.
-
-python
-
-```python
-import mlflow
-
-mlflow.set_tracking_uri("http://localhost:5000")
-
-```
-
-Refer to the [instruction](https://github.com/mlflow/mlflow/tree/master/docker-compose/README.md) for more details, e.g., overriding the default environment variables.
-
-If you have a remote MLflow tracking server, configure the connection:
-
-python
-
-```python
-import os
-import mlflow
-
-# Set your MLflow tracking URI
-os.environ["MLFLOW_TRACKING_URI"] = "http://your-mlflow-server:5000"
-# Or directly in code
-mlflow.set_tracking_uri("http://your-mlflow-server:5000")
-
-```
-
-If you have a Databricks account, configure the connection:
-
-python
-
-```python
-import mlflow
-
-mlflow.login()
-
-```
-
-This will prompt you for your configuration details (Databricks Host url and a PAT).
-
-tip
-
-If you are unsure about how to set up an MLflow tracking server, you can start with the cloud-based MLflow powered by Databricks: [Sign up for free →](https://login.databricks.com/?destination_url=%2Fml%2Fexperiments-signup%3Fsource%3DTRY_MLFLOW\&dbx_source=TRY_MLFLOW\&signup_experience_step=EXPRESS\&provider=MLFLOW\&utm_source=mlflow_org\&tuuid=a9534f33-78bf-4b81-becc-4334e993251d\&rl_aid=e6685d78-9f85-4fed-b64f-08e247f53547\&intent=SIGN_UP)
+Refer to the [instruction](https://github.com/mlflow/mlflow/tree/master/docker-compose/README.md) for more details (e.g., overriding the default environment variables).
 
 ### Step 0: Simulate Production Traces[​](#step-0-simulate-production-traces "Direct link to Step 0: Simulate Production Traces")
 

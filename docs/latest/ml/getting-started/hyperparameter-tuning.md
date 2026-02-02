@@ -1,5 +1,9 @@
 # Tracking Hyperparameter Tuning with MLflow
 
+MLflow Assistant
+
+Need help setting up tracking? Try [MLflow Assistant](/mlflow-website/docs/latest/genai/getting-started/try-assistant.md) - a powerful AI assistant that can help you set up MLflow tracking for your project.
+
 ![MLflow UI Chart page](/mlflow-website/docs/latest/images/tutorials/introductory/hyperparameter-tuning/ui-compare-metrics.png)
 
 Hyperparameter tuning is an important process for improving the performance of a machine learning model, however, it can be cumbersome to manually track and compare the different trials. MLflow provides a powerful framework for hyperparameter tuning that allows you to systematically explore the hyperparameter space and find the best model.
@@ -132,7 +136,7 @@ To see the results of training, you can access the MLflow UI by navigating to th
 bash
 
 ```bash
-mlflow ui --port 5000
+mlflow server --port 5000
 
 ```
 

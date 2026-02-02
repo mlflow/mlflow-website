@@ -73,7 +73,7 @@ Once your training job finishes, you can run the following command to launch the
 bash
 
 ```bash
-mlflow ui --port 8080 --backend-store-uri sqlite:///mlruns.db
+mlflow server --port 8080 --backend-store-uri sqlite:///mlruns.db
 
 ```
 

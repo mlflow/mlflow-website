@@ -1,8 +1,12 @@
 # MLflow Tracking Quickstart
 
-tip
+info
 
 Looking for using MLflow for LLMs/Agent development? Checkout the [MLflow for GenAI](/mlflow-website/docs/latest/genai.md) documentation instead. This guide is intended for data scientists who train traditional machine learning models, such as decision trees.
+
+MLflow Assistant
+
+Need help setting up tracking? Try [MLflow Assistant](/mlflow-website/docs/latest/genai/getting-started/try-assistant.md) - a powerful AI assistant that can help you set up MLflow tracking for your project.
 
 Welcome to MLflow! The purpose of this quickstart is to provide a quick guide to the most essential core APIs of MLflow Tracking. In just a few minutes of following along with this quickstart, you will learn:
 
@@ -59,7 +63,6 @@ X_train, X_test, y_train, y_test = train_test_split(
 params = {
     "solver": "lbfgs",
     "max_iter": 1000,
-    "multi_class": "auto",
     "random_state": 8888,
 }
 
@@ -99,7 +102,7 @@ To see the results of training, you can access the MLflow UI by navigating to th
 bash
 
 ```bash
-mlflow ui --port 5000
+mlflow server --port 5000
 
 ```
 

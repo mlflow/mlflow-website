@@ -37,7 +37,7 @@ def my_function(input_data):
 
 ### Q: Which libraries does MLflow Tracing support automatically?[​](#q-which-libraries-does-mlflow-tracing-support-automatically "Direct link to Q: Which libraries does MLflow Tracing support automatically?")
 
-MLflow provides automatic tracing (autolog) for 20+ popular libraries. See the complete list at [Automatic Tracing Integrations](/mlflow-website/docs/latest/genai/tracing/integrations.md).
+MLflow provides automatic tracing (autolog) for 40+ popular libraries. See the complete list at [Automatic Tracing Integrations](/mlflow-website/docs/latest/genai/tracing/integrations.md).
 
 ## User Interface and Jupyter Integration[​](#user-interface-and-jupyter-integration "Direct link to User Interface and Jupyter Integration")
 
@@ -109,7 +109,7 @@ def predict(messages: list[dict]) -> str:
 
 Yes, MLflow Tracing is stable and designed to be used in production environments.
 
-When using MLflow Tracing in production environments, we recommend using the [MLflow Tracing SDK](https://pypi.org/project/mlflow-tracing/) (`mlflow-tracing`) to instrument your code/models/agents with a minimal set of dependencies and a smaller installation footprint. The SDK is designed to be a perfect fit for production environments where you want an efficient and lightweight tracing solution. Please refer to the [Production Monitoring](/mlflow-website/docs/latest/genai/tracing/prod-tracing.md) section for more details.
+When using MLflow Tracing in production environments, we recommend using the [Production Tracing SDK](/mlflow-website/docs/latest/genai/tracing/lightweight-sdk.md) (`mlflow-tracing`) to instrument your code/models/agents with a minimal set of dependencies and a smaller installation footprint. Please refer to the [Production Monitoring](/mlflow-website/docs/latest/genai/tracing/prod-tracing.md) section for more details.
 
 ### Q: How do I enable asynchronous trace logging?[​](#q-how-do-i-enable-asynchronous-trace-logging "Direct link to Q: How do I enable asynchronous trace logging?")
 
@@ -251,7 +251,7 @@ There are multiple possible reasons why a trace may not be viewable in the MLflo
    bash
 
    ```bash
-   mlflow ui --host 0.0.0.0 --port 5000
+   mlflow server --host 0.0.0.0 --port 5000
 
    ```
 
@@ -521,7 +521,7 @@ Read more about [trace deletion](/mlflow-website/docs/latest/genai/tracing/obser
 
 Traces are stored in your MLflow tracking backend:
 
-**Local filesystem**: When using `mlflow ui` locally, traces are stored in the `mlruns` directory
+**Local filesystem**: When using `mlflow server` locally, traces are stored in the `mlruns` directory
 
 **Remote tracking server**: When using a remote MLflow server, traces are stored in the configured backend (database + artifact store)
 

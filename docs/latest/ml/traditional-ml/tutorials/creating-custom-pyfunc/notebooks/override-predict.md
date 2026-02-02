@@ -44,7 +44,7 @@ And the MLflow UI server can be started locally via:
 bash
 
 ```bash
-mlflow ui --host 127.0.0.1 --port 8090
+mlflow server --host 127.0.0.1 --port 8090
 
 ```
 

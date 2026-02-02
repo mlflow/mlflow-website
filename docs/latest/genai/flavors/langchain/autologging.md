@@ -9,7 +9,7 @@ MLflow LangChain Autologging is verified to be compatible with LangChain version
 text
 
 ```text
-pip install mlflow[langchain] --upgrade
+pip install 'mlflow[genai,langchain]' --upgrade
 
 ```
 
@@ -34,7 +34,7 @@ mlflow.langchain.autolog()
 
 Once you have invoked the chain, you can view the logged traces and artifacts in the MLflow UI.
 
-![LangChain Tracing via autolog](/mlflow-website/docs/latest/assets/images/tracing-top-dcca046565ab33be6afe0447dd328c22.gif)
+[](/mlflow-website/docs/latest/images/llms/tracing/tracing-top.mp4)
 
 ## Configure Autologging[​](#configure-autologging "Direct link to Configure Autologging")
 

@@ -20,7 +20,7 @@ In this example, we'll use the openai-agents-sdk to define our Responses API com
    bash
 
    ```bash
-   pip install -U openai-agents mlflow>=3.6.0
+   pip install -U openai-agents 'mlflow[genai]>=3.6.0'
    export OPENAI_API_KEY=sk-...
 
    ```

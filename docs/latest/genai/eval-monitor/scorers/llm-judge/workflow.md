@@ -187,7 +187,7 @@ python
 
 ```python
 # Retrieve traces with both judge and human assessments
-traces = mlflow.search_traces(experiment_ids=[experiment_id], return_type="list")
+traces = mlflow.search_traces(locations=[experiment_id], return_type="list")
 
 # Filter for traces with both assessments
 aligned_traces = []
@@ -260,7 +260,7 @@ Retrieve and use your registered judge with `mlflow.genai.evaluate()`:
 python
 
 ```python
-from mlflow.genai.scorers import get_scorer
+from mlflow.genai import get_scorer
 import pandas as pd
 
 # Retrieve the registered judge

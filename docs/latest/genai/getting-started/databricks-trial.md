@@ -71,7 +71,7 @@ Run the following command in your dev environment to install dependencies.
 bash
 
 ```bash
-%pip install -q mlflow
+%pip install -q 'mlflow[genai]'
 
 ```
 

@@ -255,7 +255,7 @@ If you log runs to a local `mlruns` directory, run the following command in the 
 bash
 
 ```bash
-mlflow ui --port 5000
+mlflow server --port 5000
 
 ```
 

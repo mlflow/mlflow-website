@@ -1,6 +1,6 @@
 # Tracing LangGraph🦜🕸️
 
-![LangChain Tracing via autolog](/mlflow-website/docs/latest/assets/images/langgraph-tracing-de19faf75490081f4df76705b9a508ff.gif)
+[](/mlflow-website/docs/latest/images/llms/tracing/langgraph-tracing.mp4)
 
 [LangGraph](https://www.langchain.com/langgraph) is an open-source library for building stateful, multi-actor applications with LLMs, used to create agent and multi-agent workflows.
 
@@ -36,7 +36,7 @@ Start the MLflow server following the [Self-Hosting Guide](/mlflow-website/docs/
 bash
 
 ```bash
-pip install langgraph langchain-openai mlflow
+pip install langgraph langchain-openai 'mlflow[genai]'
 
 ```
 
@@ -280,6 +280,26 @@ def code_check(state: GraphState):
 This way, the span for the `check_code` node will have child spans, which record whether the each validation fails or not, with their exception details.
 
 ![LangGraph Child Span](/mlflow-website/docs/latest/assets/images/langgraph-child-span-076b0cb599aeabce965b36602d5fda82.png)
+
+Async Context Propagation
+
+When using async methods like `ainvoke()` with manual `@mlflow.trace` decorators inside LangGraph nodes or tools, enable inline tracer execution to ensure proper context propagation:
+
+python
+
+```python
+mlflow.langchain.autolog(run_tracer_inline=True)
+
+```
+
+This ensures that manually traced spans are properly nested within the autolog trace hierarchy. Without this setting, manual spans may appear as separate traces in async scenarios.
+
+warning
+
+When `run_tracer_inline=True` is enabled, avoid calling multiple graph invocations sequentially within the same async function, as this may cause traces to merge unexpectedly. If you need to make multiple sequential invocations, either:
+
+* Wrap each invocation in a separate async task
+* Use the default `run_tracer_inline=False` if you don't need manual tracing integration
 
 ## Thread ID Tracking[​](#thread-id-tracking "Direct link to Thread ID Tracking")
 

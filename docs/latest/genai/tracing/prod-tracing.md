@@ -1,52 +1,37 @@
-# Production Monitoring for GenAI Applications
+# Production Tracing and Monitoring
 
-Machine learning projects don't conclude with their initial launch. Ongoing monitoring and incremental enhancements are critical for long-term success. MLflow Tracing offers comprehensive observability for your production applications, supporting the iterative process of continuous improvement while ensuring quality delivery to users.
+When you deploy an agent or LLM application to production, real users behave differently than test data—they find edge cases, ask unexpected questions, and expose issues you didn't anticipate. This guide covers how to configure MLflow Tracing for production environments—including automatic (online) quality evaluation—to catch these issues early and continuously improve your application.
 
-GenAI applications face unique challenges that make production monitoring essential. Quality drift can occur over time due to model updates, data distribution shifts, or new user interaction patterns. The operational complexity of multi-step workflows involving LLMs, vector databases, and retrieval systems creates multiple potential failure points that need continuous oversight. Cost management becomes critical as token usage and API costs can vary significantly based on user behavior and model performance.
+[](/mlflow-website/docs/latest/images/llms/tracing/overview_demo.mp4)
 
-## Key Monitoring Areas[​](#key-monitoring-areas "Direct link to Key Monitoring Areas")
+## Production Checklist[​](#production-checklist "Direct link to Production Checklist")
 
-Understanding what to monitor helps you focus on metrics that actually impact user experience and business outcomes. Rather than trying to monitor everything, focus on areas that provide actionable insights for your specific application and user base.
+We recommend the following steps before deploying to production. Each topic is covered in more detail below.
 
-* Operational Metrics
-* Quality Metrics
-* Business Impact
-
-**Performance and Reliability**: Monitor end-to-end response times from user request to final response, including LLM inference latency, retrieval system performance, and component-level bottlenecks. Track overall error rates, LLM API failures, timeout occurrences, and dependency failures to maintain system reliability.
-
-**Resource Utilization**: Monitor token consumption patterns, API cost tracking, request throughput, and system resource usage to optimize performance and control costs.
-
-**Business Metrics**: Track user engagement rates, session completion rates, feature adoption, and user satisfaction scores to understand the business impact of your application.
-
-**Response Quality**: Assess response relevance to user queries, factual accuracy, completeness of responses, and consistency across similar queries to ensure your application meets user needs.
-
-**Safety and Compliance**: Monitor for harmful content detection, bias monitoring, privacy compliance, and regulatory adherence, which is especially important for applications in regulated industries.
-
-**User Experience Quality**: Track response helpfulness, clarity and readability, appropriate tone and style, and multi-turn conversation quality to optimize user satisfaction.
-
-**Domain-Specific Quality**: Implement metrics that vary by application type, such as technical accuracy for specialized domains, citation quality for RAG applications, code quality for programming assistants, or creative quality for content generation.
-
-**User Behavior**: Monitor session duration and depth, feature usage patterns, user retention rates, and conversion metrics to understand how users engage with your application.
-
-**Operational Efficiency**: Track support ticket reduction, process automation success, time savings for users, and task completion rates to measure operational improvements.
-
-**Cost-Benefit Analysis**: Compare infrastructure costs versus value delivered, ROI on GenAI investment, productivity improvements, and customer satisfaction impact to justify and optimize your GenAI initiatives.
+* [ ] **[Use a production-grade SQL database](/mlflow-website/docs/latest/self-hosting/architecture/backend-store.md#relational-database-default)** — Use PostgreSQL, MySQL, or similar for reliability at scale
+* [ ] **[Enable async trace logging](#asynchronous-trace-logging)** — Upload traces in the background to avoid adding latency to your app
+* <!-- -->
+  \[Optional] **[Use the production tracing SDK](#using-the-production-tracing-sdk)** — Faster startup and smaller footprint than the full `mlflow` package
+* <!-- -->
+  \[Optional] **[Configure trace sampling](#sampling-traces)** — Control costs by logging a percentage of traces for high-volume applications
+* <!-- -->
+  \[Optional] **[Enable automatic quality evaluation](#automatic-online-quality-evaluation)** — Use LLM judges to monitor quality on production traffic
+* <!-- -->
+  \[Optional] **[Collect end-user feedback](#feedback-collection)** — Capture ratings and comments to identify issues and improve quality
+* <!-- -->
+  \[Optional] **[Add application context to traces](#adding-context-to-production-traces)** — Track user IDs, sessions, and metadata to debug and analyze behavior
 
 ## Setting Up Tracing for Production Endpoints[​](#setting-up-tracing-for-production-endpoints "Direct link to Setting Up Tracing for Production Endpoints")
 
-When deploying your GenAI application to production, you need to configure MLflow Tracing to send traces to your MLflow tracking server. This configuration forms the foundation for all production observability capabilities.
+For production deployments, we recommend the [Production Tracing SDK](#using-the-production-tracing-sdk) to minimize library dependencies and reduce startup time, and [async logging with sampling](#production-tracing-configurations) for better performance and cost control at scale.
 
-#### Pro Tip: Using the Lightweight Tracing SDK[​](#pro-tip-using-the-lightweight-tracing-sdk "Direct link to Pro Tip: Using the Lightweight Tracing SDK")
+#### Using the Production Tracing SDK[​](#using-the-production-tracing-sdk "Direct link to Using the Production Tracing SDK")
 
-The [MLflow Tracing SDK `mlflow-tracing`](/mlflow-website/docs/latest/genai/tracing/lightweight-sdk.md) is a lightweight package that only includes the minimum set of dependencies to instrument your code/models/agents with MLflow Tracing.
+The [Production Tracing SDK (`mlflow-tracing`)](/mlflow-website/docs/latest/genai/tracing/lightweight-sdk.md) is a smaller package that only includes the minimum set of dependencies to instrument your code/models/agents with MLflow Tracing.
 
 **⚡️ Faster Deployment**: Significantly smaller package size and fewer dependencies enable quicker deployments in containers and serverless environments
 
-**🔧 Simple Dependency Management**: Reduced dependencies mean less maintenance overhead and fewer potential conflicts
-
 **📦 Enhanced Portability**: Easily deploy across different platforms with minimal compatibility concerns
-
-**🔒 Improved Security**: Smaller attack surface with fewer dependencies reduces security risks
 
 **🚀 Performance Optimizations**: Optimized for high-volume tracing in production environments
 
@@ -56,9 +41,54 @@ Compatibility Warning
 
 When installing the MLflow Tracing SDK, make sure the environment **does not have** the full MLflow package installed. Having both packages in the same environment might cause conflicts and unexpected behaviors.
 
-### Environment Variable Configuration[​](#environment-variable-configuration "Direct link to Environment Variable Configuration")
+## Automatic (Online) Quality Evaluation[​](#automatic-online-quality-evaluation "Direct link to Automatic (Online) Quality Evaluation")
 
-Configure the following environment variables in your production environment. See [Production Monitoring Configurations](#production-monitoring-configurations) below for more details about these configurations.
+MLflow's [automatic evaluation](/mlflow-website/docs/latest/genai/eval-monitor/automatic-evaluations.md) enables continuous quality monitoring of production traffic using LLM judges. Judges run asynchronously on incoming traces without blocking your application, evaluating for issues like:
+
+* **Hallucinations and factual accuracy**
+* **PII leakage and safety violations**
+* **User frustration in multi-turn conversations**
+* **Response relevance and completeness**
+
+### Setting Up Production Judges[​](#setting-up-production-judges "Direct link to Setting Up Production Judges")
+
+You can configure LLM judges to automatically evaluate a sample of your production traces using the UI or SDK. Judges can be set up with sampling rates to control costs and filter strings to target specific traces. For detailed setup instructions and configuration options, see [Automatic Evaluation](/mlflow-website/docs/latest/genai/eval-monitor/automatic-evaluations.md).
+
+[](/mlflow-website/docs/latest/images/llms/tracing/automatic-evaluation-ui-setup.mp4)
+
+<br />
+
+python
+
+```python
+import mlflow
+from mlflow.genai.scorers import Guidelines, ScorerSamplingConfig
+
+mlflow.set_experiment("production-genai-app")
+
+# Create a judge for detecting potential issues
+safety_judge = Guidelines(
+    name="safety_check",
+    guidelines="The response must not contain PII, harmful content, or hallucinated information.",
+    model="gateway:/my-llm-endpoint",
+)
+
+# Register and start automatic evaluation
+registered_judge = safety_judge.register(name="production_safety_check")
+registered_judge.start(
+    sampling_config=ScorerSamplingConfig(
+        sample_rate=0.1,  # Evaluate 10% of traces
+        filter_string="metadata.environment = 'production'",  # Only production traces
+    ),
+)
+
+```
+
+## Production Tracing Configurations[​](#production-tracing-configurations "Direct link to Production Tracing Configurations")
+
+For production deployments, we recommend enabling [asynchronous trace logging](#asynchronous-trace-logging) to avoid blocking your application, and configuring [trace sampling](#sampling-traces) to control costs for high-volume traffic.
+
+Example configuration:
 
 bash
 
@@ -79,128 +109,6 @@ export MLFLOW_TRACE_SAMPLING_RATIO=0.1
 
 ```
 
-## Self-Hosted Tracking Server[​](#self-hosted-tracking-server "Direct link to Self-Hosted Tracking Server")
-
-You can use the MLflow tracking server to store production traces. However, the tracking server is optimized for offline experience and generally not suitable for handling hyper-scale traffic. For high-volume production workloads, consider using OpenTelemetry integration with dedicated observability platforms.
-
-If you choose to use the tracking server in production, we **strongly recommend**:
-
-1. **Use SQL-based tracking server** on top of a scalable database and artifact storage
-2. **Configure proper indexing** on trace tables for better query performance
-3. **Set up periodic deletion** for trace data management
-4. **Monitor server performance** and scale appropriately
-
-Refer to the [tracking server setup guide](/mlflow-website/docs/latest/ml/tracking.md#tracking-setup) for more details.
-
-### Performance Considerations[​](#performance-considerations "Direct link to Performance Considerations")
-
-**Database**: Use PostgreSQL or MySQL for better concurrent write performance rather than SQLite for production deployments.
-
-**Storage**: Use cloud storage (S3, Azure Blob, GCS) for artifact storage to ensure scalability and reliability.
-
-**Indexing**: Ensure proper indexes on `timestamp_ms`, `status`, and frequently queried tag columns to maintain query performance as trace volume grows.
-
-**Retention**: Implement data retention policies to manage storage costs and maintain system performance over time.
-
-### Docker Deployment Example[​](#docker-deployment-example "Direct link to Docker Deployment Example")
-
-When deploying with Docker, pass environment variables through your container configuration:
-
-dockerfile
-
-```dockerfile
-# Dockerfile
-FROM python:3.9-slim
-
-# Install dependencies
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-# Copy application code
-COPY . /app
-WORKDIR /app
-
-# Set default environment variables (can be overridden at runtime)
-ENV MLFLOW_TRACKING_URI=""
-ENV MLFLOW_EXPERIMENT_NAME="production-genai-app"
-ENV MLFLOW_ENABLE_ASYNC_TRACE_LOGGING=true
-
-CMD ["python", "app.py"]
-
-```
-
-Run the container with environment variables:
-
-bash
-
-```bash
-docker run -d \
-  -e MLFLOW_TRACKING_URI="http://your-mlflow-server:5000" \
-  -e MLFLOW_EXPERIMENT_NAME="production-genai-app" \
-  -e MLFLOW_ENABLE_ASYNC_TRACE_LOGGING=true \
-  -e APP_VERSION="1.0.0" \
-  your-app:latest
-
-```
-
-### Kubernetes Deployment Example[​](#kubernetes-deployment-example "Direct link to Kubernetes Deployment Example")
-
-For Kubernetes deployments, use ConfigMaps and Secrets:
-
-yaml
-
-```yaml
-# configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: mlflow-config
-data:
-  MLFLOW_TRACKING_URI: 'http://mlflow-server:5000'
-  MLFLOW_EXPERIMENT_NAME: 'production-genai-app'
-  MLFLOW_ENABLE_ASYNC_TRACE_LOGGING: 'true'
-
----
-# deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: genai-app
-spec:
-  template:
-    spec:
-      containers:
-        - name: app
-          image: your-app:latest
-          envFrom:
-            - configMapRef:
-                name: mlflow-config
-          env:
-            - name: APP_VERSION
-              value: '1.0.0'
-
-```
-
-## OpenTelemetry Backends[​](#opentelemetry-backends "Direct link to OpenTelemetry Backends")
-
-MLflow Traces can be exported to any OpenTelemetry-compatible backend. See the [OpenTelemetry Integration](/mlflow-website/docs/latest/genai/tracing/opentelemetry/export.md) documentation for more details.
-
-## Managed Monitoring with Databricks[​](#managed-monitoring-with-databricks "Direct link to Managed Monitoring with Databricks")
-
-Databricks also offers a [managed solution](https://docs.databricks.com/aws/en/generative-ai/agent-evaluation/monitoring) for monitoring your GenAI applications that integrates with MLflow Tracing.
-
-![Monitoring Hero](https://assets.docs.databricks.com/_static/images/generative-ai/monitoring/monitoring-hero.gif)
-
-Capabilities include:
-
-* Track **operational metrics** like request volume, latency, errors, and cost.
-* Monitor **quality metrics** such as correctness, safety, context sufficiency, and more using managed evaluation.
-* Configure **custom metrics** with Python function.
-* Root cause analysis by looking at the recorded **traces** from MLflow Tracing.
-* Support for applications hosted outside of Databricks
-
-## Production Monitoring Configurations[​](#production-monitoring-configurations "Direct link to Production Monitoring Configurations")
-
 ### Asynchronous Trace Logging[​](#asynchronous-trace-logging "Direct link to Asynchronous Trace Logging")
 
 For production applications, MLflow logs traces asynchronously by default to prevent blocking your application:
@@ -212,21 +120,9 @@ For production applications, MLflow logs traces asynchronously by default to pre
 | `MLFLOW_ASYNC_TRACE_LOGGING_MAX_QUEUE_SIZE` | The maximum number of traces that can be queued before being logged to backend by the worker threads. When the queue is full, new traces will be discarded. Increasing this allows higher durability of trace logging, but also increases memory consumption. | `1000`        |
 | `MLFLOW_ASYNC_TRACE_LOGGING_RETRY_TIMEOUT`  | The timeout in seconds for retrying failed trace logging. When a trace logging fails, it will be retried up to this timeout with backoff, after which it will be discarded.                                                                                   | `500`         |
 
-Example configuration for high-volume applications:
-
-bash
-
-```bash
-export MLFLOW_ENABLE_ASYNC_TRACE_LOGGING=true
-export MLFLOW_ASYNC_TRACE_LOGGING_MAX_WORKERS=20
-export MLFLOW_ASYNC_TRACE_LOGGING_MAX_QUEUE_SIZE=2000
-export MLFLOW_ASYNC_TRACE_LOGGING_RETRY_TIMEOUT=600
-
-```
-
 ### Sampling Traces[​](#sampling-traces "Direct link to Sampling Traces")
 
-For a high-volume application, you may want to reduce the number of traces exported to the backend. You can configure the sampling ratio to control the number of traces exported.
+For high-volume applications, you may want to reduce the number of traces exported to the backend. You can configure the sampling ratio to control the number of traces exported.
 
 | Environment Variable          | Description                                                                                                                   | Default Value |
 | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------- |
@@ -236,18 +132,18 @@ The default value is `1.0`, which means all traces will be exported. When set to
 
 ## Adding Context to Production Traces[​](#adding-context-to-production-traces "Direct link to Adding Context to Production Traces")
 
-In production environments, enriching traces with contextual information is crucial for understanding user behavior, debugging issues, and improving your GenAI application. This context enables you to analyze user interactions, track quality across different segments, and identify patterns that lead to better or worse outcomes.
+Adding user IDs, session IDs, and environment metadata to your traces makes it easier to debug issues for specific users and analyze behavior across different segments.
 
 ### Tracking Request, Session, and User Context[​](#tracking-request-session-and-user-context "Direct link to Tracking Request, Session, and User Context")
 
-Production applications need to track multiple pieces of context simultaneously. Here's a comprehensive example showing how to track all of these in a FastAPI application:
+Production applications need to track multiple pieces of context simultaneously. For detailed guidance, see [Track Users & Sessions](/mlflow-website/docs/latest/genai/tracing/track-users-sessions.md). The following example demonstrates how to track all of these in a FastAPI application.
 
 python
 
 ```python
 import mlflow
 import os
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request
 from pydantic import BaseModel
 
 # Initialize FastAPI app
@@ -291,7 +187,7 @@ def handle_chat(request: Request, chat_request: ChatRequest):
 
 ### Feedback Collection[​](#feedback-collection "Direct link to Feedback Collection")
 
-Capturing user feedback on specific interactions is essential for understanding quality and improving your GenAI application:
+Capturing user feedback on specific interactions is essential for understanding quality and improving your GenAI application. For detailed guidance, see [Collect User Feedback](/mlflow-website/docs/latest/genai/tracing/collect-user-feedback.md). The following example demonstrates how to collect feedback in a FastAPI application.
 
 python
 
@@ -325,7 +221,7 @@ def handle_chat_feedback(
     # Search for the trace with the matching client_request_id
     client = MlflowClient()
     experiment = client.get_experiment_by_name("production-genai-app")
-    traces = client.search_traces(experiment_ids=[experiment.experiment_id])
+    traces = client.search_traces(locations=[experiment.experiment_id])
     traces = [
         trace for trace in traces if trace.info.client_request_id == client_request_id
     ][:1]
@@ -357,46 +253,51 @@ def handle_chat_feedback(
 
 ### Querying Traces with Context[​](#querying-traces-with-context "Direct link to Querying Traces with Context")
 
-Use the contextual information to analyze production behavior:
+Once you've enriched traces with user, session, and environment context, you can query them to debug issues for specific users, analyze conversation flows within sessions, or compare behavior across deployments. For detailed guidance, see [Search Traces](/mlflow-website/docs/latest/genai/tracing/search-traces.md). The following example demonstrates how to query traces by user, session, and environment.
 
 python
 
 ```python
 import mlflow
 
+mlflow.set_experiment("production-genai-app")
+
 # Query traces by user
 user_traces = mlflow.search_traces(
-    experiment_ids=[experiment.experiment_id],
     filter_string="tags.`mlflow.trace.user` = 'user-jane-doe-12345'",
     max_results=100,
 )
 
 # Query traces by session
 session_traces = mlflow.search_traces(
-    experiment_ids=[experiment.experiment_id],
     filter_string="tags.`mlflow.trace.session` = 'session-def-456'",
     max_results=100,
 )
 
 # Query traces by environment
 production_traces = mlflow.search_traces(
-    experiment_ids=[experiment.experiment_id],
     filter_string="tags.environment = 'production'",
     max_results=100,
 )
 
 ```
 
-## Summary[​](#summary "Direct link to Summary")
-
-Production monitoring with MLflow Tracing provides comprehensive observability for your GenAI applications. Understanding how users actually interact with your application, monitoring quality and performance in real-world conditions, and tracking the business impact of your GenAI initiatives are all essential for long-term success.
-
-Key recommendations for successful production deployments include using `mlflow-tracing` for production deployments to minimize dependencies and optimize performance, configuring async logging for high-volume applications to prevent blocking, adding rich context with tags and metadata for effective debugging and analysis, implementing feedback collection for quality monitoring and continuous improvement, considering OpenTelemetry integration for enterprise observability platforms, and monitoring performance while implementing proper error handling.
-
-Whether you're using self-hosted MLflow, integrating with enterprise observability platforms through OpenTelemetry, or leveraging Databricks Mosaic AI's advanced capabilities, MLflow Tracing provides the foundation for understanding and improving your production GenAI applications.
-
 ## Next Steps[​](#next-steps "Direct link to Next Steps")
 
-**[Searching for traces](/mlflow-website/docs/latest/genai/tracing/search-traces.md)**: Understand how to access trace data for analysis with UI or API.
+### [Automatic Evaluation](/mlflow-website/docs/latest/genai/eval-monitor/automatic-evaluations.md)
 
-**[Track Users & Sessions](/mlflow-website/docs/latest/genai/tracing/track-users-sessions.md)**: Implement user and session context tracking for better monitoring insights
+[Set up LLM judges to automatically monitor quality on production traffic.](/mlflow-website/docs/latest/genai/eval-monitor/automatic-evaluations.md)
+
+[Set up automatic evaluation →](/mlflow-website/docs/latest/genai/eval-monitor/automatic-evaluations.md)
+
+### [Searching for Traces](/mlflow-website/docs/latest/genai/tracing/search-traces.md)
+
+[Understand how to access trace data for analysis with UI or API.](/mlflow-website/docs/latest/genai/tracing/search-traces.md)
+
+[Learn to search traces →](/mlflow-website/docs/latest/genai/tracing/search-traces.md)
+
+### [Track Users & Sessions](/mlflow-website/docs/latest/genai/tracing/track-users-sessions.md)
+
+[Implement user and session context tracking for better monitoring insights.](/mlflow-website/docs/latest/genai/tracing/track-users-sessions.md)
+
+[Track users & sessions →](/mlflow-website/docs/latest/genai/tracing/track-users-sessions.md)

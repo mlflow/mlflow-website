@@ -1,0 +1,73 @@
+# Custom Alignment Optimizers
+
+MLflow's alignment system is designed as a **plugin architecture**, allowing you to create custom optimizers for different alignment strategies. This extensibility enables you to implement domain-specific optimization approaches while leveraging MLflow's judge infrastructure.
+
+## Creating a Custom Optimizer[​](#creating-a-custom-optimizer "Direct link to Creating a Custom Optimizer")
+
+To create a custom alignment optimizer, extend the [AlignmentOptimizer](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.judges.base.AlignmentOptimizer) abstract base class:
+
+python
+
+```python
+from mlflow.genai.judges.base import AlignmentOptimizer, Judge
+from mlflow.entities.trace import Trace
+
+
+class MyCustomOptimizer(AlignmentOptimizer):
+    """Custom optimizer implementation for judge alignment."""
+
+    def __init__(self, model: str = None, **kwargs):
+        """Initialize your optimizer with custom parameters."""
+        self.model = model
+
+    def align(self, judge: Judge, traces: list[Trace]) -> Judge:
+        """
+        Implement your alignment algorithm.
+
+        Args:
+            judge: The judge to be optimized
+            traces: List of traces containing human feedback
+
+        Returns:
+            A new Judge instance with improved alignment
+        """
+        # Your custom alignment logic here
+        # 1. Extract feedback from traces
+        # 2. Analyze disagreements between judge and human
+        # 3. Generate improved instructions
+        # 4. Return new judge with better alignment
+
+        from mlflow.genai.judges import make_judge
+
+        improved_instructions = self._optimize_instructions(judge.instructions, traces)
+
+        return make_judge(
+            name=judge.name,
+            instructions=improved_instructions,
+            feedback_value_type=str,
+            model=judge.model,
+        )
+
+    def _optimize_instructions(self, instructions: str, traces: list[Trace]) -> str:
+        """Your custom optimization logic."""
+        # Implement your optimization strategy
+        pass
+
+```
+
+## Using Custom Optimizers[​](#using-custom-optimizers "Direct link to Using Custom Optimizers")
+
+Once implemented, use your custom optimizer just like the built-in ones:
+
+python
+
+```python
+# Create your custom optimizer
+custom_optimizer = MyCustomOptimizer(model="your-model")
+
+# Use it for alignment
+aligned_judge = initial_judge.align(traces_with_feedback, custom_optimizer)
+
+```
+
+The plugin architecture ensures that new optimization strategies can be added without modifying the core judge system, promoting extensibility and experimentation with different alignment approaches.

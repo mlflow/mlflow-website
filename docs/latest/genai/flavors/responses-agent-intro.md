@@ -25,12 +25,14 @@ If you want to return outputs that don't fit into the standard interface, you ca
 
 Below are some helper methods you can use to create common outputs within the ResponsesAgent interface:
 
-* [`mlflow.pyfunc.ResponsesAgent.create_reasoning_item()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.ResponsesAgent.create_reasoning_item)
-* [`mlflow.pyfunc.ResponsesAgent.create_text_output_item()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.ResponsesAgent.create_text_output_item)
-* [`mlflow.pyfunc.ResponsesAgent.create_function_call_item()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.ResponsesAgent.create_function_call_item)
-* [`mlflow.pyfunc.ResponsesAgent.create_function_call_output_item()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.ResponsesAgent.create_function_call_output_item)
-* [`mlflow.pyfunc.ResponsesAgent.create_text_delta()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.ResponsesAgent.create_text_delta) (only for streaming)
-* [`mlflow.pyfunc.ResponsesAgent.create_annotation_added()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.ResponsesAgent.create_annotation_added) (only for streaming)
+* [`mlflow.types.responses.create_reasoning_item()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.types.html#mlflow.types.responses.create_reasoning_item)
+* [`mlflow.types.responses.create_text_output_item()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.types.html#mlflow.types.responses.create_text_output_item)
+* [`mlflow.types.responses.create_function_call_item()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.types.html#mlflow.types.responses.create_function_call_item)
+* [`mlflow.types.responses.create_function_call_output_item()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.types.html#mlflow.types.responses.create_function_call_output_item)
+* [`mlflow.types.responses.create_mcp_approval_request_item()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.types.html#mlflow.types.responses.create_mcp_approval_request_item)
+* [`mlflow.types.responses.create_mcp_approval_response_item()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.types.html#mlflow.types.responses.create_mcp_approval_response_item)
+* [`mlflow.types.responses.create_text_delta()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.types.html#mlflow.types.responses.create_text_delta) (only for streaming)
+* [`mlflow.types.responses.create_annotation_added()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.types.html#mlflow.types.responses.create_annotation_added) (only for streaming)
 
 Here's an example of a complete tool calling sequence using `ResponsesAgentResponse` with a custom output:
 

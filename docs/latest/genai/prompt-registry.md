@@ -29,7 +29,7 @@ Share prompts across your organization with a centralized registry, enabling tea
 
 ![Create Prompt UI](/mlflow-website/docs/latest/assets/images/create-prompt-ui-03c88144e65d28eb7847b2ae5d8dd49a.png)
 
-1. Run `mlflow ui` in your terminal to start the MLflow UI.
+1. Run `mlflow server` in your terminal to start the MLflow UI.
 2. Navigate to the **Prompts** tab in the MLflow UI.
 3. Click on the **Create Prompt** button.
 4. Fill in the prompt details such as name, prompt template text, and commit message (optional).
@@ -128,7 +128,7 @@ Versions](/mlflow-website/docs/latest/assets/images/compare-prompt-versions-2082
 
 ### 4. Load and Use the Prompt[​](#4-load-and-use-the-prompt "Direct link to 4. Load and Use the Prompt")
 
-To use a prompt in your GenAI application, you can load it with the [`mlflow.genai.load_prompt()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.load_prompt) API and fill in the variables using the [`mlflow.entities.Prompt.format()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.entities.html#mlflow.entities.Prompt.format) method of the prompt object:
+To use a prompt in your GenAI application, you can load it with the [`mlflow.genai.load_prompt()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.load_prompt) API and fill in the variables using the [`mlflow.entities.Prompt.format()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.entities.html#mlflow.entities.Prompt.format) method of the prompt object.
 
 python
 
@@ -223,6 +223,8 @@ Key attributes of a Prompt object:
 
 * `response_format`: An optional property containing the expected response structure specification, which can be used to validate or structure outputs from LLM calls.
 
+* `model_config`: An optional dictionary containing model-specific configuration such as model name, temperature, max\_tokens, and other inference parameters. See [Model Configuration](#model-configuration) for more details.
+
 ### Prompt Types[​](#prompt-types "Direct link to Prompt Types")
 
 #### Text Prompts[​](#text-prompts "Direct link to Text Prompts")
@@ -249,6 +251,44 @@ chat_template = [
 ]
 
 ```
+
+#### Jinja2 Prompts[​](#jinja2-prompts "Direct link to Jinja2 Prompts")
+
+For advanced templating needs, MLflow supports [Jinja2](https://jinja.palletsprojects.com/) templates with conditionals, loops, and filters. Jinja2 prompts are automatically detected when the template contains control flow syntax (`{% %}`):
+
+python
+
+```python
+import mlflow
+
+# Jinja2 template with conditionals and loops
+jinja_template = """\
+Hello {% if name %}{{ name }}{% else %}Guest{% endif %}!
+
+{% if items %}
+Here are your items:
+{% for item in items %}
+- {{ item }}
+{% endfor %}
+{% endif %}
+"""
+
+# Register the Jinja2 prompt
+prompt = mlflow.genai.register_prompt(
+    name="greeting-prompt",
+    template=jinja_template,
+)
+
+# Format with variables
+result = prompt.format(name="Alice", items=["Book", "Pen", "Notebook"])
+
+```
+
+note
+
+* Templates with only `{{ variable }}` syntax are treated as **text prompts** and use simple string substitution
+* Templates containing `{% %}` control flow syntax are treated as **Jinja2 prompts** and support the full Jinja2 feature set
+* Jinja2 rendering uses `SandboxedEnvironment` by default for security. Pass `use_jinja_sandbox=False` to `format()` if you need unrestricted Jinja2 features
 
 ### Response Format[​](#response-format "Direct link to Response Format")
 
@@ -298,6 +338,277 @@ mlflow.genai.load_prompt("prompts:/summarization-prompt/1").tags
 mlflow.genai.delete_prompt_version_tag("summarization-prompt", 1, "author")
 
 ```
+
+## Model Configuration[​](#model-configuration "Direct link to Model Configuration")
+
+MLflow Prompt Registry allows you to store model-specific configuration alongside your prompts, ensuring reproducibility and clarity about which model and parameters were used with a particular prompt version. This is especially useful when you want to:
+
+* Version both prompt templates and model parameters together
+* Share prompts with recommended model settings across your team
+* Reproduce exact inference configurations from previous experiments
+* Maintain different model configurations for different prompt versions
+
+### Basic Usage[​](#basic-usage "Direct link to Basic Usage")
+
+You can attach model configuration to a prompt by passing a `model_config` parameter when registering:
+
+python
+
+```python
+import mlflow
+
+# Using a dictionary
+model_config = {
+    "model_name": "gpt-4",
+    "temperature": 0.7,
+    "max_tokens": 1000,
+    "top_p": 0.9,
+}
+
+mlflow.genai.register_prompt(
+    name="qa-prompt",
+    template="Answer the following question: {{question}}",
+    model_config=model_config,
+    commit_message="QA prompt with model config",
+)
+
+# Load and access the model config
+prompt = mlflow.genai.load_prompt("qa-prompt")
+print(f"Model: {prompt.model_config['model_name']}")
+print(f"Temperature: {prompt.model_config['temperature']}")
+
+```
+
+### Using PromptModelConfig Class[​](#using-promptmodelconfig-class "Direct link to Using PromptModelConfig Class")
+
+For better type safety and validation, you can use the [`mlflow.entities.model_registry.PromptModelConfig()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.entities.html#mlflow.entities.model_registry.PromptModelConfig) class:
+
+python
+
+```python
+import mlflow
+from mlflow.entities.model_registry import PromptModelConfig
+
+# Create a validated config object
+config = PromptModelConfig(
+    model_name="gpt-4-turbo",
+    temperature=0.5,
+    max_tokens=2000,
+    top_p=0.95,
+    frequency_penalty=0.2,
+    presence_penalty=0.1,
+    stop_sequences=["END", "\n\n"],
+)
+
+mlflow.genai.register_prompt(
+    name="creative-prompt",
+    template="Write a creative story about {{topic}}",
+    model_config=config,
+)
+
+```
+
+The `PromptModelConfig` class provides validation to catch errors early:
+
+python
+
+```python
+# This will raise a ValueError
+config = PromptModelConfig(temperature=-1.0)  # temperature must be non-negative
+
+# This will raise a ValueError
+config = PromptModelConfig(max_tokens=-100)  # max_tokens must be positive
+
+```
+
+### Supported Configuration Parameters[​](#supported-configuration-parameters "Direct link to Supported Configuration Parameters")
+
+The following standard parameters are supported in `PromptModelConfig`:
+
+* `model_name` (str): The name or identifier of the model (e.g., "gpt-4", "claude-3-opus")
+* `temperature` (float): Sampling temperature for controlling randomness (typically 0.0-2.0)
+* `max_tokens` (int): Maximum number of tokens to generate in the response
+* `top_p` (float): Nucleus sampling parameter (typically 0.0-1.0)
+* `top_k` (int): Top-k sampling parameter
+* `frequency_penalty` (float): Penalty for token frequency (typically -2.0 to 2.0)
+* `presence_penalty` (float): Penalty for token presence (typically -2.0 to 2.0)
+* `stop_sequences` (list\[str]): List of sequences that will cause the model to stop generating
+* `extra_params` (dict): Additional provider-specific or experimental parameters
+
+### Provider-Specific Parameters[​](#provider-specific-parameters "Direct link to Provider-Specific Parameters")
+
+You can include provider-specific parameters using the `extra_params` field:
+
+python
+
+```python
+# Anthropic-specific configuration with extended thinking
+# See: https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking
+anthropic_thinking_config = PromptModelConfig(
+    model_name="claude-sonnet-4-20250514",
+    max_tokens=16000,
+    extra_params={
+        # Enable extended thinking for complex reasoning tasks
+        "thinking": {
+            "type": "enabled",
+            "budget_tokens": 10000,  # Max tokens for internal reasoning
+        },
+        # User tracking for abuse detection
+        "metadata": {
+            "user_id": "user-123",
+        },
+    },
+)
+
+# OpenAI-specific configuration with reproducibility and structured output
+# See: https://platform.openai.com/docs/api-reference/chat/create
+openai_config = PromptModelConfig(
+    model_name="gpt-4o",
+    temperature=0.7,
+    max_tokens=2000,
+    extra_params={
+        # Seed for reproducible outputs
+        "seed": 42,
+        # Bias specific tokens (token_id: bias from -100 to 100)
+        "logit_bias": {"50256": -100},  # Discourage <|endoftext|>
+        # User identifier for abuse tracking
+        "user": "user-123",
+        # Service tier for priority processing
+        "service_tier": "default",
+    },
+)
+
+```
+
+### Managing Model Configuration[​](#managing-model-configuration "Direct link to Managing Model Configuration")
+
+Model configuration is mutable and can be updated after a prompt version is created. This makes it easy to fix mistakes or iterate on model parameters without creating new prompt versions.
+
+#### Setting or Updating Model Config[​](#setting-or-updating-model-config "Direct link to Setting or Updating Model Config")
+
+Use [`mlflow.genai.set_prompt_model_config()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.set_prompt_model_config) to set or update the model configuration for a prompt version:
+
+python
+
+```python
+import mlflow
+from mlflow.entities.model_registry import PromptModelConfig
+
+# Register a prompt without model config
+mlflow.genai.register_prompt(
+    name="my-prompt",
+    template="Analyze: {{text}}",
+)
+
+# Later, add model config
+mlflow.genai.set_prompt_model_config(
+    name="my-prompt",
+    version=1,
+    model_config={"model_name": "gpt-4", "temperature": 0.7},
+)
+
+# Or update existing model config
+mlflow.genai.set_prompt_model_config(
+    name="my-prompt",
+    version=1,
+    model_config={"model_name": "gpt-4-turbo", "temperature": 0.8, "max_tokens": 2000},
+)
+
+# Verify the update
+prompt = mlflow.genai.load_prompt("my-prompt", version=1)
+print(prompt.model_config)
+
+```
+
+#### Deleting Model Config[​](#deleting-model-config "Direct link to Deleting Model Config")
+
+Use [`mlflow.genai.delete_prompt_model_config()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.delete_prompt_model_config) to remove model configuration from a prompt version:
+
+python
+
+```python
+import mlflow
+
+# Remove model config
+mlflow.genai.delete_prompt_model_config(name="my-prompt", version=1)
+
+# Verify removal
+prompt = mlflow.genai.load_prompt("my-prompt", version=1)
+assert prompt.model_config is None
+
+```
+
+#### Important Notes[​](#important-notes "Direct link to Important Notes")
+
+* Model config changes are **version-specific** - updating one version doesn't affect others
+* Model config is **mutable** - unlike the prompt template, it can be changed after creation
+* Changes are **immediate** - no need to create a new version to fix model parameters
+* **Validation applies** - The same validation rules apply when updating as when creating
+
+## Prompt Caching[​](#prompt-caching "Direct link to Prompt Caching")
+
+MLflow automatically caches loaded prompts in memory to improve performance and reduce repeated API calls. The caching behavior differs based on whether you're loading a prompt by **version** or by **alias**.
+
+### Default Caching Behavior[​](#default-caching-behavior "Direct link to Default Caching Behavior")
+
+* **Version-based prompts** (e.g., `prompts:/summarization-prompt/1`): Cached with **infinite TTL** by default. Since prompt versions are immutable, they can be safely cached indefinitely.
+* **Alias-based prompts** (e.g., `prompts:/summarization-prompt@latest` or `prompts:/summarization-prompt@production`): Cached with **60 seconds TTL** by default. Aliases can point to different versions over time, so a shorter TTL ensures your application picks up updates.
+
+### Customizing Cache Behavior[​](#customizing-cache-behavior "Direct link to Customizing Cache Behavior")
+
+#### Per-Request Cache Control[​](#per-request-cache-control "Direct link to Per-Request Cache Control")
+
+You can control caching on a per-request basis using the `cache_ttl_seconds` parameter:
+
+python
+
+```python
+import mlflow
+
+# Custom TTL: Cache for 5 minutes
+prompt = mlflow.genai.load_prompt(
+    "prompts:/summarization-prompt/1", cache_ttl_seconds=300
+)
+
+# Bypass cache entirely: Always fetch from registry
+prompt = mlflow.genai.load_prompt(
+    "prompts:/summarization-prompt@production", cache_ttl_seconds=0
+)
+
+# Use infinite TTL even for alias-based prompts
+prompt = mlflow.genai.load_prompt(
+    "prompts:/summarization-prompt@latest", cache_ttl_seconds=float("inf")
+)
+
+```
+
+#### Global Cache Configuration[​](#global-cache-configuration "Direct link to Global Cache Configuration")
+
+You can set default TTL values globally using environment variables:
+
+bash
+
+```bash
+# Set alias-based prompt cache TTL to 5 minutes
+export MLFLOW_ALIAS_PROMPT_CACHE_TTL_SECONDS=300
+
+# Set version-based prompt cache TTL to 1 hour (instead of infinite)
+export MLFLOW_VERSION_PROMPT_CACHE_TTL_SECONDS=3600
+
+# Disable caching globally
+export MLFLOW_ALIAS_PROMPT_CACHE_TTL_SECONDS=0
+export MLFLOW_VERSION_PROMPT_CACHE_TTL_SECONDS=0
+
+```
+
+### Cache Invalidation[​](#cache-invalidation "Direct link to Cache Invalidation")
+
+The cache is automatically invalidated when you modify the prompt version or alias, including the following operations:
+
+* `mlflow.genai.set_prompt_version_tag`
+* `mlflow.genai.set_prompt_alias`
+* `mlflow.genai.delete_prompt_version_tag`
+* `mlflow.genai.delete_prompt_alias`
 
 ## FAQ[​](#faq "Direct link to FAQ")
 

@@ -54,7 +54,7 @@ MLflow provides comprehensive experiment tracking, model management, and deploym
 
 ## Why MLflow for Deep Learning?[​](#why-mlflow-for-deep-learning "Direct link to Why MLflow for Deep Learning?")
 
-![Deep Learning Training Comparison](/mlflow-website/docs/latest/images/deep-learning/dl-run-comparison.gif)
+[](/mlflow-website/docs/latest/images/deep-learning/dl-run-comparison.mp4)
 
 #### One-Line Autologging
 

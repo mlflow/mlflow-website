@@ -13,7 +13,7 @@ Starting the tracking server is as simple as running the following command:
 bash
 
 ```bash
-mlflow server --host 127.0.0.1 --port 8080 --backend-store-uri sqlite:///mlflow.db
+mlflow server --host 127.0.0.1 --port 8080
 
 ```
 
@@ -31,15 +31,25 @@ INFO:     Uvicorn running on http://127.0.0.1:8080 (Press CTRL+C to quit)
 
 There are many options to configure the server, refer to [Configure Server](#configure-server) for more details.
 
-info
-
-The `--backend-store-uri` option is not mandatory, but highly recommended. MLflow uses a local filesystem for storing the metadata by default. The above option overrides this to uses a database backend, which provides much better performance and reliability in general. The file backend is in Keep-the-Light-On (KTLO) mode and will not receive most of the new features in MLflow. For different database type such as PostgreSQL, check out [Backend Store](/mlflow-website/docs/latest/self-hosting/architecture/backend-store.md).
-
 important
 
 The server listens on <http://localhost:5000> by default and only accepts connections from the local machine. To let the server accept connections from other machines, you will need to pass `--host 0.0.0.0` to listen on all network interfaces (or a specific interface address). This is typically required configuration when running the server **in a Kubernetes pod or a Docker container**.
 
 MLflow 3.5.0+ includes built-in security middleware to protect against DNS rebinding and CORS attacks. When using `--host 0.0.0.0`, configure the `--allowed-hosts` option to specify which domains can access your server. See [Security Configuration](/mlflow-website/docs/latest/self-hosting/security/network.md) for details.
+
+Read-only Filesystems
+
+When running in containers with read-only root filesystems (common in Kubernetes with `securityContext.readOnlyRootFilesystem: true`), configure remote artifact storage using `--artifacts-destination` (artifact serving is enabled by default). The tracking server does not create local directories at startup when using remote artifact storage, making it compatible with read-only environments.
+
+bash
+
+```bash
+mlflow server \
+    --host 0.0.0.0 \
+    --backend-store-uri postgresql://user:pass@host/db \
+    --artifacts-destination s3://my-bucket
+
+```
 
 ## Logging to a Tracking Server[​](#logging_to_a_tracking_server "Direct link to Logging to a Tracking Server")
 
@@ -127,27 +137,29 @@ This section describes how to configure the tracking server for some common use 
 
 ### Backend Store[​](#backend-store "Direct link to Backend Store")
 
-By default, the tracking server logs runs metadata to the local filesystem under `./mlruns` directory. You can configure the different backend store by adding `--backend-store-uri` option:
+By default, the tracking server uses SQLite database (`sqlite:///mlflow.db`) to store runs metadata. You can configure a different backend store by adding the `--backend-store-uri` option:
 
 Example
 
 bash
 
 ```bash
-# Default: local file system
+# Default: SQLite database (mlflow.db in current directory)
 mlflow server
-# SQLite: create a SQLite database `my.db` in the current directory
-mlflow server --backend-store-uri sqlite:///my.db
+
 # PostgreSQL: connect to an existing PostgreSQL database
 mlflow server --backend-store-uri postgresql://username:password@host:port/database
 
+# File-based (legacy): use local filesystem under ./mlruns directory
+mlflow server --backend-store-uri ./mlruns
+
 ```
 
-We **recommend using a database backend** in general, because it provides better performance and reliability than the default file backend.
+SQLite is the default backend and provides good performance and reliability for most use cases. For production deployments with high concurrency, consider using PostgreSQL or MySQL.
 
 ### Remote artifacts store[​](#tracking-server-artifact-store "Direct link to Remote artifacts store")
 
-#### Using the Tracking Server for proxied artifact access[​](#using-the-tracking-server-for-proxied-artifact-access "Direct link to Using the Tracking Server for proxied artifact access")
+#### Using the Tracking Server for proxied artifact access (default)[​](#using-the-tracking-server-for-proxied-artifact-access-default "Direct link to Using the Tracking Server for proxied artifact access (default)")
 
 By default, the tracking server stores artifacts in its local filesystem under `./mlartifacts` directory. To configure the tracking server to connect to remote storage and serve artifacts, start the server with `--artifacts-destination` flag.
 
@@ -190,11 +202,18 @@ mlflow server --no-serve-artifacts --default-artifact-root s3://my-bucket
 
 ```
 
-With this setting, the MLflow client still makes minimum HTTP requests to the tracking server for fetching proper remote storage URI, but can directly upload artifacts to / download artifacts from the remote storage. While this might not be a good practice for access and secury governance, it could be useful when you want to avoid the overhead of proxying artifacts through the tracking server.
+With this setting, the MLflow client still makes minimum HTTP requests to the tracking server for fetching proper remote storage URI, but can directly upload artifacts to / download artifacts from the remote storage. While this might not be a good practice for access and security governance, it could be useful when you want to avoid the overhead of proxying artifacts through the tracking server.
+
+Use the right configuration keys
+
+The two options `--serve-artifacts` and `--default-artifact-root` look similar, but they are used for different purposes. When you pick the wrong one, the artifact logging requests will not go through the expected route and may cause access issues. The rule of thumb is:
+
+1. **Want the server to proxy uploads?** Specify `--artifacts-destination` option and **do not set** `--default-artifact-root`. New experiments will get `mlflow-artifacts:/...` run URIs and clients upload and download artifacts via the server. Credentials are managed by the tracking server and clients do not need to set them.
+2. **Want clients to write straight to storage?** Set `--default-artifact-root` option and `--no-serve-artifacts`. Runs will get `s3://...` / `gs://...` URIs and clients must have credentials to access the storage.
 
 note
 
-If the MLflow server is *not configured* with the `--serve-artifacts` option, the client directly pushes artifacts to the artifact store. It does not proxy these through the tracking server by default.
+If the MLflow server is started with `--no-serve-artifacts` option, the client directly pushes artifacts to the artifact store. It does not proxy these through the tracking server by default.
 
 For this reason, the client needs direct access to the artifact store. For instructions on setting up these credentials, see [Artifact Stores documentation](/mlflow-website/docs/latest/self-hosting/architecture/artifact-store.md#artifacts-stores-manage-access).
 

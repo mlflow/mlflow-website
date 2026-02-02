@@ -498,7 +498,7 @@ with mlflow.start_run(run_id=last_run_id):
 
 ### What's Logged to MLflow?[​](#whats-logged-to-mlflow "Direct link to What's Logged to MLflow?")
 
-Let's briefly review what is logged/saved to MLflow as a result of your training. To access the MLflow UI, run `mlflow ui` commands and open `https://localhost:PORT` (PORT is 5000 by default). Select the experiment "MLflow PEFT Tutorial" (or the notebook name when running on Databricks) on the left side. Then click on the latest MLflow Run named `Mistral-7B-SQL-QLoRA-2024-...` to view the Run details.
+Let's briefly review what is logged/saved to MLflow as a result of your training. To access the MLflow UI, run `mlflow server` commands and open `https://localhost:PORT` (PORT is 5000 by default). Select the experiment "MLflow PEFT Tutorial" (or the notebook name when running on Databricks) on the left side. Then click on the latest MLflow Run named `Mistral-7B-SQL-QLoRA-2024-...` to view the Run details.
 
 #### Parameters[​](#parameters "Direct link to Parameters")
 

@@ -4,6 +4,8 @@
 
 [MLflow Tracing](/mlflow-website/docs/latest/genai/tracing.md) provides automatic tracing capability for [OpenAI Agents SDK](https://platform.openai.com/docs/guides/agents-sdk), a multi-agent framework developed by OpenAI. By enabling auto tracing for OpenAI by calling the [`mlflow.openai.autolog()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.openai.html#mlflow.openai.autolog) function, MLflow will capture traces and log them to the active MLflow Experiment.
 
+Show setup code
+
 python
 
 ```python
@@ -16,6 +18,8 @@ mlflow.openai.autolog()
 ## Basic Example[​](#basic-example "Direct link to Basic Example")
 
 The following example demonstrates how to use the OpenAI Agents SDK with MLflow tracing for simple multi-language chat agents. The three agents collaborate to determine the language of the input and handoff to the appropriate sub-agent that speaks the language. MLflow captures how the agents interact with each other and make calls to the OpenAI API.
+
+Show basic example code
 
 python
 
@@ -64,6 +68,8 @@ if __name__ == "__main__":
 
 OpenAI Agents SDK support defining functions that can be called by the agent. MLflow captures the function calls and display what functions are available to the agent, which of them are called, and the inputs and outputs of the function calls.
 
+Show function calling example code
+
 python
 
 ```python
@@ -104,6 +110,8 @@ if __name__ == "__main__":
 ## Guardrails[​](#guardrails "Direct link to Guardrails")
 
 OpenAI Agents SDK support defining guardrails that can be used to check the input and output of the agent. MLflow captures the guardrail checks and display the reasoning behind the guardrail check and whether the guardrail was tripped.
+
+Show guardrails example code
 
 python
 

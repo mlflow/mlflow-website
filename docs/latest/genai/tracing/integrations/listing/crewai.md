@@ -1,6 +1,6 @@
 # Tracing CrewAI
 
-![CrewAI Tracing via autolog](/mlflow-website/docs/latest/assets/images/crewai-tracing-91ffc6888df3527199ebf2e25cf697d8.gif)
+[](/mlflow-website/docs/latest/images/llms/crewai/crewai-tracing.mp4)
 
 [CrewAI](https://www.crewai.com/) is an open-source framework for orchestrating role-playing, autonomous AI agent.
 
@@ -174,6 +174,7 @@ class TripCrew:
             verbose=True,
             memory=True,
             knowledge={
+                "collection_name": "crewai_example",
                 "sources": [string_source],
                 "metadata": {"preference": "personal"},
             },

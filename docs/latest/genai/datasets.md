@@ -1,26 +1,75 @@
-# Evaluation Datasets
+# Building MLflow evaluation datasets
 
-## Transform Your GenAI Testing with Structured Evaluation Data[​](#transform-your-genai-testing-with-structured-evaluation-data "Direct link to Transform Your GenAI Testing with Structured Evaluation Data")
+To systematically test and improve a GenAI application, you use an evaluation dataset. An evaluation dataset is a selected set of example inputs — either labeled (with known expected outputs, i.e. ground-truth expectations) or unlabeled (without ground-truth). Evaluation datasets help you improve your app's performance in the following ways:
 
-Evaluation datasets are the foundation of systematic GenAI application testing. They provide a centralized way to manage test data, ground truth expectations, and evaluation results—enabling you to measure and improve the quality of your AI applications with confidence.
+* Improve quality by testing fixes against known problematic examples from production.
+* Prevent regressions. Create a "golden set" of examples that must always work correctly.
+* Compare app versions. Test different prompts, models, or app logic against the same data.
+* Target specific features or isolate certain problems in your agent. Build specialized datasets for safety, domain knowledge, or edge cases.
+* Validate the app across different environments (e.g., development vs. production) as part of LLMOps.
+
+You can think of them as test suites or benchmarks for your LLM functionality.
+
+## Requirements[​](#requirements "Direct link to Requirements")
 
 SQL Backend Required
 
 Evaluation Datasets require an MLflow Tracking Server with a **[SQL backend](/mlflow-website/docs/latest/self-hosting/architecture/backend-store.md#types-of-backend-stores)** (PostgreSQL, MySQL, SQLite, or MSSQL). This feature is **not available** in FileStore (local file system-based tracking). If you need a simple local configuration for MLflow, use the sqlite option when starting MLflow.
 
-## Quickstart: Build Your First Evaluation Dataset[​](#quickstart-build-your-first-evaluation-dataset "Direct link to Quickstart: Build Your First Evaluation Dataset")
+* An evaluation dataset is attached to an MLflow experiment. If you do not already have an experiment, see [Create an MLflow Experiment](/mlflow-website/docs/latest/genai/tracing/quickstart.md) to create one.
 
-There are several ways to create evaluation datasets, each suited to different stages of your GenAI development process.
+## Data sources for evaluation datasets[​](#data-sources-for-evaluation-datasets "Direct link to Data sources for evaluation datasets")
 
-The simplest way to create one is through MLflow's UI. Navigate to an Experiment that you want the evaluation dataset to be associated with and you can directly create a new one by supplying a unique name. After adding records to it, you can view the dataset's entries in the UI.
+You can use any of the following to create an evaluation dataset:
 
-![Evaluation Datasets Video](/mlflow-website/docs/latest/images/eval-datasets.gif)
+* Existing traces. If you have already captured traces from a GenAI application, you can use them to create an evaluation dataset based on real-world scenarios.
+* Manually created examples. Define test cases by hand using dictionaries or DataFrames. This is useful for targeting specific edge cases or creating "golden" test cases that must always pass.
 
-At its core, evaluation datasets are comprised of **inputs** and **expectations**. **Outputs** are an optional addition that can be added to an evaluation dataset for post-hoc evaluation with scorers. Adding these elements can be done either directly from traces, dictionaries, or via a Pandas DataFrame.
+This page describes how to create an MLflow evaluation dataset. You can create datasets from traces using either the MLflow Monitoring UI or the SDK. You can also use other types of datasets, such as Pandas DataFrames or a list of dictionaries. See [Evaluation examples](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/eval-examples.md) for more examples.
 
-* Build from Traces
+## Create or update a dataset using the UI[​](#create-or-update-a-dataset-using-the-ui "Direct link to Create or update a dataset using the UI")
+
+Follow these steps to use the UI to create a dataset or add to a dataset from existing traces.
+
+1. Click **Experiments** in the sidebar to display the Experiments page.
+
+2. In the table, click on the name of your experiment to open it.
+
+3. In the left sidebar, click **Traces**.
+
+   ![Traces tab in sidebar](/mlflow-website/docs/latest/images/genai/traces-tab.png)
+
+4. Use the checkboxes to the left of the trace list to select traces to export to your dataset. To select all traces, click the box next to **Trace ID**.
+
+   [](/mlflow-website/docs/latest/images/genai/select-traces.mp4)
+
+5. Click **Actions**. From the drop-down menu, select **Add to evaluation dataset**.
+
+6. The **Export traces to evaluation dataset** dialog appears.
+
+   ![Add to dataset dialog](/mlflow-website/docs/latest/images/genai/add-to-dataset-dialog.png)
+
+   If evaluation datasets exist for this experiment, they appear in the dialog.
+
+   1. Click **Export** next to the dataset you want to add these traces to.
+
+   If no evaluation dataset exists for the experiment:
+
+   1. Click **Create new dataset**.
+   2. In the **Create Dataset** dialog, enter a name for the evaluation dataset and click **Create**.
+   3. Click **Export** next to the dataset you just created.
+
+## Create a dataset using the SDK and add records[​](#create-a-dataset-using-the-sdk-and-add-records "Direct link to Create a dataset using the SDK and add records")
+
+This section describes several options for adding records to the evaluation dataset.
+
+* From existing traces
 * From Dictionaries
 * From DataFrame
+
+One of the most effective ways to build a relevant evaluation dataset is by curating examples directly from your application's historical interactions captured by MLflow Tracing.
+
+Programmatically search for traces and then add them to the dataset using `search_traces()`. Use filters to identify traces by success, failure, use in production, or other properties. See [Search traces](/mlflow-website/docs/latest/genai/tracing/search-traces.md#search-traces-overview). You can also add ground-truth expectations to your traces before or after adding them to an evaluation dataset using [`log_expectation()`](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.html?highlight=log_expectation#mlflow.log_expectation).
 
 python
 
@@ -42,36 +91,83 @@ set_dataset_tags(
     tags={"environment": "dev", "validation_version": "1.3"},
 )
 
-# First, retrieve traces that will become the basis of the dataset
+# 2. Search for traces
 traces = mlflow.search_traces(
-    experiment_ids=["0"],
-    max_results=20,
-    filter_string="attributes.name = 'chat_completion'",
-    return_type="list",  # Returns list[Trace]
+    filter_string="attributes.name = 'chat_completion' AND tags.environment = 'production'",
+    order_by=["attributes.timestamp_ms DESC"],
+    max_results=10,
 )
 
-# Add expectations to the traces
+print(f"Found {len(traces)} successful traces")
+
+# 3. Add expectations to the traces
 for trace in traces:
     mlflow.log_expectation(
         trace_id=trace.info.trace_id,
         name="expected_answer",
-        value=(
-            "The correct answer should include step-by-step instructions "
-            "for password reset with email verification"
-        ),
+        value=("Correct answer for this input"),
     )
 
-# Retrieve the traces with added expectations
-annotated_traces = mlflow.search_traces(
-    experiment_ids=["0"],
-    max_results=20,
-    return_type="list",
-)
-
-# Merge the list of Trace objects directly into your dataset
-dataset.merge_records(annotated_traces)
+# 4. Add the traces to the evaluation dataset
+eval_dataset = eval_dataset.merge_records(traces)
+print(f"Added {len(traces)} records to evaluation dataset")
 
 ```
+
+#### Select traces for evaluation datasets[​](#select-traces-for-evaluation-datasets "Direct link to Select traces for evaluation datasets")
+
+Before adding traces to your dataset, identify which traces represent important test cases for your evaluation needs. You can use both quantitative and qualitative analysis to select representative traces.
+
+**Quantitative trace selection**
+
+Use the MLflow UI or SDK to filter and analyze traces based on measurable characteristics:
+
+* **In the MLflow UI**: Filter by tags (e.g., `tag.quality_score < 0.7`), search for specific inputs/outputs, sort by latency or token usage
+* **Programmatically**: Query traces to perform advanced analysis
+
+python
+
+```python
+import mlflow
+import pandas as pd
+
+# Search for traces with potential quality issues
+traces_df = mlflow.search_traces(
+    filter_string="tag.quality_score < 0.7",
+    max_results=100,
+    extract_fields=[
+        "span.end_time",
+        "span.inputs.messages",
+        "span.outputs.choices",
+        "span.attributes.usage.total_tokens",
+    ],
+)
+
+# Analyze patterns
+# For example, check if quality issues correlate with token usage
+correlation = traces_df["span.attributes.usage.total_tokens"].corr(
+    traces_df["tag.quality_score"]
+)
+print(f"Correlation between token usage and quality: {correlation}")
+
+```
+
+For complete trace query syntax and examples, see [Search Query Syntax](/mlflow-website/docs/latest/genai/tracing/search-traces.md#search-query-syntax).
+
+**Qualitative trace selection**
+
+Review individual traces to identify patterns requiring human judgment:
+
+* Examine inputs that led to low-quality outputs
+* Look for patterns in how your application handled edge cases
+* Identify missing context or faulty reasoning
+* Compare high-quality vs. low-quality traces to understand differentiating factors
+
+Once you've identified representative traces, add them to your dataset using the search and merge methods described above.
+
+You can also use AI Insights features like [Analyze Experiment](/mlflow-website/docs/latest/genai/eval-monitor/ai-insights/ai-issue-discovery.md) to automatically discover quality and operational issues across your traces.
+
+You can curate examples from scratch. Your data must match (or be transformed to match) the [evaluation dataset schema](/mlflow-website/docs/latest/genai/concepts/evaluation-datasets.md#record-structure).
 
 python
 
@@ -176,91 +272,56 @@ dataset.merge_records(df)
 
 ```
 
-## Understanding Source Types[​](#understanding-source-types "Direct link to Understanding Source Types")
+### Preview the dataset[​](#preview-the-dataset "Direct link to Preview the dataset")
+
+Optionally, you can examine the dataset by converting it to a dataframe.
+
+python
+
+```python
+df = eval_dataset.to_df()
+print(f"\nDataset preview:")
+print(f"Total records: {len(df)}")
+print("\nSample record:")
+sample = df.iloc[0]
+print(f"Inputs: {sample['inputs']}")
+
+```
+
+### Understanding Source Types[​](#understanding-source-types "Direct link to Understanding Source Types")
 
 Every record in an evaluation dataset has a **source type** that tracks its provenance. This enables you to analyze model performance by data origin and understand which types of test data are most valuable.
 
-#### TRACE
+## Update existing datasets[​](#update-existing-datasets "Direct link to Update existing datasets")
 
-Records from production traces - automatically assigned when adding traces via mlflow\.search\_traces()
+You can use the UI or the SDK to update an evaluation dataset. For UI instructions, see [Create or update a dataset using the UI](#create-or-update-a-dataset-using-the-ui).
 
-#### HUMAN
+To use the MLflow SDK to update and existing evaluation dataset:
 
-Subject matter expert annotations - automatically inferred for records with expectations (ground truth)
+python
 
-#### CODE
+```python
+import mlflow.genai.datasets
+import pandas as pd
 
-Programmatically generated test cases - automatically inferred for records without expectations
+# Load existing dataset
+dataset = mlflow.genai.datasets.get_dataset(name="eval_dataset")
 
-#### DOCUMENT
+# Add new test cases
+new_cases = [
+    {
+        "inputs": {"question": "What are MLflow models?"},
+        "expectations": {
+            "expected_facts": ["model packaging", "deployment", "registry"],
+            "min_response_length": 100,
+        },
+    }
+]
 
-Test cases extracted from documentation or specs - must be explicitly specified with source metadata
+# Merge new cases
+dataset = dataset.merge_records(new_cases)
 
-Source types are automatically inferred based on record characteristics but can be explicitly overridden when needed. See the [SDK Guide](/mlflow-website/docs/latest/genai/datasets/sdk-guide.md#source-type-inference) for detailed inference rules and examples.
-
-## Why Evaluation Datasets?[​](#why-evaluation-datasets "Direct link to Why Evaluation Datasets?")
-
-#### Centralized Test Management
-
-Store all your test cases, expected outputs, and evaluation criteria in one place. No more scattered CSV files or hardcoded test data.
-
-#### Consistent Evaluation Source
-
-Maintain a concrete representation of test data that can be used repeatedly as your project evolves. Eliminate manual testing and avoid repeatedly assembling evaluation data for each iteration.
-
-#### Systematic Testing
-
-Move beyond ad-hoc testing to systematic evaluation. Define clear expectations and measure performance consistently across deployments.
-
-#### Collaborative Improvement
-
-Enable your entire team to contribute test cases and expectations. Share evaluation datasets across projects and teams.
-
-## The Evaluation Loop[​](#the-evaluation-loop "Direct link to The Evaluation Loop")
-
-Evaluation datasets bridge the critical gap between trace generation and evaluation execution in the GenAI development lifecycle. As you test your application and capture traces with expectations, **evaluation datasets transform these individual test cases into a materialized, reusable evaluation suite**. This creates a consistent and evolving collection of evaluation records that grows with your application—each iteration adds new test cases while preserving the historical test coverage. Rather than losing valuable test scenarios after each development cycle, you build a comprehensive evaluation asset that can immediately assess the quality of changes and improvements to your implementation.
-
-### The Evaluation Loop
-
-Iterate on Code
-
-Test App
-
-Collect Traces
-
-Add Expectations
-
-Create Dataset
-
-Run Evaluation
-
-Analyze Results
-
-## Key Features[​](#key-features "Direct link to Key Features")
-
-#### Ground Truth Management
-
-Define and maintain expected outputs for your test cases. Capture expert knowledge about what constitutes correct behavior for your AI system.
-
-#### Schema Evolution
-
-Automatically track the structure of your test data as it evolves. Add new fields and test dimensions without breaking existing evaluations.
-
-#### Incremental Updates
-
-Continuously improve your test suite by adding new cases from production. Update expectations as your understanding of correct behavior evolves.
-
-#### Flexible Tagging
-
-Organize datasets with tags for easy discovery and filtering. Track metadata like data sources, annotation guidelines, and quality levels.
-
-#### Performance Tracking
-
-Monitor how your application performs against the same test data over time. Identify regressions and improvements across deployments.
-
-#### Experiment Integration
-
-Link datasets to MLflow experiments for complete traceability. Understand which test data was used for each model evaluation.
+```
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")
 
@@ -272,23 +333,11 @@ Ready to improve your GenAI testing? Start with these resources:
 
 [Learn the concepts →](/mlflow-website/docs/latest/genai/concepts/evaluation-datasets.md)
 
-### [SDK Guide](/mlflow-website/docs/latest/genai/datasets/sdk-guide.md)
-
-[Complete guide to creating and managing evaluation datasets programmatically](/mlflow-website/docs/latest/genai/datasets/sdk-guide.md)
-
-[View SDK guide →](/mlflow-website/docs/latest/genai/datasets/sdk-guide.md)
-
 ### [Setting Expectations](/mlflow-website/docs/latest/genai/assessments/expectations.md)
 
 [Learn how to define ground truth and expected outputs for your AI system](/mlflow-website/docs/latest/genai/assessments/expectations.md)
 
 [Define expectations →](/mlflow-website/docs/latest/genai/assessments/expectations.md)
-
-### [Tracing Guide](/mlflow-website/docs/latest/genai/tracing.md)
-
-[Capture detailed execution data from your GenAI applications](/mlflow-website/docs/latest/genai/tracing.md)
-
-[Start tracing →](/mlflow-website/docs/latest/genai/tracing.md)
 
 ### [Evaluation Framework](/mlflow-website/docs/latest/genai/eval-monitor.md)
 

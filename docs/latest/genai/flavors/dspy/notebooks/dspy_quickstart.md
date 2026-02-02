@@ -26,7 +26,7 @@ Below we create a simple program that demonstrates the power of DSPy. We will bu
 python
 
 ```python
-%pip install -U datasets openai "dspy>=3.0.3" "mlflow>=3.4.0"
+%pip install -U datasets openai "dspy>=3.0.3" "mlflow[genai]>=3.4.0"
 
 ```
 

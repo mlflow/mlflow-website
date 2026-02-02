@@ -8,7 +8,7 @@ The following guide will get you started with MLflow's UI for prompt engineering
 
 ### Step 1: Create an MLflow AI Gateway Completions or Chat Endpoint[​](#step-1-create-an-mlflow-ai-gateway-completions-or-chat-endpoint "Direct link to Step 1: Create an MLflow AI Gateway Completions or Chat Endpoint")
 
-To use the prompt engineering UI, you need to create one or more [MLflow AI Gateway](/mlflow-website/docs/latest/genai/governance/ai-gateway.md) completions or chat endpoints. Follow the [MLflow AI Gateway Quickstart guide](/mlflow-website/docs/latest/genai/governance/ai-gateway/guides/step1-create-deployments.md) to easily create an endpoint in less than five minutes. If you already have access to an MLflow AI Gateway endpoint of type `llm/v1/completions` or `llm/v1/chat`, you can skip this step.
+To use the prompt engineering UI, you need to create one or more [MLflow AI Gateway](/mlflow-website/docs/latest/genai/governance/ai-gateway.md) completions or chat endpoints. Follow the [MLflow AI Gateway Quickstart guide](/mlflow-website/docs/latest/genai/governance/ai-gateway/legacy/setup.md) to easily create an endpoint in less than five minutes. If you already have access to an MLflow AI Gateway endpoint of type `llm/v1/completions` or `llm/v1/chat`, you can skip this step.
 
 bash
 

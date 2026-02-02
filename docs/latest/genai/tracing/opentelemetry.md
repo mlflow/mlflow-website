@@ -18,7 +18,7 @@ MLflow understands popular OpenTelemetry semantic conventions for GenAI, such as
 
 ## OpenTelemetry-native MLflow Tracing SDK[​](#opentelemetry-native-mlflow-tracing-sdk "Direct link to OpenTelemetry-native MLflow Tracing SDK")
 
-To get started with vendor-neutral tracing quickly, you can use the OpenTelemetry-native MLflow Tracing SDK. The SDK provides a convenient one-line auto-tracing experience for [popular GenAI libraries](/mlflow-website/docs/latest/genai/tracing/integrations.md) and enhances general OpenTelemetry traces with rich AI-specific metadata such as prompts, token usage, model name, etc. See [Quickstart](/mlflow-website/docs/latest/genai/tracing/quickstart/python-openai.md) to get started with the MLflow Tracing SDK.
+To get started with vendor-neutral tracing quickly, you can use the OpenTelemetry-native MLflow Tracing SDK. The SDK provides a convenient one-line auto-tracing experience for [popular GenAI libraries](/mlflow-website/docs/latest/genai/tracing/integrations.md) and enhances general OpenTelemetry traces with rich AI-specific metadata such as prompts, token usage, model name, etc. See [Quickstart](/mlflow-website/docs/latest/genai/tracing/quickstart.md) to get started with the MLflow Tracing SDK.
 
 python
 

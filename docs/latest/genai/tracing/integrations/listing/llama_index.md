@@ -1,6 +1,6 @@
 # Tracing LlamaIndex🦙
 
-![LlamaIndex Tracing via autolog](/mlflow-website/docs/latest/assets/images/llamaindex-tracing-67ed751e565ef74209381a497c70cf18.gif)
+[](/mlflow-website/docs/latest/images/llms/tracing/llamaindex-tracing.mp4)
 
 [LlamaIndex](https://www.llamaindex.ai/) is an open-source framework for building agentic generative AI applications that allow large language models to work with your data in any format.
 

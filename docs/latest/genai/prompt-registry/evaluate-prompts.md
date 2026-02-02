@@ -18,7 +18,7 @@ First install MLflow and OpenAI SDK. If you use different LLM providers, install
 bash
 
 ```bash
-pip install mlflow>=2.21.0 openai -qU
+pip install 'mlflow[genai]>=2.21.0' openai -qU
 
 ```
 
@@ -41,7 +41,7 @@ os.environ["OPENAI_API_KEY"] = getpass("Enter your OpenAI API key: ")
 
 ![Create Prompt UI](/mlflow-website/docs/latest/assets/images/create-prompt-ui-03c88144e65d28eb7847b2ae5d8dd49a.png)
 
-1. Run `mlflow ui` in your terminal to start the MLflow UI.
+1. Run `mlflow server` in your terminal to start the MLflow UI.
 2. Navigate to the **Prompts** tab in the MLflow UI.
 3. Click on the **Create Prompt** button.
 4. Fill in the prompt details such as name, prompt template text, and commit message (optional).

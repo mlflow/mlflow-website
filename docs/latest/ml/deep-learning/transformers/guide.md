@@ -5,7 +5,6 @@ The `transformers` model flavor enables logging of [transformers models, compone
 This page explains the detailed features and configurations of the MLflow `transformers` flavor. For the general introduction about the MLflow's Transformer integration, please refer to the [MLflow Transformers Flavor](/mlflow-website/docs/latest/ml/deep-learning/transformers.md) page.
 
 * [Loading a Transformers Model as a Python Function](#loading-a-transformers-model-as-a-python-function)
-* [Saving Prompt Templates with Transformer Pipelines](#saving-prompt-templates-with-transformer-pipelines)
 * [Using model\_config and Model Signature Params for Inference](#using-model-config-and-model-signature-params-for-inference)
 * [Pipelines vs. Component Logging](#pipelines-vs-component-logging)
 * [Automatic Metadata and ModelCard logging](#automatic-metadata-and-modelcard-logging)
@@ -110,68 +109,6 @@ print(response)
 # >> [It's a new thing that's been around for a while.]
 
 ```
-
-## Saving Prompt Templates with Transformer Pipelines[​](#saving-prompt-templates-with-transformer-pipelines "Direct link to Saving Prompt Templates with Transformer Pipelines")
-
-note
-
-This feature is only available in MLflow 2.10.0 and above.
-
-MLflow supports specifying prompt templates for certain pipeline types:
-
-* [feature-extraction](https://huggingface.co/transformers/main_classes/pipelines.html#transformers.FeatureExtractionPipeline)
-* [fill-mask](https://huggingface.co/transformers/main_classes/pipelines.html#transformers.FillMaskPipeline)
-* [summarization](https://huggingface.co/transformers/main_classes/pipelines.html#transformers.SummarizationPipeline)
-* [text2text-generation](https://huggingface.co/transformers/main_classes/pipelines.html#transformers.Text2TextGenerationPipeline)
-* [text-generation](https://huggingface.co/transformers/main_classes/pipelines.html#transformers.TextGenerationPipeline)
-
-Prompt templates are strings that are used to format user inputs prior to `pyfunc` inference. To specify a prompt template, use the `prompt_template` argument when calling [`mlflow.transformers.save_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.transformers.html#mlflow.transformers.save_model) or [`mlflow.transformers.log_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.transformers.html#mlflow.transformers.log_model). The prompt template must be a string with a single format placeholder, `{prompt}`.
-
-For example:
-
-python
-
-```python
-import mlflow
-from transformers import pipeline
-
-# Initialize a pipeline. `distilgpt2` uses a "text-generation" pipeline
-generator = pipeline(model="distilgpt2")
-
-# Define a prompt template
-prompt_template = "Answer the following question: {prompt}"
-
-# Save the model
-mlflow.transformers.save_model(
-    transformers_model=generator,
-    path="path/to/model",
-    prompt_template=prompt_template,
-)
-
-```
-
-When the model is then loaded with [`mlflow.pyfunc.load_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_model), the prompt template will be used to format user inputs before passing them into the pipeline:
-
-python
-
-```python
-import mlflow
-
-# Load the model with pyfunc
-model = mlflow.pyfunc.load_model("path/to/model")
-
-# The prompt template will be used to format this input, so the
-# string that is passed to the text-generation pipeline will be:
-# "Answer the following question: What is MLflow?"
-model.predict("What is MLflow?")
-
-```
-
-note
-
-`text-generation` pipelines with a prompt template will have the [return\_full\_text pipeline argument](https://huggingface.co/docs/huggingface_hub/main/en/package_reference/inference_client#huggingface_hub.inference._text_generation.TextGenerationParameters.return_full_text) set to `False` by default. This is to prevent the template from being shown to the users, which could potentially cause confusion as it was not part of their original input. To override this behaviour, either set `return_full_text` to `True` via `params`, or by including it in a `model_config` dict in `log_model()`. See [this section](#using-model-config-and-model-signature-params-for-inference) for more details on how to do this.
-
-For a more in-depth guide, check out the [Prompt Templating notebook](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/prompt-templating/prompt-templating.md)!
 
 ## Using model\_config and Model Signature Params for Inference[​](#using-model-config-and-model-signature-params-for-inference "Direct link to Using model_config and Model Signature Params for Inference")
 
@@ -452,10 +389,6 @@ In addition to the `ModelCard`, the components that comprise any Pipeline (or th
 
 In order to preserve any attached legal requirements to the usage of any model that is hosted on the huggingface hub, a "best effort" attempt is made when logging a transformers model to retrieve and persist any license information. A file will be generated (`LICENSE.txt`) within the root of the model directory. Within this file you will either find a copy of a declared license, the name of a common license type that applies to the model's use (i.e., 'apache-2.0', 'mit'), or, in the event that license information was never submitted to the huggingface hub when uploading a model repository, a link to the repository for you to use in order to determine what restrictions exist regarding the use of the model.
 
-note
-
-Model license information was introduced in **MLflow 2.10.0**. Previous versions do not include license information for models.
-
 ## Automatic Signature inference[​](#automatic-signature-inference "Direct link to Automatic Signature inference")
 
 For pipelines that support `pyfunc`, there are 3 means of attaching a model signature to the `MLmodel` file.
@@ -577,10 +510,6 @@ torch.float64
 
 note
 
-MLflow 2.12.1 slightly changed the `torch_dtype` extraction logic. Previously it depended on the `torch_dtype` attribute of the pipeline instance, but now it is extracted from the underlying model via `dtype` property. This enables MLflow to capture the dtype change of the model after pipeline instantiation.
-
-note
-
 Logging or saving a model in 'components' mode (using a dictionary to declare components) does not support setting the data type for a constructed pipeline. If you need to override the default behavior of how data is encoded, please save or log a *pipeline* object.
 
 note
@@ -649,7 +578,7 @@ peft_model = get_peft_model(base_model, lora_config)
 
 ```
 
-In MLflow 2.11.0, we introduced support for tracking PEFT models in the MLflow Transformers flavor. You can log and load PEFT models using the same APIs as other Transformers models, such as [`mlflow.transformers.log_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.transformers.html#mlflow.transformers.log_model) and [`mlflow.transformers.load_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.transformers.html#mlflow.transformers.load_model).
+MLflow supports tracking PEFT models in the Transformers flavor. You can log and load PEFT models using the same APIs as other Transformers models, such as [`mlflow.transformers.log_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.transformers.html#mlflow.transformers.log_model) and [`mlflow.transformers.load_model()`](/mlflow-website/docs/latest/api_reference/python_api/mlflow.transformers.html#mlflow.transformers.load_model).
 
 python
 

@@ -114,34 +114,6 @@ For detailed instructions on collecting feedback, see [Collecting Feedback for A
 
 After collecting feedback, align your judge and register it:
 
-* Default Optimizer (Recommended)
-* Explicit Optimizer
-
-python
-
-```python
-# Retrieve traces with both judge and human assessments
-traces_for_alignment = mlflow.search_traces(
-    experiment_ids=[experiment_id], max_results=15, return_type="list"
-)
-
-# Align the judge using human corrections (minimum 10 traces recommended)
-if len(traces_for_alignment) >= 10:
-    optimizer = SIMBAAlignmentOptimizer(model="anthropic:/claude-opus-4-1-20250805")
-
-    # Run alignment - shows minimal progress by default:
-    # INFO: Starting SIMBA optimization with 15 examples (set logging to DEBUG for detailed output)
-    # INFO: SIMBA optimization completed
-    aligned_judge = initial_judge.align(optimizer, traces_for_alignment)
-
-    # Register the aligned judge
-    aligned_judge.register(experiment_id=experiment_id)
-    print("Judge aligned successfully with human feedback")
-else:
-    print(f"Need at least 10 traces for alignment, have {len(traces_for_alignment)}")
-
-```
-
 python
 
 ```python
@@ -154,7 +126,7 @@ traces_for_alignment = mlflow.search_traces(
 
 # Align the judge using human corrections (minimum 10 traces recommended)
 if len(traces_for_alignment) >= 10:
-    # Explicitly specify SIMBA with custom model configuration
+    # Use SIMBAAlignmentOptimizer explicitly (this is also the default if no optimizer is specified)
     optimizer = SIMBAAlignmentOptimizer(model="anthropic:/claude-opus-4-1-20250805")
     aligned_judge = initial_judge.align(traces_for_alignment, optimizer)
 
@@ -166,71 +138,15 @@ else:
 
 ```
 
-## The SIMBA Alignment Optimizer[​](#the-simba-alignment-optimizer "Direct link to The SIMBA Alignment Optimizer")
+## Alignment Optimizers[​](#alignment-optimizers "Direct link to Alignment Optimizers")
 
-MLflow provides the **default alignment optimizer** using [DSPy's implementation of SIMBA](https://dspy.ai/api/optimizers/SIMBA/) (Simplified Multi-Bootstrap Aggregation). When you call `align()` without specifying an optimizer, the SIMBA optimizer is used automatically:
+MLflow provides multiple alignment optimizers:
 
-python
+* [**SIMBA**](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/simba.md) (default) - Uses DSPy's SIMBA algorithm for prompt optimization
+* [**GEPA**](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/gepa.md) - Uses DSPy's GEPA algorithm with LLM-driven reflection for iterative refinement
+* [**MemAlign**](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/memalign.md) (experimental) - Uses a dual-memory system for fast and cheap few-shot alignment
 
-```python
-# Default: Uses SIMBA optimizer automatically
-aligned_judge = initial_judge.align(traces_with_feedback)
-
-# Explicit: Same as above but with custom model specification
-from mlflow.genai.judges.optimizers import SIMBAAlignmentOptimizer
-
-optimizer = SIMBAAlignmentOptimizer(
-    model="anthropic:/claude-opus-4-1-20250805"  # Model used for optimization
-)
-aligned_judge = initial_judge.align(traces_with_feedback, optimizer)
-
-# Requirements for alignment:
-# - Minimum 10 traces with BOTH judge assessments and human feedback
-# - Both assessments must use the same name (matching the judge name)
-# - Order doesn't matter - humans can assess before or after judge
-# - Mix of agreements and disagreements between judge and human recommended
-
-```
-
-Default Optimizer Behavior
-
-When using `align()` without an optimizer parameter, MLflow automatically uses the SIMBA optimizer. This simplifies the alignment process while still allowing customization when needed.
-
-### Controlling Optimization Output[​](#controlling-optimization-output "Direct link to Controlling Optimization Output")
-
-By default, alignment shows minimal progress information to keep logs clean. If you need to debug the optimization process or see detailed iteration progress, enable DEBUG logging:
-
-python
-
-```python
-import logging
-
-# Enable detailed optimization output
-logging.getLogger("mlflow.genai.judges.optimizers.simba").setLevel(logging.DEBUG)
-
-# Now alignment will show:
-# - Detailed iteration-by-iteration progress
-# - Score improvements at each step
-# - Strategy selection details
-# - Full DSPy optimization output
-
-aligned_judge = initial_judge.align(optimizer, traces_with_feedback)
-
-# Reset to default (minimal output) after debugging
-logging.getLogger("mlflow.genai.judges.optimizers.simba").setLevel(logging.INFO)
-
-```
-
-When to Use Detailed Logging
-
-Enable DEBUG logging when:
-
-* Optimization seems stuck or is taking too long
-* You want to understand how the optimizer is improving instructions
-* Debugging alignment failures or unexpected results
-* Learning how SIMBA optimization works internally
-
-Keep it at INFO (default) for production use to avoid verbose output.
+You can also [create custom optimizers](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-optimizers.md) to implement domain-specific alignment strategies.
 
 ## Collecting Feedback for Alignment[​](#collecting-feedback-for-alignment "Direct link to Collecting Feedback for Alignment")
 
@@ -308,94 +224,11 @@ Include both positive and negative examples. Aim for at least 30% of each to hel
 
 #### Sufficient Volume
 
-Collect at least 10 feedback examples (minimum for SIMBA), but 50-100 examples typically yield better results.
+Collect sufficient feedback examples for alignment. More examples typically yield better results, though the exact number depends on the optimizer used.
 
 #### Consistent Standards
 
 Ensure reviewers use consistent criteria. Provide guidelines or rubrics to standardize assessments.
-
-## Custom Alignment Optimizers[​](#custom-alignment-optimizers "Direct link to Custom Alignment Optimizers")
-
-MLflow's alignment system is designed as a **plugin architecture**, allowing you to create custom optimizers for different alignment strategies. This extensibility enables you to implement domain-specific optimization approaches while leveraging MLflow's judge infrastructure.
-
-### Creating a Custom Optimizer[​](#creating-a-custom-optimizer "Direct link to Creating a Custom Optimizer")
-
-To create a custom alignment optimizer, extend the [AlignmentOptimizer](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.judges.base.AlignmentOptimizer) abstract base class:
-
-python
-
-```python
-from mlflow.genai.judges.base import AlignmentOptimizer, Judge
-from mlflow.entities.trace import Trace
-
-
-class MyCustomOptimizer(AlignmentOptimizer):
-    """Custom optimizer implementation for judge alignment."""
-
-    def __init__(self, model: str = None, **kwargs):
-        """Initialize your optimizer with custom parameters."""
-        self.model = model
-        # Add any custom initialization logic
-
-    def align(self, judge: Judge, traces: list[Trace]) -> Judge:
-        """
-        Implement your alignment algorithm.
-
-        Args:
-            judge: The judge to be optimized
-            traces: List of traces containing human feedback
-
-        Returns:
-            A new Judge instance with improved alignment
-        """
-        # Your custom alignment logic here
-        # 1. Extract feedback from traces
-        # 2. Analyze disagreements between judge and human
-        # 3. Generate improved instructions
-        # 4. Return new judge with better alignment
-
-        # Example: Return judge with modified instructions
-        from mlflow.genai.judges import make_judge
-
-        improved_instructions = self._optimize_instructions(judge.instructions, traces)
-
-        return make_judge(
-            name=judge.name,
-            instructions=improved_instructions,
-            feedback_value_type=str,
-            model=judge.model,
-        )
-
-    def _optimize_instructions(self, instructions: str, traces: list[Trace]) -> str:
-        """Your custom optimization logic."""
-        # Implement your optimization strategy
-        pass
-
-```
-
-### Using Custom Optimizers[​](#using-custom-optimizers "Direct link to Using Custom Optimizers")
-
-Once implemented, use your custom optimizer just like the built-in ones:
-
-python
-
-```python
-# Create your custom optimizer
-custom_optimizer = MyCustomOptimizer(model="your-model")
-
-# Use it for alignment
-aligned_judge = initial_judge.align(traces_with_feedback, custom_optimizer)
-
-```
-
-### Available Optimizers[​](#available-optimizers "Direct link to Available Optimizers")
-
-MLflow currently provides:
-
-* **SIMBAAlignmentOptimizer** (default): Uses [DSPy's Simplified Multi-Bootstrap Aggregation](https://dspy.ai/api/optimizers/SIMBA/) for robust alignment
-* **Custom optimizers**: Extend `AlignmentOptimizer` to implement your own strategies
-
-The plugin architecture ensures that new optimization strategies can be added without modifying the core judge system, promoting extensibility and experimentation with different alignment approaches.
 
 ## Testing Alignment Effectiveness[​](#testing-alignment-effectiveness "Direct link to Testing Alignment Effectiveness")
 
@@ -443,11 +276,11 @@ def test_alignment_improvement(
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")
 
-### [Create Custom Judges](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/make-judge.md)
+### [Create Custom Judges](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges.md)
 
-[Learn to create domain-specific judges with make\_judge.](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/make-judge.md)
+[Learn to create domain-specific judges with make\_judge.](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges.md)
 
-[Create judges →](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/make-judge.md)
+[Create judges →](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges.md)
 
 ### [Development Workflow](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/workflow.md)
 

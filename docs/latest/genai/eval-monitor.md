@@ -12,7 +12,7 @@ This documentation covers MLflow's **GenAI evaluation system** which uses:
 
 MLflow's evaluation and monitoring capabilities help you systematically measure, improve, and maintain the quality of your GenAI applications throughout their lifecycle from development through production.
 
-![Prompt Evaluation](/mlflow-website/docs/latest/images/mlflow-3/eval-monitor/evaluation-result-video.gif)
+[](/mlflow-website/docs/latest/images/mlflow-3/eval-monitor/evaluation-result-video.mp4)
 
 A core tenet of MLflow's evaluation capabilities is **Evaluation-Driven Development**. This is an emerging practice to tackle the challenge of building high-quality LLM/Agentic applications. MLflow is an **end-to-end** platform that is designed to support this practice and help you deploy AI applications with confidence.
 
@@ -42,7 +42,7 @@ Human feedback is essential for building high-quality GenAI applications that me
 
 Feedbacks are attached to traces and recorded with metadata, including user, timestamp, revisions, etc.
 
-[Learn more →](/mlflow-website/docs/latest/genai/tracing/collect-user-feedback.md)
+[Learn more →](/mlflow-website/docs/latest/genai/assessments/feedback.md)
 
 ![Trace Feedback](/mlflow-website/docs/latest/assets/images/genai-human-feedback-9a8ea2ba10a5f7c7bb192aea22345b19.png)
 
@@ -156,7 +156,7 @@ Open the MLflow UI to review the evaluation results. If you are using OSS MLflow
 bash
 
 ```bash
-mlflow ui --port 5000
+mlflow server --port 5000
 
 ```
 

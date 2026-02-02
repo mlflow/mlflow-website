@@ -21,7 +21,7 @@ First, let's set up the environment. We'll need the OpenAI Python SDK, as well a
 python
 
 ```python
-%pip install 'mlflow>=2.17.0' 'openai>=1.0' -qq
+%pip install 'mlflow[genai]>=2.17.0' 'openai>=1.0' -qq
 
 ```
 
@@ -175,8 +175,7 @@ class WeatherModel(mlflow.pyfunc.ChatModel):
 
       # if OpenAI returns a tool_calling response, then we call
       # our tool. otherwise, we just return the response as is
-      tool_calls = response.choices[0].message.tool_calls
-      if tool_calls:
+      if tool_calls := response.choices[0].message.tool_calls:
           print("Received a tool call, calling the weather tool...")
 
           # for this example, we only provide the model with one tool,
@@ -213,7 +212,7 @@ This step is optional, but highly recommended to improve observability in your a
 
 Integrating tracing is easy, we simply decorate the functions we're interested in (`get_weather()` and `predict()`) with `@mlflow.trace`! MLflow Tracing also has integrations with many popular GenAI frameworks, such as LangChain, OpenAI, LlamaIndex, and more. For the full list, check out this [documentation page](https://mlflow.org/docs/latest/llms/tracing/index.html#automatic-tracing). In this tutorial, we're using the OpenAI SDK to make API calls, so we can enable tracing for this by calling `mlflow.openai.autolog()`.
 
-To view the traces in the UI, run `mlflow ui` in a separate terminal shell, and navigate to the `Traces` tab after using the model for inference below.
+To view the traces in the UI, run `mlflow server` in a separate terminal shell, and navigate to the `Traces` tab after using the model for inference below.
 
 python
 
@@ -259,8 +258,7 @@ class WeatherModel(mlflow.pyfunc.ChatModel):
           tools=self.tools,
       )
 
-      tool_calls = response.choices[0].message.tool_calls
-      if tool_calls:
+      if tool_calls := response.choices[0].message.tool_calls:
           print("Received a tool call, calling the weather tool...")
 
           city = json.loads(tool_calls[0].function.arguments)["city"]

@@ -66,7 +66,7 @@ Install MLflow and required packages:
 bash
 
 ```bash
-pip install "mlflow>=3.4" openai
+pip install 'mlflow[genai]>=3.4' openai
 
 ```
 

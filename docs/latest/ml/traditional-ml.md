@@ -42,7 +42,7 @@ MLflow provides comprehensive experiment tracking, model management, and deploym
 
 ## Why MLflow for Traditional ML?[​](#why-mlflow-for-traditional-ml "Direct link to Why MLflow for Traditional ML?")
 
-![Hyper Parameter Optimization with scikit-learn](/mlflow-website/docs/latest/images/traditional-ml-ui.gif)
+[](/mlflow-website/docs/latest/images/traditional-ml-ui.mp4)
 
 #### Automatic Logging
 

@@ -1,324 +1,274 @@
 # Tracing Quickstart
 
+MLflow Assistant
+
+Need help setting up tracing? Try [MLflow Assistant](/mlflow-website/docs/latest/genai/getting-started/try-assistant.md) - a powerful AI assistant that can add MLflow tracing to your project automatically.
+
 This quickstart guide will walk you through setting up a simple GenAI application with MLflow Tracing. In less than 10 minutes, you'll enable tracing, run a basic application, and explore the generated traces in the MLflow UI.
 
 ## Prerequisites[​](#prerequisites "Direct link to Prerequisites")
 
-This guide requires the following packages:
+Make sure you have started the MLflow server. If you don't have the MLflow server running yet, just follow these simple steps to get it started.
 
-* **mlflow>=3.1**: Core MLflow functionality with GenAI features
-* **openai>=1.0.0**: For OpenAI API integration
+* Local (uv)
+* Local (pip)
+* Local (docker)
 
-Install the required packages:
+Install the Python package manager [uv](https://docs.astral.sh/uv/getting-started/installation/) (that will also install [`uvx` command](https://docs.astral.sh/uv/guides/tools/) to invoke Python tools without installing them).
+
+Start a MLflow server locally.
+
+shell
+
+```shell
+uvx mlflow server
+
+```
+
+**Python Environment**: Python 3.10+
+
+Install the `mlflow` Python package via `pip` and start a MLflow server locally.
+
+shell
+
+```shell
+pip install --upgrade 'mlflow[genai]'
+mlflow server
+
+```
+
+MLflow provides a Docker Compose file to start a local MLflow server with a PostgreSQL database and a MinIO server.
+
+shell
+
+```shell
+git clone --depth 1 --filter=blob:none --sparse https://github.com/mlflow/mlflow.git
+cd mlflow
+git sparse-checkout set docker-compose
+cd docker-compose
+cp .env.dev.example .env
+docker compose up -d
+
+```
+
+Refer to the [instruction](https://github.com/mlflow/mlflow/tree/master/docker-compose/README.md) for more details (e.g., overriding the default environment variables).
+
+## Create a MLflow Experiment[​](#create-a-mlflow-experiment "Direct link to Create a MLflow Experiment")
+
+The traces your GenAI application will send to the MLflow server are grouped into MLflow experiments. We recommend creating one experiment for each GenAI application.
+
+Let's create a new MLflow experiment using the MLflow UI so that you can start sending your traces.
+
+![New Experiment](/mlflow-website/docs/latest/images/llms/tracing/quickstart/mlflow-ui-new-experiment.png)
+
+1. Navigate to the MLflow UI in your browser at <http://localhost:5000>.
+2. Click on the
+
+   Create
+
+   button on the top right.
+3. Enter a name for the experiment and click on "Create".
+
+*You can leave the `Artifact Location` field blank for now. It is an advanced configuration to override where MLflow stores experiment data.*
+
+## Dependency[​](#dependency "Direct link to Dependency")
+
+To connect your GenAI application to the MLflow server, you will need to install the MLflow client SDK.
+
+* Python(OpenAI)
+* TypeScript(OpenAI)
 
 bash
 
 ```bash
-pip install --upgrade "mlflow" openai>=1.0.0
+pip install --upgrade 'mlflow[genai]' openai>=1.0.0
 
 ```
-
-note
-
-Tracing features are available in MLflow 2.15.0+, though some advanced features may be limited compared to MLflow 3. It is **highly advised** to upgrade to MLflow 3 to get the benefits of tracing features that have been greatly improved.
-
-## Step 1: Set up your environment[​](#step-1-set-up-your-environment "Direct link to Step 1: Set up your environment")
-
-* Local MLflow
-* Remote MLflow Server
-* Databricks
-
-For the fastest setup, you can run MLflow locally:
 
 bash
 
 ```bash
-# Start MLflow tracking server locally
-mlflow ui
-
-# This will start the server at http://127.0.0.1:5000
+npm install mlflow-openai
 
 ```
 
-If you have a remote MLflow tracking server, configure the connection:
+info
 
-python
+While this guide features an example using the OpenAI SDK, the same steps apply to other LLM providers, including Anthropic, Google, Bedrock, and many others.
 
-```python
-import os
-import mlflow
+For a comprehensive list of LLM providers supported by MLflow, see the [LLM Integrations Overview](/mlflow-website/docs/latest/genai/tracing/integrations.md).
 
-# Set your MLflow tracking URI
-os.environ["MLFLOW_TRACKING_URI"] = "http://your-mlflow-server:5000"
-# Or directly in code
-mlflow.set_tracking_uri("http://your-mlflow-server:5000")
+## Start Tracing[​](#start-tracing "Direct link to Start Tracing")
 
-```
+Once your experiment is created, you're ready to connect to the MLflow server and begin sending traces from your GenAI application.
 
-If you have a Databricks account, configure the connection:
+* Python(OpenAI)
+* TypeScript(OpenAI)
+* OpenTelemetry
 
 python
 
 ```python
 import mlflow
-
-mlflow.login()
-
-```
-
-This will prompt you for your configuration details (Databricks Host url and a PAT).
-
-### Configure OpenAI API Key[​](#configure-openai-api-key "Direct link to Configure OpenAI API Key")
-
-Set your OpenAI API key as an environment variable:
-
-python
-
-```python
-import os
-
-# Set your OpenAI API key
-os.environ["OPENAI_API_KEY"] = "your-api-key-here"  # Replace with your actual API key
-
-```
-
-tip
-
-You can also set the environment variable in your shell before running the script:
-
-bash
-
-```bash
-export OPENAI_API_KEY="your-api-key-here"
-export MLFLOW_TRACKING_URI="http://your-mlflow-server:5000"  # Optional: for remote server, set as 'databricks' if connecting to a Databricks account
-
-```
-
-## Step 2: Create a simple application with tracing[​](#step-2-create-a-simple-application-with-tracing "Direct link to Step 2: Create a simple application with tracing")
-
-python
-
-```python
-import mlflow
-import openai
 from openai import OpenAI
-import os
 
-# Set up MLflow experiment
-mlflow.set_experiment("openai-tracing-quickstart")
+# Specify the tracking URI for the MLflow server.
+mlflow.set_tracking_uri("http://localhost:5000")
 
-# Enable automatic tracing for all OpenAI API calls
+# Specify the experiment you just created for your GenAI application.
+mlflow.set_experiment("My Application")
+
+# Enable automatic tracing for all OpenAI API calls.
 mlflow.openai.autolog()
 
 client = OpenAI()
-
-
-def get_weather_response(location):
-    """Get a weather-related response for a given location."""
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "You are a helpful weather assistant."},
-            {"role": "user", "content": f"What's the weather like in {location}?"},
-        ],
-        max_tokens=100,
-        temperature=0.7,
-    )
-    return response.choices[0].message.content
-
-
-# Execute the traced function
-location = "San Francisco"
-response = get_weather_response(location)
-
-print(f"Query: What's the weather like in {location}?")
-print(f"Response: {response}")
-print("\nTraces have been captured!")
-print(
-    "View them in the MLflow UI at: http://127.0.0.1:5000 (or your MLflow server URL)"
+# The trace of the following is sent to the MLflow server.
+client.chat.completions.create(
+    model="o4-mini",
+    messages=[
+        {"role": "system", "content": "You are a helpful weather assistant."},
+        {"role": "user", "content": "What's the weather like in Seattle?"},
+    ],
 )
 
 ```
 
-## Step 3: Run the application[​](#step-3-run-the-application "Direct link to Step 3: Run the application")
+typescript
 
-* In a Jupyter Notebook
-* As a Python Script
+```typescript
+import { init } from "mlflow-tracing";
+import { tracedOpenAI } from "mlflow-openai";
+import { OpenAI } from "openai";
 
-Simply run the code cell above. You should see output similar to:
+init({
+    trackingUri: "http://localhost:5000",
+    // NOTE: specifying experiment name is not yet supported in TypeScript SDK.
+    // You can copy the experiment id from the experiment details on the MLflow UI.
+    experimentId: "<experiment-id>",
+});
 
-text
+// Wrap the OpenAI client with the tracedOpenAI function to enable automatic tracing.
+const client = tracedOpenAI(new OpenAI());
 
-```text
-Query: What's the weather like in San Francisco?
-Response: I don't have real-time weather data, but San Francisco typically has mild temperatures year-round...
-Traces have been captured!
-View them in the MLflow UI at: http://127.0.0.1:5000
-
-```
-
-tip
-
-If you're using Jupyter with MLflow 2.20+, the trace UI will automatically display in your notebook when traces are generated!
-
-1. Save the code above to a file named `weather_app.py`
-2. Run the script:
-
-bash
-
-```bash
-python weather_app.py
+// The trace of the following is sent to the MLflow server.
+client.chat.completions.create({
+    model: "o4-mini",
+    messages: [
+        {"role": "system", "content": "You are a helpful weather assistant."},
+        {"role": "user", "content": "What's the weather like in Seattle?"},
+    ],
+})
 
 ```
 
-You should see output similar to:
+MLflow Server exposes an OTLP endpoint at `/v1/traces` ([OTLP](https://opentelemetry.io/docs/specs/otlp/)). This endpoint accepts traces from any native OpenTelemetry instrumentation, allowing you to trace applications written in other languages such as Java, Go, Rust, etc.
 
-text
+The following example shows how to collect traces from a FastAPI application using OpenTelemetry FastAPI instrumentation.
 
-```text
-Query: What's the weather like in San Francisco?
-Response: I don't have real-time weather data, but San Francisco typically has mild temperatures year-round...
-Traces have been captured!
-View them in the MLflow UI at: http://127.0.0.1:5000
+python
+
+```python
+import os
+import uvicorn
+from fastapi import FastAPI
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+
+# Set the endpoint and header
+MLFLOW_TRACKING_URI = "http://localhost:5000"
+MLFLOW_EXPERIMENT_ID = "123"
+
+os.environ["OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"] = f"{MLFLOW_TRACKING_URI}/v1/traces"
+os.environ[
+    "OTEL_EXPORTER_OTLP_TRACES_HEADERS"
+] = f"x-mlflow-experiment-id={MLFLOW_EXPERIMENT_ID}"
+
+app = FastAPI()
+FastAPIInstrumentor.instrument_app(app)
+
+
+@app.get("/")
+async def root():
+    return {"message": "Hello, World!"}
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 
 ```
 
-## Step 4: Explore traces in the MLflow UI[​](#step-4-explore-traces-in-the-mlflow-ui "Direct link to Step 4: Explore traces in the MLflow UI")
+For a deeper dive into using MLflow together with OpenTelemetry, see the [OpenTelemetry guide](/mlflow-website/docs/latest/genai/tracing/opentelemetry.md).
 
-1. **Open the MLflow UI** by navigating to <http://127.0.0.1:5000> (or your MLflow server URL)
+## View Your Traces on the MLflow UI[​](#view-your-traces-on-the-mlflow-ui "Direct link to View Your Traces on the MLflow UI")
 
-2. **Click on the "openai-tracing-quickstart" experiment** from the experiments list
+After running the code above, go to the MLflow UI and select the "My Application" experiment, and then select the "Traces" tab. It should show the newly created trace.
 
-3. **Click on the "Traces" tab** to view all captured traces from your OpenAI API calls
+![Single Trace](/mlflow-website/docs/latest/images/llms/tracing/quickstart/single-openai-trace-list.png)
 
-4. **Click on any individual trace** to open the detailed trace view
+![Single Trace](/mlflow-website/docs/latest/images/llms/tracing/quickstart/single-openai-trace-detail.png)
 
-5. **Explore the trace details** including input messages, system prompts, model parameters (temperature, max\_tokens, etc.), output responses, execution time, token usage, and the complete request/response flow
+## Track Multi-Turn Conversations with Sessions[​](#track-multi-turn-conversations-with-sessions "Direct link to Track Multi-Turn Conversations with Sessions")
 
-![MLflow Traces UI](/mlflow-website/docs/latest/assets/images/tracing-top-dcca046565ab33be6afe0447dd328c22.gif)
+Many GenAI applications maintain multi-turn conversations with users. MLflow provides built-in support for tracking user sessions by using standard metadata fields. This allows you to group related traces together and analyze conversation flows.
 
-## Step 5: Add custom tracing (Optional)[​](#step-5-add-custom-tracing-optional "Direct link to Step 5: Add custom tracing (Optional)")
+* Python
+* TypeScript
 
-Enhance your application with custom tracing for better observability:
+Here's how to add user and session tracking to your application:
 
 python
 
 ```python
 import mlflow
-from openai import OpenAI
-
-mlflow.set_experiment("enhanced-weather-app")
-mlflow.openai.autolog()
-
-client = OpenAI()
 
 
 @mlflow.trace
-def preprocess_location(location):
-    """Preprocess the location input."""
-    # Add custom span for preprocessing
-    cleaned_location = location.strip().title()
-    return cleaned_location
+def chat_completion(message: list[dict], user_id: str, session_id: str):
+    """Process a chat message with user and session tracking."""
 
-
-@mlflow.trace
-def get_enhanced_weather_response(location):
-    """Enhanced weather response with preprocessing and custom metadata."""
-
-    # Add tags for better organization
+    # Add user and session context to the current trace
     mlflow.update_current_trace(
-        tags={
-            "location": location,
-            "app_version": "1.0.0",
-            "request_type": "weather_query",
+        metadata={
+            "mlflow.trace.user": user_id,  # Links trace to specific user
+            "mlflow.trace.session": session_id,  # Groups trace with conversation
         }
     )
 
-    # Preprocess input
-    cleaned_location = preprocess_location(location)
-
-    # Make OpenAI call (automatically traced)
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "You are a helpful weather assistant."},
-            {
-                "role": "user",
-                "content": f"What's the weather like in {cleaned_location}?",
-            },
-        ],
-        max_tokens=150,
-        temperature=0.7,
-    )
-
-    result = response.choices[0].message.content
-
-    # Add custom attributes
-    mlflow.update_current_trace(
-        tags={
-            "response_length": len(result),
-            "cleaned_location": cleaned_location,
-        }
-    )
-
-    return result
-
-
-# Test the enhanced function
-locations = ["san francisco", "  New York  ", "tokyo"]
-
-for location in locations:
-    print(f"\n--- Processing: {location} ---")
-    response = get_enhanced_weather_response(location)
-    print(f"Response: {response[:100]}...")
-
-print("\nEnhanced traces captured! Check the MLflow UI for detailed trace information.")
+    # Your chat logic here
+    return generate_response(message)
 
 ```
 
-## Next Steps[​](#next-steps "Direct link to Next Steps")
+typescript
 
-Now that you have basic tracing working, explore these advanced features:
+```typescript
+import * as mlflow from "mlflow-tracing";
 
-1. **Search and Filter Traces** Learn how to find specific traces using the [search functionality](/mlflow-website/docs/latest/genai/tracing/search-traces.md).
+const chatCompletion = mlflow.trace(
+    (message: Array<Record<string, any>>, userId: string, sessionId: string) => {
+        // Add user and session context to the current trace
+        mlflow.updateCurrentTrace({
+            metadata: {
+                "mlflow.trace.user": userId,
+                "mlflow.trace.session": sessionId,
+            },
+        });
 
-2. **Add Tags and Context** Organize your traces with [custom tags](/mlflow-website/docs/latest/genai/tracing/attach-tags.md) for better monitoring.
+        // Your chat logic here
+        return generateResponse(message);
+    },
+    { name: "chat_completion" }
+);
 
-3. **Production Deployment** Set up [production monitoring](/mlflow-website/docs/latest/genai/tracing/prod-tracing.md) with the lightweight SDK.
+```
 
-4. **Integration with Other Libraries** Explore [automatic tracing](/mlflow-website/docs/latest/genai/tracing/integrations.md) for LangChain, LlamaIndex, and more.
+For more details on tracking users and sessions, see the [Track Users & Sessions guide](/mlflow-website/docs/latest/genai/tracing/track-users-sessions.md).
 
-5. **Manual Instrumentation** Learn [manual tracing techniques](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/manual-tracing.md) for custom applications.
+## Next Step[​](#next-step "Direct link to Next Step")
 
-## Troubleshooting[​](#troubleshooting "Direct link to Troubleshooting")
+Congrats on sending your first trace with MLflow! Now that you've got the basics working, here is the recommended next step to deepen your understanding of tracing:
 
-### Common Issues[​](#common-issues "Direct link to Common Issues")
+[Automatic and Manual Tracing →](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/automatic.md)
 
-**Traces not appearing in UI:**
+***
 
-* Verify MLflow server is running and accessible
-* Check that `MLFLOW_TRACKING_URI` is set correctly
-* Ensure experiment exists (MLflow creates it automatically if it doesn't)
-
-**OpenAI API errors:**
-
-* Verify your `OPENAI_API_KEY` is set correctly
-* Check that you have API credits available
-* Ensure the model name (`gpt-4o-mini`) is correct and accessible
-
-**MLflow server not starting:**
-
-* Check if port 5000 is already in use: `lsof -i :5000`
-* Try a different port: `mlflow ui --port 5001`
-* Verify MLflow installation: `mlflow --version`
-
-## Summary[​](#summary "Direct link to Summary")
-
-Congratulations! You've successfully:
-
-* ✅ Set up MLflow Tracing for a GenAI application
-* ✅ Enabled automatic tracing for OpenAI API calls
-* ✅ Generated and explored traces in the MLflow UI
-* ✅ Learned how to add custom tracing and metadata
-
-MLflow Tracing provides powerful observability for your GenAI applications, helping you monitor performance, debug issues, and understand user interactions. Continue exploring the advanced features to get the most out of your tracing setup!
+[Explore how MLflow supports both automatic tracing and manual tracing for custom logic, plus how you can combine the two to get more insightful traces.](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/automatic.md)

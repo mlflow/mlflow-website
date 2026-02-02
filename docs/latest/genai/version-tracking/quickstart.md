@@ -13,7 +13,7 @@ This quickstart requires MLflow version 3.0 or higher for full GenAI functionali
 bash
 
 ```bash
-pip install --upgrade mlflow
+pip install --upgrade 'mlflow[genai]'
 pip install langchain-openai
 
 ```

@@ -1,5 +1,9 @@
 # Deep Learning Quickstart
 
+MLflow Assistant
+
+Need help setting up tracking? Try [MLflow Assistant](/mlflow-website/docs/latest/genai/getting-started/try-assistant.md) - a powerful AI assistant that can help you set up MLflow tracking for your project.
+
 ![MLflow UI System metrics page](/mlflow-website/docs/latest/images/tutorials/introductory/deep-learning/ui-system-metrics.png)
 
 In this tutorial, we demonstrate how to use MLflow to track deep learning experiments with Pytorch. By combining MLflow
@@ -141,7 +145,7 @@ with mlflow.start_run() as run:
 
     for epoch in range(params["epochs"]):
         model.train()
-        train_loss = correct, total = 0, 0, 0
+        train_loss, correct, total = 0, 0, 0
 
         for batch_idx, (data, target) in enumerate(train_loader):
             data, target = data.to(device), target.to(device)
@@ -223,7 +227,7 @@ To see the results of training, you can access the MLflow UI by navigating to th
 bash
 
 ```bash
-mlflow ui --port 5000
+mlflow server --port 5000
 
 ```
 
@@ -258,8 +262,8 @@ python
 model = mlflow.pytorch.load_model("runs:/<run_id>/final_model")
 # or load a checkpoint
 # model = mlflow.pytorch.load_model("runs:/<run_id>/checkpoint_<epoch>")
-loaded_model.to(device)
-loaded_model.eval()
+model.to(device)
+model.eval()
 
 # Resume the previous run to log test metrics
 with mlflow.start_run(run_id=run.info.run_id) as run:

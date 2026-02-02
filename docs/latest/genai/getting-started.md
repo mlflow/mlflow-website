@@ -4,7 +4,7 @@
 
 MLflow transforms how software engineers build, evaluate, and deploy GenAI applications. Get complete observability, systematic evaluation, and deployment confidence—all while maintaining the flexibility to use any framework or model provider.
 
-![MLflow Tracing UI showing detailed GenAI observability](/mlflow-website/docs/latest/images/llms/tracing/tracing-top.gif)
+[](/mlflow-website/docs/latest/images/llms/tracing/tracing-top.mp4)
 
 ## The GenAI Development Lifecycle[​](#the-genai-development-lifecycle "Direct link to The GenAI Development Lifecycle")
 
@@ -145,7 +145,7 @@ Transform manual prompt engineering into systematic, data-driven optimization wi
 Ready to get started? You'll need:
 
 * Python 3.10+ installed
-* MLflow 3.5+ (`pip install --upgrade mlflow`)
+* MLflow 3.5+ (`pip install --upgrade 'mlflow[genai]'`)
 * API access to an LLM provider (OpenAI, Anthropic, etc.)
 
 ***
@@ -221,14 +221,6 @@ MLflow provides deep integrations with popular GenAI frameworks. Choose your fra
 [Instrument RAG pipelines and document processing workflows with LlamaIndex support](/mlflow-website/docs/latest/genai/flavors/llama-index.md)
 
 [Use LlamaIndex →](/mlflow-website/docs/latest/genai/flavors/llama-index.md)
-
-[![OpenAI Integration](/mlflow-website/docs/latest/images/logos/openai-logo.svg)](/mlflow-website/docs/latest/genai/flavors/openai.md)
-
-### [OpenAI Integration](/mlflow-website/docs/latest/genai/flavors/openai.md)
-
-[Track completions, embeddings, and function calls with native OpenAI instrumentation](/mlflow-website/docs/latest/genai/flavors/openai.md)
-
-[Use OpenAI →](/mlflow-website/docs/latest/genai/flavors/openai.md)
 
 ### [DSPy Integration](/mlflow-website/docs/latest/genai/flavors/dspy.md)
 

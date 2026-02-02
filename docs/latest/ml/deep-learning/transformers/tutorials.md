@@ -16,9 +16,11 @@ Fine-tuning a model is a common task in machine learning workflows. These tutori
 
 [Fine tuning a transformers Foundation Model](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/fine-tuning/transformers-fine-tuning.md)
 
-[Learn how to fine-tune a transformers model using MLflow to keep track of the training process and to log a use-case-specific tuned pipeline.](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/fine-tuning/transformers-fine-tuning.md)
+[Learn how to fine-tune a transformers model using MLflow to keep track of the training process and to log a use-case-specific tuned pipeline.](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/fine-tuning/transformers-fine-tuning.md)[](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/fine-tuning/transformers-peft.md)
 
 [Fine tuning LLMs efficiently using PEFT and MLflow](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/fine-tuning/transformers-peft.md)
+
+[](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/fine-tuning/transformers-peft.md)
 
 [Learn how to fine-tune a large foundational models with significantly reduced memory usage using PEFT (QLoRA) and MLflow.](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/fine-tuning/transformers-peft.md)
 
@@ -30,20 +32,28 @@ These more advanced tutorials are designed to showcase different applications of
 
 [Audio Transcription with Transformers](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/audio-transcription/whisper.md)
 
-[Learn how to leverage the Whisper Model with MLflow to generate accurate audio transcriptions.](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/audio-transcription/whisper.md)
+[Learn how to leverage the Whisper Model with MLflow to generate accurate audio transcriptions.](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/audio-transcription/whisper.md)[](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/translation/component-translation.md)
 
 [Translation with Transformers](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/translation/component-translation.md)
 
-[Learn about the options for saving and loading transformers models in MLflow for customization of your workflows with a fun translation example!](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/translation/component-translation.md)
+[](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/translation/component-translation.md)
+
+[Learn about the options for saving and loading transformers models in MLflow for customization of your workflows with a fun translation example!](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/translation/component-translation.md)[](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/conversational/conversational-model.md)
 
 [Chat with Transformers](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/conversational/conversational-model.md)
 
-[Learn the basics of stateful chat Conversational Pipelines with Transformers and MLflow.](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/conversational/conversational-model.md)
+[](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/conversational/conversational-model.md)
+
+[Learn the basics of stateful chat Conversational Pipelines with Transformers and MLflow.](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/conversational/conversational-model.md)[](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/conversational/pyfunc-chat-model.md)
 
 [Building and Serving an OpenAI-Compatible Chatbot](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/conversational/pyfunc-chat-model.md)
 
-[Learn how to build an OpenAI-compatible chatbot using a local Transformers model and MLflow, and serve it with minimal configuration.](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/conversational/pyfunc-chat-model.md)
+[](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/conversational/pyfunc-chat-model.md)
+
+[Learn how to build an OpenAI-compatible chatbot using a local Transformers model and MLflow, and serve it with minimal configuration.](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/conversational/pyfunc-chat-model.md)[](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/prompt-templating/prompt-templating.md)
 
 [Prompt templating with Transformers Pipelines](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/prompt-templating/prompt-templating.md)
+
+[](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/prompt-templating/prompt-templating.md)
 
 [Learn how to set prompt templates on Transformers Pipelines to optimize your LLM's outputs, and simplify the end-user experience.](/mlflow-website/docs/latest/ml/deep-learning/transformers/tutorials/prompt-templating/prompt-templating.md)

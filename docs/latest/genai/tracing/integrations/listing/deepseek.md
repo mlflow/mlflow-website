@@ -1,41 +1,81 @@
 # Tracing DeepSeek
 
-![Deepseek Tracing via autolog](/mlflow-website/docs/latest/assets/images/deepseek-tracing-agent-9bc5d50e8a028ac3e2f11325c0c05277.png)
+[MLflow Tracing](/mlflow-website/docs/latest/genai/tracing/integrations.md) provides automatic tracing capability for <!-- -->DeepSeek<!-- --> models through the OpenAI SDK integration. Since <!-- -->DeepSeek<!-- --> offers an OpenAI-compatible API format, you can use<!-- --> `mlflow.openai.autolog()` to trace interactions with <!-- -->DeepSeek<!-- --> models.
 
-[MLflow Tracing](/mlflow-website/docs/latest/genai/tracing/integrations.md) provides automatic tracing capability for Deepseek models through the OpenAI SDK integration. Since DeepSeek uses an OpenAI-compatible API format, you can use `mlflow.openai.autolog()` to trace interactions with DeepSeek models.
+![Tracing via autolog](/mlflow-website/docs/latest/images/llms/tracing/openai-function-calling.png)
 
-python
-
-```python
-import mlflow
-
-# Enable
-mlflow.openai.autolog()
-
-```
-
-MLflow trace automatically captures the following information about DeepSeek calls:
+MLflow trace automatically captures the following information about <!-- -->DeepSeek<!-- --> calls:
 
 * Prompts and completion responses
 * Latencies
+* Token usage
 * Model name
-* Additional metadata such as `temperature`, `max_tokens`, if specified.
+* Additional metadata such as `temperature`, `max_completion_tokens`, if specified.
 * Function calling if returned in the response
+* Built-in tools such as web search, file search, computer use, etc.
 * Any exception if raised
 
-## Supported APIs[​](#supported-apis "Direct link to Supported APIs")
+## Getting Started
 
-MLflow supports automatic tracing for the following DeepSeek APIs through the OpenAI integration:
+1
 
-| Chat Completion | Function Calling | Streaming | Async    |
-| --------------- | ---------------- | --------- | -------- |
-| ✅              | ✅               | ✅ (\*1)  | ✅ (\*2) |
+### Install dependencies
 
-(\*1) Streaming support requires MLflow 2.15.0 or later. (\*2) Async support requires MLflow 2.21.0 or later.
+* Python
+* JS / TS
 
-To request support for additional APIs, please open a [feature request](https://github.com/mlflow/mlflow/issues/new?assignees=\&labels=enhancement\&projects=\&template=feature_request_template.yaml) on GitHub.
+bash
 
-## Basic Example[​](#basic-example "Direct link to Basic Example")
+```bash
+pip install 'mlflow[genai]' openai
+
+```
+
+bash
+
+```bash
+npm install mlflow-openai openai
+
+```
+
+2
+
+### Start MLflow server
+
+* Local (pip)
+* Local (docker)
+
+If you have a local Python environment >= 3.10, you can start the MLflow server locally using the `mlflow` CLI command.
+
+bash
+
+```bash
+mlflow server
+
+```
+
+MLflow also provides a Docker Compose file to start a local MLflow server with a postgres database and a minio server.
+
+bash
+
+```bash
+git clone --depth 1 --filter=blob:none --sparse https://github.com/mlflow/mlflow.git
+cd mlflow
+git sparse-checkout set docker-compose
+cd docker-compose
+cp .env.dev.example .env
+docker compose up -d
+
+```
+
+Refer to the [instruction](https://github.com/mlflow/mlflow/tree/master/docker-compose/README.md) for more details, e.g., overriding the default environment variables.
+
+3
+
+### Enable tracing and call DeepSeek
+
+* Python
+* JS / TS
 
 python
 
@@ -52,36 +92,66 @@ mlflow.set_experiment("DeepSeek")
 
 # Initialize the OpenAI client with DeepSeek API endpoint
 client = openai.OpenAI(
-    base_url="https://api.deepseek.com", api_key="<your_deepseek_api_key>"
+    base_url="https://api.deepseek.com",
+    api_key="<your_deepseek_api_key>",
 )
-
-messages = [
-    {"role": "system", "content": "You are a helpful assistant."},
-    {"role": "user", "content": "What is the capital of France?"},
-]
 
 response = client.chat.completions.create(
     model="deepseek-chat",
-    messages=messages,
-    temperature=0.1,
-    max_tokens=100,
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "What is the capital of France?"},
+    ],
 )
 
 ```
 
-The above example should generate a trace in the `DeepSeek` experiment in the MLflow UI:
+typescript
 
-![Deepseek Tracing](/mlflow-website/docs/latest/assets/images/deepseek-tracing-148528f9d4da0be7e5c4ec64b21ce52c.png)
+```typescript
+import { OpenAI } from "openai";
+import { tracedOpenAI } from "mlflow-openai";
 
-## Streaming and Async Support[​](#streaming-and-async-support "Direct link to Streaming and Async Support")
+// Wrap the OpenAI client and point to DeepSeek endpoint
+const client = tracedOpenAI(
+  new OpenAI({
+    baseURL: "https://api.deepseek.com",
+    apiKey: "<your_deepseek_api_key>",
+  })
+);
 
-MLflow supports tracing for streaming and async DeepSeek APIs. Visit the [OpenAI Tracing documentation](/mlflow-website/docs/latest/genai/tracing/integrations/listing/openai.md) for example code snippets for tracing streaming and async calls through OpenAI SDK.
+const response = await client.chat.completions.create({
+  model: "deepseek-chat",
+  messages: [
+    { role: "system", content: "You are a helpful assistant." },
+    { role: "user", content: "What is the capital of France?" },
+  ],
+  temperature: 0.1,
+  max_tokens: 100,
+});
 
-## Advanced Example: Function Calling Agent[​](#advanced-example-function-calling-agent "Direct link to Advanced Example: Function Calling Agent")
+```
 
-MLflow Tracing automatically captures function calling responses from DeepSeek models through the OpenAI SDK. The function instruction in the response will be highlighted in the trace UI. Moreover, you can annotate the tool function with the `@mlflow.trace` decorator to create a span for the tool execution.
+4
 
-The following example implements a simple function calling agent using DeepSeek Function Calling and MLflow Tracing.
+### View traces in MLflow UI
+
+Browse to your MLflow UI (for example, http\://localhost:5000) and open the `DeepSeek` experiment to see traces for the calls above.
+
+![DeepSeek Tracing](/mlflow-website/docs/latest/images/llms/tracing/basic-openai-trace.png)
+
+-> View<!-- --> *[Next Steps](#next-steps)* <!-- -->for learning about more MLflow features like user feedback tracking, prompt management, and evaluation.
+
+## Streaming and Async Support
+
+MLflow supports tracing for streaming and async <!-- -->DeepSeek<!-- --> APIs. Visit the<!-- --> [OpenAI Tracing documentation](/mlflow-website/docs/latest/genai/tracing/integrations/listing/openai.md) for example code snippets for tracing streaming and async calls through OpenAI SDK.
+
+## Combine with frameworks or manual tracing
+
+The automatic tracing capability in MLflow is designed to work seamlessly with the<!-- --> [Manual Tracing SDK](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/manual-tracing.md) or multi-framework integrations. The examples below show Python (manual span) and JS/TS (manual span) at the same level of complexity.
+
+* Python
+* JS / TS
 
 python
 
@@ -92,140 +162,91 @@ import mlflow
 from mlflow.entities import SpanType
 
 # Initialize the OpenAI client with DeepSeek API endpoint
-client = OpenAI(base_url="https://api.deepseek.com", api_key="<your_deepseek_api_key>")
+client = OpenAI(
+    base_url="https://api.deepseek.com",
+    api_key="<your_deepseek_api_key>",
+)
 
 
-# Define the tool function. Decorate it with `@mlflow.trace` to create a span for its execution.
-@mlflow.trace(span_type=SpanType.TOOL)
-def get_weather(city: str) -> str:
-    if city == "Tokyo":
-        return "sunny"
-    elif city == "Paris":
-        return "rainy"
-    return "unknown"
-
-
-tools = [
-    {
-        "type": "function",
-        "function": {
-            "name": "get_weather",
-            "parameters": {
-                "type": "object",
-                "properties": {"city": {"type": "string"}},
-            },
-        },
-    }
-]
-
-_tool_functions = {"get_weather": get_weather}
-
-
-# Define a simple tool calling agent
-@mlflow.trace(span_type=SpanType.AGENT)
-def run_tool_agent(question: str):
+# Create a parent span for the DeepSeek call
+@mlflow.trace(span_type=SpanType.CHAIN)
+def answer_question(question: str):
     messages = [{"role": "user", "content": question}]
-
-    # Invoke the model with the given question and available tools
     response = client.chat.completions.create(
         model="deepseek-chat",
         messages=messages,
-        tools=tools,
     )
 
-    ai_msg = response.choices[0].message
-    messages.append(ai_msg)
-
-    # If the model request tool call(s), invoke the function with the specified arguments
-    if tool_calls := ai_msg.tool_calls:
-        for tool_call in tool_calls:
-            function_name = tool_call.function.name
-            if tool_func := _tool_functions.get(function_name):
-                args = json.loads(tool_call.function.arguments)
-                tool_result = tool_func(**args)
-            else:
-                raise RuntimeError("An invalid tool is returned from the assistant!")
-
-            messages.append(
-                {
-                    "role": "tool",
-                    "tool_call_id": tool_call.id,
-                    "content": tool_result,
-                }
-            )
-
-        # Sent the tool results to the model and get a new response
-        response = client.chat.completions.create(
-            model="deepseek-chat", messages=messages
-        )
-
+    # Attach session/user metadata to the trace
+    mlflow.update_current_trace(
+        metadata={
+            "mlflow.trace.session": "session-12345",
+            "mlflow.trace.user": "user-a",
+        }
+    )
     return response.choices[0].message.content
 
 
-# Run the tool calling agent
-question = "What's the weather like in Paris today?"
-answer = run_tool_agent(question)
+answer = answer_question("What is the capital of France?")
 
 ```
 
-## Token usage[​](#token-usage "Direct link to Token usage")
+typescript
 
-MLflow >= 3.2.0 supports token usage tracking for Deepseek models through the OpenAI SDK integration. The token usage for each LLM call will be logged in the `mlflow.chat.tokenUsage` attribute. The total token usage throughout the trace will be available in the `token_usage` field of the trace info object.
+```typescript
+import * as mlflow from "mlflow-tracing";
+import { OpenAI } from "openai";
+import { tracedOpenAI } from "mlflow-openai";
 
-python
+mlflow.init({
+  trackingUri: "http://localhost:5000",
+  experimentId: "<your_experiment_id>",
+});
 
-```python
-import json
-import mlflow
+// Wrap the OpenAI client and point to DeepSeek endpoint
+const client = tracedOpenAI(
+  new OpenAI({
+    baseURL: "https://api.deepseek.com",
+    apiKey: "<your_deepseek_api_key>",
+  })
+);
 
-mlflow.openai.autolog()
+// Create a traced function that wraps the DeepSeek call
+const answerQuestion = mlflow.trace(
+  async (question: string) => {
+    const resp = await client.chat.completions.create({
+      model: "deepseek-chat",
+      messages: [{ role: "user", content: question }],
+    });
+    return resp.choices[0].message?.content;
+  },
+  { name: "answer-question" }
+);
 
-# Run the tool calling agent defined in the previous section
-question = "What's the weather like in Paris today?"
-answer = run_tool_agent(question)
-
-# Get the trace object just created
-last_trace_id = mlflow.get_last_active_trace_id()
-trace = mlflow.get_trace(trace_id=last_trace_id)
-
-# Print the token usage
-total_usage = trace.info.token_usage
-print("== Total token usage: ==")
-print(f"  Input tokens: {total_usage['input_tokens']}")
-print(f"  Output tokens: {total_usage['output_tokens']}")
-print(f"  Total tokens: {total_usage['total_tokens']}")
-
-# Print the token usage for each LLM call
-print("\n== Detailed usage for each LLM call: ==")
-for span in trace.data.spans:
-    if usage := span.get_attribute("mlflow.chat.tokenUsage"):
-        print(f"{span.name}:")
-        print(f"  Input tokens: {usage['input_tokens']}")
-        print(f"  Output tokens: {usage['output_tokens']}")
-        print(f"  Total tokens: {usage['total_tokens']}")
+await answerQuestion("What is the capital of France?");
 
 ```
 
-bash
+Running either example will produce a trace that includes the <!-- -->DeepSeek<!-- --> LLM span; the traced function creates the parent span automatically.
 
-```bash
-== Total token usage: ==
-  Input tokens: 84
-  Output tokens: 22
-  Total tokens: 106
+![DeepSeek Tracing with Manual Tracing](/mlflow-website/docs/latest/images/llms/tracing/openai-trace-with-manual-span.png)
 
-== Detailed usage for each LLM call: ==
-Completions_1:
-  Input tokens: 45
-  Output tokens: 14
-  Total tokens: 59
-Completions_2:
-  Input tokens: 39
-  Output tokens: 8
-  Total tokens: 47
+## Next steps
 
-```
+### [Track User Feedback](/mlflow-website/docs/latest/genai/tracing/collect-user-feedback.md)
 
-## Disable auto-tracing[​](#disable-auto-tracing "Direct link to Disable auto-tracing")
+[Record user feedback on traces for tracking user satisfaction.](/mlflow-website/docs/latest/genai/tracing/collect-user-feedback.md)
 
-Auto tracing for DeepSeek (through OpenAI SDK) can be disabled globally by calling `mlflow.openai.autolog(disable=True)` or `mlflow.autolog(disable=True)`.
+[Learn about feedback ->](/mlflow-website/docs/latest/genai/tracing/collect-user-feedback.md)
+
+### [Manage Prompts](/mlflow-website/docs/latest/genai/prompt-registry.md)
+
+[Learn how to manage prompts with MLflow's prompt registry.](/mlflow-website/docs/latest/genai/prompt-registry.md)
+
+[Manage prompts ->](/mlflow-website/docs/latest/genai/prompt-registry.md)
+
+### [Evaluate Traces](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/traces.md)
+
+[Evaluate traces with LLM judges to understand and improve your AI application's behavior.](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/traces.md)
+
+[Evaluate traces ->](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/traces.md)

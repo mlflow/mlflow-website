@@ -1,80 +1,470 @@
-# Guidelines-based LLM Scorers
+# Create a guidelines LLM Judge
 
-[Guidelines](/mlflow-website/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.scorers.Guidelines) is a powerful scorer class designed to let you quickly and easily customize evaluation by defining natural language criteria that are framed as pass/fail conditions. It is ideal for checking compliance with rules, style guides, or information inclusion/exclusion.
+Guidelines LLM judges use pass/fail natural language criteria to evaluate GenAI outputs. They excel at evaluating:
 
-Guidelines have the distinct advantage of being easy to explain to business stakeholders ("we are evaluating if the app delivers upon this set of rules") and, as such, can often be directly written by domain experts.
+* **Compliance**: "Must not include pricing information"
+* **Style/tone**: "Maintain professional, empathetic tone"
+* **Requirements**: "Must include specific disclaimers"
+* **Accuracy**: "Use only facts from provided context"
 
-### Example usage[​](#example-usage "Direct link to Example usage")
+### Benefits[​](#benefits "Direct link to Benefits")
 
-First, define the guidelines as a simple string:
+* **Business-friendly**: Domain experts write criteria without coding
+* **Flexible**: Update criteria without code changes
+* **Interpretable**: Clear pass/fail conditions
+* **Fast iteration**: Rapidly test new criteria
+
+## Ways to use guidelines judges[​](#ways-to-use-guidelines-judges "Direct link to Ways to use guidelines judges")
+
+MLflow provides the following guidelines judges:
+
+* Global guidelines
+* Per-row guidelines
+
+**[Built-in `Guidelines()` judge](#1-built-in-guidelines-judge-global-guidelines)**: Apply global guidelines uniformly to all rows. Evaluates app inputs/outputs only.
+
+Use this judge when:
+
+* You want to apply the same evaluation criteria uniformly across all examples
+* You have consistent quality standards that apply to all outputs
+* You're evaluating general requirements like tone, style, or compliance
+
+**[Built-in `ExpectationsGuidelines()` judge](#2-built-in-expectationsguidelines-judge-per-row-guidelines)**: Apply per-row guidelines labeled by domain experts in an evaluation dataset. Evaluates app inputs/outputs only.
+
+Use this judge when:
+
+* You have domain experts who have labeled specific examples with custom guidelines
+* Different rows require different evaluation criteria
+* You're evaluating diverse content types that need specialized criteria
+
+## How guidelines work[​](#how-guidelines-work "Direct link to How guidelines work")
+
+Guidelines judges evaluate whether text meets your specified criteria. The judge:
+
+1. **Receives context**: Any JSON dictionary containing the data to evaluate (e.g., request, response). You can reference these keys by name directly in your guidelines - see detailed examples
+2. **Applies guidelines**: Your natural language rules defining pass/fail conditions
+3. **Makes judgment**: Returns a binary pass/fail score with detailed rationale
+
+## Prerequisites for running the examples[​](#prerequisites-for-running-the-examples "Direct link to Prerequisites for running the examples")
+
+1. Install MLflow and required packages
+
+   bash
+
+   ```bash
+   pip install --upgrade mlflow
+
+   ```
+
+2. Create an MLflow experiment by following the [setup your environment quickstart](/mlflow-website/docs/latest/genai/getting-started/connect-environment.md).
+
+3. (Optional, if using OpenAI models) Use the native OpenAI SDK to connect to OpenAI-hosted models. Select a model from the [available OpenAI models](https://platform.openai.com/docs/models).
+
+   python
+
+   ```python
+   import mlflow
+   import os
+   import openai
+
+   # Ensure your OPENAI_API_KEY is set in your environment
+   # os.environ["OPENAI_API_KEY"] = "<YOUR_API_KEY>" # Uncomment and set if not globally configured
+
+   # Enable auto-tracing for OpenAI
+   mlflow.openai.autolog()
+
+   # Create an OpenAI client
+   client = openai.OpenAI()
+
+   # Select an LLM
+   model_name = "gpt-4o-mini"
+
+   ```
+
+## 1. Built-in `Guidelines()` judge: global guidelines[​](#1-built-in-guidelines-judge-global-guidelines "Direct link to 1-built-in-guidelines-judge-global-guidelines")
+
+The `Guidelines` judge applies uniform guidelines across all rows in your evaluation. It automatically extracts request/response data from your trace and evaluates it against your guidelines.
+
+### Examples[​](#examples "Direct link to Examples")
+
+In your guideline, refer to the app's inputs as the `request` and the app's outputs as the `response`.
 
 python
 
 ```python
-tone = "The response must maintain a courteous, respectful tone throughout.  It must show empathy for customer concerns."
-easy_to_understand = "The response must use clear, concise language and structure responses logically. It must avoid jargon or explain technical terms when used."
-banned_topics = "If the request is a question about product pricing, the response must politely decline to answer and refer the user to the pricing page."
-
-```
-
-Then pass each guideline to the `Guidelines` class to create a scorer and run evaluation:
-
-python
-
-```python
+from mlflow.genai.scorers import Guidelines
 import mlflow
 
-eval_dataset = [
+# Example data
+data = [
     {
-        "inputs": {"question": "I'm having trouble with my account.  I can't log in."},
-        "outputs": "I'm sorry to hear that you're having trouble logging in. Please provide me with your username and the specific issue you're experiencing, and I'll be happy to help you resolve it.",
+        "inputs": {"question": "What is the capital of France?"},
+        "outputs": {"response": "The capital of France is Paris."},
     },
     {
-        "inputs": {"question": "How much does a microwave cost?"},
-        "outputs": "The microwave costs $100.",
-    },
-    {
-        "inputs": {"question": "How does a refrigerator work?"},
-        "outputs": "A refrigerator operates via thermodynamic vapor-compression cycles utilizing refrigerant phase transitions. The compressor pressurizes vapor which condenses externally, then expands through evaporator coils to absorb internal heat through endothermic vaporization.",
+        "inputs": {"question": "What is the capital of Germany?"},
+        "outputs": {"response": "The capital of Germany is Berlin."},
     },
 ]
 
-mlflow.genai.evaluate(
-    data=eval_dataset,
-    scorers=[
-        # Create a scorer for each guideline
-        Guidelines(name="tone", guidelines=tone),
-        Guidelines(name="easy_to_understand", guidelines=easy_to_understand),
-        Guidelines(name="banned_topics", guidelines=banned_topics),
+# Create scorers with global guidelines
+english = Guidelines(
+    name="english",
+    guidelines=[
+        "The response must be in English",
+        "The response must be grammatically correct",
     ],
+)
+
+clarity = Guidelines(
+    name="clarity",
+    guidelines=["The response must be clear, coherent, and concise"],
+    model="openai:/gpt-4o-mini",  # Optional custom judge model
+)
+
+# Evaluate with global guidelines
+results = mlflow.genai.evaluate(data=data, scorers=[english, clarity])
+
+```
+
+![Guidelines judge result](/mlflow-website/docs/latest/images/genai/eval-monitor/guidelines-judge-results.png)
+
+### Parameters[​](#parameters "Direct link to Parameters")
+
+| Parameter    | Type               | Required | Description                                         |
+| ------------ | ------------------ | -------- | --------------------------------------------------- |
+| `name`       | `str`              | Yes      | Name for the judge, displayed in evaluation results |
+| `guidelines` | `str \| list[str]` | Yes      | Guidelines to apply uniformly to all rows           |
+| `model`      | `str`              | No       | Custom judge model (defaults to `gpt-4o-mini`)      |
+
+## 2. Built-in `ExpectationsGuidelines()` judge: per-row guidelines[​](#2-built-in-expectationsguidelines-judge-per-row-guidelines "Direct link to 2-built-in-expectationsguidelines-judge-per-row-guidelines")
+
+The `ExpectationsGuidelines` judge evaluates against row-specific guidelines from domain experts. This allows different evaluation criteria for each example in your dataset.
+
+### Example[​](#example "Direct link to Example")
+
+In your guideline, refer to the app's inputs as the `request` and the app's outputs as the `response`.
+
+python
+
+```python
+from mlflow.genai.scorers import ExpectationsGuidelines
+import mlflow
+
+# Dataset with per-row guidelines
+data = [
+    {
+        "inputs": {"question": "What is the capital of France?"},
+        "outputs": "The capital of France is Paris.",
+        "expectations": {"guidelines": ["The response must be factual and concise"]},
+    },
+    {
+        "inputs": {"question": "How to learn Python?"},
+        "outputs": "You can read a book or take a course.",
+        "expectations": {
+            "guidelines": ["The response must be helpful and encouraging"]
+        },
+    },
+]
+
+# Evaluate with per-row guidelines
+results = mlflow.genai.evaluate(data=data, scorers=[ExpectationsGuidelines()])
+
+```
+
+![Expectations Guidelines judge results](/mlflow-website/docs/latest/images/genai/eval-monitor/expectations-guidelines-judge-results.png)
+
+## Return values[​](#return-values "Direct link to Return values")
+
+Guidelines judges return an [mlflow.entities.Feedback](/mlflow-website/docs/latest/api_reference/python_api/mlflow.entities.html#mlflow.entities.Feedback) object containing:
+
+* `value`: Either `"yes"` (meets guidelines) or `"no"` (fails guidelines)
+* `rationale`: Detailed explanation of why the content passed or failed
+* `name`: The assessment name (either provided or auto-generated)
+* `error`: Error details if evaluation failed
+
+## Writing effective guidelines[​](#writing-effective-guidelines "Direct link to Writing effective guidelines")
+
+Well-written guidelines are crucial for accurate evaluation. Follow these best practices:
+
+### Best practices[​](#best-practices "Direct link to Best practices")
+
+**Be specific and measurable**
+
+✅ "The response must not include specific pricing amounts or percentages"
+
+❌ "Don't talk about money"
+
+**Use clear pass/fail conditions**
+
+✅ "If asked about pricing, the response must direct users to the pricing page"
+
+❌ "Handle pricing questions appropriately"
+
+**Structure complex requirements**
+
+python
+
+```python
+guidelines = [
+    "The response must include a greeting if first message.",
+    "The response must address the user's specific question.",
+    "The response must end with an offer to help further.",
+    "The response must not exceed 150 words.",
+]
+
+```
+
+## Real world examples[​](#real-world-examples "Direct link to Real world examples")
+
+### Customer service chatbot[​](#customer-service-chatbot "Direct link to Customer service chatbot")
+
+Here are practical guidelines examples for evaluating a customer service chatbot across different scenarios:
+
+#### Global guidelines for all interactions[​](#global-guidelines-for-all-interactions "Direct link to Global guidelines for all interactions")
+
+python
+
+```python
+from mlflow.genai.scorers import Guidelines
+import mlflow
+
+# Define global standards for all customer interactions
+tone_guidelines = Guidelines(
+    name="customer_service_tone",
+    guidelines="""The response must maintain our brand voice which is:
+    - Professional yet warm and conversational (avoid corporate jargon)
+    - Empathetic, acknowledging emotional context before jumping to solutions
+    - Proactive in offering help without being pushy
+
+    Specifically:
+    - If the customer expresses frustration, anger, or disappointment, the first sentence must acknowledge their emotion
+    - The response must use "I" statements to take ownership (e.g., "I understand" not "We understand")
+    - The response must avoid phrases that minimize concerns like "simply", "just", or "obviously"
+    - The response must end with a specific next step or open-ended offer to help, not generic closings""",
+)
+
+compliance_guidelines = Guidelines(
+    name="policy_compliance",
+    guidelines=[
+        """Refund and return policies:
+        - The response must not promise refunds beyond the 30-day return window
+        - The response must mention restocking fees for electronics (15%) if discussing returns
+        - For items over $500, the response must note that manager approval is required
+        - The response must not waive shipping fees without checking customer loyalty tier""",
+        """Data privacy and security:
+        - The response must never ask for full credit card numbers, SSN, or passwords
+        - The response must not reference other customers' orders or information
+        - When discussing order details, the response must only reference the last 4 digits of payment methods
+        - The response must direct customers to secure portal for updating payment information""",
+        """Commitment limitations:
+        - The response must not guarantee specific delivery dates without system verification
+        - The response must include disclaimer about "estimated" times when discussing shipping
+        - The response must not promise price matches without mentioning the verification process
+        - For out-of-stock items, the response must not commit to restock dates""",
+    ],
+)
+
+# Example customer service data
+customer_interactions = [
+    {
+        "inputs": {
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "I've been waiting 2 hours on hold! This is ridiculous!",
+                }
+            ]
+        },
+        "outputs": {
+            "choices": [
+                {
+                    "message": {
+                        "content": "I completely understand your frustration about the long wait time. That's absolutely not the experience we want you to have. I'm here to help you right now - what can I assist you with today?"
+                    }
+                }
+            ]
+        },
+    },
+    {
+        "inputs": {
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Can I return my laptop? I bought it 45 days ago.",
+                }
+            ]
+        },
+        "outputs": {
+            "choices": [
+                {
+                    "message": {
+                        "content": "I'd be happy to look into return options for you. Since our standard return window is 30 days and your purchase was 45 days ago, I'll need to check if there are any exceptions we can make. For electronics like laptops, we do have a 15% restocking fee. May I have your order number to review your specific situation?"
+                    }
+                }
+            ]
+        },
+    },
+]
+
+# Evaluate customer service interactions
+results = mlflow.genai.evaluate(
+    data=customer_interactions, scorers=[tone_guidelines, compliance_guidelines]
 )
 
 ```
 
-![Guidelines scorers result](/mlflow-website/docs/latest/images/mlflow-3/eval-monitor/scorers/guideline-scorers-results.png)
+### Document extraction app[​](#document-extraction-app "Direct link to Document extraction app")
 
-## Selecting Judge Models[​](#selecting-judge-models "Direct link to Selecting Judge Models")
+Here are practical guidelines examples for evaluating a document extraction application:
 
-MLflow supports all major LLM providers, such as OpenAI, Anthropic, Google, xAI, and more.
+#### Per-row guidelines for document types[​](#per-row-guidelines-for-document-types "Direct link to Per-row guidelines for document types")
 
-See [Supported Models](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge.md#supported-models) for more details.
+python
 
-## Next Steps[​](#next-steps "Direct link to Next Steps")
+```python
+from mlflow.genai.scorers import ExpectationsGuidelines
+import mlflow
 
-### [Evaluate Agents](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/agents.md)
 
-[Learn how to evaluate AI agents with specialized techniques and scorers](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/agents.md)
+# Dataset with document-type specific guidelines
+document_extraction_data = [
+    {
+        "inputs": {
+            "document_type": "invoice",
+            "document_text": "Invoice #INV-2024-001\nBill To: Acme Corp\nAmount: $1,234.56\nDue Date: 2024-03-15",
+        },
+        "outputs": {
+            "invoice_number": "INV-2024-001",
+            "customer": "Acme Corp",
+            "total_amount": 1234.56,
+            "due_date": "2024-03-15",
+        },
+        "expectations": {
+            "guidelines": [
+                """Invoice identification and classification:
+               - Must extract invoice_number preserving exact format including prefixes/suffixes
+               - Must identify invoice type (standard, credit memo, proforma) if specified
+               - Must extract both invoice date and due date, calculating days until due
+               - Must identify if this is a partial, final, or supplementary invoice
+               - For recurring invoices, must extract frequency and period covered""",
+                """Financial data extraction and validation:
+               - Line items must be extracted as array with: description, quantity, unit_price, total
+               - Must identify and separate: subtotal, tax amounts (with rates), shipping, discounts
+               - Currency must be identified explicitly, not assumed to be USD
+               - For discounts, must specify if percentage or fixed amount and what it applies to
+               - Payment terms must be extracted (e.g., "Net 30", "2/10 Net 30")
+               - Must flag any mathematical inconsistencies between line items and totals""",
+                """Vendor and customer information:
+               - Must extract complete billing and shipping addresses as separate objects
+               - Company names must include any DBA ("doing business as") variations
+               - Must extract tax IDs, business registration numbers if present
+               - Contact information must be categorized (billing contact vs. delivery contact)
+               - Must preserve any customer account numbers or reference codes""",
+            ]
+        },
+    },
+    {
+        "inputs": {
+            "document_type": "contract",
+            "document_text": "This agreement between Party A and Party B commences on January 1, 2024...",
+        },
+        "outputs": {
+            "parties": ["Party A", "Party B"],
+            "effective_date": "2024-01-01",
+            "term_length": "Not specified",
+        },
+        "expectations": {
+            "guidelines": [
+                """Party identification and roles:
+               - Must extract all parties with their full legal names and entity types (Inc., LLC, etc.)
+               - Must identify party roles (buyer/seller, licensee/licensor, employer/employee)
+               - Must extract any parent company relationships or guarantors mentioned
+               - Must capture all representatives, their titles, and authority to sign
+               - Must identify jurisdiction for each party if specified""",
+                """Critical dates and terms extraction:
+               - Must differentiate between: execution date, effective date, and expiration date
+               - Must extract notice periods for termination (e.g., "30 days written notice")
+               - Must identify any automatic renewal clauses and their conditions
+               - Must extract all milestone dates and deliverable deadlines
+               - For amendments, must note which version/date of original contract is modified""",
+                """Obligations and risk analysis:
+               - Must extract all payment terms, amounts, and schedules
+               - Must identify liability caps, indemnification clauses, and insurance requirements
+               - Must flag any non-standard clauses that deviate from typical contracts
+               - Must extract all conditions precedent and subsequent
+               - Must identify dispute resolution mechanism (arbitration, litigation, jurisdiction)
+               - Must extract any non-compete, non-solicitation, or confidentiality periods""",
+            ]
+        },
+    },
+    {
+        "inputs": {
+            "document_type": "medical_record",
+            "document_text": "Patient: John Doe\nDOB: 1985-06-15\nDiagnosis: Type 2 Diabetes\nMedications: Metformin 500mg",
+        },
+        "outputs": {
+            "patient_name": "John Doe",
+            "date_of_birth": "1985-06-15",
+            "diagnoses": ["Type 2 Diabetes"],
+            "medications": [{"name": "Metformin", "dosage": "500mg"}],
+        },
+        "expectations": {
+            "guidelines": [
+                """HIPAA compliance and privacy protection:
+               - Must never extract full SSN (only last 4 digits if needed for matching)
+               - Must never include full insurance policy numbers or member IDs
+               - Must redact or generalize sensitive mental health or substance abuse information
+               - For minors, must flag records requiring additional consent for sharing
+               - Must not extract genetic testing results without explicit permission flag""",
+                """Clinical data extraction standards:
+               - Diagnoses must use ICD-10 codes when available, with lay descriptions
+               - Medications must include: generic name, brand name, dosage, frequency, route, start date
+               - Must differentiate between active medications and discontinued/past medications
+               - Allergies must specify type (drug, food, environmental) and reaction severity
+               - Lab results must include: value, unit, reference range, abnormal flags
+               - Vital signs must include measurement date/time and measurement conditions""",
+                """Data quality and medical accuracy:
+               - Must flag any potentially dangerous drug interactions if multiple meds listed
+               - Must identify if vaccination records are up-to-date based on CDC guidelines
+               - Must extract both chief complaint and final diagnosis separately
+               - For chronic conditions, must note date of first diagnosis vs. most recent visit
+               - Must preserve clinical abbreviations but also provide expansions
+               - Must extract provider name, credentials, and NPI number if available""",
+            ]
+        },
+    },
+]
 
-[Learn more →](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/agents.md)
 
-### [Evaluate Traces](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/traces.md)
+results = mlflow.genai.evaluate(
+    data=document_extraction_data, scorers=[ExpectationsGuidelines()]
+)
 
-[Evaluate production traces to understand and improve your AI application's behavior](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/traces.md)
+```
 
-[Learn more →](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/traces.md)
+## Select the LLM that powers the judge[​](#select-the-llm-that-powers-the-judge "Direct link to Select the LLM that powers the judge")
 
-### [Collect User Feedback](/mlflow-website/docs/latest/genai/assessments/feedback.md)
+You can change the judge model by using the `model` argument in the judge definition. The model must be specified in the format `<provider>:/<model-name>`, where `<provider>` is a LiteLLM-compatible model provider.
 
-[Integrate user feedback to continuously improve your evaluation criteria and model performance](/mlflow-website/docs/latest/genai/assessments/feedback.md)
+For a list of supported models, see [selecting judge models](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges.md#selecting-judge-models).
 
-[Learn more →](/mlflow-website/docs/latest/genai/assessments/feedback.md)
+## Next steps[​](#next-steps "Direct link to Next steps")
+
+### [Use built-in LLM judges](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/predefined.md#available-judges)
+
+[Evaluate quality with MLflow's other research-backed, built-in LLM judges](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/predefined.md#available-judges)
+
+[Learn more →](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/predefined.md#available-judges)
+
+### [Create custom LLM judges](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges.md)
+
+[Build custom judges for your specific needs](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges.md)
+
+[Learn more →](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges.md)
+
+### [Align judges with human feedback](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/alignment.md)
+
+[Improve judge accuracy to match your quality standards](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/alignment.md)
+
+[Learn more →](/mlflow-website/docs/latest/genai/eval-monitor/scorers/llm-judge/alignment.md)
