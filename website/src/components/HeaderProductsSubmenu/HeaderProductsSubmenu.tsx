@@ -9,10 +9,12 @@ const wrapper = cva(
 const component = cva("flex flex-col gap-4");
 
 const titleContainer = cva(
-  "flex flex-col gap-1 md:gap-4 border-b border-[#F7F8F8]/8 pb-4",
+  "flex flex-col gap-1 md:gap-4 border-b border-[#F7F8F8]/8 pb-4 group",
 );
 
-const title = cva("text-white");
+const title = cva(
+  "text-white transition-colors duration-200 group-hover:!text-white/60",
+);
 
 const subtitle = cva("text-[#F7F8F8]/60 m-0");
 
@@ -30,7 +32,7 @@ export const HeaderProductsSubmenu = () => {
       <div className={component()}>
         <div className={titleContainer()}>
           <Link to="/genai">
-            <h3 className={title()}>Gen AI</h3>
+            <h3 className={title()}>GenAI Apps & Agents</h3>
             <p className={subtitle()}>Ship high-quality GenAI, fast</p>
           </Link>
         </div>
@@ -43,15 +45,11 @@ export const HeaderProductsSubmenu = () => {
                 label="Observability"
               />
               <HeaderMenuItem href="/genai/evaluations" label="Evaluations" />
-              <HeaderMenuItem
-                href="/genai/prompt-registry"
-                label="Prompt Registry"
-              />
             </div>
             <div className={column()}>
               <HeaderMenuItem
-                href="/genai/app-versioning"
-                label="App versioning"
+                href="/genai/prompt-registry"
+                label="Prompt Registry"
               />
               <HeaderMenuItem href="/genai/ai-gateway" label="AI Gateway" />
             </div>
@@ -61,7 +59,7 @@ export const HeaderProductsSubmenu = () => {
       <div className={component()}>
         <div className={titleContainer()}>
           <Link to="/classical-ml">
-            <h3 className={title()}>Model training</h3>
+            <h3 className={title()}>Model Training</h3>
             <p className={subtitle()}>Mastering the ML lifecycle</p>
           </Link>
         </div>

@@ -7,11 +7,10 @@ import {
   ValuePropWidget,
   StickyGrid,
 } from "../../components";
-import { MLFLOW_DOCS_URL } from "@site/src/constants";
+import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import Card1 from "@site/static/img/GenAI_home/GenAI_home_1.png";
 import Card2 from "@site/static/img/GenAI_home/GenAI_home_2.png";
 import Card3 from "@site/static/img/GenAI_home/GenAI_home_3.png";
-import Card4 from "@site/static/img/GenAI_home/GenAI_home_4.png";
 import CardGateway from "@site/static/img/GenAI_gateway/GenAI_gateway_1.png";
 
 export default function GenAi(): JSX.Element {
@@ -22,7 +21,7 @@ export default function GenAi(): JSX.Element {
         body={[
           "Enhance your GenAI application with end-to-end tracking, observability, evaluations, all in one integrated platform.",
         ]}
-        hasGetStartedButton="https://mlflow.org/docs/latest/genai/getting-started/"
+        hasGetStartedButton={MLFLOW_GENAI_DOCS_URL}
         bodyColor="white"
       />
 
@@ -61,17 +60,7 @@ export default function GenAi(): JSX.Element {
             },
             image: <img src={Card3} alt="MLflow LLM judges" />,
           },
-          {
-            title: "Agent and application versioning",
-            body: [
-              "Version your agents, capturing their associated code, parameters, and evalation metrics for each iteration. MLflow's centralized management of agents complements Git, providing full lifecycle capabilities for all your generative AI assets.",
-            ],
-            cta: {
-              href: "/genai/app-versioning",
-              text: "Learn more",
-            },
-            image: <img src={Card4} alt="MLflow LLM judges" />,
-          },
+
           {
             title: "AI Gateway",
             body: [

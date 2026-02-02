@@ -1,0 +1,59 @@
+---
+title: Introducing MLflow Agents Dashboard
+description: Monitor your Agents with comprehensive analytics and visualizations in MLflow's new Overview tab
+slug: mlflow-agent-dashboard
+authors: [mlflow-maintainers]
+tags: [tracing, genai, observability, charts, dashboard]
+thumbnail: /img/blog/agents-dashboard.png
+---
+
+We're excited to introduce the **Agent Dashboard**, a new Overview tab in MLflow GenAI experiments that gives you instant comprehensive visibility into your agent's health.
+
+<video src={require("./overview_demo.mp4").default} controls loop autoPlay muted width="100%" />
+
+## Challenges
+
+Building GenAI applications is hard, but keeping them running well in production is harder. Teams often struggle to answer basic questions:
+
+- Why is my application slow today?
+- Are my outputs maintaining quality over time?
+- Which tools in my agent are causing failures?
+- How much am I spending on tokens?
+
+Previously, answering these questions required digging through individual traces or building custom dashboards. The Overview tab changes that.
+
+## One Dashboard, Complete Visibility
+
+The Overview tab automatically aggregates metrics from all traces logged to an experiment. It consolidates these insights into three focused views:
+
+- **Usage**: Track requests, latency, errors, and token consumption over time
+- **Quality**: Monitor agent quality based on your [MLflow scorers](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/)
+- **Tool Calls**: Analyze agent tool performance, success rates, and error patterns
+
+Each view includes time range and granularity controls, making it easy to zoom in on issues or spot long-term trends.
+
+## Get Started
+
+The Overview tab is available since MLflow 3.9.0. Install the latest version:
+
+```bash
+# Using uv
+uv pip install mlflow>=3.9.0
+
+# Using pip
+pip install mlflow>=3.9.0
+```
+
+Then enable tracing in your application. For example, with OpenAI autologging:
+
+```python
+import mlflow
+
+mlflow.openai.autolog()
+```
+
+MLflow will automatically trace all OpenAI calls and populate the dashboard with your metrics. MLflow supports [40+ integrations](https://mlflow.org/docs/latest/genai/tracing/integrations/) including LangChain, LiteLLM, Claude Code, and more.
+
+For details on each tab and available metrics, check out the [MLflow Tracing UI documentation](https://mlflow.org/docs/latest/genai/tracing/observe-with-traces/ui/).
+
+We'd love to hear your [feedback](https://github.com/mlflow/mlflow/issues) as you explore this new feature! If you find MLflow useful, please give us a ⭐ on [GitHub](https://github.com/mlflow/mlflow).
