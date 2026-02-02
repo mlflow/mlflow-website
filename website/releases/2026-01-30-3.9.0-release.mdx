@@ -45,22 +45,31 @@ MemAlign is a new optimization algorithm that learns evaluation guidelines from 
 Use the `MemAlignOptimizer` to optimize your judges with historical feedback:
 
 ```python
-from mlflow.genai.judges.optimize import MemAlignOptimizer
+import mlflow
+from mlflow.genai.judges import make_judge
+from mlflow.genai.judges.optimizers import MemAlignOptimizer
 
-# Initialize optimizer with your judge
-optimizer = MemAlignOptimizer(
-    judge=my_custom_judge,
-    feedback_dataset="human_feedback_traces",
+# Create a judge
+judge = make_judge(
+    name="politeness",
+    instructions=(
+        "Given a user question, evaluate if the chatbot's response is polite and respectful. "
+        "Consider the tone, language, and context of the response.\n\n"
+        "Question: {{ inputs }}\n"
+        "Response: {{ outputs }}"
+    ),
+    feedback_value_type=bool,
+    model="openai:/gpt-5-mini",
 )
 
-# Train on historical feedback
-optimizer.fit()
+# Create the MemAlign optimizer
+optimizer = MemAlignOptimizer(reflection_lm="openai:/gpt-5-mini")
 
-# The optimized judge now retrieves relevant guidelines dynamically
-optimized_judge = optimizer.get_optimized_judge()
+# Retrieve traces with human feedback
+traces = mlflow.search_traces(return_type="list")
 
-# Use in evaluation
-result = optimized_judge.evaluate(trace)
+# Align the judge
+aligned_judge = judge.align(traces=traces, optimizer=optimizer)
 ```
 
 [Learn more about MemAlign](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/memalign/)
@@ -89,30 +98,37 @@ Go to the "Judges" tab in your experiment, select from pre-defined judges or use
 
 Track requests across multiple services with context propagation, enabling end-to-end visibility into distributed AI systems. Maintain trace continuity across microservices and external API calls, debug issues that span multiple services with a unified trace view, and understand latency and errors at each step of your distributed pipeline.
 
-Use the `mlflow.tracing.distributed` module to inject and extract trace context:
+Use the `get_tracing_context_headers_for_http_request` and `set_tracing_context_from_http_request_headers` functions to inject and extract trace context:
 
 ```python
-from mlflow.tracing.distributed import inject_trace_context, extract_trace_context
+# Service A: Inject context into the headers of the outgoing request
 import requests
+import mlflow
+from mlflow.tracing import get_tracing_context_headers_for_http_request
 
-# Service A: Inject context into outgoing request
-def call_downstream_service(data):
-    headers = {}
-    inject_trace_context(headers)
-    response = requests.post(
-        "http://service-b/process",
-        json=data,
-        headers=headers,
+with mlflow.start_span("client-root"):
+    headers = get_tracing_context_headers_for_http_request()
+    requests.post(
+        "https://your.service/handle", headers=headers, json={"input": "hello"}
     )
-    return response.json()
+```
 
+```python
 # Service B: Extract context from incoming request
-def process_request(request):
-    extract_trace_context(request.headers)
-    # Continue tracing in this service
-    with mlflow.start_span(name="process") as span:
-        result = do_processing(request.json)
-    return result
+import mlflow
+from flask import Flask, request
+from mlflow.tracing import set_tracing_context_from_http_request_headers
+
+app = Flask(__name__)
+
+@app.post("/handle")
+def handle():
+    headers = dict(request.headers)
+    with set_tracing_context_from_http_request_headers(headers):
+        with mlflow.start_span("server-handler") as span:
+            # ... your logic ...
+            span.set_attribute("status", "ok")
+    return {"ok": True}
 ```
 
 [Learn more about Distributed Tracing](https://mlflow.org/docs/latest/genai/tracing/app-instrumentation/distributed-tracing/)
