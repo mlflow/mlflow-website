@@ -797,8 +797,20 @@ asyncio.run(async_pipeline(["item1", "item2", "item3"]))
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")
 
-**[Combining with Auto-Tracing](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/automatic.md#combining-manual-and-automatic-tracing)**: Mix automatic and manual tracing for optimal observability
+### [Combining with Auto-Tracing](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/automatic.md#combining-manual-and-automatic-tracing)
 
-**[Trace Concepts](/mlflow-website/docs/latest/genai/concepts/trace.md)**: Understand the structure and components of MLflow traces
+[Mix automatic and manual tracing for optimal observability](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/automatic.md#combining-manual-and-automatic-tracing)
 
-**[Querying Traces](/mlflow-website/docs/latest/genai/tracing/search-traces.md)**: Programmatically search and analyze your traces
+[Learn more →](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/automatic.md#combining-manual-and-automatic-tracing)
+
+### [Trace Concepts](/mlflow-website/docs/latest/genai/concepts/trace.md)
+
+[Understand the structure and components of MLflow traces](/mlflow-website/docs/latest/genai/concepts/trace.md)
+
+[Explore concepts →](/mlflow-website/docs/latest/genai/concepts/trace.md)
+
+### [Querying Traces](/mlflow-website/docs/latest/genai/tracing/search-traces.md)
+
+[Programmatically search and analyze your traces](/mlflow-website/docs/latest/genai/tracing/search-traces.md)
+
+[Search traces →](/mlflow-website/docs/latest/genai/tracing/search-traces.md)

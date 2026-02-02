@@ -242,8 +242,20 @@ result = chain.invoke({"question": "What is MLflow?"})
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")
 
-* **[Create and Edit Prompts](/mlflow-website/docs/latest/genai/prompt-registry/create-and-edit-prompts.md)** to learn the basics of prompt management
-* **[Use Prompts in Apps](/mlflow-website/docs/latest/genai/prompt-registry/use-prompts-in-apps.md)** to see how to integrate prompts into your applications
-* **[Evaluate Prompts](/mlflow-website/docs/latest/genai/prompt-registry/evaluate-prompts.md)** to learn how to assess prompt performance
+### [Create and Edit Prompts](/mlflow-website/docs/latest/genai/prompt-registry/create-and-edit-prompts.md)
 
-Structured output is a powerful feature that can significantly improve the reliability and maintainability of your GenAI applications by ensuring consistent data formats and enabling better integration with downstream systems.
+[Learn the basics of prompt management in MLflow](/mlflow-website/docs/latest/genai/prompt-registry/create-and-edit-prompts.md)
+
+[Manage prompts →](/mlflow-website/docs/latest/genai/prompt-registry/create-and-edit-prompts.md)
+
+### [Use Prompts in Apps](/mlflow-website/docs/latest/genai/prompt-registry/use-prompts-in-apps.md)
+
+[See how to integrate prompts into your applications](/mlflow-website/docs/latest/genai/prompt-registry/use-prompts-in-apps.md)
+
+[Integrate prompts →](/mlflow-website/docs/latest/genai/prompt-registry/use-prompts-in-apps.md)
+
+### [Evaluate Prompts](/mlflow-website/docs/latest/genai/prompt-registry/evaluate-prompts.md)
+
+[Learn how to assess prompt performance with evaluations](/mlflow-website/docs/latest/genai/prompt-registry/evaluate-prompts.md)
+
+[Evaluate prompts →](/mlflow-website/docs/latest/genai/prompt-registry/evaluate-prompts.md)

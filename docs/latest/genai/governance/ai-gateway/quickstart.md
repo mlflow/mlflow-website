@@ -100,8 +100,20 @@ You should receive a response from your configured model.
 
 Now that you have a working gateway, explore these features:
 
-* **[Create and Manage API Keys](/mlflow-website/docs/latest/genai/governance/ai-gateway/api-keys/create-and-manage.md)** - Learn about credential management and best practices
-* **[Create and Manage Endpoints](/mlflow-website/docs/latest/genai/governance/ai-gateway/endpoints/create-and-manage.md)** - Configure endpoints with multiple models
-* **[Query Endpoints](/mlflow-website/docs/latest/genai/governance/ai-gateway/endpoints/query-endpoints.md)** - Explore unified and passthrough APIs
-* **[Model Providers](/mlflow-website/docs/latest/genai/governance/ai-gateway/endpoints/model-providers.md)** - See all supported providers and models
-* **[Traffic Routing & Fallbacks](/mlflow-website/docs/latest/genai/governance/ai-gateway/traffic-routing-fallbacks.md)** - Set up A/B testing and high availability
+### [API Keys](/mlflow-website/docs/latest/genai/governance/ai-gateway/api-keys/create-and-manage.md)
+
+[Learn about credential management and best practices for API keys](/mlflow-website/docs/latest/genai/governance/ai-gateway/api-keys/create-and-manage.md)
+
+[Manage API keys →](/mlflow-website/docs/latest/genai/governance/ai-gateway/api-keys/create-and-manage.md)
+
+### [Endpoints](/mlflow-website/docs/latest/genai/governance/ai-gateway/endpoints/create-and-manage.md)
+
+[Configure endpoints with multiple models and query options](/mlflow-website/docs/latest/genai/governance/ai-gateway/endpoints/create-and-manage.md)
+
+[Configure endpoints →](/mlflow-website/docs/latest/genai/governance/ai-gateway/endpoints/create-and-manage.md)
+
+### [Traffic Routing](/mlflow-website/docs/latest/genai/governance/ai-gateway/traffic-routing-fallbacks.md)
+
+[Set up A/B testing, fallbacks, and high availability](/mlflow-website/docs/latest/genai/governance/ai-gateway/traffic-routing-fallbacks.md)
+
+[Set up routing →](/mlflow-website/docs/latest/genai/governance/ai-gateway/traffic-routing-fallbacks.md)

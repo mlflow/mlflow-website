@@ -274,3 +274,9 @@ print(f"Success rate: {success_rate}")
 [Set up comprehensive production observability with user context](/mlflow-website/docs/latest/genai/tracing/prod-tracing.md)
 
 [Monitor production →](/mlflow-website/docs/latest/genai/tracing/prod-tracing.md)
+
+### [Multi-turn Evaluation](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/multi-turn.md)
+
+[Evaluate the quality of multi-turn conversations in your application](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/multi-turn.md)
+
+[Evaluate sessions →](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/multi-turn.md)

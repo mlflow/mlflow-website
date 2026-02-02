@@ -382,10 +382,20 @@ To **enable** tracing (if it had been temporarily disabled), the [`mlflow.tracin
 
 ## Next Steps[​](#next-steps "Direct link to Next Steps")
 
-**[Manual Tracing](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/manual-tracing.md)**: Learn how to add custom tracing to your application logic
+### [Manual Tracing](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/manual-tracing.md)
 
-**[Integration Guides](/mlflow-website/docs/latest/genai/tracing/integrations.md)**: Explore detailed guides for specific libraries and frameworks
+[Learn how to add custom tracing to your application logic](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/manual-tracing.md)
 
-**[Viewing Traces](/mlflow-website/docs/latest/genai/tracing/observe-with-traces/ui.md)**: Learn how to explore and analyze your traces in the MLflow UI
+[Add custom spans →](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/manual-tracing.md)
 
-**[Querying Traces](/mlflow-website/docs/latest/genai/tracing/search-traces.md)**: Programmatically search and retrieve trace data for analysis
+### [Viewing Traces](/mlflow-website/docs/latest/genai/tracing/observe-with-traces/ui.md)
+
+[Explore and analyze your traces in the MLflow UI](/mlflow-website/docs/latest/genai/tracing/observe-with-traces/ui.md)
+
+[View traces →](/mlflow-website/docs/latest/genai/tracing/observe-with-traces/ui.md)
+
+### [Querying Traces](/mlflow-website/docs/latest/genai/tracing/search-traces.md)
+
+[Programmatically search and retrieve trace data for analysis](/mlflow-website/docs/latest/genai/tracing/search-traces.md)
+
+[Search traces →](/mlflow-website/docs/latest/genai/tracing/search-traces.md)

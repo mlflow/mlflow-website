@@ -276,3 +276,9 @@ Once your gateway is running, learn how to configure providers and endpoints:
 [Start querying endpoints with Python client and REST APIs](/mlflow-website/docs/latest/genai/governance/ai-gateway/legacy/usage.md)
 
 [Start using →](/mlflow-website/docs/latest/genai/governance/ai-gateway/legacy/usage.md)
+
+### [Main AI Gateway](/mlflow-website/docs/latest/genai/governance/ai-gateway.md)
+
+[Explore the modern AI Gateway with enhanced features and UI management](/mlflow-website/docs/latest/genai/governance/ai-gateway.md)
+
+[View AI Gateway →](/mlflow-website/docs/latest/genai/governance/ai-gateway.md)

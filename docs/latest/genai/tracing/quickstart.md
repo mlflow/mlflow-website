@@ -263,12 +263,24 @@ const chatCompletion = mlflow.trace(
 
 For more details on tracking users and sessions, see the [Track Users & Sessions guide](/mlflow-website/docs/latest/genai/tracing/track-users-sessions.md).
 
-## Next Step[​](#next-step "Direct link to Next Step")
+## Next Steps[​](#next-steps "Direct link to Next Steps")
 
-Congrats on sending your first trace with MLflow! Now that you've got the basics working, here is the recommended next step to deepen your understanding of tracing:
+Congrats on sending your first trace with MLflow! Now that you've got the basics working, here are the recommended next steps to deepen your understanding of tracing:
 
-[Automatic and Manual Tracing →](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/automatic.md)
+### [Automatic Tracing](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/automatic.md)
 
-***
+[Explore one-line automatic tracing for popular GenAI libraries and frameworks](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/automatic.md)
 
-[Explore how MLflow supports both automatic tracing and manual tracing for custom logic, plus how you can combine the two to get more insightful traces.](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/automatic.md)
+[Enable auto-tracing →](/mlflow-website/docs/latest/genai/tracing/app-instrumentation/automatic.md)
+
+### [Tracing UI](/mlflow-website/docs/latest/genai/tracing/observe-with-traces/ui.md)
+
+[Learn how to explore and analyze your traces in the MLflow UI](/mlflow-website/docs/latest/genai/tracing/observe-with-traces/ui.md)
+
+[View traces →](/mlflow-website/docs/latest/genai/tracing/observe-with-traces/ui.md)
+
+### [Quality Test Traces](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/traces.md)
+
+[Run quality evaluations on your logged traces to ensure response accuracy](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/traces.md)
+
+[Evaluate traces →](/mlflow-website/docs/latest/genai/eval-monitor/running-evaluation/traces.md)
