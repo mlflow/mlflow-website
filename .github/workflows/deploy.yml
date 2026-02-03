@@ -1,79 +1,98 @@
-name: Deploy to GitHub Pages
+name: Deploy to Netlify
 
 on:
-  push:
-    branches:
-      - main
-      - mlflow-3-website-update
-    # Review gh actions docs if you want to further define triggers, paths, etc
-    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
-  pull_request:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
 
 permissions:
-  contents: write
+  actions: write
+  contents: read
+  pull-requests: write
 
 jobs:
   deploy:
-    name: Deploy to GitHub Pages
+    name: Deploy to Netlify
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
-        with:
-          python-version: "3.10"
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 20
-      - uses: astral-sh/setup-uv@v5
-      - name: Build docs
-        # Only build docs for main branch, otherwise
-        # the build will take a long time.
-        if: github.ref == 'refs/heads/main'
-        env:
-          GTM_ID: ${{ secrets.GTM_ID }}
-          PIP_EXTRA_INDEX_URL: https://download.pytorch.org/whl/cpu
-          DOCS_BASE_URL: /mlflow-website/docs/latest
-        run: |
-          curl https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-1-amd64.deb -L -o /tmp/pandoc.deb
-          sudo dpkg -i /tmp/pandoc.deb
-          rm /tmp/pandoc.deb
-          git clone --depth 1 https://github.com/mlflow/mlflow /tmp/mlflow
-          pushd /tmp/mlflow
-          pip install '.[gateway]'
-          pip install -r requirements/doc-requirements.txt
-          cd docs
-          yarn install
-          yarn convert-notebooks
-          yarn build
-          popd
-          rm -rf website/static/docs
-          mkdir -p website/static/docs/latest
-          cp -r /tmp/mlflow/docs/build/* website/static/docs/latest
-      - name: Install dependencies
-        working-directory: website
-        run: yarn install --frozen-lockfile
-      - name: Build website
-        working-directory: website
-        env:
-          BASE_URL: /mlflow-website/
-          GTM_ID: ${{ secrets.GTM_ID }}
-        run: yarn build
+      - uses: actions/checkout@v4
 
-      # Popular action to deploy to GitHub Pages:
-      # Docs: https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-docusaurus
-      - name: Deploy to GitHub Pages
-        if: github.event_name == 'push'
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Download build identifier
+        uses: actions/github-script@v7
+        env:
+          ARTIFACT_NAME: build-id
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Build output to publish to the `gh-pages` branch:
-          publish_dir: ./website/build
-          # The following lines assign commit authorship to the official
-          # GH-Actions bot for deploys to `gh-pages` branch:
-          # https://github.com/actions/checkout/issues/13#issuecomment-724415212
-          # The GH actions bot is used by default if you didn't specify the two fields.
-          # You can swap them out with your own user credentials.
-          # user_name: github-actions[bot]
-          # user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          script: |
+            const { downloadArtifact } = require('./.github/scripts/artifact-utils.js');
+            await downloadArtifact({ github, context });
+
+      - name: Read build identifier
+        id: build-id
+        run: |
+          BUILD_ID=$(cat build-id.txt)
+          echo "value=$BUILD_ID" >> $GITHUB_OUTPUT
+          if [ "$BUILD_ID" = "main" ]; then
+            echo "is_main=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_main=false" >> $GITHUB_OUTPUT
+          fi
+          rm build-id.txt
+
+      - name: Download build artifacts
+        uses: actions/github-script@v7
+        env:
+          ARTIFACT_NAME: website-build-${{ steps.build-id.outputs.value }}
+          EXTRACT_PATH: website/build
+        with:
+          script: |
+            const { downloadArtifact } = require('./.github/scripts/artifact-utils.js');
+            await downloadArtifact({ github, context });
+
+      - name: Clean up GitHub artifacts
+        uses: actions/github-script@v7
+        env:
+          BUILD_ID: ${{ steps.build-id.outputs.value }}
+        with:
+          script: |
+            const { deleteBuildArtifacts } = require('./.github/scripts/artifact-utils.js');
+            await deleteBuildArtifacts({ github, context });
+
+      - name: Install Netlify CLI
+        run: npm install -g netlify-cli
+
+      - name: Deploy to Netlify
+        working-directory: website
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          BUILD_ID: ${{ steps.build-id.outputs.value }}
+          IS_MAIN: ${{ steps.build-id.outputs.is_main }}
+          ACTION_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ "$IS_MAIN" = "true" ]; then
+            ALIAS="main"
+            MESSAGE="Main Deploy - GitHub Action: ${ACTION_URL}"
+          else
+            ALIAS="pr-${BUILD_ID}"
+            MESSAGE="PR Preview #${BUILD_ID} - GitHub Action: ${ACTION_URL}"
+          fi
+          netlify deploy \
+            --dir=build \
+            --no-build \
+            --alias="$ALIAS" \
+            --message="$MESSAGE"
+
+      - name: Comment PR with preview URL
+        if: ${{ steps.build-id.outputs.is_main == 'false' }}
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.build-id.outputs.value }}
+          NETLIFY_DOMAIN: ${{ secrets.NETLIFY_SITE_NAME }}
+          DEPLOY_ACTION_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          BUILD_ACTION_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}
+        with:
+          script: |
+            const script = require('./.github/scripts/preview-comment.js');
+            await script({ github, context });

@@ -1,8 +1,14 @@
-name: PR Build
+name: Build
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    paths:
+      - "website/**"
+      - ".github/**"
+  push:
+    branches:
+      - main
     paths:
       - "website/**"
       - ".github/**"
@@ -31,21 +37,30 @@ jobs:
           GTM_ID: ${{ secrets.GTM_ID }}
         run: yarn build
 
-      - name: Save PR number
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: echo "${PR_NUMBER}" > pr-number.txt
+      - name: Set artifact name
+        id: artifact
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "name=website-build-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+            echo "id=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          else
+            echo "name=website-build-main" >> $GITHUB_OUTPUT
+            echo "id=main" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Upload PR number
+      - name: Save build identifier
+        run: echo "${{ steps.artifact.outputs.id }}" > build-id.txt
+
+      - name: Upload build identifier
         uses: actions/upload-artifact@v4
         with:
-          name: pr-number
-          path: pr-number.txt
+          name: build-id
+          path: build-id.txt
           retention-days: 1
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: website-build-${{ github.event.pull_request.number }}
+          name: ${{ steps.artifact.outputs.name }}
           path: website/build
           retention-days: 1
