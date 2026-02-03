@@ -60,6 +60,10 @@ Each integration automatically captures your application's logic and intermediat
 
 [Strands Agent SDK](/mlflow-website/docs/latest/genai/tracing/integrations/listing/strands.md)
 
+[![LiveKit Agents Logo](/mlflow-website/docs/latest/images/logos/livekit-logo.png)](/mlflow-website/docs/latest/genai/tracing/integrations/listing/livekit.md)
+
+[LiveKit Agents](/mlflow-website/docs/latest/genai/tracing/integrations/listing/livekit.md)
+
 [![Agno Logo](/mlflow-website/docs/latest/images/logos/agno-logo.png)](/mlflow-website/docs/latest/genai/tracing/integrations/listing/agno.md)
 
 [Agno](/mlflow-website/docs/latest/genai/tracing/integrations/listing/agno.md)

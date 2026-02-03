@@ -1,4 +1,4 @@
-# Optimize Prompts (Experimental)
+# Optimize Prompts
 
 **The simple way to continuously improve your AI agents and prompts.**
 
