@@ -5,7 +5,7 @@ import { LogosCarousel } from "../LogosCarousel/LogosCarousel";
 export const StatsBand = () => {
   return (
     <Section
-      title="The Most Adopted Open-Source MLOps Platform"
+      title="Most Adopted Open-Source MLOps Platform"
       body="Backed by Linux Foundation, MLflow has been fully committed to open-source for 5+ years. Now trusted by thousands of organizations and research teams worldwide."
       align="center"
     >
@@ -52,7 +52,7 @@ export const StatsBand = () => {
                 </span>
               </div>
             </div>
-            <span className="text-sm font-semibold">mlflow/mlflow</span>
+            <span className="text-md font-semibold">mlflow/mlflow</span>
             <div className="flex items-center gap-1.5 text-sm font-semibold text-white/80">
               <svg
                 width="16"
@@ -69,7 +69,7 @@ export const StatsBand = () => {
 
           <div className="flex flex-col items-center gap-1.5">
             <span className="text-3xl font-semibold leading-tight text-white sm:text-4xl">
-              25 Million+
+              30 Million+
             </span>
             <span className="text-xs text-white/70 sm:text-sm">
               Package Downloads / Month

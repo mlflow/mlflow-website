@@ -23,8 +23,8 @@ export const EcosystemList = () => {
       </div>
 
       <Section
-        title="Works with Any LLM App and Model"
-        body="From LLM providers to agent frameworks to traditional ML libraries—MLflow integrates seamlessly with 40+ tools across the AI ecosystem. Supports Python, TypeScript/JavaScript, Java, and natively integrates with OpenTelemetry."
+        title="Works with Any LLM Apps and Models"
+        body="From LLM agent frameworks to traditional ML libraries - MLflow integrates seamlessly with 100+ tools across the AI ecosystem. Supports Python, TypeScript/JavaScript, Java, R, and natively integrates with OpenTelemetry."
         align="center"
       >
         <div style={{ maxWidth: 1000 }} className="w-full">

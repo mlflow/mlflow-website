@@ -37,11 +37,11 @@ export default function Home(): JSX.Element {
         }
         primaryCTA={{
           label: "Get Started",
-          href: `${MLFLOW_DOCS_URL}genai/index.html`,
+          href: `#get-started`,
         }}
         secondaryCTA={{
-          label: "Try in Cloud",
-          href: MLFLOW_DBX_TRIAL_URL,
+          label: "View Docs",
+          href: MLFLOW_DOCS_URL,
         }}
       />
 

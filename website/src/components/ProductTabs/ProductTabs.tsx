@@ -12,18 +12,17 @@ import EvaluationTabImg from "@site/static/img/GenAI_home/GenAI_evaluation_darkm
 import GatewayTabImg from "@site/static/img/GenAI_home/GenAI_gateway_darkmode.png";
 import PromptTabImg from "@site/static/img/GenAI_home/GenAI_prompts_darkmode.png";
 import ExperimentTrackingImg from "@site/static/img/GenAI_home/model_training_darkmode.png";
-import ModelRegistryImg from "@site/static/img/Classical_registry/classical_registry_hero.png";
-import ModelDeploymentImg from "@site/static/img/Classical_models/classical_models_hero.png";
+import ModelRegistryImg from "@site/static/img/GenAI_home/model_registry_darkmode.png";
+import DeploymentImg from "@site/static/img/GenAI_home/deployment_darkmode.png";
 
 // Feature type definition
 type Feature = {
   id: string;
   title: string;
   description: string;
-  imageSrc: string;
+  imageSrc?: string;
   imageZoom?: number;
   imagePosition?: string; // Custom object-position value (e.g., "30% top")
-  docLink: string;
   quickstartLink?: string;
   codeSnippet: string;
   codeLanguage?: "python" | "typescript";
@@ -35,10 +34,9 @@ const llmAgentFeatures: Feature[] = [
     id: "observability",
     title: "Observability",
     description:
-      "Capture complete traces of your LLM applications and agents. Inspect failures, debug issues, and build evaluation datasets. Built on OpenTelemetry with support for 30+ LLM providers and agent frameworks.",
+      "Capture complete traces of your LLM applications and agents to get deep insights into their behavior. Built on OpenTelemetry and supports any LLM provider and agent framework.",
     imageSrc: TracingTabImg,
     imageZoom: 160,
-    docLink: "https://mlflow.org/docs/latest/genai/tracing/",
     quickstartLink: "https://mlflow.org/docs/latest/genai/tracing/quickstart/",
     codeSnippet: `import mlflow
 import openai
@@ -59,9 +57,8 @@ response = client.chat.completions.create(
     id: "evaluation",
     title: "Evaluation",
     description:
-      "Run systematic evaluations using LLM-as-judge, custom metrics, and human feedback. Track quality metrics over time and catch regressions before they reach production.",
+      "Run systematic evaluations, track quality metrics over time, and catch regressions before they reach production. Choose from 50+ built-in metrics and LLM judges, or define your own with highly flexible APIs.",
     imageSrc: EvaluationTabImg,
-    docLink: "https://mlflow.org/docs/latest/genai/eval-monitor/",
     quickstartLink:
       "https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/",
     codeSnippet: `import mlflow
@@ -84,14 +81,13 @@ results = mlflow.genai.evaluate(
   },
   {
     id: "prompt",
-    title: "Prompt Registry",
+    title: "Prompt Management",
     description:
       "Version, test, and deploy prompts with full lineage tracking. Compare prompt performance across versions and collaborate with your team on prompt engineering.",
     imageSrc: PromptTabImg,
     imageZoom: 150,
-    docLink: "https://mlflow.org/docs/latest/genai/prompt-registry/",
     quickstartLink:
-      "https://mlflow.org/docs/latest/genai/prompt-registry/quickstart/",
+      "https://mlflow.org/docs/latest/genai/prompt-registry/create-and-edit-prompts/",
     codeSnippet: `import mlflow
 
 # Register a prompt template
@@ -112,11 +108,10 @@ formatted = prompt.format(num_sentences=2, content="...")`,
     id: "gateway",
     title: "AI Gateway",
     description:
-      "Unified API gateway for all LLM providers. Route requests, manage rate limits, handle fallbacks, and control costs through a single OpenAI-compatible interface.",
+      "Unified API gateway for all LLM providers. Route requests, manage rate limits, handle fallbacks, and control costs through a unified OpenAI-compatible interface.",
     imageSrc: GatewayTabImg,
     imagePosition: "0% top",
-    docLink: "https://mlflow.org/docs/latest/genai/gateway/",
-    quickstartLink: "https://mlflow.org/docs/latest/genai/gateway/quickstart/",
+    quickstartLink: "https://mlflow.org/docs/latest/genai/governance/ai-gateway/quickstart/",
     codeSnippet: `from openai import OpenAI
 
 # Point to MLflow AI Gateway - OpenAI compatible API
@@ -128,7 +123,7 @@ client = OpenAI(
 # Gateway routes to configured providers
 # with rate limiting, fallbacks, and cost tracking
 response = client.chat.completions.create(
-    model="gpt-4o",  # or "claude-sonnet", "llama-3", etc.
+    model="gpt-5.2",  # or "claude-opus-4.5", "gemini-3-flash", etc.
     messages=[{"role": "user", "content": "Hello!"}]
 )`,
   },
@@ -143,8 +138,7 @@ const modelTrainingFeatures: Feature[] = [
       "Track experiments, log parameters, metrics, and artifacts. Compare runs side-by-side, reproduce results, and collaborate with your team on ML experiments.",
     imageSrc: ExperimentTrackingImg,
     imageZoom: 150,
-    docLink: "https://mlflow.org/docs/latest/tracking/",
-    quickstartLink: "https://mlflow.org/docs/latest/getting-started/",
+    quickstartLink: "https://mlflow.org/docs/latest/ml/getting-started/quickstart/",
     codeSnippet: `import mlflow
 
 # Enable autologging for your ML framework
@@ -164,9 +158,8 @@ model.fit(X, y)  # Parameters, metrics, model logged automatically`,
     description:
       "Central hub to manage the full lifecycle of ML models. Version models, track lineage, manage stage transitions, and collaborate on model development.",
     imageSrc: ModelRegistryImg,
-    imageZoom: 130,
-    docLink: "https://mlflow.org/docs/latest/model-registry/",
-    quickstartLink: "https://mlflow.org/docs/latest/model-registry/quickstart/",
+    imageZoom: 120,
+    quickstartLink: "https://mlflow.org/docs/latest/ml/model-registry/tutorial/",
     codeSnippet: `import mlflow
 
 # Register a model from a run
@@ -186,10 +179,9 @@ predictions = model.predict(new_data)`,
     title: "Deployment",
     description:
       "Deploy models to production with a single command. Serve models as REST APIs, batch inference jobs, or integrate with cloud platforms like AWS, Azure, and Databricks.",
-    imageSrc: ModelDeploymentImg,
-    imageZoom: 130,
-    docLink: "https://mlflow.org/docs/latest/deployment/",
-    quickstartLink: "https://mlflow.org/docs/latest/deployment/quickstart/",
+    imageSrc: DeploymentImg,
+    imageZoom: 110,
+    quickstartLink: "https://mlflow.org/docs/latest/ml/deployment/",
     codeSnippet: `# Serve model as REST API
 mlflow models serve -m "models:/my-model@champion" -p 5000
 
@@ -489,47 +481,47 @@ const FeatureMediaCard = ({
               }}
             />
 
-            {/* Screenshot image with gradient border */}
+            {/* Screenshot image */}
             <div
-              className={clsx(
-                "absolute bottom-0 w-[93%] h-[93%] z-10 pt-[1px]",
-                imageOnLeft
-                  ? "left-0 rounded-tr-lg pr-[1px]"
-                  : "right-0 rounded-tl-lg pl-[1px]",
-              )}
-              style={{
-                background: imageOnLeft
-                  ? "linear-gradient(225deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)"
-                  : "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)",
-              }}
-            >
-              <div
                 className={clsx(
-                  "w-full h-full pt-[4px] overflow-hidden",
+                  "absolute bottom-0 w-[93%] h-[93%] z-10 pt-[1px]",
                   imageOnLeft
-                    ? "rounded-tr-lg pr-[4px]"
-                    : "rounded-tl-lg pl-[4px]",
+                    ? "left-0 rounded-tr-lg pr-[1px]"
+                    : "right-0 rounded-tl-lg pl-[1px]",
                 )}
-                style={{ backgroundColor: "#11171d" }}
+                style={{
+                  background: imageOnLeft
+                    ? "linear-gradient(225deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)"
+                    : "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)",
+                }}
               >
-                <img
-                  src={feature.imageSrc}
-                  alt={`${feature.title} screenshot`}
+                <div
                   className={clsx(
-                    "object-cover",
-                    imageOnLeft ? "rounded-tr" : "rounded-tl",
+                    "w-full h-full pt-[4px] overflow-hidden",
+                    imageOnLeft
+                      ? "rounded-tr-lg pr-[4px]"
+                      : "rounded-tl-lg pl-[4px]",
                   )}
-                  style={{
-                    width: `${feature.imageZoom ?? 115}%`,
-                    height: `${feature.imageZoom ?? 115}%`,
-                    objectPosition:
-                      feature.imagePosition ??
-                      (imageOnLeft ? "right top" : "left top"),
-                  }}
-                  loading="lazy"
-                />
+                  style={{ backgroundColor: "#11171d" }}
+                >
+                  <img
+                    src={feature.imageSrc}
+                    alt={`${feature.title} screenshot`}
+                    className={clsx(
+                      "object-cover",
+                      imageOnLeft ? "rounded-tr" : "rounded-tl",
+                    )}
+                    style={{
+                      width: `${feature.imageZoom ?? 115}%`,
+                      height: `${feature.imageZoom ?? 115}%`,
+                      objectPosition:
+                        feature.imagePosition ??
+                        (imageOnLeft ? "right top" : "left top"),
+                    }}
+                    loading="lazy"
+                  />
+                </div>
               </div>
-            </div>
           </motion.div>
         ) : (
           <motion.div
@@ -708,70 +700,6 @@ const StickyFeaturesGrid = ({ features }: { features: Feature[] }) => {
   );
 };
 
-// Feature card component - two-column layout (original, kept for reference)
-const FeatureCard = ({
-  feature,
-  index,
-}: {
-  feature: Feature;
-  index: number;
-}) => {
-  const isEven = index % 2 === 0;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="grid grid-cols-1 lg:grid-cols-2 gap-8 py-10 border-b border-white/10 last:border-b-0"
-    >
-      {/* Text content */}
-      <div
-        className={clsx(
-          "flex flex-col justify-center",
-          !isEven && "lg:order-2",
-        )}
-      >
-        <h3 className="text-2xl font-bold text-white mb-4">{feature.title}</h3>
-        <p className="text-gray-400 leading-relaxed mb-6">
-          {feature.description}
-        </p>
-        <a
-          href={feature.docLink}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="inline-flex items-center gap-1 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
-        >
-          Learn more
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </a>
-      </div>
-
-      {/* Media card (screenshot/code toggle) */}
-      <div className={clsx(!isEven && "lg:order-1")}>
-        <FeatureMediaCard feature={feature} imageOnLeft={!isEven} />
-      </div>
-    </motion.div>
-  );
-};
-
-// Tab style variants
-type TabStyle = "underline" | "segmented" | "glassmorphism" | "minimal";
-
-// Underline tabs component
 const UnderlineTabs = ({
   activeCategory,
   setActiveCategory,
@@ -811,390 +739,7 @@ const UnderlineTabs = ({
   </div>
 );
 
-// Segmented control component (iOS style)
-const SegmentedTabs = ({
-  activeCategory,
-  setActiveCategory,
-}: {
-  activeCategory: string;
-  setActiveCategory: (id: string) => void;
-}) => (
-  <div className="flex justify-center">
-    <div className="inline-flex rounded-lg p-1 bg-white/5 border border-white/10">
-      {categories.map((category) => {
-        const isActive = category.id === activeCategory;
-        return (
-          <button
-            key={category.id}
-            onClick={() => setActiveCategory(category.id)}
-            className={clsx(
-              "relative px-6 py-2 text-sm font-medium rounded-md transition-colors",
-              isActive ? "text-white" : "text-white/50 hover:text-white/70",
-            )}
-          >
-            {isActive && (
-              <motion.div
-                layoutId="activeSegment"
-                className="absolute inset-0 rounded-md bg-white/10"
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              />
-            )}
-            <span className="relative z-10">{category.label}</span>
-          </button>
-        );
-      })}
-    </div>
-  </div>
-);
 
-// Glassmorphism tabs component
-const GlassmorphismTabs = ({
-  activeCategory,
-  setActiveCategory,
-}: {
-  activeCategory: string;
-  setActiveCategory: (id: string) => void;
-}) => (
-  <div className="flex justify-center">
-    <div className="inline-flex gap-3">
-      {categories.map((category) => {
-        const isActive = category.id === activeCategory;
-        return (
-          <button
-            key={category.id}
-            onClick={() => setActiveCategory(category.id)}
-            className={clsx(
-              "relative px-6 py-2.5 text-sm font-medium rounded-xl transition-all",
-              isActive
-                ? "text-white bg-white/10 backdrop-blur-md border border-white/20 shadow-lg"
-                : "text-white/50 hover:text-white/70 hover:bg-white/5 border border-transparent",
-            )}
-          >
-            {isActive && (
-              <motion.div
-                layoutId="activeGlass"
-                className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border border-white/20"
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              />
-            )}
-            <span className="relative z-10">{category.label}</span>
-          </button>
-        );
-      })}
-    </div>
-  </div>
-);
-
-// Minimal text tabs component
-const MinimalTabs = ({
-  activeCategory,
-  setActiveCategory,
-}: {
-  activeCategory: string;
-  setActiveCategory: (id: string) => void;
-}) => (
-  <div className="flex justify-center">
-    <div className="flex gap-6">
-      {categories.map((category, index) => {
-        const isActive = category.id === activeCategory;
-        return (
-          <button
-            key={category.id}
-            onClick={() => setActiveCategory(category.id)}
-            className={clsx(
-              "relative text-base transition-all",
-              isActive
-                ? "text-white font-semibold"
-                : "text-white/40 hover:text-white/60 font-normal",
-            )}
-          >
-            {category.label}
-            {index < categories.length - 1 && (
-              <span className="absolute -right-3 top-1/2 -translate-y-1/2 text-white/20">
-                |
-              </span>
-            )}
-          </button>
-        );
-      })}
-    </div>
-  </div>
-);
-
-// Gradient border tabs
-const GradientBorderTabs = ({
-  activeCategory,
-  setActiveCategory,
-}: {
-  activeCategory: string;
-  setActiveCategory: (id: string) => void;
-}) => (
-  <div className="flex justify-center">
-    <div className="flex gap-4">
-      {categories.map((category) => {
-        const isActive = category.id === activeCategory;
-        return (
-          <button
-            key={category.id}
-            onClick={() => setActiveCategory(category.id)}
-            className={clsx(
-              "relative px-5 py-2 text-sm font-medium rounded-full transition-all",
-              isActive ? "text-white" : "text-white/50 hover:text-white/70",
-            )}
-          >
-            {isActive && (
-              <motion.div
-                layoutId="activeGradientBorder"
-                className="absolute inset-0 rounded-full p-[1px]"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #e05585, #9066cc, #5a8fd4)",
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              >
-                <div className="w-full h-full rounded-full bg-[#0d0d1a]" />
-              </motion.div>
-            )}
-            <span className="relative z-10">{category.label}</span>
-          </button>
-        );
-      })}
-    </div>
-  </div>
-);
-
-// Neon glow tabs
-const NeonTabs = ({
-  activeCategory,
-  setActiveCategory,
-}: {
-  activeCategory: string;
-  setActiveCategory: (id: string) => void;
-}) => (
-  <div className="flex justify-center">
-    <div className="flex gap-6">
-      {categories.map((category) => {
-        const isActive = category.id === activeCategory;
-        return (
-          <button
-            key={category.id}
-            onClick={() => setActiveCategory(category.id)}
-            className={clsx(
-              "relative px-5 py-2 text-sm font-medium transition-all",
-              isActive ? "text-cyan-400" : "text-white/50 hover:text-white/70",
-            )}
-            style={
-              isActive
-                ? {
-                    textShadow:
-                      "0 0 10px rgba(34,211,238,0.8), 0 0 20px rgba(34,211,238,0.5), 0 0 30px rgba(34,211,238,0.3)",
-                  }
-                : undefined
-            }
-          >
-            {category.label}
-            {isActive && (
-              <motion.div
-                layoutId="activeNeon"
-                className="absolute bottom-0 left-0 right-0 h-[2px] bg-cyan-400"
-                style={{
-                  boxShadow:
-                    "0 0 10px rgba(34,211,238,0.8), 0 0 20px rgba(34,211,238,0.5)",
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              />
-            )}
-          </button>
-        );
-      })}
-    </div>
-  </div>
-);
-
-// Pill outline tabs
-const PillOutlineTabs = ({
-  activeCategory,
-  setActiveCategory,
-}: {
-  activeCategory: string;
-  setActiveCategory: (id: string) => void;
-}) => (
-  <div className="flex justify-center">
-    <div className="flex gap-3">
-      {categories.map((category) => {
-        const isActive = category.id === activeCategory;
-        return (
-          <button
-            key={category.id}
-            onClick={() => setActiveCategory(category.id)}
-            className={clsx(
-              "relative px-5 py-2 text-sm font-medium rounded-full border transition-all",
-              isActive
-                ? "text-white border-white/40 bg-white/10"
-                : "text-white/50 border-white/10 hover:border-white/20 hover:text-white/70",
-            )}
-          >
-            {category.label}
-          </button>
-        );
-      })}
-    </div>
-  </div>
-);
-
-// Floating elevated tabs
-const FloatingTabs = ({
-  activeCategory,
-  setActiveCategory,
-}: {
-  activeCategory: string;
-  setActiveCategory: (id: string) => void;
-}) => (
-  <div className="flex justify-center">
-    <div className="flex gap-2 p-1.5 rounded-2xl bg-black/40 backdrop-blur-sm border border-white/5">
-      {categories.map((category) => {
-        const isActive = category.id === activeCategory;
-        return (
-          <button
-            key={category.id}
-            onClick={() => setActiveCategory(category.id)}
-            className={clsx(
-              "relative px-5 py-2 text-sm font-medium rounded-xl transition-all",
-              isActive ? "text-white" : "text-white/50 hover:text-white/70",
-            )}
-          >
-            {isActive && (
-              <motion.div
-                layoutId="activeFloating"
-                className="absolute inset-0 rounded-xl bg-white/15 shadow-lg"
-                style={{
-                  boxShadow:
-                    "0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)",
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              />
-            )}
-            <span className="relative z-10">{category.label}</span>
-          </button>
-        );
-      })}
-    </div>
-  </div>
-);
-
-// Chip/tag style tabs
-const ChipTabs = ({
-  activeCategory,
-  setActiveCategory,
-}: {
-  activeCategory: string;
-  setActiveCategory: (id: string) => void;
-}) => (
-  <div className="flex justify-center">
-    <div className="flex gap-2">
-      {categories.map((category) => {
-        const isActive = category.id === activeCategory;
-        return (
-          <motion.button
-            key={category.id}
-            onClick={() => setActiveCategory(category.id)}
-            className={clsx(
-              "px-4 py-1.5 text-sm font-medium rounded-full transition-colors",
-              isActive
-                ? "bg-white text-black"
-                : "bg-white/10 text-white/60 hover:bg-white/15 hover:text-white/80",
-            )}
-            layout
-            transition={{ type: "spring", stiffness: 500, damping: 30 }}
-          >
-            {category.label}
-          </motion.button>
-        );
-      })}
-    </div>
-  </div>
-);
-
-// Dot indicator tabs
-const DotTabs = ({
-  activeCategory,
-  setActiveCategory,
-}: {
-  activeCategory: string;
-  setActiveCategory: (id: string) => void;
-}) => (
-  <div className="flex justify-center">
-    <div className="flex gap-8">
-      {categories.map((category) => {
-        const isActive = category.id === activeCategory;
-        return (
-          <button
-            key={category.id}
-            onClick={() => setActiveCategory(category.id)}
-            className={clsx(
-              "relative flex flex-col items-center gap-2 text-sm font-medium transition-colors",
-              isActive ? "text-white" : "text-white/50 hover:text-white/70",
-            )}
-          >
-            {category.label}
-            <div className="relative h-1.5 w-1.5">
-              {isActive && (
-                <motion.div
-                  layoutId="activeDot"
-                  className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 to-blue-500"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              )}
-            </div>
-          </button>
-        );
-      })}
-    </div>
-  </div>
-);
-
-// Bracket tabs
-const BracketTabs = ({
-  activeCategory,
-  setActiveCategory,
-}: {
-  activeCategory: string;
-  setActiveCategory: (id: string) => void;
-}) => (
-  <div className="flex justify-center">
-    <div className="flex gap-6">
-      {categories.map((category) => {
-        const isActive = category.id === activeCategory;
-        return (
-          <button
-            key={category.id}
-            onClick={() => setActiveCategory(category.id)}
-            className={clsx(
-              "relative px-3 py-1 text-sm font-medium transition-colors",
-              isActive ? "text-white" : "text-white/50 hover:text-white/70",
-            )}
-          >
-            {isActive && (
-              <>
-                <motion.span
-                  layoutId="bracketLeft"
-                  className="absolute left-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-pink-500 to-purple-500"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-                <motion.span
-                  layoutId="bracketRight"
-                  className="absolute right-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-purple-500 to-blue-500"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              </>
-            )}
-            {category.label}
-          </button>
-        );
-      })}
-    </div>
-  </div>
-);
 
 // Main component
 export function ProductTabs() {
@@ -1236,7 +781,6 @@ export type Tab = {
   icon?: ReactNode;
   title?: string;
   description?: string;
-  docLink?: string;
   quickstartLink?: string;
   codeSnippets?: {
     python: string;

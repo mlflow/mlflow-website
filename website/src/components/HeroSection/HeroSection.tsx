@@ -13,6 +13,7 @@ type Props = {
   secondaryCTA?: {
     label: string;
     href: string;
+    icon?: ReactNode;
   };
 };
 
@@ -62,6 +63,9 @@ export function HeroSection({
           {secondaryCTA && (
             <Link to={secondaryCTA.href}>
               <Button variant="outline" size="medium">
+                {secondaryCTA.icon && (
+                  <span className="inline-flex">{secondaryCTA.icon}</span>
+                )}
                 {secondaryCTA.label}
               </Button>
             </Link>

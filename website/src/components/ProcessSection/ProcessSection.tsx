@@ -1,7 +1,19 @@
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useCallback } from "react";
 import Link from "@docusaurus/Link";
+import { Highlight, themes } from "prism-react-renderer";
 import { Section } from "../Section/Section";
+
+// Custom Night Owl theme with modified string color
+const customNightOwl = {
+  ...themes.nightOwl,
+  styles: themes.nightOwl.styles.map((style) => {
+    if (style.types.includes("string")) {
+      return { ...style, style: { ...style.style, color: "#58a6ff" } };
+    }
+    return style;
+  }),
+};
 
 // Copy button component for code snippets
 const CopyButton = ({ code }: { code: string }) => {
@@ -69,10 +81,10 @@ const CopyButton = ({ code }: { code: string }) => {
 const steps = [
   {
     number: "1",
-    title: "Install MLflow",
+    title: "Start MLflow Server",
     description: "One command to get started. Docker setup is also available.",
-    time: "~1 minute",
-    code: "pip install mlflow",
+    time: "~30 seconds",
+    code: `uvx mlflow server`,
     language: "bash",
   },
   {
@@ -81,18 +93,27 @@ const steps = [
     description:
       "Add 1 line of code to start capturing traces, metrics, and parameters",
     time: "~30 seconds",
-    code: "mlflow.openai.autolog()",
+    code: `import mlflow
+
+mlflow.set_tracking_uri("http://localhost:5000")
+mlflow.openai.autolog()`,
     language: "python",
   },
   {
     number: "3",
-    title: "View UI",
+    title: "Run your code",
     description:
-      "Start the MLflow server and explore the web UI from your browser.",
+      "Run your ML/LLM code as usual. MLflow logs traces and you can explore them in the MLflow UI.",
     time: "~1 minute",
-    code: "mlflow server --port 5000",
-    language: "bash",
-  },
+    code: `from openai import OpenAI
+
+client = OpenAI()
+client.responses.create(
+    model="gpt-5-mini",
+    input="Hello!",
+)`,
+    language: "python",
+  }
 ];
 
 export function ProcessSection() {
@@ -205,10 +226,27 @@ export function ProcessSection() {
                         </span>
                         <CopyButton code={step.code} />
                       </div>
-                      <div className="p-3">
-                        <code className="text-xs text-sky-300 font-mono whitespace-pre !bg-transparent">
-                          {step.code}
-                        </code>
+                      <div className="p-3 overflow-x-auto hidden-scrollbar">
+                        <Highlight
+                          theme={customNightOwl}
+                          code={step.code.trim()}
+                          language={step.language === "bash" ? "bash" : "python"}
+                        >
+                          {({ style, tokens, getLineProps, getTokenProps }) => (
+                            <pre
+                              className="text-xs font-mono !m-0 !p-0 text-left"
+                              style={{ ...style, backgroundColor: "transparent" }}
+                            >
+                              {tokens.map((line, i) => (
+                                <div key={i} {...getLineProps({ line })}>
+                                  {line.map((token, key) => (
+                                    <span key={key} {...getTokenProps({ token })} />
+                                  ))}
+                                </div>
+                              ))}
+                            </pre>
+                          )}
+                        </Highlight>
                       </div>
                     </div>
 
