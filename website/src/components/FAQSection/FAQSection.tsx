@@ -11,7 +11,7 @@ const faqs = [
   {
     question: "How does MLflow compare to other MLOps/LLMOps tools?",
     answer:
-      "MLflow stands out with its vendor-neutral approach, comprehensive feature set, and massive community support. Unlike proprietary alternatives, MLflow doesn't lock you into any specific cloud or vendor. With 50M+ monthly downloads and 20K+ GitHub stars, it's the most widely adopted open-source MLOps platform.",
+      "Many LLMOps tools are either proprietary or only cover part of the lifecycle. MLflow gives you full stack MLOps and LLMOps capabilities in single open-source platform. Backed by the Linux Foundation, MLflow ensures your AI infrastructure remains open, vendor-neutral, and fully in your control.",
   },
   {
     question: "Can I use MLflow with my existing AI infrastructure?",

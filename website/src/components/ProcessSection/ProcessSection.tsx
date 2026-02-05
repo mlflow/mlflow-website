@@ -89,9 +89,9 @@ const steps = [
   },
   {
     number: "2",
-    title: "Enable Auto-Logging",
+    title: "Enable Logging",
     description:
-      "Add 1 line of code to start capturing traces, metrics, and parameters",
+      "Add minimal code to start capturing traces, metrics, and parameters",
     time: "~30 seconds",
     code: `import mlflow
 
@@ -113,7 +113,7 @@ client.responses.create(
     input="Hello!",
 )`,
     language: "python",
-  }
+  },
 ];
 
 export function ProcessSection() {
@@ -230,17 +230,25 @@ export function ProcessSection() {
                         <Highlight
                           theme={customNightOwl}
                           code={step.code.trim()}
-                          language={step.language === "bash" ? "bash" : "python"}
+                          language={
+                            step.language === "bash" ? "bash" : "python"
+                          }
                         >
                           {({ style, tokens, getLineProps, getTokenProps }) => (
                             <pre
                               className="text-xs font-mono !m-0 !p-0 text-left"
-                              style={{ ...style, backgroundColor: "transparent" }}
+                              style={{
+                                ...style,
+                                backgroundColor: "transparent",
+                              }}
                             >
                               {tokens.map((line, i) => (
                                 <div key={i} {...getLineProps({ line })}>
                                   {line.map((token, key) => (
-                                    <span key={key} {...getTokenProps({ token })} />
+                                    <span
+                                      key={key}
+                                      {...getTokenProps({ token })}
+                                    />
                                   ))}
                                 </div>
                               ))}

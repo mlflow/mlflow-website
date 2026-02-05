@@ -43,7 +43,7 @@ const benefits = [
     ),
     title: "No Vendor Lock-in",
     description:
-      "Works with any cloud, framework, or tool you use. Switch providers anytime.",
+      "Works with any cloud, framework, or tool you use. Switch vendors anytime.",
     color: "from-purple-500/20 to-purple-600/20",
     iconBg: "bg-purple-500/20",
     iconColor: "text-purple-400",
@@ -89,7 +89,7 @@ const benefits = [
     ),
     title: "Full Visibility",
     description:
-      "Complete tracing and observability for all your AI applications and agents.",
+      "Complete tracking and observability for all your AI applications and agents.",
     color: "from-cyan-500/20 to-cyan-600/20",
     iconBg: "bg-cyan-500/20",
     iconColor: "text-cyan-400",
@@ -135,7 +135,7 @@ const benefits = [
     ),
     title: "Integrations",
     description:
-      "Works out of the box with LangChain, OpenAI, PyTorch, and 30+ AI frameworks.",
+      "Works out of the box with LangChain, OpenAI, PyTorch, and 100+ AI frameworks.",
     color: "from-rose-500/20 to-rose-600/20",
     iconBg: "bg-rose-500/20",
     iconColor: "text-rose-400",

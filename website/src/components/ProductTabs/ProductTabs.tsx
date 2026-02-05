@@ -13,7 +13,7 @@ import GatewayTabImg from "@site/static/img/GenAI_home/GenAI_gateway_darkmode.pn
 import PromptTabImg from "@site/static/img/GenAI_home/GenAI_prompts_darkmode.png";
 import ExperimentTrackingImg from "@site/static/img/GenAI_home/model_training_darkmode.png";
 import ModelRegistryImg from "@site/static/img/GenAI_home/model_registry_darkmode.png";
-import DeploymentImg from "@site/static/img/GenAI_home/deployment_darkmode.png";
+import DeploymentImg from "@site/static/img/GenAI_home/deployment.png";
 
 // Feature type definition
 type Feature = {
@@ -111,7 +111,8 @@ formatted = prompt.format(num_sentences=2, content="...")`,
       "Unified API gateway for all LLM providers. Route requests, manage rate limits, handle fallbacks, and control costs through a unified OpenAI-compatible interface.",
     imageSrc: GatewayTabImg,
     imagePosition: "0% top",
-    quickstartLink: "https://mlflow.org/docs/latest/genai/governance/ai-gateway/quickstart/",
+    quickstartLink:
+      "https://mlflow.org/docs/latest/genai/governance/ai-gateway/quickstart/",
     codeSnippet: `from openai import OpenAI
 
 # Point to MLflow AI Gateway - OpenAI compatible API
@@ -138,7 +139,8 @@ const modelTrainingFeatures: Feature[] = [
       "Track experiments, log parameters, metrics, and artifacts. Compare runs side-by-side, reproduce results, and collaborate with your team on ML experiments.",
     imageSrc: ExperimentTrackingImg,
     imageZoom: 150,
-    quickstartLink: "https://mlflow.org/docs/latest/ml/getting-started/quickstart/",
+    quickstartLink:
+      "https://mlflow.org/docs/latest/ml/getting-started/quickstart/",
     codeSnippet: `import mlflow
 
 # Enable autologging for your ML framework
@@ -159,7 +161,8 @@ model.fit(X, y)  # Parameters, metrics, model logged automatically`,
       "Central hub to manage the full lifecycle of ML models. Version models, track lineage, manage stage transitions, and collaborate on model development.",
     imageSrc: ModelRegistryImg,
     imageZoom: 120,
-    quickstartLink: "https://mlflow.org/docs/latest/ml/model-registry/tutorial/",
+    quickstartLink:
+      "https://mlflow.org/docs/latest/ml/model-registry/tutorial/",
     codeSnippet: `import mlflow
 
 # Register a model from a run
@@ -483,45 +486,45 @@ const FeatureMediaCard = ({
 
             {/* Screenshot image */}
             <div
+              className={clsx(
+                "absolute bottom-0 w-[93%] h-[93%] z-10 pt-[1px]",
+                imageOnLeft
+                  ? "left-0 rounded-tr-lg pr-[1px]"
+                  : "right-0 rounded-tl-lg pl-[1px]",
+              )}
+              style={{
+                background: imageOnLeft
+                  ? "linear-gradient(225deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)"
+                  : "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)",
+              }}
+            >
+              <div
                 className={clsx(
-                  "absolute bottom-0 w-[93%] h-[93%] z-10 pt-[1px]",
+                  "w-full h-full pt-[4px] overflow-hidden",
                   imageOnLeft
-                    ? "left-0 rounded-tr-lg pr-[1px]"
-                    : "right-0 rounded-tl-lg pl-[1px]",
+                    ? "rounded-tr-lg pr-[4px]"
+                    : "rounded-tl-lg pl-[4px]",
                 )}
-                style={{
-                  background: imageOnLeft
-                    ? "linear-gradient(225deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)"
-                    : "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)",
-                }}
+                style={{ backgroundColor: "#11171d" }}
               >
-                <div
+                <img
+                  src={feature.imageSrc}
+                  alt={`${feature.title} screenshot`}
                   className={clsx(
-                    "w-full h-full pt-[4px] overflow-hidden",
-                    imageOnLeft
-                      ? "rounded-tr-lg pr-[4px]"
-                      : "rounded-tl-lg pl-[4px]",
+                    "object-cover",
+                    imageOnLeft ? "rounded-tr" : "rounded-tl",
                   )}
-                  style={{ backgroundColor: "#11171d" }}
-                >
-                  <img
-                    src={feature.imageSrc}
-                    alt={`${feature.title} screenshot`}
-                    className={clsx(
-                      "object-cover",
-                      imageOnLeft ? "rounded-tr" : "rounded-tl",
-                    )}
-                    style={{
-                      width: `${feature.imageZoom ?? 115}%`,
-                      height: `${feature.imageZoom ?? 115}%`,
-                      objectPosition:
-                        feature.imagePosition ??
-                        (imageOnLeft ? "right top" : "left top"),
-                    }}
-                    loading="lazy"
-                  />
-                </div>
+                  style={{
+                    width: `${feature.imageZoom ?? 115}%`,
+                    height: `${feature.imageZoom ?? 115}%`,
+                    objectPosition:
+                      feature.imagePosition ??
+                      (imageOnLeft ? "right top" : "left top"),
+                  }}
+                  loading="lazy"
+                />
               </div>
+            </div>
           </motion.div>
         ) : (
           <motion.div
@@ -738,8 +741,6 @@ const UnderlineTabs = ({
     </div>
   </div>
 );
-
-
 
 // Main component
 export function ProductTabs() {
