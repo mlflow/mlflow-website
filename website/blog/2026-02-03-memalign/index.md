@@ -7,6 +7,8 @@ thumbnail: /img/blog/memalign-thumbnail.png
 image: /img/blog/memalign-thumbnail.png
 ---
 
+_This post was originally posted on the [Databricks website](https://www.databricks.com/blog/memalign-building-better-llm-judges-human-feedback-scalable-memory), and this is a cross post to share with the MLflow community._
+
 As GenAI adoption grows, we increasingly rely on LLM Judges to scale agent evaluation and optimization across industries. However, out-of-the-box LLM judges often fail to capture domain-specific nuances. To bridge this gap, system developers usually turn to prompt engineering (which is brittle) or fine-tuning (which is slow, expensive, and data-hungry).
 
 Today, we are introducing **MemAlign**, a new framework that aligns LLMs with human feedback via a lightweight dual-memory system. As part of our [Agent Learning from Human Feedback (ALHF)](https://www.databricks.com/blog/alhf) work, MemAlign only needs a handful of natural-language feedback examples instead of hundreds of labels from human raters, and automatically creates aligned judges with competitive or better quality than state-of-the-art prompt optimizers, at **orders-of-magnitude lower cost and latency**.
@@ -16,7 +18,7 @@ _Figure 1. Comparison of MemAlign vs. prompt optimizers from DSPy on alignment c
 
 With MemAlign, we observe what we call **memory scaling**: as feedback accumulates, quality continues to improve without re-optimization. This is similar to [test-time scaling](https://openai.com/index/learning-to-reason-with-llms/), but quality improvement comes from accumulated experience rather than increased per-query compute.
 
-MemAlign is now offered in [open-source MLflow](https://www.mlflow.org/docs/latest/llms/llm-judge/index.html) and on Databricks for judge alignment. Try it out now!
+MemAlign is now offered in [open-source MLflow](https://www.mlflow.org/docs/latest/llms/llm-judge/index.html) and on Databricks for judge alignment. To get a glimpse of MemAlign in action, you can check out our [3.9.0 webinar](https://youtube.com/live/2-A3Z_uQsYQ?si=f36V-3xxTxNNGJkP). Try it out now!
 
 ## The Problem: LLM Judges Don't Think Like Domain Experts
 
