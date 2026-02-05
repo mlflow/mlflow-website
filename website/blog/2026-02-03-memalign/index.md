@@ -7,7 +7,7 @@ thumbnail: /img/blog/memalign-thumbnail.png
 image: /img/blog/memalign-thumbnail.png
 ---
 
-_This post was originally posted on the [Databricks website](https://www.databricks.com/blog/memalign-building-better-llm-judges-human-feedback-scalable-memory), and this is a cross post to share with the MLflow community._
+_Note: This post was originally published on the [Databricks website](https://www.databricks.com/blog/memalign-building-better-llm-judges-human-feedback-scalable-memory), and is cross-posted here to share with the MLflow community._
 
 As GenAI adoption grows, we increasingly rely on LLM Judges to scale agent evaluation and optimization across industries. However, out-of-the-box LLM judges often fail to capture domain-specific nuances. To bridge this gap, system developers usually turn to prompt engineering (which is brittle) or fine-tuning (which is slow, expensive, and data-hungry).
 
