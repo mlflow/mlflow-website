@@ -81,13 +81,13 @@ results = mlflow.genai.evaluate(
   },
   {
     id: "prompt",
-    title: "Prompt Management",
+    title: "Prompt & Optimization",
     description:
-      "Version, test, and deploy prompts with full lineage tracking. Compare prompt performance across versions and collaborate with your team on prompt engineering.",
+      "Version, test, and deploy prompts with full lineage tracking. Automatically optimize prompts with state-of-the-art algorithms to improve performance.",
     imageSrc: PromptTabImg,
     imageZoom: 150,
     quickstartLink:
-      "https://mlflow.org/docs/latest/genai/prompt-registry/create-and-edit-prompts/",
+      "https://mlflow.org/docs/latest/genai/prompt-registry/",
     codeSnippet: `import mlflow
 
 # Register a prompt template
