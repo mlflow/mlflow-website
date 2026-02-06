@@ -105,8 +105,12 @@ To better understand the system's behavior, we run additional ablations on a sam
 
 **Are both memory modules necessary?** After ablating each memory module, we observe performance drops in both cases. Removing Semantic Memory and the judge loses its stable foundation of principles; remove Episodic Memory and it struggles with edge cases. Both components are important to performance.
 
+<div align="center">
+
 ![Ablation of Memory Components](ablation-memory-components.png)
 _Figure 5. Performance (as measured by [Concordance Correlation Coefficient (CCC)](https://en.wikipedia.org/wiki/Concordance_correlation_coefficient)) of MemAlign with only semantic memory, only episodic memory, or both enabled._
+
+</div>
 
 **Feedback is at least as effective as labels, especially early on.** Given a fixed annotation budget, which type of learning signal is most worth investing in, labels, natural language feedback, or both? We see a slight early advantage (5 or fewer examples) for feedback over labels, with the gap narrowing as examples accumulate. This means that if your experts only have time for a handful of examples, it may be better to have them explain their reasoning; otherwise, labels alone could be sufficient.
 
