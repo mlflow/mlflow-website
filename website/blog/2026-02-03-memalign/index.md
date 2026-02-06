@@ -122,7 +122,7 @@ _Figure 7. Learning curves of MemAlign with different base LLMs._
 
 MemAlign bridges the gap between general-purpose LLMs and domain-specific nuance using a dual-memory architecture that enables fast, inexpensive alignment. It reflects a different philosophy: leverage dense natural-language feedback from human experts rather than approximating it with large numbers of labels. More broadly, MemAlign highlights the promise of **memory scaling**: by accumulating lessons instead of repeatedly re-optimizing, agents can continue to improve without sacrificing speed or cost. We believe this paradigm will be increasingly important for long-running, expert-in-the-loop agent workflows.
 
-MemAlign is now available as an [optimization algorithm](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/memalign/) behind MLflow's [`align()`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/alignment/#the-simba-alignment-optimizer) method. Check out this [demo notebook](https://www.databricks.com/sites/default/files/demos/memalign-demo.html) to get started!
+MemAlign is now available as an [optimization algorithm](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/memalign/) behind MLflow's [`align()`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/alignment/#the-simba-alignment-optimizer) method. Check out the [MLflow docs](https://mlflow.org/docs/latest/genai/eval-monitor/) to get started!
 
 ---
 
