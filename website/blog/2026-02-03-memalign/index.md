@@ -5,9 +5,12 @@ tags: [mlflow, genai, llm-judges, evaluation, alignment, memory, alhf]
 authors: [mosaic-research-team]
 thumbnail: /img/blog/memalign-thumbnail.png
 image: /img/blog/memalign-thumbnail.png
+description: "Introducing MemAlign, a new framework that aligns LLMs with human feedback via a lightweight dual-memory system, achieving competitive or better quality than state-of-the-art prompt optimizers, at orders-of-magnitude lower cost and latency."
 ---
 
 _Note: This post was originally published on the [Databricks website](https://www.databricks.com/blog/memalign-building-better-llm-judges-human-feedback-scalable-memory), and is cross-posted here to share with the MLflow community._
+
+![MemAlign: Building Better LLM Judges From Human Feedback With Scalable Memory](memalign-header.png)
 
 As GenAI adoption grows, we increasingly rely on LLM Judges to scale agent evaluation and optimization across industries. However, out-of-the-box LLM judges often fail to capture domain-specific nuances. To bridge this gap, system developers usually turn to prompt engineering (which is brittle) or fine-tuning (which is slow, expensive, and data-hungry).
 
