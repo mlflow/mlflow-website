@@ -11,14 +11,14 @@ _Note: This post was originally published on the [Databricks website](https://ww
 
 As GenAI adoption grows, we increasingly rely on LLM Judges to scale agent evaluation and optimization across industries. However, out-of-the-box LLM judges often fail to capture domain-specific nuances. To bridge this gap, system developers usually turn to prompt engineering (which is brittle) or fine-tuning (which is slow, expensive, and data-hungry).
 
-Today, we are introducing **MemAlign**, a new framework that aligns LLMs with human feedback via a lightweight dual-memory system. As part of our [Agent Learning from Human Feedback (ALHF)](https://www.databricks.com/blog/alhf) work, MemAlign only needs a handful of natural-language feedback examples instead of hundreds of labels from human raters, and automatically creates aligned judges with competitive or better quality than state-of-the-art prompt optimizers, at **orders-of-magnitude lower cost and latency**.
+Today, we are introducing **MemAlign**, a new framework that aligns LLMs with human feedback via a lightweight dual-memory system. As part of our [Agent Learning from Human Feedback (ALHF)](https://www.databricks.com/blog/agent-learning-human-feedback-alhf-databricks-knowledge-assistant-case-study) work, MemAlign only needs a handful of natural-language feedback examples instead of hundreds of labels from human raters, and automatically creates aligned judges with competitive or better quality than state-of-the-art prompt optimizers, at **orders-of-magnitude lower cost and latency**.
 
 ![Comparison of MemAlign vs. prompt optimizers from DSPy on alignment cost-quality and latency-quality tradeoff](cost-latency-quality-tradeoff.png)
-_Figure 1. Comparison of MemAlign vs. prompt optimizers from DSPy on alignment cost-quality (left) and alignment latency-quality (right) tradeoff after adapting on up to 50 examples, averaged across 10 datasets from the [Prometheus-eval](https://github.com/prometheus-eval/prometheus-eval) LLM judge benchmark. MemAlign achieves the highest quality while requiring $0.03 in alignment cost and ~40 seconds of latency, compared to $1–$5 and 9–85 minutes for prompt optimizers, placing it firmly in the top-left region of both plots._
+_Figure 1. Comparison of MemAlign vs. prompt optimizers from DSPy on alignment cost-quality (left) and alignment latency-quality (right) tradeoff after adapting on up to 50 examples, averaged across 10 datasets from the [Prometheus-eval](https://huggingface.co/datasets/prometheus-eval/Feedback-Collection) LLM judge benchmark. MemAlign achieves the highest quality while requiring $0.03 in alignment cost and ~40 seconds of latency, compared to $1–$5 and 9–85 minutes for prompt optimizers, placing it firmly in the top-left region of both plots._
 
-With MemAlign, we observe what we call **memory scaling**: as feedback accumulates, quality continues to improve without re-optimization. This is similar to [test-time scaling](https://openai.com/index/learning-to-reason-with-llms/), but quality improvement comes from accumulated experience rather than increased per-query compute.
+With MemAlign, we observe what we call **memory scaling**: as feedback accumulates, quality continues to improve without re-optimization. This is similar to [test-time scaling](https://arxiv.org/abs/2408.03314), but quality improvement comes from accumulated experience rather than increased per-query compute.
 
-MemAlign is now offered in [open-source MLflow](https://www.mlflow.org/docs/latest/llms/llm-judge/index.html) and on Databricks for judge alignment. To get a glimpse of MemAlign in action, you can check out our [3.9.0 webinar](https://youtube.com/live/2-A3Z_uQsYQ?si=f36V-3xxTxNNGJkP). Try it out now!
+MemAlign is now offered in [open-source MLflow](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/memalign/) and on Databricks for judge alignment. To get a glimpse of MemAlign in action, you can check out our [3.9.0 webinar](https://youtube.com/live/2-A3Z_uQsYQ?si=f36V-3xxTxNNGJkP). Try it out now!
 
 ## The Problem: LLM Judges Don't Think Like Domain Experts
 
@@ -36,7 +36,7 @@ The standard playbook for closing this gap involves collecting gold labels from 
 
 - **Prompt engineering** is brittle and doesn't scale. You'll quickly hit context limits, introduce contradictions, and spend weeks playing whack-a-mole with edge cases.
 - **Fine-tuning** requires substantial amounts of labeled data, which is costly and time-consuming to collect from experts.
-- **Automatic prompt optimizers** (like [DSPy](https://dspy.ai/)'s GEPA and MIPRO) are powerful, but each optimization run takes minutes to hours, unsuitable for tight feedback loops. Moreover, they require an explicit _metric_ to optimize against, which in judge development typically relies on gold labels. In practice, it's recommended to collect [a considerable number](https://dspy.ai/tutorials/saving-state/#saving-optimized-objects) of labels for stable, reliable optimization.
+- **Automatic prompt optimizers** (like [DSPy](https://dspy.ai/)'s GEPA and MIPRO) are powerful, but each optimization run takes minutes to hours, unsuitable for tight feedback loops. Moreover, they require an explicit _metric_ to optimize against, which in judge development typically relies on gold labels. In practice, it's recommended to collect [a considerable number](https://dspy.ai/learn/optimization/overview/) of labels for stable, reliable optimization.
 
 This led to a key insight: what if, instead of collecting large numbers of labels, we learn from small amounts of **natural language feedback**, the same way humans teach each other? Unlike labels, natural language feedback is information-dense: a single comment can capture intent, constraints, and corrective guidance all at once. In practice, it often takes dozens of contrastive examples to implicitly teach a rule, while a single piece of feedback can make that rule explicit. This mirrors how humans improve on complex tasks—through review and reflection, not just scalar outcomes. This paradigm underpins our broader Agent Learning from Human Feedback (ALHF) effort.
 
@@ -60,9 +60,9 @@ A useful parallel is to view MemAlign through the lens of prompt optimizers. Pro
 
 ## Performance: MemAlign vs. Prompt Optimizers
 
-We benchmark MemAlign against state-of-the-art prompt optimizers ([MIPROv2](https://dspy.ai/api/optimizers/MIPROv2/), [SIMBA](https://dspy.ai/api/optimizers/SIMBA/), [GEPA](https://github.com/gepa-ai/gepa) (auto budget = 'light') from DSPy) across datasets involving five judgment categories:
+We benchmark MemAlign against state-of-the-art prompt optimizers ([MIPROv2](https://dspy.ai/api/optimizers/MIPROv2/), [SIMBA](https://dspy.ai/api/optimizers/SIMBA/), [GEPA](https://dspy.ai/api/optimizers/GEPA/overview/) (auto budget = 'light') from DSPy) across datasets involving five judgment categories:
 
-- **Answer correctness:** [FinanceBench](https://huggingface.co/datasets/PatronusAI/financebench), [HotpotQA](https://hotpotqa.github.io/)
+- **Answer correctness:** [FinanceBench](https://huggingface.co/datasets/PatronusAI/financebench), [HotpotQA](https://huggingface.co/datasets/hotpotqa/hotpot_qa)
 - **Faithfulness:** [HaluBench](https://huggingface.co/datasets/PatronusAI/HaluBench)
 - **Safety:** We worked with [Flo Health](https://flo.health/) to validate MemAlign on one of their internal anonymized datasets (QA pairs with medical expert annotations across 12 nuanced criteria).
 - **Pairwise preference:** [Auto-J](https://github.com/GAIR-NLP/auto-j) (PKU-SafeRLHF and OpenAI Summary subsets)
@@ -119,7 +119,7 @@ _Figure 7. Learning curves of MemAlign with different base LLMs._
 
 MemAlign bridges the gap between general-purpose LLMs and domain-specific nuance using a dual-memory architecture that enables fast, inexpensive alignment. It reflects a different philosophy: leverage dense natural-language feedback from human experts rather than approximating it with large numbers of labels. More broadly, MemAlign highlights the promise of **memory scaling**: by accumulating lessons instead of repeatedly re-optimizing, agents can continue to improve without sacrificing speed or cost. We believe this paradigm will be increasingly important for long-running, expert-in-the-loop agent workflows.
 
-MemAlign is now available as an [optimization algorithm](https://www.mlflow.org/docs/latest/llms/llm-judge/index.html) behind MLflow's `align()` method. Check out this [demo notebook](https://github.com/mlflow/mlflow/tree/master/examples) to get started!
+MemAlign is now available as an [optimization algorithm](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/memalign/) behind MLflow's [`align()`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/alignment/#the-simba-alignment-optimizer) method. Check out this [demo notebook](https://www.databricks.com/sites/default/files/demos/memalign-demo.html) to get started!
 
 ---
 
