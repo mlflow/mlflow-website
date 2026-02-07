@@ -1,12 +1,14 @@
 import clsx from "clsx";
-import { ReactNode, useState, useRef, useCallback } from "react";
+import { useState, useRef } from "react";
 import {
   motion,
   AnimatePresence,
   useScroll,
   useMotionValueEvent,
 } from "motion/react";
-import { Highlight, themes } from "prism-react-renderer";
+import { Highlight } from "prism-react-renderer";
+import { CopyButton } from "../CodeSnippet/CopyButton";
+import { customNightOwl, CODE_BG } from "../CodeSnippet/codeTheme";
 import TracingTabImg from "@site/static/img/GenAI_home/GenAI_trace_darkmode.png";
 import EvaluationTabImg from "@site/static/img/GenAI_home/GenAI_evaluation_darkmode.png";
 import GatewayTabImg from "@site/static/img/GenAI_home/GenAI_gateway_darkmode.png";
@@ -86,8 +88,7 @@ results = mlflow.genai.evaluate(
       "Version, test, and deploy prompts with full lineage tracking. Automatically optimize prompts with state-of-the-art algorithms to improve performance.",
     imageSrc: PromptTabImg,
     imageZoom: 150,
-    quickstartLink:
-      "https://mlflow.org/docs/latest/genai/prompt-registry/",
+    quickstartLink: "https://mlflow.org/docs/latest/genai/prompt-registry/",
     codeSnippet: `import mlflow
 
 # Register a prompt template
@@ -169,7 +170,7 @@ model.fit(X, y)  # Parameters, metrics, model logged automatically`,
 model_uri = f"runs:/{run_id}/model"
 mlflow.register_model(model_uri, "fraud-detection-model")
 
-# Load a registered model for inference="w-full flex flex-col gap-16
+# Load a registered model for inference
 model = mlflow.pyfunc.load_model(
     "models:/fraud-detection-model@champion"
 )
@@ -217,85 +218,6 @@ const categories = [
   },
 ];
 
-// Copy button component
-const CopyButton = ({ code }: { code: string }) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy:", err);
-    }
-  }, [code]);
-
-  return (
-    <button
-      onClick={handleCopy}
-      className="absolute top-3 right-3 p-2 rounded-md bg-white/10 hover:bg-white/20 transition-colors z-10 group"
-      aria-label={copied ? "Copied!" : "Copy code"}
-    >
-      <AnimatePresence mode="wait" initial={false}>
-        {copied ? (
-          <motion.svg
-            key="check"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0 }}
-            className="w-4 h-4 text-green-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
-          </motion.svg>
-        ) : (
-          <motion.svg
-            key="copy"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0 }}
-            className="w-4 h-4 text-white/60 group-hover:text-white/90"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-            />
-          </motion.svg>
-        )}
-      </AnimatePresence>
-    </button>
-  );
-};
-
-// Custom Night Owl theme with modified string color
-const customNightOwl = {
-  ...themes.nightOwl,
-  styles: themes.nightOwl.styles.map((style) => {
-    if (style.types.includes("string")) {
-      return { ...style, style: { ...style.style, color: "#58a6ff" } };
-    }
-    return style;
-  }),
-};
-
-const codeColorScheme = {
-  theme: customNightOwl,
-  bg: "#0d1117",
-};
-
 // Code block component
 const CodeBlock = ({
   code,
@@ -308,21 +230,21 @@ const CodeBlock = ({
 
   return (
     <Highlight
-      theme={codeColorScheme.theme}
+      theme={customNightOwl}
       code={code.trim()}
       language={prismLanguage}
     >
       {({ style, tokens, getLineProps, getTokenProps }) => (
-        <div
-          className="relative h-full"
-          style={{ backgroundColor: codeColorScheme.bg }}
-        >
-          <CopyButton code={code.trim()} />
+        <div className="relative h-full" style={{ backgroundColor: CODE_BG }}>
+          <CopyButton
+            code={code.trim()}
+            className="absolute top-3 right-3 p-2 rounded-md z-10"
+          />
           <pre
             className="h-full overflow-auto leading-snug font-mono p-4 m-0 dark-scrollbar"
             style={{
               ...style,
-              backgroundColor: codeColorScheme.bg,
+              backgroundColor: CODE_BG,
               fontSize: "13px",
               lineHeight: "1.5",
             }}
@@ -418,13 +340,7 @@ const ScreenshotIcon = () => (
 );
 
 // Feature Media Card with hover toggle button
-const FeatureMediaCard = ({
-  feature,
-  imageOnLeft = false,
-}: {
-  feature: Feature;
-  imageOnLeft?: boolean;
-}) => {
+const FeatureMediaCard = ({ feature }: { feature: Feature }) => {
   const [showCode, setShowCode] = useState(false);
 
   return (
@@ -486,40 +402,24 @@ const FeatureMediaCard = ({
 
             {/* Screenshot image */}
             <div
-              className={clsx(
-                "absolute bottom-0 w-[93%] h-[93%] z-10 pt-[1px]",
-                imageOnLeft
-                  ? "left-0 rounded-tr-lg pr-[1px]"
-                  : "right-0 rounded-tl-lg pl-[1px]",
-              )}
+              className="absolute bottom-0 right-0 w-[93%] h-[93%] z-10 pt-[1px] rounded-tl-lg pl-[1px]"
               style={{
-                background: imageOnLeft
-                  ? "linear-gradient(225deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)"
-                  : "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)",
+                background:
+                  "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 50%, transparent 100%)",
               }}
             >
               <div
-                className={clsx(
-                  "w-full h-full pt-[4px] overflow-hidden",
-                  imageOnLeft
-                    ? "rounded-tr-lg pr-[4px]"
-                    : "rounded-tl-lg pl-[4px]",
-                )}
+                className="w-full h-full pt-[4px] overflow-hidden rounded-tl-lg pl-[4px]"
                 style={{ backgroundColor: "#11171d" }}
               >
                 <img
                   src={feature.imageSrc}
                   alt={`${feature.title} screenshot`}
-                  className={clsx(
-                    "object-cover",
-                    imageOnLeft ? "rounded-tr" : "rounded-tl",
-                  )}
+                  className="object-cover rounded-tl"
                   style={{
                     width: `${feature.imageZoom ?? 115}%`,
                     height: `${feature.imageZoom ?? 115}%`,
-                    objectPosition:
-                      feature.imagePosition ??
-                      (imageOnLeft ? "right top" : "left top"),
+                    objectPosition: feature.imagePosition ?? "left top",
                   }}
                   loading="lazy"
                 />
@@ -589,11 +489,9 @@ const interpolateColor = (color1: string, color2: string, factor: number) => {
 // Feature text section component - sticky card with QuickstartLink
 const FeatureTextSection = ({
   feature,
-  showMobileImage = true,
   visibility = 1, // 0 = fully dark, 1 = fully visible
 }: {
   feature: Feature;
-  showMobileImage?: boolean;
   visibility?: number;
 }) => {
   // Interpolate colors based on visibility (0 to 1)
@@ -618,11 +516,9 @@ const FeatureTextSection = ({
       </div>
 
       {/* Mobile: Show image inline */}
-      {showMobileImage && (
-        <div className="lg:hidden">
-          <FeatureMediaCard feature={feature} imageOnLeft={false} />
-        </div>
-      )}
+      <div className="lg:hidden">
+        <FeatureMediaCard feature={feature} />
+      </div>
     </div>
   );
 };
@@ -693,9 +589,7 @@ const StickyFeaturesGrid = ({ features }: { features: Feature[] }) => {
             transition={{ duration: 0.4 }}
             className="h-full"
           >
-            {activeFeature && (
-              <FeatureMediaCard feature={activeFeature} imageOnLeft={false} />
-            )}
+            {activeFeature && <FeatureMediaCard feature={activeFeature} />}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -773,23 +667,3 @@ export function ProductTabs() {
     </div>
   );
 }
-
-// Export for backwards compatibility
-export type Tab = {
-  id: string;
-  label: string;
-  imageSrc: string;
-  icon?: ReactNode;
-  title?: string;
-  description?: string;
-  quickstartLink?: string;
-  codeSnippets?: {
-    python: string;
-    typescript?: string;
-    typescriptComingSoon?: boolean;
-  };
-  link?: string;
-  imageZoom?: number;
-};
-
-export const homepageTabs: Tab[] = [];

@@ -26,8 +26,6 @@ export { StickyGrid } from "./StickyGrid";
 export { GradientWrapper } from "./GradientWrapper/GradientWrapper";
 export { StatsBand } from "./StatsBand/StatsBand";
 export { ProductTabs } from "./ProductTabs/ProductTabs";
-export { Challenges } from "./Challenges/Challenges";
-export { RunningAnywhere } from "./RunningAnywhere/RunningAnywhere";
 export { HeroSection, HighlightedKeyword } from "./HeroSection/HeroSection";
 export { BenefitsSection } from "./BenefitsSection/BenefitsSection";
 export { ProcessSection } from "./ProcessSection/ProcessSection";

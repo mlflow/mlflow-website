@@ -1,22 +1,17 @@
 import {
   LatestNews,
   Layout,
-  GlossyCard,
   BelowTheFold,
-  Card,
-  GlossyCardContainer,
   EcosystemList,
   ProductTabs,
-  Section,
   StatsBand,
-  RunningAnywhere,
   HeroSection,
   HighlightedKeyword,
   BenefitsSection,
   ProcessSection,
   FAQSection,
 } from "../components";
-import { MLFLOW_DOCS_URL, MLFLOW_DBX_TRIAL_URL } from "../constants";
+import { MLFLOW_DOCS_URL } from "../constants";
 
 export default function Home(): JSX.Element {
   return (
@@ -55,24 +50,16 @@ export default function Home(): JSX.Element {
       {/* 3. TRUST LOGOS */}
       <StatsBand />
 
-      {/* 4. OPEN AND NEUTRAL - Vendor lock-in free, integrations (kept as is per user request) */}
-      <div className="flex flex-col gap-16"></div>
+      {/* 4. OPEN AND NEUTRAL - Vendor lock-in free, integrations */}
       <EcosystemList />
 
       {/* 5. BENEFITS SECTION - Why teams choose MLflow */}
-      <div className="flex flex-col gap-16"></div>
       <BenefitsSection />
 
       {/* 6. PROCESS SECTION - 1-2-3 getting started steps */}
-      <div className="flex flex-col gap-16"></div>
       <ProcessSection />
 
-      {/* 7. RUNNING ANYWHERE - Cloud platform logos
-      <div className="flex flex-col gap-16"></div>
-      <RunningAnywhere /> */}
-
-      {/* 10. FAQ SECTION - Common questions */}
-      <div className="flex flex-col gap-16"></div>
+      {/* 7. FAQ SECTION - Common questions */}
       <FAQSection />
 
       {/* 12. COMMUNITY & LATEST NEWS */}

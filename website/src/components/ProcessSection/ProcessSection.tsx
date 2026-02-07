@@ -1,82 +1,9 @@
-import { motion, AnimatePresence } from "motion/react";
-import { useState, useCallback } from "react";
+import { motion } from "motion/react";
 import Link from "@docusaurus/Link";
-import { Highlight, themes } from "prism-react-renderer";
+import { Highlight } from "prism-react-renderer";
 import { Section } from "../Section/Section";
-
-// Custom Night Owl theme with modified string color
-const customNightOwl = {
-  ...themes.nightOwl,
-  styles: themes.nightOwl.styles.map((style) => {
-    if (style.types.includes("string")) {
-      return { ...style, style: { ...style.style, color: "#58a6ff" } };
-    }
-    return style;
-  }),
-};
-
-// Copy button component for code snippets
-const CopyButton = ({ code }: { code: string }) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy:", err);
-    }
-  }, [code]);
-
-  return (
-    <button
-      onClick={handleCopy}
-      className="p-1.5 rounded bg-white/10 hover:bg-white/20 transition-colors"
-      aria-label={copied ? "Copied!" : "Copy code"}
-    >
-      <AnimatePresence mode="wait" initial={false}>
-        {copied ? (
-          <motion.svg
-            key="check"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0 }}
-            className="w-3.5 h-3.5 text-green-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
-          </motion.svg>
-        ) : (
-          <motion.svg
-            key="copy"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0 }}
-            className="w-3.5 h-3.5 text-white/50 hover:text-white/80"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-            />
-          </motion.svg>
-        )}
-      </AnimatePresence>
-    </button>
-  );
-};
+import { CopyButton } from "../CodeSnippet/CopyButton";
+import { customNightOwl, CODE_BG } from "../CodeSnippet/codeTheme";
 
 const steps = [
   {
@@ -219,7 +146,10 @@ export function ProcessSection() {
                     </p>
 
                     {/* Code snippet */}
-                    <div className="rounded-lg bg-[#0d1117] border border-white/10 overflow-hidden mb-3">
+                    <div
+                      className={`rounded-lg border border-white/10 overflow-hidden mb-3`}
+                      style={{ backgroundColor: CODE_BG }}
+                    >
                       <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
                         <span className="text-xs text-white/50 font-mono">
                           {step.language}
