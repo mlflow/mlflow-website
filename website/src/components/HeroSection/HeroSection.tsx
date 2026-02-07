@@ -26,17 +26,15 @@ export function HeroSection({
   return (
     <div className="w-full px-4 md:px-8 lg:px-16 pt-16 md:pt-24">
       <div className="max-w-5xl mx-auto text-center flex flex-col items-center gap-6">
-        {/* Title - uses div with role="heading" to avoid global h1 CSS overrides */}
-        <motion.div
-          role="heading"
-          aria-level={1}
-          className="text-balance font-light text-[40px] xxs:text-[52px] xs:text-[72px] leading-[100%] tracking-[-3%] text-white text-center"
+        {/* Title */}
+        <motion.h1
+          className="text-balance font-light text-[40px] xxs:text-[52px] xs:text-[72px] leading-[100%] tracking-[-3%] text-white text-center !border-none !m-0"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
           {title}
-        </motion.div>
+        </motion.h1>
 
         {/* Subtitle */}
         <motion.p

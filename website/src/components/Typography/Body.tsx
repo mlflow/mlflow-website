@@ -10,6 +10,7 @@ const styles = cva(["font-regular leading-[140%] tracking-[0%]"], {
       s: "text-[14px]",
     },
     align: {
+      left: "text-left",
       center: "text-center",
     },
     margin: {

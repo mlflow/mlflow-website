@@ -6,26 +6,11 @@ import MiniLogoCard from "../MiniLogoCard/MiniLogoCard";
 export const EcosystemList = () => {
   return (
     <div className="w-full px-4 md:px-8 lg:px-16 flex justify-center relative overflow-hidden">
-      {/* Ambient Background Glows - Blue-purple theme */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div
-          className="absolute top-1/4 left-1/4 w-80 h-80 rounded-full blur-3xl"
-          style={{ background: "rgba(120, 110, 220, 0.06)" }}
-        />
-        <div
-          className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-3xl"
-          style={{ background: "rgba(130, 100, 230, 0.06)" }}
-        />
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl"
-          style={{ background: "rgba(110, 120, 240, 0.05)" }}
-        />
-      </div>
-
       <Section
         title="Works with Any LLM Apps and Models"
         body="From LLM agent frameworks to traditional ML libraries - MLflow integrates seamlessly with 100+ tools across the AI ecosystem. Supports Python, TypeScript/JavaScript, Java, R, and natively integrates with OpenTelemetry."
         align="center"
+        ambient
       >
         <div style={{ maxWidth: 1000 }} className="w-full">
           <BrowserOnly>
@@ -39,7 +24,7 @@ export const EcosystemList = () => {
                   },
                   {
                     title: "Anthropic",
-                    src: "img/anthropic.png",
+                    src: "img/anthropic.svg",
                     href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/anthropic.html",
                   },
                   {

@@ -4,6 +4,7 @@ import { Highlight } from "prism-react-renderer";
 import { Section } from "../Section/Section";
 import { CopyButton } from "../CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../CodeSnippet/codeTheme";
+import { Clock, ArrowRight } from "lucide-react";
 
 const steps = [
   {
@@ -190,43 +191,21 @@ export function ProcessSection() {
 
                     {/* Time estimate */}
                     <div className="flex items-center justify-center gap-2 text-xs text-white/40">
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
+                      <Clock className="w-4 h-4" />
                       <span>{step.time}</span>
                     </div>
                   </div>
 
                   {/* Arrow to next step (hidden on last item and mobile) */}
                   {index < steps.length - 1 && (
-                    <div className="hidden md:block absolute top-6 -right-4 z-20">
-                      <motion.svg
-                        className="w-8 h-8 text-white/30"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        initial={{ x: 0 }}
-                        animate={{ x: [0, 5, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M13 7l5 5m0 0l-5 5m5-5H6"
-                        />
-                      </motion.svg>
-                    </div>
+                    <motion.div
+                      className="hidden md:block absolute top-6 -right-4 z-20 text-white/30"
+                      initial={{ x: 0 }}
+                      animate={{ x: [0, 5, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      <ArrowRight className="w-8 h-8" />
+                    </motion.div>
                   )}
                 </motion.div>
               );

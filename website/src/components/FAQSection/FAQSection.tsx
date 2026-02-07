@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Section } from "../Section/Section";
+import { ChevronDown } from "lucide-react";
 
 const faqs = [
   {
@@ -61,19 +62,7 @@ function FAQItem({
           transition={{ duration: 0.2 }}
           className="flex-shrink-0 text-white/60"
         >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
+          <ChevronDown className="w-5 h-5" />
         </motion.span>
       </button>
 

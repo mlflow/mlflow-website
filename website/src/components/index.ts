@@ -11,7 +11,6 @@ export { Header } from "./Header/Header";
 export { Layout } from "./Layout/Layout";
 export { AboveTheFold } from "./Layout/AboveTheFold";
 export { BelowTheFold } from "./Layout/BelowTheFold";
-export { GlossyCard, GlossyCardContainer } from "./GlossyCard/GlossyCard";
 export { GetStartedTagline } from "./GetStartedTagline/GetStartedTagline";
 export { Customers } from "./Customers/Customers";
 export { GetStartedButton } from "./GetStartedButton/GetStartedButton";
