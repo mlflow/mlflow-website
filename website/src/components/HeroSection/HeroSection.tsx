@@ -28,7 +28,7 @@ export function HeroSection({
       <div className="max-w-5xl mx-auto text-center flex flex-col items-center gap-6">
         {/* Title */}
         <motion.h1
-          className="text-balance font-light text-[40px] xxs:text-[52px] xs:text-[72px] leading-[100%] tracking-[-3%] text-white text-center !border-none !m-0"
+          className="text-balance font-light! text-[40px] xxs:text-[52px] xs:text-[72px] leading-[100%] text-white text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}

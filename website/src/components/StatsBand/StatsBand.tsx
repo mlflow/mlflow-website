@@ -22,13 +22,13 @@ export const StatsBand = () => {
     >
       <div className="flex w-full flex-col items-center gap-16 relative">
         <div className="grid w-full max-w-4xl grid-cols-1 gap-6 text-center sm:grid-cols-3 relative z-10">
-          <div>
-            <LinuxFoundationLogo className="h-20 w-auto text-white" />
+          <div className="flex justify-center">
+            <LinuxFoundationLogo className="h-20 max-w-full text-white" />
           </div>
 
           <a
             href="https://github.com/mlflow/mlflow"
-            className="group github-stats-card flex items-center justify-center gap-3 rounded-2xl bg-white/5 px-3 py-3 text-white border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all"
+            className="group github-stats-card flex w-fit mx-auto items-center justify-center gap-3 rounded-2xl bg-white/5 px-3 py-3 text-white border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all sm:w-auto sm:mx-0"
             target="_blank"
             rel="noreferrer noopener"
           >
