@@ -1,68 +1,70 @@
 import {
   LatestNews,
   Layout,
-  GlossyCard,
-  GetStartedTagline,
-  Customers,
-  AboveTheFold,
   BelowTheFold,
-  Card,
-  GlossyCardContainer,
   EcosystemList,
+  ProductTabs,
+  StatsBand,
+  HeroSection,
+  HighlightedKeyword,
+  BenefitsSection,
+  ProcessSection,
+  FAQSection,
 } from "../components";
-import GenAI from "@site/static/img/Home_page_hybrid/GenAI Apps & Agents.png";
-import ModelTraining from "@site/static/img/Home_page_hybrid/Model Training.png";
+import { MLFLOW_DOCS_URL } from "../constants";
 
 export default function Home(): JSX.Element {
   return (
     <Layout>
-      <AboveTheFold
-        title="Deliver production-ready AI"
-        body="The open source developer platform to build AI applications and models with confidence."
-        minHeight="small"
-      >
-        <GlossyCardContainer>
-          <GlossyCard>
-            <Card
-              title="GenAI Apps & Agents"
-              bodySize="m"
-              body="Enhance your GenAI applications with end-to-end observability, evaluations, AI gateway and tracking all in one integrated platform."
-              padded
-              rounded={false}
-              cta={{
-                href: "/genai",
-                text: "Learn more",
-                prominent: true,
-              }}
-              image={<img src={GenAI} alt="" className="hidden md:block" />}
-            />
-          </GlossyCard>
-          <GlossyCard>
-            <Card
-              title="Model Training"
-              bodySize="m"
-              body="Streamline your machine learning workflows with end-to-end tracking, model management, and deployment."
-              padded
-              rounded={false}
-              cta={{
-                href: "/classical-ml",
-                text: "Learn more",
-                prominent: true,
-              }}
-              image={
-                <img src={ModelTraining} alt="" className="hidden md:block" />
-              }
-            />
-          </GlossyCard>
-        </GlossyCardContainer>
-      </AboveTheFold>
+      {/* 1. HERO SECTION */}
+      <HeroSection
+        title="Deliver High-Quality AI, Fast"
+        subtitle={
+          <>
+            Building AI products is all about iteration.
+            <br />
+            MLflow lets you move 10x faster by simplifying how you <br />
+            <HighlightedKeyword>debug</HighlightedKeyword>,{" "}
+            <HighlightedKeyword>test</HighlightedKeyword>, and{" "}
+            <HighlightedKeyword>evaluate</HighlightedKeyword> your LLM
+            applications, Agents, and Models.
+          </>
+        }
+        primaryCTA={{
+          label: "Get Started",
+          href: `#get-started`,
+        }}
+        secondaryCTA={{
+          label: "View Docs",
+          href: MLFLOW_DOCS_URL,
+        }}
+      />
 
-      <Customers />
+      {/* 2. FEATURES SECTION - Two categories with features */}
+      <div className="w-full px-4 md:px-8 lg:px-16 pb-36">
+        <div className="max-w-7xl mx-auto">
+          <ProductTabs />
+        </div>
+      </div>
+
+      {/* 3. TRUST LOGOS */}
+      <StatsBand />
+
+      {/* 4. OPEN AND NEUTRAL - Vendor lock-in free, integrations */}
       <EcosystemList />
 
-      <BelowTheFold>
+      {/* 5. BENEFITS SECTION - Why teams choose MLflow */}
+      <BenefitsSection />
+
+      {/* 6. PROCESS SECTION - 1-2-3 getting started steps */}
+      <ProcessSection />
+
+      {/* 7. FAQ SECTION - Common questions */}
+      <FAQSection />
+
+      {/* 12. COMMUNITY & LATEST NEWS */}
+      <BelowTheFold hideGetStarted>
         <LatestNews />
-        <GetStartedTagline />
       </BelowTheFold>
     </Layout>
   );

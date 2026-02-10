@@ -1,0 +1,70 @@
+import LinuxFoundationLogo from "@site/static/img/linux-foundation.svg";
+import { Section } from "../Section/Section";
+import { LogosCarousel } from "../LogosCarousel/LogosCarousel";
+import { Star } from "lucide-react";
+import type { SVGProps } from "react";
+
+const GitHubIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 48 48" fill="none" {...props}>
+    <path
+      d="M24 3.9C35.05 3.9 44 12.85 44 23.9c0 4.19-1.315 8.275-3.759 11.68-2.444 3.404-5.894 5.955-9.864 7.296-.996.2-1.371-.425-1.371-.95 0-.675.025-2.825.025-5.5 0-1.875-.625-3.075-1.35-3.7 4.45-.5 9.125-2.2 9.125-9.875 0-2.2-.775-3.975-2.05-5.375.2-.5.9-2.55-.2-5.3 0 0-1.675-.55-5.5 2.05-1.6-.45-3.3-.675-5-.675s-3.7.225-5.3.675c-3.825-2.575-5.5-2.05-5.5-2.05-1.1 2.75-.4 4.8-.2 5.3-1.275 1.4-2.05 3.2-2.05 5.375 0 7.65 4.65 9.4 9.1 9.9-.575.5-1.1 1.375-1.275 2.675-1.15.525-4.025 1.375-5.825-1.65-.375-.6-1.5-2.075-3.075-2.05-1.675.025-.675.95.025 1.325.85.475 1.825 2.25 2.05 2.825.4 1.125 1.7 3.275 6.725 2.35 0 1.675.025 3.25.025 3.725 0 .525-.375 1.125-1.375.95-3.983-1.326-7.447-3.872-9.902-7.278C5.318 32.192 3.998 28.1 4 23.901 4 12.851 12.95 3.9 24 3.9Z"
+      fill="currentColor"
+    />
+  </svg>
+);
+
+export const StatsBand = () => {
+  return (
+    <Section
+      title="Most Adopted Open-Source MLOps Platform"
+      body="Backed by Linux Foundation, MLflow has been fully committed to open-source for 5+ years. Now trusted by thousands of organizations and research teams worldwide."
+      align="center"
+    >
+      <div className="flex w-full flex-col items-center gap-16 relative">
+        <div className="grid w-full max-w-4xl grid-cols-1 gap-6 text-center sm:grid-cols-3 relative z-10">
+          <div className="flex justify-center">
+            <LinuxFoundationLogo className="h-20 max-w-full text-white" />
+          </div>
+
+          <a
+            href="https://github.com/mlflow/mlflow"
+            className="group github-stats-card flex w-fit mx-auto items-center justify-center gap-3 rounded-2xl bg-white/5 px-3 py-3 text-white border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all sm:w-auto sm:mx-0"
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            <div className="relative h-10 w-10 [perspective:800px]">
+              <div className="absolute inset-0 [transform-style:preserve-3d] transition-transform duration-500 group-hover:[transform:rotateY(180deg)]">
+                <span className="absolute inset-0 inline-flex items-center justify-center rounded-full bg-white/10 [backface-visibility:hidden]">
+                  <GitHubIcon className="w-[22px] h-[22px] text-white" />
+                </span>
+                <span className="absolute inset-0 inline-flex items-center justify-center rounded-full bg-white/20 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                  <Star
+                    width="20"
+                    height="20"
+                    className="text-white"
+                    fill="currentColor"
+                  />
+                </span>
+              </div>
+            </div>
+            <span className="text-md font-semibold">mlflow/mlflow</span>
+            <div className="flex items-center gap-1.5 text-sm font-semibold text-white/80">
+              <Star className="w-4 h-4" fill="currentColor" />
+              23K
+            </div>
+          </a>
+
+          <div className="flex flex-col items-center gap-1.5">
+            <span className="text-3xl font-semibold leading-tight text-white sm:text-4xl">
+              30 Million+
+            </span>
+            <span className="text-xs text-white/70 sm:text-sm">
+              Package Downloads / Month
+            </span>
+          </div>
+        </div>
+      </div>
+      <LogosCarousel />
+    </Section>
+  );
+};

@@ -25,7 +25,7 @@ export const LogosCarousel = () => {
     />
   ));
   return (
-    <div className="flex overflow-x-hidden [mask-image:_linear-gradient(to_right,_transparent_0,_white_128px,white_calc(100%-128px),_transparent_100%)] w-full p-8">
+    <div className="flex overflow-x-hidden [mask-image:_linear-gradient(to_right,_transparent_0,_white_128px,white_calc(100%-128px),_transparent_100%)] w-full max-w-7xl mx-auto p-8">
       <div className={container}>{items}</div>
       <div className={container} aria-hidden>
         {items}
