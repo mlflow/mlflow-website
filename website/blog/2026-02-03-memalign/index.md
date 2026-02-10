@@ -3,8 +3,8 @@ title: "MemAlign: Building Better LLM Judges From Human Feedback With Scalable M
 slug: memalign
 tags: [mlflow, genai, llm-judges, evaluation, alignment, memory, alhf]
 authors: [mosaic-research-team]
-thumbnail: /img/blog/memalign-thumbnail.png
-image: /img/blog/memalign-thumbnail.png
+thumbnail: /img/blog/memalign-thumbnail.svg
+image: /img/blog/memalign-thumbnail.svg
 description: "Introducing MemAlign, a new framework that aligns LLMs with human feedback via a lightweight dual-memory system, achieving competitive or better quality than state-of-the-art prompt optimizers, at orders-of-magnitude lower cost and latency."
 ---
 
