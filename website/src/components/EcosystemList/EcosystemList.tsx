@@ -7,7 +7,7 @@ export const EcosystemList = () => {
   return (
     <div className="w-full px-4 md:px-8 lg:px-16 flex justify-center relative overflow-hidden">
       <Section
-        title="Works with Any LLM Apps and Models"
+        title="Works With Any LLM Framework"
         body="From LLM agent frameworks to traditional ML libraries - MLflow integrates seamlessly with 100+ tools across the AI ecosystem. Supports Python, TypeScript/JavaScript, Java, R, and natively integrates with OpenTelemetry."
         align="center"
         ambient
