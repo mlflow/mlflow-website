@@ -49,7 +49,13 @@ export function ProductTabs() {
     categories.find((c) => c.id === activeCategory)?.features ?? [];
 
   return (
-    <div className="w-full flex flex-col gap-12">
+    <motion.div
+      className="w-full flex flex-col gap-12"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6 }}
+    >
       {/* Top-level category tabs */}
       <UnderlineTabs
         activeCategory={activeCategory}
@@ -70,6 +76,6 @@ export function ProductTabs() {
           </motion.div>
         </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   );
 }
