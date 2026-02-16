@@ -1,20 +1,20 @@
 ---
-title: "5 Things AI Engineers Should Know About Coding Agent and MLflow"
-description: Discover how MLflow brings observability, evaluation, and AI-powered assistance to Claude Code - turning your coding agent from a black box into a transparent, testable tool.
+title: "5 Tips to Get More Out of Your Claude Code with MLflow"
+description: Trace every token, evaluate every session, and extend Claude Code with MLflow's MCP server and skills. Five tips to turn your coding agent from a black box into a controllable workflow..
 slug: mlflow-claude-code
 authors: [yuki-watanabe]
 tags: [genai, evaluation, tracing, claude-code]
-thumbnail: /img/blog/mlflow-claude-code-thumbnail.png
-image: /img/blog/mlflow-claude-code-thumbnail.png
+thumbnail: /img/blog/mlflow-claude-code-thumbmail-6.png
+image: /img/blog/mlflow-claude-code-thumbmail-6.png
 ---
 
 import TOCInline from "@theme/TOCInline";
 
-Claude Code is a powerful coding agent that help you write code, automate workflow, design features, and so much more. It has been disrupting the software engineering process and becoming an indispensable tool for developers.In this blog, we will show you how to enhance your Claude Code experience with MLflow and 10x your productivity as an AI engineer, using [MLflow](https://mlflow.org/), an the open-source platform for adding observability and control into AI/ML workflows.
+Claude Code is a powerful coding agent that helps you write code, automate workflows, design features, and so much more. Engineers are using it to ship features in hours instead of days, and it's quickly becoming an indispensable tool for developers. In this blog, we will show you five tips on how to enhance your Claude Code experience and level up your workflow as an AI engineer, using [MLflow](https://mlflow.org/), the open-source platform for adding observability and control into AI/ML workflows.
 
 <TOCInline toc={toc} maxHeadingLevel={2} />
 
-## Tip 1: Monitoring Claude Code Usage Pattern
+## Tip 1: Monitoring Claude Code Usage Patterns
 
 Claude Code is powerful, but it can also be a black box. You give it a task, it gives you a result, but you have no visibility into how it got there. But **what did it actually do under the hood?** How many tokens did it burn? Which tools did it call, and in what order? If you're using customization knobs like skills, sub-agents, batch operations, how can you prove they are actually used and improve the output?
 
@@ -28,9 +28,9 @@ Here is where MLflow comes in. MLflow's [Tracing](https://mlflow.org/docs/latest
   width="100%"
 />
 
-<br/>
+<br />
 
-To start tracing your Claude Code sessions, run a single command in your project. Alternatively, you can setup the hook at user level by following the [guide](https://mlflow.org/docs/latest/genai/tracing/claude-code/index.html) here.
+To start tracing your Claude Code sessions, run a single command in your project. Alternatively, you can set up the hook at user level by following the [guide](https://mlflow.org/docs/latest/genai/tracing/claude-code/index.html) here.
 
 ```bash
 mlflow autolog claude
@@ -46,13 +46,11 @@ The individual trace captured by MLflow includes rich information about the sess
   width="100%"
 />
 
-
 ## Tip 2: Systematic Evaluation for Claude Code
 
-Tracing Claude Code unlocks another powerful capability: testing and evaluation. Claude Code is highly customizable, so you can define your own skills and sub-agents to fit your needs. However, often times we just add more and more tools, skills, commands, without actually testing whether they are useful or not. They can take up the context window and silently degrade the performance of the coding agent, without us noticing.
+Tracing Claude Code unlocks another powerful capability: testing and evaluation. Claude Code is highly customizable, so you can define your own skills and sub-agents to fit your needs. However, oftentimes we just add more and more tools, skills, commands, without actually testing whether they are useful or not. They can take up the context window and silently degrade the performance of the coding agent, without us noticing.
 
-With MLflow, you can run arbitrary testing criteria against Claude Code by using its [Trace Evaluation](https://mlflow.org/docs/latest/genai/eval-monitor/running-evaluation/traces/) capability. Once traces are recoded into MLflow by the `mlflow autolog claude` command, you can run run various built-in scorers, LLM judges, and custom code scorers.
-
+With MLflow, you can run arbitrary testing criteria against Claude Code by using its [Trace Evaluation](https://mlflow.org/docs/latest/genai/eval-monitor/running-evaluation/traces/) capability. Once traces are recorded into MLflow by the `mlflow autolog claude` command, you can run various built-in scorers, LLM judges, and custom code scorers.
 
 ```python
 @scorer
@@ -86,8 +84,6 @@ def num_permission_block(trace) -> int:
     return permission_block
 ```
 
-
-
 ```python
 import mlflow
 from mlflow.genai.scorers import ConversationCompleteness, RelevanceToQuery
@@ -120,7 +116,8 @@ Each Claude Code execution session is assessed across multiple criteria, with cl
 So far we have seen how to use MLflow to monitor and evaluate Claude Code. However, MLflow can also be used as a tool to enhance your Claude Code workflow.
 
 ### `MLflow MCP Server`
-MLflow support [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) for connecting Claude Code or various different coding agents and LLM frameworks directly to MLflow.
+
+MLflow supports [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) for connecting Claude Code or various different coding agents and LLM frameworks directly to MLflow.
 
 To use it, start the MLflow Tracking Server as usual and then add this to your `.claude/settings.json`:
 
@@ -140,10 +137,9 @@ To use it, start the MLflow Tracking Server as usual and then add this to your `
 
 Now Claude Code can search traces, log feedback, query metrics, and manage experiments. For more details about available tools and setup instructions for other frameworks, see [MLflow MCP Server docs](https://mlflow.org/docs/latest/genai/mcp/).
 
-
 ### `MLflow CLI`
 
-Another way for Claude Code to interact with services is to use Command Line Interface (CLI). While MCP provides narrower scope of tools and their interface, CLI gives Claude Code more flexibility to run flexible workflow by chaining multiple commands together.
+Another way for Claude Code to interact with services is to use Command Line Interface (CLI). While MCP provides narrower scope of tools and their interface, CLI gives Claude Code more freedom to chain multiple commands into custom workflows.
 
 MLflow has been built as a CLI friendly tool for years. Almost every action you can take in the MLflow UI can be done via CLI. This gives you a powerful way for Claude Code to interact with MLflow.
 
@@ -153,22 +149,21 @@ Here are some examples of how it can use CLI to interact with MLflow:
 - Use `mlflow runs describe` to get detailed information about a specific run.
 - Use `mlflow deployments list-endpoints` to list all the deployed endpoints and further inspect the details.
 
-MCP and CLI are case-by-case, use the one that fits your needs best.
+Choose MCP for structured tool access and CLI for ad-hoc or scripted workflows.
 
 ## Tip 4: Automating Workflow with MLflow Skills
 
 In day-to-day work of AI engineers, there are many manual repetitive tasks such as debugging errors in traces, generating a report from evaluation results, monitoring metric trends, etc. Claude Code can help you with these tasks, but it needs to be trained to do so.
 
-While the MCP server and CLI gives Claude Code an essential building block to interact with MLflow, they do not tell how to combine them to form a workflow. [Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) is a way to package a set of instructions to teach agent how to perform specific tasks or workflows.
+While the MCP server and CLI give Claude Code essential building blocks to interact with MLflow, they do not tell it how to combine them to form a workflow. [Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) is a way to package a set of instructions to teach an agent how to perform specific tasks or workflows.
 
-MLflow provides an official Skills `mlflow/skills` that covers a wide range of tasks such as trace analysis, agent evaluation, metrics querying, and debugging. Just by installing this Skills, your coding agent becomes a full-fledged MLflow expert and help you with your daily work.
-
+MLflow provides an official Skills `mlflow/skills` that covers a wide range of tasks such as trace analysis, agent evaluation, metrics querying, and debugging. Just by installing this Skills, your coding agent becomes a full-fledged MLflow expert and helps you with your daily work.
 
 ```bash
 npx skills add mlflow/skills
 ```
 
-This adds official MLflow skills to your Claude Code, so that it can perform various tasks such as trace analysis, agent evaluation, metrics querying, and debugging.
+This adds official MLflow skills to your Claude Code, enabling it to handle trace analysis, agent evaluation, metrics querying, and debugging out of the box.
 
 <div style={{ display: "flex", justifyContent: "center" }}>
   <video controls autoplay muted loop playsinline width="80%">
@@ -179,14 +174,13 @@ This adds official MLflow skills to your Claude Code, so that it can perform var
   </video>
 </div>
 
-
 ## Tip 5: MLflow Assistant, Powered by Claude Code
 
 We have been talking about how to use Claude Code CLI with MLflow to boost your productivity. However, what if you can run Claude Code directly **inside** MLflow?
 
-[MLflow Assistant](https://mlflow.org/docs/latest/genai/getting-started/try-assistant.html) achieves this dream. It is a Claude Code powered assistant that is embedded directly in the MLflow UI and help you with your MLflow related tasks.
+[MLflow Assistant](https://mlflow.org/docs/latest/genai/getting-started/try-assistant.html) makes this possible. It is a Claude Code powered assistant that is embedded directly in the MLflow UI and helps you with your MLflow related tasks.
 
-MLflow Assistant eliminates that context-switching entirely. You don't need to manually copy and paste IDs, error stacktrace, evaluation results, back and forth between the UI and the terminal. Claude Code now shares the same context of what you are seeing in the UI, such as which traces, runs, evaluations, you are looking at, and work like another AI engineer sit next to your desk.
+MLflow Assistant eliminates that context-switching entirely. You don't need to manually copy and paste IDs, error stack traces, evaluation results, back and forth between the UI and the terminal. Claude Code now shares the same context of what you are seeing in the UI, such as which traces, runs, evaluations, you are looking at, and works like another AI engineer sitting next to your desk.
 
 <video controls autoplay muted loop playsinline width="100%">
   <source
@@ -197,8 +191,7 @@ MLflow Assistant eliminates that context-switching entirely. You don't need to m
 
 Moreover, it doesn't just understand MLflow data. It also understands your project's codebase. It can connect a failing trace back to the actual code that produced it, suggest fixes, and set up tracing or evaluation pipelines tailored to your stack. The combination of MLflow's UI context and Claude Code's deep codebase awareness is where it gets truly powerful.
 
-Since it uses your existing Claude Code subscription, no extra API keys, no additional cost. Everything runs locally with full transparency. Get started by configuring the Assistant in the MLflow UI and follow [docs](https://mlflow.org/docs/latest/genai/getting-started/try-assistant.html) to customize it to your needs.
-
+Since it uses your existing Claude Code subscription, **no extra API keys and no additional cost**. Everything runs locally with full transparency. Get started by configuring the Assistant in the MLflow UI and follow [docs](https://mlflow.org/docs/latest/genai/getting-started/try-assistant.html) to customize it to your needs.
 
 ## Summary
 
@@ -210,7 +203,7 @@ Coding agents are powerful, but without observability, they are a black box. MLf
 4. **Automate** repetitive MLflow workflows by installing official skills.
 5. **Assist** from inside the MLflow UI itself — no more copy-pasting between terminal and dashboard.
 
-Coding agents are reshaping how software gets built, and we believe the infrastructure around them should be open. MLflow is committed to becoming a **coding-agent native platform**, built in the open, for the community, with first-class support for the agentic workflows that are quickly becoming the norm. These integrations are just the beginning, and we're doubling down.
+Coding agents are reshaping how software gets built, and we believe the infrastructure around them should be open. MLflow is committed to becoming a **coding-agent native platform**, built in the open, for the community, with first-class support for the agentic workflows that are quickly becoming the norm. These integrations are just the beginning — expect deeper agent integrations, richer evaluation frameworks, and more automation, all open source.
 
 If this is useful, give us a star on GitHub: **[github.com/mlflow/mlflow](https://github.com/mlflow/mlflow)**
 
