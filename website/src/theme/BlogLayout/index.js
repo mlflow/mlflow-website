@@ -21,7 +21,7 @@ export default function BlogLayout({ children, ...props }) {
           className={
             isHomeOrTagsPage
               ? "flex flex-col md:px-20"
-              : "flex flex-col max-w-7xl mx-auto w-full"
+              : "blog-page flex flex-col max-w-7xl mx-auto w-full"
           }
         >
           {children}
