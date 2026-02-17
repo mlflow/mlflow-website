@@ -16,7 +16,7 @@ const GitHubIcon = (props: SVGProps<SVGSVGElement>) => (
 export const StatsBand = () => {
   return (
     <Section
-      title="Most Adopted Open-Source MLOps Platform"
+      title="Most Adopted Open-Source AI Platform"
       body="Backed by Linux Foundation, MLflow has been fully committed to open-source for 5+ years. Now trusted by thousands of organizations and research teams worldwide."
       align="center"
     >
