@@ -108,20 +108,59 @@ mlflow deployments get -t modal --name iris-classifier
 mlflow deployments delete -t modal --name iris-classifier
 ```
 
-## GPU Deployments
+## GPU Deployment: Text Generation with Streaming
 
-The plugin supports all ten GPU types available on Modal, from T4 (budget inference) through H100 and B200 (large model serving).
+The iris example shows the basic workflow, but the plugin is designed for workloads that actually need GPUs -- transformer models, LLMs, and large-scale inference. Here's a more realistic example: deploying a text generation model with GPU acceleration, auto-scaling, and streaming predictions.
 
 ```python
+import mlflow
+from mlflow.deployments import get_deploy_client
+from transformers import pipeline
+
+# Load a text generation model
+generator = pipeline("text-generation", model="distilgpt2")
+
+with mlflow.start_run():
+    mlflow.transformers.log_model(generator, name="text-generator", task="text-generation")
+    run_id = mlflow.active_run().info.run_id
+
+# Deploy with GPU, auto-scaling, and streaming
+client = get_deploy_client("modal")
 deployment = client.create_deployment(
-    name="gpu-model",
-    model_uri=f"runs:/{run_id}/model",
+    name="text-generator",
+    model_uri=f"runs:/{run_id}/text-generator",
     config={
         "gpu": "T4",
         "memory": 4096,
+        "min_containers": 0,        # Scale to zero when idle
+        "max_containers": 10,       # Scale up under load
+        "scaledown_window": 120,    # 2 min cooldown
+        "concurrent_inputs": 4,     # 4 requests per container
     },
 )
 ```
+
+This single call handles everything that would otherwise require writing a Dockerfile, configuring GPU drivers, setting up an HTTP server, and wiring auto-scaling rules. The plugin generates the Modal application, installs the correct Python version and dependencies from the model's environment, and deploys with the specified GPU and scaling configuration.
+
+The deployed endpoint supports streaming out of the box:
+
+```python
+# Streaming predictions (Server-Sent Events)
+for chunk in client.predict_stream(
+    deployment_name="text-generator",
+    inputs={
+        "prompt": "Machine learning deployment is",
+        "max_new_tokens": 50,
+    },
+):
+    print(chunk, end="", flush=True)
+```
+
+If the model supports `predict_stream` natively (LLMs, chat models, LangChain), chunks arrive incrementally. For models that don't (sklearn, XGBoost), the endpoint falls back to returning the full prediction as a single SSE chunk -- so the same `predict_stream()` API works for any model type.
+
+## GPU Configuration
+
+The plugin supports all ten GPU types available on Modal, from T4 (budget inference) through H100 and B200 (large model serving).
 
 For large models that benefit from multi-GPU parallelism:
 
@@ -209,24 +248,6 @@ deployment = client.create_deployment(
 
 This is particularly effective for GPU models where the marginal cost of processing additional inputs in a batch is low compared to the fixed cost of a GPU kernel launch.
 
-## Streaming Predictions
-
-For LLM and generative models, the plugin supports Server-Sent Events (SSE) streaming through `predict_stream()`. The streaming endpoint is automatically generated alongside the standard prediction endpoint.
-
-```python
-for chunk in client.predict_stream(
-    deployment_name="my-llm",
-    inputs={
-        "messages": [{"role": "user", "content": "Explain MLflow in one sentence."}],
-        "temperature": 0.7,
-        "max_tokens": 100,
-    },
-):
-    print(chunk, end="", flush=True)
-```
-
-If the deployed model doesn't support streaming natively, the endpoint gracefully falls back to returning the full prediction as a single SSE chunk. This means the same `predict_stream()` API works regardless of whether the underlying model is a streaming LLM or a traditional sklearn classifier.
-
 ## Automatic Dependency Management
 
 A common pain point in model deployment is getting the runtime environment right. The plugin handles this automatically:
@@ -262,9 +283,9 @@ config={
 Under the hood, the plugin generates a complete Modal application file tailored to the model and configuration. Here's a simplified view of the deployment pipeline:
 
 <img
-  src={require("./architecture-diagram.svg").default}
+  src={require("./architecture-diagram.png").default}
   alt="Architecture diagram showing the mlflow-modal-deploy deployment pipeline: MLflow Model Registry flows into the plugin, which extracts dependencies, generates a Modal app, and uploads artifacts to a Modal Volume. These converge into modal deploy, which creates a serverless container on Modal Cloud with GPU, auto-scaling, and prediction endpoints."
-  width="100%"
+  style={{ maxWidth: "680px", margin: "0 auto", display: "block" }}
 />
 
 The generated Modal application uses `@modal.fastapi_endpoint` for HTTP serving and `@modal.enter()` for one-time model loading. The model is stored on a Modal Volume (separate from the container image), which means redeployments with a new model version are fast since only the volume contents change, not the entire container image.
