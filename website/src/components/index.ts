@@ -25,6 +25,8 @@ export { StickyGrid } from "./StickyGrid";
 export { GradientWrapper } from "./GradientWrapper/GradientWrapper";
 export { StatsBand } from "./StatsBand/StatsBand";
 export { ProductTabs } from "./ProductTabs/ProductTabs";
+export { llmAgentFeatures } from "./ProductTabs/features";
+export type { Category } from "./ProductTabs/features";
 export { HeroSection, HighlightedKeyword } from "./HeroSection/HeroSection";
 export { BenefitsSection } from "./BenefitsSection/BenefitsSection";
 export { ProcessSection } from "./ProcessSection/ProcessSection";

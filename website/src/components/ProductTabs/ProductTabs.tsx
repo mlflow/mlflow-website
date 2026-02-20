@@ -1,19 +1,21 @@
 import clsx from "clsx";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { categories } from "./features";
+import { categories as defaultCategories, type Category } from "./features";
 import { StickyFeaturesGrid } from "./StickyFeaturesGrid";
 
 const UnderlineTabs = ({
+  items,
   activeCategory,
   setActiveCategory,
 }: {
+  items: Category[];
   activeCategory: string;
   setActiveCategory: (id: string) => void;
 }) => (
   <div className="flex justify-center">
     <div className="flex gap-8">
-      {categories.map((category) => {
+      {items.map((category) => {
         const isActive = category.id === activeCategory;
         return (
           <button
@@ -43,7 +45,9 @@ const UnderlineTabs = ({
   </div>
 );
 
-export function ProductTabs() {
+export function ProductTabs({
+  categories = defaultCategories,
+}: { categories?: Category[] } = {}) {
   const [activeCategory, setActiveCategory] = useState(categories[0].id);
   const activeFeatures =
     categories.find((c) => c.id === activeCategory)?.features ?? [];
@@ -56,13 +60,14 @@ export function ProductTabs() {
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
     >
-      {/* Top-level category tabs */}
-      <UnderlineTabs
-        activeCategory={activeCategory}
-        setActiveCategory={setActiveCategory}
-      />
+      <div className={categories.length > 1 ? "" : "invisible"}>
+        <UnderlineTabs
+          items={categories}
+          activeCategory={activeCategory}
+          setActiveCategory={setActiveCategory}
+        />
+      </div>
 
-      {/* Features - sticky scroll layout */}
       <div className="px-4">
         <AnimatePresence mode="wait">
           <motion.div

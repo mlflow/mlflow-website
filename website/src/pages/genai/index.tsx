@@ -4,6 +4,7 @@ import {
   BelowTheFold,
   EcosystemList,
   ProductTabs,
+  llmAgentFeatures,
   StatsBand,
   HeroSection,
   HighlightedKeyword,
@@ -41,7 +42,11 @@ export default function GenAi(): JSX.Element {
 
       <div className="w-full px-4 md:px-8 lg:px-16 pb-36">
         <div className="max-w-7xl mx-auto">
-          <ProductTabs />
+          <ProductTabs
+            categories={[
+              { id: "llm-agents", label: "LLMs & Agents", features: llmAgentFeatures },
+            ]}
+          />
         </div>
       </div>
 

@@ -24,7 +24,7 @@ export type Category = {
   features: Feature[];
 };
 
-const llmAgentFeatures: Feature[] = [
+export const llmAgentFeatures: Feature[] = [
   {
     id: "observability",
     title: "Observability",
