@@ -1,0 +1,247 @@
+---
+title: "Ship LLM Agents Faster with Coding Agents and MLflow Skills"
+description: How coding agents and MLflow create a tight feedback loop for building better LLM agents — trace, analyze, evaluate, fix, repeat.
+slug: self-improving-agent-loop
+authors: [yuki-watanabe]
+tags: [genai, evaluation, tracing, coding-agents]
+thumbnail: /img/blog/mlflow-skills-thumbnail.jpeg
+image: /img/blog/mlflow-skills-thumbnail.jpeg
+---
+
+import TOCInline from "@theme/TOCInline";
+
+Building LLM agents often feels like flying blind. You change a prompt, manually test a few queries, hope it's better, and repeat. There's no systematic way to know if your last change actually improved things or quietly broke something else.
+
+We've seen this story play out across teams. Everyone knows they *should* test and evaluate their agent, but the launch deadline is in three months, the manager wants an MVP yesterday, and learning evaluation frameworks feels like a detour. So testing gets pushed to "after launch... someday."
+
+Claude Code, Codex, Gemini CLI: these tools are already transforming how developers write code. But they struggle with agent development out of the box. **Coding agents need a tight feedback loop to work well.** Unit tests, linters, and type checkers provide that loop for regular code — but no equivalent exists for agent code. Without one, coding agents can't tell whether their changes actually improved your agent or made it worse.
+
+**What if you could give your coding agent that missing feedback loop?**
+
+We built [MLflow Agent Skills](https://github.com/mlflow/skills) to do exactly that. Skills give your coding agent the expertise to trace, evaluate, and fix LLM agents. Combined with MLflow's tracing and evaluation infrastructure, this creates a self-improving loop where each iteration makes your agent measurably better.
+
+In our [previous post](https://mlflow.org/blog/mlflow-claude-code), we introduced the individual tools that enhance coding agents. In this post, we'll walk through how to connect them into a complete agent development loop.
+
+<TOCInline toc={toc} maxHeadingLevel={2} />
+
+## The Loop
+
+The core idea is a six-step cycle where your coding agent drives most of the work:
+
+1. **Setup tracing** — `mlflow/skills` auto-configures tracing for your stack
+2. **Run your agent** — traces land in MLflow automatically
+3. **Find issues from traces** — the coding agent analyzes traces via MCP or CLI
+4. **Test via judges** — the coding agent writes scorers to quantify problems
+5. **Fix the code** — the coding agent suggests and applies changes
+6. **Go to 2** — re-run and verify the fix with evidence
+
+Steps 1, 3, 4, and 5 are all driven by the coding agent with MLflow Skills. You focus on the decisions; the agent handles the mechanics.
+
+## Getting Started: One Command
+
+Let's say you have a QA agent. It mostly works, but you're not sure how well. Are there hallucinations? Is retrieval finding relevant chunks? You don't know, because you haven't measured it.
+
+Start by giving your coding agent MLflow expertise:
+
+```bash
+$ npx skills add mlflow/skills
+```
+
+This installs official MLflow skills that teach your coding agent how to set up tracing, run evaluations, analyze traces, and more. Now ask the coding agent to set up tracing for your project:
+
+```
+> Set up MLflow tracing for this project.
+```
+
+The coding agent configures autologging for your stack (e.g., `mlflow.langchain.autolog()`) and ensures traces flow to MLflow. No manual setup required.
+
+Here's the difference Skills make. The left side shows Claude Code **with** MLflow Skills, the right side **without**:
+
+<video controls autoPlay muted loop playsInline width="100%">
+  <source
+    src={require("./mlflow-tracing-skill-demo.mp4").default}
+    type="video/mp4"
+  />
+</video>
+
+With Skills, Claude Code completed the task in half the time and set up complete observability (conversation thread tracking, user feedback integration, proper experiment configuration), not just basic tracing. Without Skills, it pinned an old MLflow version and missed key setup steps.
+
+> **Note:** `mlflow/skills` works with Claude Code, Codex, Gemini CLI, and OpenCode. For detailed setup instructions, see our [previous post](/blog/mlflow-claude-code).
+
+## The Loop in Action
+
+With tracing configured, you are now ready to drive the improvement loop for your agent.
+
+### Find: What's Going Wrong?
+
+Run your agent on a set of test queries. Every call (retrieval, LLM generation, tool use) is captured as a structured trace.
+
+How do we find issues in the traces? Manually reviewing them is ok when there are only a few traces. But when there are tens of traces, it is time-consuming.
+
+<img src={require("./trace-list.png").default} alt="Screenshot of MLflow trace list showing recent agent traces with status, latency, and token usage" width="100%" />
+
+Instead, you can ask the coding agent to find issues for you.
+
+```
+> Look at the recent traces in MLflow. Are there failures, high latency, or quality issues?
+```
+
+The coding agent uses skills, queries traces via MLflow CLI, inspects span details, and reports back.
+
+```
+⏺ Quality issues found in several conversations:
+
+  1. Hallucination / wrong answers
+    - User: "You're hallucinating. I will find information myself."
+    - User: "Completely wrong answer."
+  2. Agent going off-topic / losing context
+    - User: "What are you talking about? I was asking for LLM cost dashboard."
+    - User: "I was asking about Google ADK right?"
+  3. Verbose / unhelpful responses
+    - User: "Too long"
+    - User: "Too many options..."
+```
+
+When we further ask for the root cause analysis, the coding agent uses the `analyzing-mlflow-session` skill to further inspect the session and find the hypothetical root causes of low quality responses.
+
+```
+❯ What is the root cause of the Google ADK session
+  ⏺ Skill(analyzing-mlflow-session)
+  ⎿  Successfully loaded skill
+```
+
+```
+⏺ Here's the root cause analysis for the Google ADK session:
+  Root Cause Analysis
+  There are 3 compounding issues that degraded this session:
+
+
+1. Tool search lost conversation context. When the user asked "How to setup tracing" as a follow-up to a Google ADK question, doc_search searched for generic "MLflow tracing setup" instead of "Google ADK tracing setup," returning irrelevant LiteLLM docs.
+2. Agent stopped using tools on corrections. When the user pushed back, the agent tried to answer from memory instead of re-querying with better search terms.
+3. No grounding led to hallucination. Without tool results, the agent fabricated specific code (AdkTracer) that doesn't exist.
+```
+
+### Quantify: How Bad Is It?
+
+Before jumping to fixes, we need a baseline. Ask the coding agent to create [Scorers](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/) that quantify each issue.
+
+```
+Create a scorer for each root cause to quantify the problem.
+```
+
+Claude Code comes up with the following scorers, using MLflow Skills for agent evaluation.
+
+The coding agent writes three scorers using MLflow's evaluation API: one for tool query relevance, one for tool reuse on user corrections, and one for response groundedness. Here's the key: **you didn't write a single line of evaluation code**. The coding agent learned how to use MLflow's scorer APIs from the installed Skills.
+
+An example of the generated scorer is as follows. This is a custom LLM-as-a-Judge scorer defined with the MLflow's [make_judge](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/make-judge.html) API.
+
+```
+response_grounded_in_tools = make_judge(
+    name="response_grounded_in_tools",
+    instructions="""You are evaluating whether an AI agent's response is grounded in evidence from tool calls, or if it fabricates information.
+
+Analyze the trace: {{ trace }}
+
+Look at:
+1. The tool calls made (if any) and their results
+2. The final response from the agent
+
+Evaluation criteria:
+- If the agent made tool calls, check whether the final response is supported by the tool results. Flag any claims, code snippets, class names, or API refe
+rences in the response that are NOT present in the tool outputs.
+- If the agent made NO tool calls but provides specific technical claims (e.g., specific class names, code examples, API details), this is likely fabrication/hallucination — answer "no".
+- If the agent made NO tool calls but gives only general/conversational responses (e.g., "sure, let me help", acknowledgments), that's acceptable — answer
+"yes".
+- If the agent's response closely follows the tool results without adding unsupported specifics, answer "yes".
+
+Answer "yes" if the response is grounded in tool evidence (or is purely conversational), "no" if it contains fabricated technical details not supported by any tool output.""",
+    model="openai:/gpt-4o-mini",
+    feedback_value_type=bool,
+)
+```
+
+It then runs evaluation across all traces:
+
+```python
+result = mlflow.genai.evaluate(
+    data=traces,
+    scorers=[tool_query_relevance, tool_reuse_on_correction, response_grounded_in_tools, ...],
+)
+```
+
+Once the evaluation is complete, you can check the results in MLflow UI. MLflow visualizes the scores for each conversation session. MLflow >= 3.10 supports [Multi-turn Conversation Evaluation](https://mlflow.org/docs/latest/genai/eval-monitor/running-evaluation/multi-turn/) that allow you to evaluate conversation level quality, not only a individual trace. This is an essential capability for building conversational agents, because user experience is defined by the entire conversation flow, not just a single question and answer.
+
+<img
+  src={require("./eval-results-2.png").default}
+  alt="Screenshot of MLflow evaluation results table"
+  width="100%"
+/>
+
+The results show response groundedness is the most impactful issue. Now we know exactly where to focus.
+
+
+### Fix: Apply and Verify
+
+With failing traces identified and scores quantified, fix the issue:
+
+```
+> Based on the evaluation results, suggest fixes to improve groundedness.
+```
+
+The coding agent proposes targeted changes: adding a query rewriting step to preserve conversation context, and system prompt guidance like *"Only answer based on the retrieved documents. If the context doesn't contain the answer, say you don't know."*
+
+After applying the fix, close the loop. We use MLflow's [Conversation Simulator](https://mlflow.org/docs/latest/genai/eval-monitor/running-evaluation/conversation-simulation/) to re-run the agent with the same user queries, then compare the results:
+
+Run groundedness against the new traces. Compare with previous results.
+
+<img
+  src={require("./trace-comparison.png").default}
+  alt="Trace comparison showing before and after changes"
+  width="100%"
+/>
+
+The trace now includes `rewrite_queries` step that rewrites the search query to reflect the full conversation context rather than the single query. Now the search query includes "Google ADK" in addition to "MLflow tracing setup" and the final response becomes more relevant to the user query.
+
+You now have **evidence&& that the change worked. Not a gut feeling, but a measured improvement with a clear before and after. Commit the fix and ship with confidence.
+
+## The Loop Inside the UI: MLflow Assistant
+
+Everything we've described also works from the MLflow UI via the [MLflow Assistant](https://mlflow.org/docs/latest/genai/getting-started/try-assistant.html). Browsing traces and spot something odd? Ask the Assistant directly, no context switching to the terminal.
+
+<video controls autoPlay muted loop playsInline width="100%">
+  <source
+    src={require("/img/releases/3.9.0/mlflow_assistant.mp4").default}
+    type="video/mp4"
+  />
+</video>
+
+<br />
+
+The Assistant can analyze traces, generate scorers, and suggest fixes, all while sharing the context of what you're looking at in the UI. Since it uses your existing Claude Code subscription, there are no extra API keys and no additional cost.
+
+## Works with Any Coding Agent
+
+The improvement loop using coding agent and MLflow Skills is applicable to any coding agent.
+
+| Coding Agent   | Skills | MCP | CLI |
+| -------------- | ------ | --- | --- |
+| **Claude Code** | Yes   | Yes | Yes |
+| **Codex**       | Yes   | Yes | Yes |
+| **Gemini CLI**  | Yes   | Yes | Yes |
+| **OpenCode**    | Yes   | Yes | Yes |
+
+## Conclusion
+
+The self-improving loop turns agent development from "change and hope" into "change and prove." Each iteration makes your agent better **and** makes future iterations faster. You accumulate scorers, build up trace history, and develop a shared understanding of what "good" looks like for your specific use case.
+After a few cycles, you have a suite of evaluations that catch regressions automatically, a library of traces that document your agent's behavior, and a coding agent that knows how to run the whole process.
+
+**Ready to try it?**:
+
+```bash
+pip install mlflow
+npx skills add mlflow/skills
+```
+
+If you find this useful, give us a star on GitHub: **[github.com/mlflow/mlflow](https://github.com/mlflow/mlflow)**⭐️
+
+Have questions or feedback? [Open an issue](https://github.com/mlflow/mlflow/issues) or join the [MLflow community](https://github.com/mlflow/mlflow/discussions).
