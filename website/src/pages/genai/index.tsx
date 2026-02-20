@@ -1,83 +1,57 @@
 import {
-  Layout,
-  LogosCarousel,
   LatestNews,
-  AboveTheFold,
+  Layout,
   BelowTheFold,
-  ValuePropWidget,
-  StickyGrid,
+  EcosystemList,
+  ProductTabs,
+  StatsBand,
+  HeroSection,
+  HighlightedKeyword,
+  BenefitsSection,
+  ProcessSection,
+  FAQSection,
 } from "../../components";
-import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
-import Card1 from "@site/static/img/GenAI_home/GenAI_home_1.png";
-import Card2 from "@site/static/img/GenAI_home/GenAI_home_2.png";
-import Card3 from "@site/static/img/GenAI_home/GenAI_home_3.png";
-import CardGateway from "@site/static/img/GenAI_gateway/GenAI_gateway_1.png";
+import { MLFLOW_GENAI_DOCS_URL } from "../../constants";
 
 export default function GenAi(): JSX.Element {
   return (
     <Layout>
-      <AboveTheFold
-        title="Ship high-quality GenAI, fast"
-        body={[
-          "Enhance your GenAI application with end-to-end tracking, observability, evaluations, all in one integrated platform.",
-        ]}
-        hasGetStartedButton={MLFLOW_GENAI_DOCS_URL}
-        bodyColor="white"
+      <HeroSection
+        title="Ship High-Quality GenAI, Fast"
+        subtitle={
+          <>
+            Building GenAI products is all about iteration.
+            <br />
+            MLflow lets you move 10x faster by simplifying how you <br />
+            <HighlightedKeyword>debug</HighlightedKeyword>,{" "}
+            <HighlightedKeyword>test</HighlightedKeyword>, and{" "}
+            <HighlightedKeyword>evaluate</HighlightedKeyword> your LLM
+            applications and Agents.
+          </>
+        }
+        primaryCTA={{
+          label: "Get Started",
+          href: "#get-started",
+        }}
+        secondaryCTA={{
+          label: "View Docs",
+          href: MLFLOW_GENAI_DOCS_URL,
+        }}
       />
 
-      <StickyGrid
-        cards={[
-          {
-            title: "Debug with tracing",
-            body: [
-              "Debug and iterate on GenAI applications using MLflow's tracing, which captures your app's entire execution, including prompts, retrievals, tool calls.",
-              "MLflow's open-source, OpenTelemetry-compatible tracing SDK helps avoid vendor lock-in.",
-            ],
-            cta: {
-              href: "/genai/observability",
-              text: "Learn more",
-            },
-            image: <img src={Card1} alt="MLflow tracing" />,
-          },
+      <div className="w-full px-4 md:px-8 lg:px-16 pb-36">
+        <div className="max-w-7xl mx-auto">
+          <ProductTabs />
+        </div>
+      </div>
 
-          {
-            title: "Accurately measure free-form language with LLM judges",
-            body: "Utilize LLM-as-a-judge metrics, mimicking human expertise, to assess and enhance GenAI quality. Access pre-built judges for common metrics like hallucination or relevance, or develop custom judges tailored to your business needs and expert insights.",
-            cta: {
-              href: "/genai/evaluations",
-              text: "Learn more",
-            },
-            image: <img src={Card2} alt="MLflow LLM judges" />,
-          },
-          {
-            title: "Prompt Registry",
-            body: [
-              "Version, compare, iterate on, and discover prompt templates directly through the MLflow UI. Reuse prompts across multiple versions of your agent or application code, and view rich lineage identifying which versions are using each prompt.",
-            ],
-            cta: {
-              href: "/genai/prompt-registry",
-              text: "Learn more",
-            },
-            image: <img src={Card3} alt="MLflow LLM judges" />,
-          },
+      <StatsBand />
+      <EcosystemList />
+      <BenefitsSection />
+      <ProcessSection />
+      <FAQSection />
 
-          {
-            title: "AI Gateway",
-            body: [
-              "Standardize access to multiple LLM providers with unified endpoints, centralized key management, and rate limiting.",
-            ],
-            cta: {
-              href: "/genai/ai-gateway",
-              text: "Learn more",
-            },
-            image: <img src={CardGateway} alt="MLflow AI Gateway" />,
-          },
-        ]}
-      />
-
-      <LogosCarousel />
-      <ValuePropWidget />
-      <BelowTheFold contentType="genai">
+      <BelowTheFold hideGetStarted>
         <LatestNews />
       </BelowTheFold>
     </Layout>
