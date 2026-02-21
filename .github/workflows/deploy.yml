@@ -19,26 +19,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download build identifier
-        uses: actions/github-script@v7
-        env:
-          ARTIFACT_NAME: build-id
-        with:
-          script: |
-            const { downloadArtifact } = require('./.github/scripts/artifact-utils.js');
-            await downloadArtifact({ github, context });
-
-      - name: Read build identifier
+      - name: Set build identifier
         id: build-id
+        env:
+          EVENT: ${{ github.event.workflow_run.event }}
+          HEAD_OWNER: ${{ github.event.workflow_run.head_repository.owner.login }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
-          BUILD_ID=$(cat build-id.txt)
-          echo "value=$BUILD_ID" >> $GITHUB_OUTPUT
-          if [ "$BUILD_ID" = "main" ]; then
+          if [ "$EVENT" = "push" ]; then
+            BUILD_ID="main"
             echo "is_main=true" >> $GITHUB_OUTPUT
           else
+            # Derive PR number from the workflow run's head branch via API
+            # instead of trusting the artifact (which fork PRs can manipulate)
+            PR_NUMBER=$(gh api "repos/$REPO/pulls?head=$HEAD_OWNER:$HEAD_BRANCH&state=open" \
+              --jq '.[0].number // empty')
+            if [ -z "$PR_NUMBER" ]; then
+              echo "::error::Could not find PR for $HEAD_OWNER:$HEAD_BRANCH"
+              exit 1
+            fi
+            BUILD_ID="$PR_NUMBER"
             echo "is_main=false" >> $GITHUB_OUTPUT
           fi
-          rm build-id.txt
+          echo "value=$BUILD_ID" >> $GITHUB_OUTPUT
 
       - name: Download build artifacts
         uses: actions/github-script@v7
