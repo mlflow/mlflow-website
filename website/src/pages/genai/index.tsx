@@ -44,7 +44,11 @@ export default function GenAi(): JSX.Element {
         <div className="max-w-7xl mx-auto">
           <ProductTabs
             categories={[
-              { id: "llm-agents", label: "LLMs & Agents", features: llmAgentFeatures },
+              {
+                id: "llm-agents",
+                label: "LLMs & Agents",
+                features: llmAgentFeatures,
+              },
             ]}
           />
         </div>
