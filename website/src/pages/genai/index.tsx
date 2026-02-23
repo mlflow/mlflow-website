@@ -12,7 +12,7 @@ import {
   ProcessSection,
   FAQSection,
 } from "../../components";
-import { MLFLOW_GENAI_DOCS_URL } from "../../constants";
+import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 
 export default function GenAi(): JSX.Element {
   return (
