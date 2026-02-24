@@ -25,6 +25,7 @@ jobs:
               "daniellok-db",
               "harupy",
               "serena-ruan",
+              "TomeHirata",
               "WeichenXu123",
               "xq-yin",
             ];
@@ -37,9 +38,16 @@ jobs:
             const approved = reviews.data
               .filter((r) => r.state === "APPROVED")
               .map((r) => r.user.login);
-            await github.rest.pulls.requestReviewers({
-              owner,
-              repo,
-              pull_number,
-              reviewers: members.filter((m) => !approved.includes(m) && m !== author),
-            });
+            const reviewers = members.filter((m) => !approved.includes(m) && m !== author);
+            for (const reviewer of reviewers) {
+              try {
+                await github.rest.pulls.requestReviewers({
+                  owner,
+                  repo,
+                  pull_number,
+                  reviewers: [reviewer],
+                });
+              } catch (e) {
+                console.warn(`Failed to request review from ${reviewer} on ${owner}/${repo}#${pull_number}: ${e.message}`);
+              }
+            }
