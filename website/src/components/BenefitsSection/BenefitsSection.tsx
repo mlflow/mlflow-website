@@ -3,14 +3,7 @@ import { motion } from "motion/react";
 import { Section } from "../Section/Section";
 import { LockOpen, Link, Zap, BarChart3, Users, Puzzle } from "lucide-react";
 
-const benefits: {
-  icon: ReactNode;
-  title: string;
-  description: string;
-  color: string;
-  iconBg: string;
-  iconColor: string;
-}[] = [
+const getBenefits = (communityLabel: string) => [
   {
     icon: <LockOpen className="w-6 h-6" />,
     title: "Open Source",
@@ -51,7 +44,7 @@ const benefits: {
     icon: <Users className="w-6 h-6" />,
     title: "Community",
     description:
-      "20K+ GitHub stars, 900+ contributors. Join the fastest-growing MLOps community.",
+      `20K+ GitHub stars, 900+ contributors. Join the fastest-growing ${communityLabel} community.`,
     color: "from-green-500/20 to-green-600/20",
     iconBg: "bg-green-500/20",
     iconColor: "text-green-400",
@@ -67,7 +60,8 @@ const benefits: {
   },
 ];
 
-export function BenefitsSection() {
+export function BenefitsSection({ communityLabel = "AIOps" }: { communityLabel?: string } = {}) {
+  const benefits = getBenefits(communityLabel);
   return (
     <Section
       title="Why Teams Choose MLflow"

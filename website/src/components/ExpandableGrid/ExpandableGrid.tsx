@@ -35,7 +35,7 @@ const ExpandableGrid = ({ items, defaultVisibleCount, renderItem }) => {
             }}
             className={styles.toggleButton}
           >
-            {isExpanded ? "See Less ∧" : "See All ∨"}
+            {isExpanded ? "See Less ∧" : "See More ∨"}
           </button>
         </div>
       )}

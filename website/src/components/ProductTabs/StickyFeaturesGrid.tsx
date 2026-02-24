@@ -65,9 +65,11 @@ const QuickstartLink = ({ href }: { href: string }) => (
 const FeatureTextSection = ({
   feature,
   visibility = 1,
+  colorTheme = "default",
 }: {
   feature: Feature;
   visibility?: number;
+  colorTheme?: "default" | "red";
 }) => {
   const titleColor = interpolateColor("#1a1a1a", "#ffffff", visibility);
   const descColor = interpolateColor("#1a1a1a", "#9ca3af", visibility);
@@ -90,13 +92,13 @@ const FeatureTextSection = ({
 
       {/* Mobile: Show image inline */}
       <div className="lg:hidden">
-        <FeatureMediaCard feature={feature} />
+        <FeatureMediaCard feature={feature} colorTheme={colorTheme} />
       </div>
     </div>
   );
 };
 
-export const StickyFeaturesGrid = ({ features }: { features: Feature[] }) => {
+export const StickyFeaturesGrid = ({ features, colorTheme = "default" }: { features: Feature[]; colorTheme?: "default" | "red" }) => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -134,6 +136,7 @@ export const StickyFeaturesGrid = ({ features }: { features: Feature[] }) => {
             key={feature.id}
             feature={feature}
             visibility={getVisibility(index)}
+            colorTheme={colorTheme}
           />
         ))}
       </div>
@@ -149,7 +152,7 @@ export const StickyFeaturesGrid = ({ features }: { features: Feature[] }) => {
             transition={{ duration: 0.4 }}
             className="h-full"
           >
-            {activeFeature && <FeatureMediaCard feature={activeFeature} />}
+            {activeFeature && <FeatureMediaCard feature={activeFeature} colorTheme={colorTheme} />}
           </motion.div>
         </AnimatePresence>
       </div>

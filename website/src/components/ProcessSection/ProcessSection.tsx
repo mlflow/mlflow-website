@@ -3,10 +3,19 @@ import Link from "@docusaurus/Link";
 import { Highlight } from "prism-react-renderer";
 import { Section } from "../Section/Section";
 import { CopyButton } from "../CodeSnippet/CopyButton";
-import { customNightOwl, CODE_BG } from "../CodeSnippet/codeTheme";
+import { customNightOwl, customNightOwlRed, CODE_BG } from "../CodeSnippet/codeTheme";
 import { Clock, ArrowRight } from "lucide-react";
 
-const steps = [
+type Step = {
+  number: string;
+  title: string;
+  description: string;
+  time: string;
+  code: string;
+  language: string;
+};
+
+const defaultSteps: Step[] = [
   {
     number: "1",
     title: "Start MLflow Server",
@@ -23,7 +32,9 @@ const steps = [
     time: "~30 seconds",
     code: `import mlflow
 
-mlflow.set_tracking_uri("http://localhost:5000")
+mlflow.set_tracking_uri(
+    "http://localhost:5000"
+)
 mlflow.openai.autolog()`,
     language: "python",
   },
@@ -31,7 +42,7 @@ mlflow.openai.autolog()`,
     number: "3",
     title: "Run your code",
     description:
-      "Run your ML/LLM code as usual. MLflow logs traces and you can explore them in the MLflow UI.",
+      "Run your code as usual. Explore traces and metrics in the MLflow UI.",
     time: "~1 minute",
     code: `from openai import OpenAI
 
@@ -44,19 +55,19 @@ client.responses.create(
   },
 ];
 
-export function ProcessSection() {
+export function ProcessSection({ subtitle, colorTheme = "default", steps: customSteps, title: customTitle, getStartedLink }: { subtitle?: string; colorTheme?: "default" | "red"; steps?: Step[]; title?: string; getStartedLink?: string } = {}) {
+  const steps = customSteps ?? defaultSteps;
   return (
     <Section
       id="get-started"
-      title="Get Started in 3 Simple Steps"
+      title={customTitle ?? `Get Started in ${steps.length} Simple Steps`}
       body={
         <div className="flex flex-col items-center gap-4">
           <span>
-            From zero to full-stack LLMOps in minutes. No complex setup or major
-            code changes required.
+            {subtitle ?? "From zero to full-stack LLMOps in minutes. No complex setup or major code changes required."}
           </span>
           <Link
-            to="https://mlflow.org/docs/latest/genai/tracing/quickstart/"
+            to={getStartedLink ?? "https://mlflow.org/docs/latest/genai/tracing/quickstart/"}
             style={{ textDecoration: "underline" }}
             className="hover:opacity-80"
           >
@@ -66,24 +77,23 @@ export function ProcessSection() {
       }
       align="center"
     >
-      <div className="max-w-5xl mx-auto">
+      <div className={`${steps.length > 3 ? "max-w-[90rem]" : "max-w-5xl"} mx-auto`}>
         {/* Steps container */}
         <div className="relative">
           {/* Steps grid */}
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            className={`grid grid-cols-1 ${steps.length === 4 ? "md:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3"} gap-8`}
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
             {steps.map((step, index) => {
-              // Red → Purple → Blue gradient theme (darkened) - each step gets a gradient segment
-              const stepColors = [
+              const defaultStepColors = [
                 {
-                  bg: "linear-gradient(135deg, #8a2a4a 0%, #6a2850 50%, #4a3366 100%)",
-                  shadow: "rgba(138, 42, 74, 0.4)",
-                  pulse: "rgba(138, 42, 74, 0.5)",
+                  bg: "linear-gradient(135deg, #4a3366 0%, #3a4580 50%, #2a4a7a 100%)",
+                  shadow: "rgba(42, 74, 122, 0.4)",
+                  pulse: "rgba(42, 74, 122, 0.5)",
                 },
                 {
                   bg: "linear-gradient(135deg, #702848 0%, #4a3366 50%, #3a4080 100%)",
@@ -91,11 +101,34 @@ export function ProcessSection() {
                   pulse: "rgba(74, 51, 102, 0.5)",
                 },
                 {
-                  bg: "linear-gradient(135deg, #4a3366 0%, #3a4580 50%, #2a4a7a 100%)",
-                  shadow: "rgba(42, 74, 122, 0.4)",
-                  pulse: "rgba(42, 74, 122, 0.5)",
+                  bg: "linear-gradient(135deg, #8a2a4a 0%, #6a2850 50%, #4a3366 100%)",
+                  shadow: "rgba(138, 42, 74, 0.4)",
+                  pulse: "rgba(138, 42, 74, 0.5)",
                 },
               ];
+              const redStepColors = [
+                {
+                  bg: "linear-gradient(135deg, #701515 0%, #8a1a1a 50%, #701818 100%)",
+                  shadow: "rgba(120, 25, 25, 0.4)",
+                  pulse: "rgba(120, 25, 25, 0.5)",
+                },
+                {
+                  bg: "linear-gradient(135deg, #8a1a1a 0%, #a52525 50%, #8a2020 100%)",
+                  shadow: "rgba(150, 30, 30, 0.4)",
+                  pulse: "rgba(150, 30, 30, 0.5)",
+                },
+                {
+                  bg: "linear-gradient(135deg, #a02020 0%, #c03030 50%, #a02525 100%)",
+                  shadow: "rgba(180, 40, 40, 0.4)",
+                  pulse: "rgba(180, 40, 40, 0.5)",
+                },
+                {
+                  bg: "linear-gradient(135deg, #b02828 0%, #d03838 50%, #b03030 100%)",
+                  shadow: "rgba(200, 45, 45, 0.4)",
+                  pulse: "rgba(200, 45, 45, 0.5)",
+                },
+              ];
+              const stepColors = colorTheme === "red" ? redStepColors : defaultStepColors;
               const colors = stepColors[index] || stepColors[0];
 
               return (
@@ -135,7 +168,7 @@ export function ProcessSection() {
                   </motion.div>
 
                   {/* Content card */}
-                  <div className="flex-1 w-full p-6 rounded-xl border border-white/10 bg-white/5">
+                  <div className="flex-1 w-full p-6 rounded-xl border border-white/10 bg-white/5 flex flex-col">
                     {/* Title */}
                     <h3 className="text-xl font-semibold text-white !mb-6">
                       {step.title}
@@ -146,9 +179,10 @@ export function ProcessSection() {
                       {step.description}
                     </p>
 
-                    {/* Code snippet */}
+                    {/* Code snippet - centered in remaining space */}
+                    <div className="flex-1 flex items-center">
                     <div
-                      className={`rounded-lg border border-white/10 overflow-hidden mb-3`}
+                      className="rounded-lg border border-white/10 overflow-hidden w-full"
                       style={{ backgroundColor: CODE_BG }}
                     >
                       <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
@@ -159,7 +193,7 @@ export function ProcessSection() {
                       </div>
                       <div className="p-3 overflow-x-auto hidden-scrollbar">
                         <Highlight
-                          theme={customNightOwl}
+                          theme={colorTheme === "red" ? customNightOwlRed : customNightOwl}
                           code={step.code.trim()}
                           language={
                             step.language === "bash" ? "bash" : "python"
@@ -188,9 +222,10 @@ export function ProcessSection() {
                         </Highlight>
                       </div>
                     </div>
+                    </div>
 
-                    {/* Time estimate */}
-                    <div className="flex items-center justify-center gap-2 text-xs text-white/40">
+                    {/* Time estimate - pinned to bottom */}
+                    <div className="flex items-center justify-center gap-2 text-xs text-white/40 mt-3">
                       <Clock className="w-4 h-4" />
                       <span>{step.time}</span>
                     </div>

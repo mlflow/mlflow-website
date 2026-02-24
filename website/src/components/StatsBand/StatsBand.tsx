@@ -1,6 +1,5 @@
 import LinuxFoundationLogo from "@site/static/img/linux-foundation.svg";
 import { Section } from "../Section/Section";
-import { LogosCarousel } from "../LogosCarousel/LogosCarousel";
 import { Star } from "lucide-react";
 import type { SVGProps } from "react";
 
@@ -13,11 +12,17 @@ const GitHubIcon = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-export const StatsBand = () => {
+export const StatsBand = ({
+  title = "Most Adopted Open-Source MLOps Platform",
+  body = "Backed by Linux Foundation, MLflow has been fully committed to open-source for 5+ years. Now trusted by thousands of organizations and research teams worldwide.",
+}: {
+  title?: string;
+  body?: string;
+} = {}) => {
   return (
     <Section
-      title="Most Adopted Open-Source MLOps Platform"
-      body="Backed by Linux Foundation, MLflow has been fully committed to open-source for 5+ years. Now trusted by thousands of organizations and research teams worldwide."
+      title={title}
+      body={body}
       align="center"
     >
       <div className="flex w-full flex-col items-center gap-16 relative">
@@ -64,7 +69,6 @@ export const StatsBand = () => {
           </div>
         </div>
       </div>
-      <LogosCarousel />
     </Section>
   );
 };

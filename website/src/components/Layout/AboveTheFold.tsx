@@ -4,7 +4,7 @@ import { cva, VariantProps } from "class-variance-authority";
 
 type Props = VariantProps<typeof innerWrapper> &
   PropsWithChildren<{
-    title: string;
+    title: ReactNode;
     body: ReactNode | ReactNode[];
     sectionLabel?: string;
     hasGetStartedButton?: true | string;
@@ -40,7 +40,7 @@ export function AboveTheFold({
     <div className="flex flex-col gap-6">
       <div className={innerWrapper({ minHeight })}>
         {sectionLabel && <SectionLabel label={sectionLabel} />}
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <Heading level={1}>{title}</Heading>
         </div>
         <div className="mx-auto text-pretty">

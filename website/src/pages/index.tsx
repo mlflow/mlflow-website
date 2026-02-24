@@ -3,6 +3,7 @@ import {
   Layout,
   BelowTheFold,
   EcosystemList,
+  LogosCarousel,
   ProductTabs,
   StatsBand,
   HeroSection,
@@ -10,6 +11,7 @@ import {
   BenefitsSection,
   ProcessSection,
   FAQSection,
+  TrustPills,
 } from "../components";
 import { MLFLOW_DOCS_URL } from "../constants";
 
@@ -18,16 +20,17 @@ export default function Home(): JSX.Element {
     <Layout>
       {/* 1. HERO SECTION */}
       <HeroSection
-        title="Deliver High-Quality AI, Fast"
+        title="Ship Production-Quality Agents and Models, Fast"
         subtitle={
           <>
-            Building AI products is all about iteration.
+            Building high-quality AI products is all about iteration.
             <br />
-            MLflow lets you move 10x faster by simplifying how you <br />
-            <HighlightedKeyword>debug</HighlightedKeyword>,{" "}
-            <HighlightedKeyword>test</HighlightedKeyword>, and{" "}
-            <HighlightedKeyword>evaluate</HighlightedKeyword> your LLM
-            applications, Agents, and Models.
+            MLflow shortens the path to production, enabling you to{" "}
+            <HighlightedKeyword>build</HighlightedKeyword>,{" "}
+            <HighlightedKeyword>evaluate</HighlightedKeyword>,{" "}
+            <HighlightedKeyword>deploy</HighlightedKeyword>, and{" "}
+            <HighlightedKeyword>monitor</HighlightedKeyword> agents and
+            models at scale — with complete visibility and control.
           </>
         }
         primaryCTA={{
@@ -38,16 +41,21 @@ export default function Home(): JSX.Element {
           label: "View Docs",
           href: MLFLOW_DOCS_URL,
         }}
-      />
+      >
+        <TrustPills />
+      </HeroSection>
 
-      {/* 2. FEATURES SECTION - Two categories with features */}
+      {/* 2. COMPANY LOGOS */}
+      <LogosCarousel />
+
+      {/* 3. FEATURES SECTION - Two categories with features */}
       <div className="w-full px-4 md:px-8 lg:px-16 pb-36">
         <div className="max-w-7xl mx-auto">
           <ProductTabs />
         </div>
       </div>
 
-      {/* 3. TRUST LOGOS */}
+      {/* 4. TRUST LOGOS */}
       <StatsBand />
 
       {/* 4. OPEN AND NEUTRAL - Vendor lock-in free, integrations */}
