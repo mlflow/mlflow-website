@@ -9,6 +9,7 @@ import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import CardHero from "@site/static/img/GenAI_gateway/GenAI_gateway_hero.png";
 import Card1 from "@site/static/img/GenAI_gateway/GenAI_gateway_1.png";
 import Card2 from "@site/static/img/GenAI_gateway/GenAI_gateway_2.png";
+import Card3 from "@site/static/img/GenAI_gateway/GenAI_gateway_3.png";
 
 export default function AiGateway() {
   return (
@@ -26,13 +27,18 @@ export default function AiGateway() {
         cards={[
           {
             title: "Configure endpoints",
-            body: "Define and manage multiple LLM endpoints across providers in a single YAML file, enabling centralized API key management and seamless integration.",
-            image: <img src={Card1} alt="Improved Model Accuracy" />,
+            body: "Define and manage multiple LLM endpoints across providers in a single place, enabling centralized API key management and seamless integration.",
+            image: <img src={Card1} alt="Configure endpoints" />,
           },
           {
-            title: "Rate limiting",
-            body: "Rate limits can be set per endpoint, such as 10 calls per minute, by specifying the limit and time period in the configuration.",
-            image: <img src={Card2} alt="Spending Oversight" />,
+            title: "Traffic routing and fallbacks",
+            body: "Split traffic across multiple models for A/B testing and gradual rollouts. Define fallback chains so requests automatically reroute to a backup provider when the primary is unavailable.",
+            image: <img src={Card2} alt="Traffic routing and fallbacks" />,
+          },
+          {
+            title: "Usage tracking",
+            body: "Every request is recorded as an MLflow trace. Visualize request volume, latency percentiles, token consumption, and cost breakdowns across all endpoints from a unified dashboard.",
+            image: <img src={Card3} alt="Usage tracking dashboard" />,
           },
         ]}
       />
