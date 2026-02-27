@@ -14,7 +14,7 @@ const SEO_DESCRIPTION =
   "Complete AI observability platform for LLM tracing, agent evaluation, and production monitoring. " +
   "Open source, no vendor lock-in. Supports OpenAI, Anthropic, LangChain, LangGraph & more.";
 
-const faqs: { question: string; answer: string }[] = [
+const faqs: { question: string; answer: React.ReactNode; answerText?: string }[] = [
   {
     question: "What is AI observability?",
     answer:
@@ -67,8 +67,14 @@ const faqs: { question: string; answer: string }[] = [
   },
   {
     question: "How do I get started with AI observability?",
-    answer:
-      "Getting started with MLflow AI observability takes just one line of code. Install MLflow, call mlflow.openai.autolog() (or the equivalent for your framework), and every LLM call is automatically traced. You can then view traces in the MLflow UI, run evaluations with LLM judges, and monitor production metrics. See the MLflow tracing quickstart and integrations documentation for framework-specific examples.",
+    answer: (
+      <>
+        Getting started with MLflow AI observability takes just one line of code. Install MLflow, call{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/quickstart/"}>mlflow.openai.autolog()</Link> (or the equivalent for your framework), and every LLM call is automatically traced. You can then view traces in the MLflow UI, run evaluations with LLM judges, and monitor production metrics. See the{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>MLflow tracing documentation</Link> for framework-specific examples.
+      </>
+    ),
+    answerText: "Getting started with MLflow AI observability takes just one line of code. Install MLflow, call mlflow.openai.autolog() (or the equivalent for your framework), and every LLM call is automatically traced. You can then view traces in the MLflow UI, run evaluations with LLM judges, and monitor production metrics. See the MLflow tracing documentation for framework-specific examples.",
   },
   {
     question: "Can I use AI observability with my existing tools?",
@@ -90,7 +96,7 @@ const faqJsonLd = {
     name: faq.question,
     acceptedAnswer: {
       "@type": "Answer",
-      text: faq.answer,
+      text: faq.answerText || faq.answer,
     },
   })),
 };
@@ -452,7 +458,7 @@ export default function AIObservability() {
             <li><strong>Monitoring Agent Behavior in Production:</strong> <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>Agents</Link> can behave unpredictably—getting stuck in loops, making incorrect tool choices, or producing inconsistent outputs. MLflow automatically captures agent execution graphs, showing every reasoning step, tool call, and decision point so you can identify and fix problematic patterns.</li>
             <li><strong>Optimizing LLM Costs:</strong> Track token usage and costs across all LLM calls to identify expensive queries, inefficient prompts, or opportunities to switch to smaller models for specific tasks. MLflow's cost tracking helps teams reduce spend by 30-50% without sacrificing quality.</li>
             <li><strong>A/B Testing Prompt Changes:</strong> Before deploying prompt modifications to production, use MLflow to run <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>side-by-side evaluations</Link> with LLM judges. Compare quality metrics like relevance, factuality, and safety to ensure changes improve—not degrade—output quality.</li>
-            <li><strong>Detecting Model Drift:</strong> Monitor quality scores, latency, and error rates over time to detect when model behavior changes due to API updates, data drift, or external factors. Automated alerts help you catch regressions before users do.</li>
+            <li><strong>Catching Production Regressions:</strong> Monitor quality scores, error rates, and latency over time to detect when model behavior degrades from API updates, prompt changes, or data drift—before users notice.</li>
             <li><strong>Maintaining Compliance:</strong> Capture complete audit trails showing what prompts were sent, what responses were received, and what data was accessed. Enforce PII redaction policies and content guardrails to meet regulatory requirements.</li>
           </ul>
 
@@ -510,7 +516,7 @@ export default function AIObservability() {
 
           <div
             className="rounded-lg border border-white/10 overflow-hidden"
-            style={{ backgroundColor: CODE_BG, margin: "24px 0" }}
+            style={{ backgroundColor: CODE_BG, margin: "8px 0" }}
           >
             <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
               <span className="text-xs text-white/50 font-mono">python</span>
@@ -569,7 +575,7 @@ response = client.chat.completions.create(
 
           <div
             className="rounded-lg border border-white/10 overflow-hidden"
-            style={{ backgroundColor: CODE_BG, margin: "24px 0" }}
+            style={{ backgroundColor: CODE_BG, margin: "8px 0" }}
           >
             <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
               <span className="text-xs text-white/50 font-mono">python</span>
@@ -626,7 +632,7 @@ agent.run("What is the weather in San Francisco?")`}
 
           <div
             className="rounded-lg border border-white/10 overflow-hidden"
-            style={{ backgroundColor: CODE_BG, margin: "24px 0" }}
+            style={{ backgroundColor: CODE_BG, margin: "8px 0" }}
           >
             <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
               <span className="text-xs text-white/50 font-mono">typescript</span>
@@ -694,7 +700,7 @@ const result = await generateText({
 
           <div className="info-box">
             <p>
-              <Link href="/genai"><strong>MLflow</strong></Link> is the largest open-source AI platform, backed by the
+              <Link href="/genai" style={{ color: "#007bff" }}><strong>MLflow</strong></Link> is the largest open-source AI platform, backed by the
               Linux Foundation and licensed under Apache 2.0. With 20,000+ GitHub stars and
               900+ contributors, it provides a complete observability stack with no vendor lock-in.
               {" "}<Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
