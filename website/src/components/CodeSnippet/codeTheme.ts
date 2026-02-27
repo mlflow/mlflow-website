@@ -22,7 +22,10 @@ export const customNightOwlRed = {
     if (style.types.includes("function")) {
       return { ...style, style: { ...style.style, color: "#ffa0a0" } };
     }
-    if (style.types.includes("operator") || style.types.includes("punctuation")) {
+    if (
+      style.types.includes("operator") ||
+      style.types.includes("punctuation")
+    ) {
       return { ...style, style: { ...style.style, color: "#f97583" } };
     }
     return style;

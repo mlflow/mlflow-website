@@ -97,7 +97,6 @@ print(f"Total tokens: {total}")`,
   },
 ];
 
-
 export default function Observability() {
   return (
     <Layout>
@@ -112,12 +111,8 @@ export default function Observability() {
           <>
             Gain visibility into your agent or LLM application's logic to{" "}
             <HighlightedKeyword>debug issues</HighlightedKeyword>,{" "}
-            <HighlightedKeyword>improve quality</HighlightedKeyword>{" "}
-            and{" "}
-            <HighlightedKeyword>
-              understand user behavior
-            </HighlightedKeyword>
-            .
+            <HighlightedKeyword>improve quality</HighlightedKeyword> and{" "}
+            <HighlightedKeyword>understand user behavior</HighlightedKeyword>.
           </>,
         ]}
         bodyColor="white"
@@ -137,9 +132,19 @@ export default function Observability() {
         }
       >
         <div className="relative w-full max-w-[1320px] mx-auto px-4">
-          <video className="rounded-[16px]" width="100%" autoPlay loop muted playsInline>
+          <video
+            className="rounded-[16px]"
+            width="100%"
+            autoPlay
+            loop
+            muted
+            playsInline
+          >
             <source
-              src={require("@site/static/img/releases/3.9.0/overview_demo.mp4").default}
+              src={
+                require("@site/static/img/releases/3.9.0/overview_demo.mp4")
+                  .default
+              }
               type="video/mp4"
             />
           </video>
@@ -147,15 +152,24 @@ export default function Observability() {
       </AboveTheFold>
 
       <Section title="Rich, detailed traces for every request">
-        <StickyFeaturesGrid
-          features={tracingFeatures}
-          colorTheme="red"
-        />
+        <StickyFeaturesGrid features={tracingFeatures} colorTheme="red" />
       </Section>
 
       <EcosystemList
         title="Automatic tracing for your entire stack"
-        body={<>Auto-trace 50+ LLM providers and agent frameworks with a single line of code. MLflow is <a href="https://mlflow.org/docs/latest/genai/tracing/opentelemetry/" className="text-blue-400 !underline decoration-blue-400/50 underline-offset-2 hover:text-blue-300 hover:decoration-blue-300/50 transition-colors">OpenTelemetry compatible</a>, supporting any programming language, agent, or LLM.</>}
+        body={
+          <>
+            Auto-trace 50+ LLM providers and agent frameworks with a single line
+            of code. MLflow is{" "}
+            <a
+              href="https://mlflow.org/docs/latest/genai/tracing/opentelemetry/"
+              className="text-blue-400 !underline decoration-blue-400/50 underline-offset-2 hover:text-blue-300 hover:decoration-blue-300/50 transition-colors"
+            >
+              OpenTelemetry compatible
+            </a>
+            , supporting any programming language, agent, or LLM.
+          </>
+        }
         items={genaiIntegrations.map((item) => ({
           ...item,
           src: item.src.startsWith("/") ? item.src : `/${item.src}`,

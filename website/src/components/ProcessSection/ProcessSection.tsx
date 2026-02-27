@@ -3,7 +3,11 @@ import Link from "@docusaurus/Link";
 import { Highlight } from "prism-react-renderer";
 import { Section } from "../Section/Section";
 import { CopyButton } from "../CodeSnippet/CopyButton";
-import { customNightOwl, customNightOwlRed, CODE_BG } from "../CodeSnippet/codeTheme";
+import {
+  customNightOwl,
+  customNightOwlRed,
+  CODE_BG,
+} from "../CodeSnippet/codeTheme";
 import { Clock, ArrowRight } from "lucide-react";
 
 type Step = {
@@ -55,7 +59,19 @@ client.responses.create(
   },
 ];
 
-export function ProcessSection({ subtitle, colorTheme = "default", steps: customSteps, title: customTitle, getStartedLink }: { subtitle?: string; colorTheme?: "default" | "red"; steps?: Step[]; title?: string; getStartedLink?: string } = {}) {
+export function ProcessSection({
+  subtitle,
+  colorTheme = "default",
+  steps: customSteps,
+  title: customTitle,
+  getStartedLink,
+}: {
+  subtitle?: string;
+  colorTheme?: "default" | "red";
+  steps?: Step[];
+  title?: string;
+  getStartedLink?: string;
+} = {}) {
   const steps = customSteps ?? defaultSteps;
   return (
     <Section
@@ -64,10 +80,14 @@ export function ProcessSection({ subtitle, colorTheme = "default", steps: custom
       body={
         <div className="flex flex-col items-center gap-4">
           <span>
-            {subtitle ?? "From zero to full-stack LLMOps in minutes. No complex setup or major code changes required."}
+            {subtitle ??
+              "From zero to full-stack LLMOps in minutes. No complex setup or major code changes required."}
           </span>
           <Link
-            to={getStartedLink ?? "https://mlflow.org/docs/latest/genai/tracing/quickstart/"}
+            to={
+              getStartedLink ??
+              "https://mlflow.org/docs/latest/genai/tracing/quickstart/"
+            }
             style={{ textDecoration: "underline" }}
             className="hover:opacity-80"
           >
@@ -77,7 +97,9 @@ export function ProcessSection({ subtitle, colorTheme = "default", steps: custom
       }
       align="center"
     >
-      <div className={`${steps.length > 3 ? "max-w-[90rem]" : "max-w-5xl"} mx-auto`}>
+      <div
+        className={`${steps.length > 3 ? "max-w-[90rem]" : "max-w-5xl"} mx-auto`}
+      >
         {/* Steps container */}
         <div className="relative">
           {/* Steps grid */}
@@ -128,7 +150,8 @@ export function ProcessSection({ subtitle, colorTheme = "default", steps: custom
                   pulse: "rgba(200, 45, 45, 0.5)",
                 },
               ];
-              const stepColors = colorTheme === "red" ? redStepColors : defaultStepColors;
+              const stepColors =
+                colorTheme === "red" ? redStepColors : defaultStepColors;
               const colors = stepColors[index] || stepColors[0];
 
               return (
@@ -181,47 +204,56 @@ export function ProcessSection({ subtitle, colorTheme = "default", steps: custom
 
                     {/* Code snippet - centered in remaining space */}
                     <div className="flex-1 flex items-center">
-                    <div
-                      className="rounded-lg border border-white/10 overflow-hidden w-full"
-                      style={{ backgroundColor: CODE_BG }}
-                    >
-                      <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
-                        <span className="text-xs text-white/50 font-mono">
-                          {step.language}
-                        </span>
-                        <CopyButton code={step.code} />
+                      <div
+                        className="rounded-lg border border-white/10 overflow-hidden w-full"
+                        style={{ backgroundColor: CODE_BG }}
+                      >
+                        <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
+                          <span className="text-xs text-white/50 font-mono">
+                            {step.language}
+                          </span>
+                          <CopyButton code={step.code} />
+                        </div>
+                        <div className="p-3 overflow-x-auto hidden-scrollbar">
+                          <Highlight
+                            theme={
+                              colorTheme === "red"
+                                ? customNightOwlRed
+                                : customNightOwl
+                            }
+                            code={step.code.trim()}
+                            language={
+                              step.language === "bash" ? "bash" : "python"
+                            }
+                          >
+                            {({
+                              style,
+                              tokens,
+                              getLineProps,
+                              getTokenProps,
+                            }) => (
+                              <pre
+                                className="text-xs font-mono !m-0 !p-0 text-left"
+                                style={{
+                                  ...style,
+                                  backgroundColor: "transparent",
+                                }}
+                              >
+                                {tokens.map((line, i) => (
+                                  <div key={i} {...getLineProps({ line })}>
+                                    {line.map((token, key) => (
+                                      <span
+                                        key={key}
+                                        {...getTokenProps({ token })}
+                                      />
+                                    ))}
+                                  </div>
+                                ))}
+                              </pre>
+                            )}
+                          </Highlight>
+                        </div>
                       </div>
-                      <div className="p-3 overflow-x-auto hidden-scrollbar">
-                        <Highlight
-                          theme={colorTheme === "red" ? customNightOwlRed : customNightOwl}
-                          code={step.code.trim()}
-                          language={
-                            step.language === "bash" ? "bash" : "python"
-                          }
-                        >
-                          {({ style, tokens, getLineProps, getTokenProps }) => (
-                            <pre
-                              className="text-xs font-mono !m-0 !p-0 text-left"
-                              style={{
-                                ...style,
-                                backgroundColor: "transparent",
-                              }}
-                            >
-                              {tokens.map((line, i) => (
-                                <div key={i} {...getLineProps({ line })}>
-                                  {line.map((token, key) => (
-                                    <span
-                                      key={key}
-                                      {...getTokenProps({ token })}
-                                    />
-                                  ))}
-                                </div>
-                              ))}
-                            </pre>
-                          )}
-                        </Highlight>
-                      </div>
-                    </div>
                     </div>
 
                     {/* Time estimate - pinned to bottom */}

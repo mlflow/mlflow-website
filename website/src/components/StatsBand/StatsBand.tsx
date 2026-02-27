@@ -20,11 +20,7 @@ export const StatsBand = ({
   body?: string;
 } = {}) => {
   return (
-    <Section
-      title={title}
-      body={body}
-      align="center"
-    >
+    <Section title={title} body={body} align="center">
       <div className="flex w-full flex-col items-center gap-16 relative">
         <div className="grid w-full max-w-4xl grid-cols-1 gap-6 text-center sm:grid-cols-3 relative z-10">
           <div className="flex justify-center">

@@ -230,12 +230,7 @@ export const EcosystemList = ({
 }: { title?: string; body?: ReactNode; items?: EcosystemItem[] } = {}) => {
   return (
     <div className="w-full px-4 md:px-8 lg:px-16 flex justify-center relative overflow-hidden">
-      <Section
-        title={title}
-        body={body}
-        align="center"
-        ambient
-      >
+      <Section title={title} body={body} align="center" ambient>
         <div style={{ maxWidth: 1000 }} className="w-full">
           <BrowserOnly>
             {() => (

@@ -98,7 +98,13 @@ const FeatureTextSection = ({
   );
 };
 
-export const StickyFeaturesGrid = ({ features, colorTheme = "default" }: { features: Feature[]; colorTheme?: "default" | "red" }) => {
+export const StickyFeaturesGrid = ({
+  features,
+  colorTheme = "default",
+}: {
+  features: Feature[];
+  colorTheme?: "default" | "red";
+}) => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -152,7 +158,12 @@ export const StickyFeaturesGrid = ({ features, colorTheme = "default" }: { featu
             transition={{ duration: 0.4 }}
             className="h-full"
           >
-            {activeFeature && <FeatureMediaCard feature={activeFeature} colorTheme={colorTheme} />}
+            {activeFeature && (
+              <FeatureMediaCard
+                feature={activeFeature}
+                colorTheme={colorTheme}
+              />
+            )}
           </motion.div>
         </AnimatePresence>
       </div>

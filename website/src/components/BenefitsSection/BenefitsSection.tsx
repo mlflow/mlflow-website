@@ -43,8 +43,7 @@ const getBenefits = (communityLabel: string) => [
   {
     icon: <Users className="w-6 h-6" />,
     title: "Community",
-    description:
-      `20K+ GitHub stars, 900+ contributors. Join the fastest-growing ${communityLabel} community.`,
+    description: `20K+ GitHub stars, 900+ contributors. Join the fastest-growing ${communityLabel} community.`,
     color: "from-green-500/20 to-green-600/20",
     iconBg: "bg-green-500/20",
     iconColor: "text-green-400",
@@ -60,7 +59,9 @@ const getBenefits = (communityLabel: string) => [
   },
 ];
 
-export function BenefitsSection({ communityLabel = "AIOps" }: { communityLabel?: string } = {}) {
+export function BenefitsSection({
+  communityLabel = "AIOps",
+}: { communityLabel?: string } = {}) {
   const benefits = getBenefits(communityLabel);
   return (
     <Section

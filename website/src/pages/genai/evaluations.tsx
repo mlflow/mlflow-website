@@ -173,17 +173,11 @@ export default function Evaluations() {
         id="quality-metrics"
         title="Find quality issues using LLM judges and human feedback"
       >
-        <StickyFeaturesGrid
-          features={qualityFeatures}
-          colorTheme="red"
-        />
+        <StickyFeaturesGrid features={qualityFeatures} colorTheme="red" />
       </Section>
 
       <Section title="Iteratively improve quality">
-        <StickyFeaturesGrid
-          features={iterativeFeatures}
-          colorTheme="red"
-        />
+        <StickyFeaturesGrid features={iterativeFeatures} colorTheme="red" />
       </Section>
 
       <ProcessSection
@@ -194,7 +188,8 @@ export default function Evaluations() {
           {
             number: "1",
             title: "Start MLflow Server",
-            description: "One command to get started. Docker setup is also available.",
+            description:
+              "One command to get started. Docker setup is also available.",
             time: "~30 seconds",
             code: "uvx mlflow server",
             language: "bash",
@@ -202,7 +197,8 @@ export default function Evaluations() {
           {
             number: "2",
             title: "Enable Tracing",
-            description: "Add minimal code to start capturing traces from your agent or LLM app.",
+            description:
+              "Add minimal code to start capturing traces from your agent or LLM app.",
             time: "~30 seconds",
             code: `import mlflow
 
@@ -215,7 +211,8 @@ mlflow.openai.autolog()`,
           {
             number: "3",
             title: "Run your code",
-            description: "Run your code as usual. Explore traces and metrics in the MLflow UI.",
+            description:
+              "Run your code as usual. Explore traces and metrics in the MLflow UI.",
             time: "~1 minute",
             code: `from openai import OpenAI
 
@@ -229,7 +226,8 @@ client.responses.create(
           {
             number: "4",
             title: "Evaluate with LLM Judges",
-            description: "Run built-in LLM judges to automatically score your app's quality.",
+            description:
+              "Run built-in LLM judges to automatically score your app's quality.",
             time: "~1 minute",
             code: `from mlflow.genai.scorers import (
     Safety,

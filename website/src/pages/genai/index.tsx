@@ -271,17 +271,35 @@ export default function GenAi(): JSX.Element {
   return (
     <Layout>
       <AboveTheFold
-        title={<span className="text-[48px] xxs:text-[64px] xs:text-[80px] leading-[110%]">Open Source Agent Engineering Platform</span>}
+        title={
+          <span className="text-[48px] xxs:text-[64px] xs:text-[80px] leading-[110%]">
+            Open Source Agent Engineering Platform
+          </span>
+        }
         body={[
           <>
-            Confidently ship agents and LLM applications to production
-            with built-in{" "}
-            <HighlightedKeyword href="/genai/observability">observability</HighlightedKeyword>,{" "}
-            <HighlightedKeyword href="/genai/evaluations">evaluation</HighlightedKeyword>,{" "}
-            <HighlightedKeyword href="/genai/prompt-registry">prompt management</HighlightedKeyword>,{" "}
-            <HighlightedKeyword href="/genai/observability">monitoring</HighlightedKeyword>,{" "}
-            <HighlightedKeyword href="/genai/ai-gateway">cost controls</HighlightedKeyword>,
-            {" "}and much more.
+            Confidently ship agents and LLM applications to production with
+            built-in{" "}
+            <HighlightedKeyword href="/genai/observability">
+              observability
+            </HighlightedKeyword>
+            ,{" "}
+            <HighlightedKeyword href="/genai/evaluations">
+              evaluation
+            </HighlightedKeyword>
+            ,{" "}
+            <HighlightedKeyword href="/genai/prompt-registry">
+              prompt management
+            </HighlightedKeyword>
+            ,{" "}
+            <HighlightedKeyword href="/genai/observability">
+              monitoring
+            </HighlightedKeyword>
+            ,{" "}
+            <HighlightedKeyword href="/genai/ai-gateway">
+              cost controls
+            </HighlightedKeyword>
+            , and much more.
           </>,
         ]}
         bodyColor="white"
@@ -325,7 +343,10 @@ export default function GenAi(): JSX.Element {
         items={genaiIntegrations}
       />
       <BenefitsSection communityLabel="LLMOps" />
-      <ProcessSection subtitle="From zero to production-ready agents in minutes. No complex setup or major code changes required." colorTheme="red" />
+      <ProcessSection
+        subtitle="From zero to production-ready agents in minutes. No complex setup or major code changes required."
+        colorTheme="red"
+      />
       <BelowTheFold contentType="genai" hideGetStarted>
         <LatestNews />
       </BelowTheFold>
