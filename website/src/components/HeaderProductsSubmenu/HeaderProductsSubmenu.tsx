@@ -32,8 +32,8 @@ export const HeaderProductsSubmenu = () => {
       <div className={component()}>
         <div className={titleContainer()}>
           <Link to="/genai">
-            <h3 className={title()}>GenAI Apps & Agents</h3>
-            <p className={subtitle()}>Ship high-quality GenAI, fast</p>
+            <h3 className={title()}>LLMs & Agents</h3>
+            <p className={subtitle()}>The leading open-source agent platform</p>
           </Link>
         </div>
         <div className={feature()}>
