@@ -15,6 +15,7 @@ type Props = {
     href: string;
     icon?: ReactNode;
   };
+  children?: ReactNode;
 };
 
 export function HeroSection({
@@ -22,6 +23,7 @@ export function HeroSection({
   subtitle,
   primaryCTA,
   secondaryCTA,
+  children,
 }: Props) {
   return (
     <div className="w-full px-4 md:px-8 lg:px-16 pt-16 md:pt-24">
@@ -69,6 +71,7 @@ export function HeroSection({
             </Link>
           )}
         </motion.div>
+        {children}
       </div>
     </div>
   );
@@ -85,7 +88,7 @@ export function HighlightedKeyword({
   if (href) {
     return (
       <Link to={href}>
-        <span className="text-white underline decoration-white/50 underline-offset-4 hover:decoration-white transition-all cursor-pointer">
+        <span className="text-white font-semibold underline decoration-white/50 underline-offset-4 hover:decoration-white transition-all cursor-pointer">
           {children}
         </span>
       </Link>
@@ -93,7 +96,7 @@ export function HighlightedKeyword({
   }
 
   return (
-    <span className="text-white underline decoration-white/50 underline-offset-4">
+    <span className="text-white font-semibold underline decoration-white/50 underline-offset-4">
       {children}
     </span>
   );

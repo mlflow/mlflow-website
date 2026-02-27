@@ -19,7 +19,7 @@ export const HeaderDocsSubmenu = () => {
     <div className={wrapper()}>
       <div className={linkItem()}>
         <Link to={MLFLOW_GENAI_DOCS_URL}>
-          <h3 className={linkTitle()}>GenAI Apps & Agents</h3>
+          <h3 className={linkTitle()}>LLMs & Agents</h3>
           <p className={linkSubtitle()}>
             Learn how to track, evaluate, and optimize your GenAI applications
             and agent workflows.

@@ -16,6 +16,8 @@ export type Feature = {
   quickstartLink?: string;
   codeSnippet: string;
   codeLanguage?: "python" | "typescript";
+  fullBleedImage?: boolean;
+  imageFit?: "cover" | "contain";
 };
 
 export type Category = {
@@ -76,7 +78,7 @@ results = mlflow.genai.evaluate(
   },
   {
     id: "prompt",
-    title: "Prompt & Optimization",
+    title: "Prompts & Optimization",
     description:
       "Version, test, and deploy prompts with full lineage tracking. Automatically optimize prompts with state-of-the-art algorithms to improve performance.",
     imageSrc: PromptTabImg,
@@ -121,6 +123,28 @@ response = client.chat.completions.create(
     model="gpt-5.2",  # or "claude-opus-4.5", "gemini-3-flash", etc.
     messages=[{"role": "user", "content": "Hello!"}]
 )`,
+  },
+  {
+    id: "agent-server",
+    title: "Agent Server",
+    description:
+      "Deploy agents to production with a single command. The MLflow Agent Server provides a FastAPI-based hosting solution with automatic request validation, streaming support, and built-in tracing — so you can go from prototype to production endpoint in minutes.",
+    quickstartLink:
+      "https://mlflow.org/docs/latest/genai/serving/agent-server/",
+    codeSnippet: `from mlflow.agent_server import AgentServer, invoke, stream
+from mlflow.types.agent import ResponsesAgentRequest, ResponsesAgentResponse
+
+@invoke()
+async def run_agent(request: ResponsesAgentRequest) -> ResponsesAgentResponse:
+    msgs = [i.model_dump() for i in request.input]
+    result = await Runner.run(agent, msgs)
+    return ResponsesAgentResponse(
+        output=[item.to_input_item() for item in result.new_items]
+    )
+
+# Start the server
+agent_server = AgentServer("MyAgent")
+agent_server.run(app_import_string="server:app")`,
   },
 ];
 
