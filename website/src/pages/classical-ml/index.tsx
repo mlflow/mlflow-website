@@ -18,7 +18,7 @@ export default function GenAi(): JSX.Element {
   return (
     <Layout>
       <AboveTheFold
-        title="Mastering the ML lifecycle"
+        title={<strong>Master the ML Lifecycle</strong>}
         body="From experiment to production, MLflow streamlines your complete machine learning journey with end-to-end tracking, model management, and deployment."
         hasGetStartedButton="#get-started"
         bodyColor="white"

@@ -6,7 +6,7 @@ import {
   StickyGrid,
 } from "../../components";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
-import CardHero from "@site/static/img/GenAI_gateway/GenAI_gateway_hero.png";
+import CardHero from "@site/static/img/blog/mlflow-ai-gateway-thumbnail.png";
 import Card1 from "@site/static/img/GenAI_gateway/GenAI_gateway_1.png";
 import Card2 from "@site/static/img/GenAI_gateway/GenAI_gateway_2.png";
 import Card3 from "@site/static/img/GenAI_gateway/GenAI_gateway_3.png";

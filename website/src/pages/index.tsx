@@ -3,6 +3,7 @@ import {
   Layout,
   BelowTheFold,
   EcosystemList,
+  LogosCarousel,
   ProductTabs,
   StatsBand,
   HeroSection,
@@ -10,6 +11,7 @@ import {
   BenefitsSection,
   ProcessSection,
   FAQSection,
+  TrustPills,
 } from "../components";
 import { MLFLOW_DOCS_URL } from "../constants";
 
@@ -38,16 +40,21 @@ export default function Home(): JSX.Element {
           label: "View Docs",
           href: MLFLOW_DOCS_URL,
         }}
-      />
+      >
+        <TrustPills />
+      </HeroSection>
 
-      {/* 2. FEATURES SECTION - Two categories with features */}
+      {/* 2. COMPANY LOGOS */}
+      <LogosCarousel />
+
+      {/* 3. FEATURES SECTION - Two categories with features */}
       <div className="w-full px-4 md:px-8 lg:px-16 pb-36">
         <div className="max-w-7xl mx-auto">
           <ProductTabs />
         </div>
       </div>
 
-      {/* 3. TRUST LOGOS */}
+      {/* 4. TRUST LOGOS */}
       <StatsBand />
 
       {/* 4. OPEN AND NEUTRAL - Vendor lock-in free, integrations */}
