@@ -29,3 +29,4 @@ export { HeroSection, HighlightedKeyword } from "./HeroSection/HeroSection";
 export { BenefitsSection } from "./BenefitsSection/BenefitsSection";
 export { ProcessSection } from "./ProcessSection/ProcessSection";
 export { FAQSection } from "./FAQSection/FAQSection";
+export { TrustPills } from "./TrustPills/TrustPills";
