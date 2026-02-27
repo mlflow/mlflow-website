@@ -6,7 +6,10 @@ import { Header } from "../../components/Header/Header";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import ObservabilityHero from "@site/static/img/GenAI_observability/GenAI_observability_hero.png";
 import { CopyButton } from "../../components/CodeSnippet/CopyButton";
-import { customNightOwl, CODE_BG } from "../../components/CodeSnippet/codeTheme";
+import {
+  customNightOwl,
+  CODE_BG,
+} from "../../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE =
   "AI Observability for LLMs, Agents & RAG | Open Source MLflow Platform";
@@ -14,14 +17,19 @@ const SEO_DESCRIPTION =
   "Complete AI observability platform for LLM tracing, agent evaluation, and production monitoring. " +
   "Open source, no vendor lock-in. Supports OpenAI, Anthropic, LangChain, LangGraph & more.";
 
-const faqs: { question: string; answer: React.ReactNode; answerText?: string }[] = [
+const faqs: {
+  question: string;
+  answer: React.ReactNode;
+  answerText?: string;
+}[] = [
   {
     question: "What is AI observability?",
     answer:
       "AI observability is the practice of collecting, analyzing, and correlating telemetry data (traces, metrics, evaluations, and logs) across AI systems to understand how they behave in development and production. It goes beyond traditional software monitoring by providing deep visibility into the internal state of non-deterministic AI applications like agents, LLMs, and RAG pipelines.",
   },
   {
-    question: "How is AI observability different from traditional software monitoring?",
+    question:
+      "How is AI observability different from traditional software monitoring?",
     answer:
       "Traditional monitoring tracks deterministic metrics like uptime, CPU, and error rates. AI observability must also capture the quality and correctness of free-form language outputs, multi-step agent reasoning, tool call chains, retrieval accuracy, and token costs (none of which exist in traditional software systems).",
   },
@@ -36,7 +44,8 @@ const faqs: { question: string; answer: React.ReactNode; answerText?: string }[]
       "Yes, if you're building production AI applications. AI observability helps you detect hallucinations, track costs, debug complex agent behaviors, monitor quality over time, and maintain compliance. Without observability, you're flying blind—unable to understand why your AI system produces certain outputs or how to improve it.",
   },
   {
-    question: "What's the difference between LLM observability and AI observability?",
+    question:
+      "What's the difference between LLM observability and AI observability?",
     answer:
       "LLM observability focuses specifically on large language model calls (prompts, completions, tokens, latency). AI observability is broader, encompassing LLMs plus agents (multi-step reasoning, tool calls), RAG systems (retrieval, chunking, embeddings), and other AI components. MLflow provides comprehensive AI observability that covers all these use cases.",
   },
@@ -74,15 +83,26 @@ const faqs: { question: string; answer: React.ReactNode; answerText?: string }[]
     question: "How do I get started with AI observability?",
     answer: (
       <>
-        Getting started with MLflow AI observability takes just one line of code. Install MLflow, call{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/quickstart/"}>mlflow.openai.autolog()</Link> (or the equivalent for your framework), and every LLM call is automatically traced. You can then view traces in the MLflow UI, run evaluations with LLM judges, and monitor production metrics. See the{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>MLflow tracing documentation</Link> for framework-specific examples.
+        Getting started with MLflow AI observability takes just one line of
+        code. Install MLflow, call{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/quickstart/"}>
+          mlflow.openai.autolog()
+        </Link>{" "}
+        (or the equivalent for your framework), and every LLM call is
+        automatically traced. You can then view traces in the MLflow UI, run
+        evaluations with LLM judges, and monitor production metrics. See the{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
+          MLflow tracing documentation
+        </Link>{" "}
+        for framework-specific examples.
       </>
     ),
-    answerText: "Getting started with MLflow AI observability takes just one line of code. Install MLflow, call mlflow.openai.autolog() (or the equivalent for your framework), and every LLM call is automatically traced. You can then view traces in the MLflow UI, run evaluations with LLM judges, and monitor production metrics. See the MLflow tracing documentation for framework-specific examples.",
+    answerText:
+      "Getting started with MLflow AI observability takes just one line of code. Install MLflow, call mlflow.openai.autolog() (or the equivalent for your framework), and every LLM call is automatically traced. You can then view traces in the MLflow UI, run evaluations with LLM judges, and monitor production metrics. See the MLflow tracing documentation for framework-specific examples.",
   },
   {
-    question: "Is it easy to integrate MLflow with my existing agent or LLM application?",
+    question:
+      "Is it easy to integrate MLflow with my existing agent or LLM application?",
     answer:
       "Yes. MLflow integrates seamlessly with your existing stack. It supports OpenTelemetry for exporting traces to any compatible backend, works with any LLM provider (OpenAI, Anthropic, Bedrock, etc.), and integrates with popular frameworks like LangChain, LangGraph, and LlamaIndex. You can also self-host MLflow or use managed versions on Databricks, AWS, and other platforms.",
   },
@@ -129,10 +149,15 @@ export default function AIObservability() {
         <meta property="og:title" content={SEO_TITLE} />
         <meta property="og:description" content={SEO_DESCRIPTION} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://mlflow.org/faq/ai-observability" />
+        <meta
+          property="og:url"
+          content="https://mlflow.org/faq/ai-observability"
+        />
         <link rel="canonical" href="https://mlflow.org/faq/ai-observability" />
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
-        <script type="application/ld+json">{JSON.stringify(softwareJsonLd)}</script>
+        <script type="application/ld+json">
+          {JSON.stringify(softwareJsonLd)}
+        </script>
         <style>{`
           /* Import MLflow docs fonts */
           @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
@@ -368,9 +393,13 @@ export default function AIObservability() {
 
           <p>
             AI observability is the practice of collecting, analyzing, and
-            correlating telemetry data across AI systems (including <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>agents</Link>, <Link href="/genai">LLMs</Link>,
-            and <Link href={MLFLOW_GENAI_DOCS_URL + "rag/"}>RAG applications</Link>) to understand how they behave in development
-            and production.
+            correlating telemetry data across AI systems (including{" "}
+            <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>
+              agents
+            </Link>
+            , <Link href="/genai">LLMs</Link>, and{" "}
+            <Link href={MLFLOW_GENAI_DOCS_URL + "rag/"}>RAG applications</Link>)
+            to understand how they behave in development and production.
           </p>
 
           <p>
@@ -383,18 +412,35 @@ export default function AIObservability() {
           </p>
 
           <p>
-            Unlike traditional software, AI applications are <strong>non-deterministic</strong>:
-            the same input can produce different outputs depending on model
-            state, retrieved context, and multi-step agent reasoning. This makes
-            traditional logging and monitoring insufficient. AI observability
-            captures the full execution context (<Link href={MLFLOW_GENAI_DOCS_URL + "prompts/"}>prompts</Link>, model responses, <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>tool
-            calls</Link>, retrieval results, and <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>evaluation scores</Link>) so teams can
-            understand the "why" behind every output.
+            Unlike traditional software, AI applications are{" "}
+            <strong>non-deterministic</strong>: the same input can produce
+            different outputs depending on model state, retrieved context, and
+            multi-step agent reasoning. This makes traditional logging and
+            monitoring insufficient. AI observability captures the full
+            execution context (
+            <Link href={MLFLOW_GENAI_DOCS_URL + "prompts/"}>prompts</Link>,
+            model responses,{" "}
+            <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>tool calls</Link>,
+            retrieval results, and{" "}
+            <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>
+              evaluation scores
+            </Link>
+            ) so teams can understand the "why" behind every output.
           </p>
 
-          <div style={{ margin: '40px 0', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e5e7eb' }}>
+          <div
+            style={{
+              margin: "40px 0",
+              borderRadius: "8px",
+              overflow: "hidden",
+              border: "1px solid #e5e7eb",
+            }}
+          >
             <video width="100%" controls autoPlay loop muted playsInline>
-              <source src="https://mlflow.org/assets/medias/overview_demo-22b5fa3cb0408e33cd92eea39813ab73.mp4" type="video/mp4" />
+              <source
+                src="https://mlflow.org/assets/medias/overview_demo-22b5fa3cb0408e33cd92eea39813ab73.mp4"
+                type="video/mp4"
+              />
               Your browser does not support the video tag.
             </video>
           </div>
@@ -402,47 +448,62 @@ export default function AIObservability() {
           <h2>Why AI Observability Matters</h2>
 
           <p>
-            AI systems, such as agents, LLM applications, and RAG systems, introduce unique challenges that traditional software monitoring can't address:
+            AI systems, such as agents, LLM applications, and RAG systems,
+            introduce unique challenges that traditional software monitoring
+            can't address:
           </p>
 
           <div className="grid-2">
             <div className="card">
               <h3>Debugging Complexity</h3>
               <p>
-                <strong>Problem:</strong> Multi-step agents, tool calls, and retrieval chains create complex execution paths that are difficult to debug.
+                <strong>Problem:</strong> Multi-step agents, tool calls, and
+                retrieval chains create complex execution paths that are
+                difficult to debug.
               </p>
               <p>
-                <strong>Solution:</strong> Tracing makes every step visible and debuggable, from initial request to final response.
+                <strong>Solution:</strong> Tracing makes every step visible and
+                debuggable, from initial request to final response.
               </p>
             </div>
 
             <div className="card">
               <h3>Cost Control</h3>
               <p>
-                <strong>Problem:</strong> Token costs can spiral out of control without visibility into usage patterns and inefficiencies.
+                <strong>Problem:</strong> Token costs can spiral out of control
+                without visibility into usage patterns and inefficiencies.
               </p>
               <p>
-                <strong>Solution:</strong> Track token usage, model selection efficiency, and per-request costs to identify optimization opportunities.
+                <strong>Solution:</strong> Track token usage, model selection
+                efficiency, and per-request costs to identify optimization
+                opportunities.
               </p>
             </div>
 
             <div className="card">
               <h3>Quality & Reliability</h3>
               <p>
-                <strong>Problem:</strong> AI systems can produce hallucinations, regressions, and degraded outputs that undermine user trust.
+                <strong>Problem:</strong> AI systems can produce hallucinations,
+                regressions, and degraded outputs that undermine user trust.
               </p>
               <p>
-                <strong>Solution:</strong> Detect issues before they reach users. Evaluate every response against quality benchmarks automatically.
+                <strong>Solution:</strong> Detect issues before they reach
+                users. Evaluate every response against quality benchmarks
+                automatically.
               </p>
             </div>
 
             <div className="card">
               <h3>Compliance & Governance</h3>
               <p>
-                <strong>Problem:</strong> AI systems make decisions that need auditing, and can inadvertently expose PII or violate content policies.
+                <strong>Problem:</strong> AI systems make decisions that need
+                auditing, and can inadvertently expose PII or violate content
+                policies.
               </p>
               <p>
-                <strong>Solution:</strong> Maintain complete audit trails and enforce PII policies, content guardrails, and access controls across your AI stack.
+                <strong>Solution:</strong> Maintain complete audit trails and
+                enforce PII policies, content guardrails, and access controls
+                across your AI stack.
               </p>
             </div>
           </div>
@@ -450,16 +511,60 @@ export default function AIObservability() {
           <h2>Common Use Cases for AI Observability</h2>
 
           <p>
-            AI observability solves real-world problems across the AI development lifecycle:
+            AI observability solves real-world problems across the AI
+            development lifecycle:
           </p>
 
           <ul>
-            <li><strong>Debugging Hallucinations:</strong> When your agents, LLM applications, or RAG systems produce incorrect outputs, tracing shows exactly what happened—which documents were retrieved, what tool calls were made, which prompts were sent, and what context was used. This makes it easy to identify whether the problem is in retrieval, reasoning, tool selection, or generation.</li>
-            <li><strong>Monitoring Agent Behavior in Production:</strong> <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>Agents</Link> can behave unpredictably—getting stuck in loops, making incorrect tool choices, or producing inconsistent outputs. AI observability platforms automatically capture agent execution graphs, showing every reasoning step, tool call, and decision point so you can identify and fix problematic patterns.</li>
-            <li><strong>Optimizing LLM Costs:</strong> Track token usage and costs across all LLM calls to identify expensive queries, inefficient prompts, or opportunities to switch to smaller models for specific tasks. AI observability platforms help teams reduce spend by 30-50% without sacrificing quality.</li>
-            <li><strong>A/B Testing Prompt Changes:</strong> Before deploying prompt modifications to production, AI observability platforms let you run <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>side-by-side evaluations</Link> with LLM judges. Compare quality metrics like relevance, factuality, and safety to ensure changes improve—not degrade—output quality.</li>
-            <li><strong>Catching Production Regressions:</strong> Monitor quality scores, error rates, and latency over time to detect when model behavior degrades from API updates, prompt changes, or data drift—before users notice.</li>
-            <li><strong>Maintaining Compliance:</strong> Capture complete audit trails showing what prompts were sent, what responses were received, and what data was accessed. Enforce PII redaction policies and content guardrails to meet regulatory requirements.</li>
+            <li>
+              <strong>Debugging Hallucinations:</strong> When your agents, LLM
+              applications, or RAG systems produce incorrect outputs, tracing
+              shows exactly what happened—which documents were retrieved, what
+              tool calls were made, which prompts were sent, and what context
+              was used. This makes it easy to identify whether the problem is in
+              retrieval, reasoning, tool selection, or generation.
+            </li>
+            <li>
+              <strong>Monitoring Agent Behavior in Production:</strong>{" "}
+              <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>
+                Agents
+              </Link>{" "}
+              can behave unpredictably—getting stuck in loops, making incorrect
+              tool choices, or producing inconsistent outputs. AI observability
+              platforms automatically capture agent execution graphs, showing
+              every reasoning step, tool call, and decision point so you can
+              identify and fix problematic patterns.
+            </li>
+            <li>
+              <strong>Optimizing LLM Costs:</strong> Track token usage and costs
+              across all LLM calls to identify expensive queries, inefficient
+              prompts, or opportunities to switch to smaller models for specific
+              tasks. AI observability platforms help teams reduce spend by
+              30-50% without sacrificing quality.
+            </li>
+            <li>
+              <strong>A/B Testing Prompt Changes:</strong> Before deploying
+              prompt modifications to production, AI observability platforms let
+              you run{" "}
+              <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>
+                side-by-side evaluations
+              </Link>{" "}
+              with LLM judges. Compare quality metrics like relevance,
+              factuality, and safety to ensure changes improve—not
+              degrade—output quality.
+            </li>
+            <li>
+              <strong>Catching Production Regressions:</strong> Monitor quality
+              scores, error rates, and latency over time to detect when model
+              behavior degrades from API updates, prompt changes, or data
+              drift—before users notice.
+            </li>
+            <li>
+              <strong>Maintaining Compliance:</strong> Capture complete audit
+              trails showing what prompts were sent, what responses were
+              received, and what data was accessed. Enforce PII redaction
+              policies and content guardrails to meet regulatory requirements.
+            </li>
           </ul>
 
           <h2>Key Components of AI Observability</h2>
@@ -469,32 +574,107 @@ export default function AIObservability() {
           </p>
 
           <ul>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"} style={{ color: "#007bff", fontWeight: "600" }}>Tracing</Link>: Record every step of request execution with inputs, outputs, and latency for each LLM call, retrieval, and tool use.</li>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"} style={{ color: "#007bff", fontWeight: "600" }}>Evaluation</Link>: Compare agents and LLM applications side-by-side using automated <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/llm-as-judge/"} style={{ color: "#007bff" }}>LLM judges</Link> or custom scoring logic to measure quality improvements.</li>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"} style={{ color: "#007bff", fontWeight: "600" }}>Monitoring</Link>: Track quality scores, error rates, and token usage over time to identify regressions and production issues.</li>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"} style={{ color: "#007bff", fontWeight: "600" }}>Cost & Latency Tracking</Link>: Monitor token consumption and costs per request to optimize spending and performance across models.</li>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"} style={{ color: "#007bff", fontWeight: "600" }}>Human Feedback</Link>: Gather expert reviews and end-user ratings to identify production failures and turn them into test cases for preventing regressions.</li>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "guides/responsible-ai/"} style={{ color: "#007bff", fontWeight: "600" }}>Governance</Link>: Maintain complete audit logs of prompts, responses, and data access for compliance and debugging.</li>
+            <li>
+              <Link
+                href={MLFLOW_GENAI_DOCS_URL + "tracing/"}
+                style={{ color: "#007bff", fontWeight: "600" }}
+              >
+                Tracing
+              </Link>
+              : Record every step of request execution with inputs, outputs, and
+              latency for each LLM call, retrieval, and tool use.
+            </li>
+            <li>
+              <Link
+                href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}
+                style={{ color: "#007bff", fontWeight: "600" }}
+              >
+                Evaluation
+              </Link>
+              : Compare agents and LLM applications side-by-side using automated{" "}
+              <Link
+                href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/llm-as-judge/"}
+                style={{ color: "#007bff" }}
+              >
+                LLM judges
+              </Link>{" "}
+              or custom scoring logic to measure quality improvements.
+            </li>
+            <li>
+              <Link
+                href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}
+                style={{ color: "#007bff", fontWeight: "600" }}
+              >
+                Monitoring
+              </Link>
+              : Track quality scores, error rates, and drift with LLM judges to
+              catch regressions early with online monitoring.
+            </li>
+            <li>
+              <Link
+                href={MLFLOW_GENAI_DOCS_URL + "tracing/"}
+                style={{ color: "#007bff", fontWeight: "600" }}
+              >
+                Cost & Latency Tracking
+              </Link>
+              : Monitor token consumption and costs per request to optimize
+              spending and performance across models.
+            </li>
+            <li>
+              <Link
+                href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}
+                style={{ color: "#007bff", fontWeight: "600" }}
+              >
+                Human Feedback
+              </Link>
+              : Gather expert reviews and end-user ratings to identify
+              production failures and turn them into test cases for preventing
+              regressions.
+            </li>
+            <li>
+              <Link
+                href={MLFLOW_GENAI_DOCS_URL + "guides/responsible-ai/"}
+                style={{ color: "#007bff", fontWeight: "600" }}
+              >
+                Governance
+              </Link>
+              : Maintain complete audit logs of prompts, responses, and data
+              access for compliance and debugging.
+            </li>
           </ul>
 
           <h2>How to Implement AI Observability</h2>
 
           <p>
-            Modern open-source AI platforms like <Link href="/genai">MLflow</Link> make
-            it easy to add comprehensive, production-grade observability to your agents, LLM applications, and RAG systems with minimal code changes.
+            Modern open-source AI platforms like{" "}
+            <Link href="/genai">MLflow</Link> make it easy to add comprehensive,
+            production-grade observability to your agents, LLM applications, and
+            RAG systems with minimal code changes.
           </p>
 
           <p>
-            With just a single line of code, you can automatically capture traces for every LLM call, including prompts, responses, token usage, latency, and model parameters. These traces are stored locally or sent to your MLflow tracking server, where you can search, filter, and analyze them in the MLflow UI. You can then evaluate traces with LLM judges to find quality issues like hallucinations and relevance problems, monitor production metrics to catch regressions, and debug failures.
+            With just a single line of code, you can automatically capture
+            traces for every LLM call, including prompts, responses, token
+            usage, latency, and model parameters. These traces are stored
+            locally or sent to your MLflow tracking server, where you can
+            search, filter, and analyze them in the MLflow UI. You can then
+            evaluate traces with LLM judges to find quality issues like
+            hallucinations and relevance problems, monitor production metrics to
+            catch regressions, and debug failures.
           </p>
 
           <p>
             Here are quick examples of enabling automatic tracing. Check out the{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/integrations/"}>MLflow tracing integrations documentation</Link>{" "}
-            to see how to use tracing with LangChain, LangGraph, LlamaIndex, Vercel AI SDK, and other frameworks.
+            <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/integrations/"}>
+              MLflow tracing integrations documentation
+            </Link>{" "}
+            to see how to use tracing with LangChain, LangGraph, LlamaIndex,
+            Vercel AI SDK, and other frameworks.
           </p>
 
-          <p style={{ marginTop: "32px", marginBottom: "0px" }}><strong>OpenAI</strong></p>
+          <p style={{ marginTop: "32px", marginBottom: "0px" }}>
+            <strong>OpenAI</strong>
+          </p>
 
           <div
             className="rounded-lg border border-white/10 overflow-hidden"
@@ -502,7 +682,8 @@ export default function AIObservability() {
           >
             <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
               <span className="text-xs text-white/50 font-mono">python</span>
-              <CopyButton code={`import mlflow
+              <CopyButton
+                code={`import mlflow
 
 # Enable automatic tracing for your LLM framework
 mlflow.openai.autolog()
@@ -513,7 +694,8 @@ client = OpenAI()
 response = client.chat.completions.create(
     model="gpt-5.2",
     messages=[{"role": "user", "content": "Hello!"}],
-)`} />
+)`}
+              />
             </div>
             <div className="p-3 overflow-x-auto">
               <Highlight
@@ -553,7 +735,9 @@ response = client.chat.completions.create(
             </div>
           </div>
 
-          <p style={{ marginTop: "32px", marginBottom: "0px" }}><strong>LangGraph</strong></p>
+          <p style={{ marginTop: "32px", marginBottom: "0px" }}>
+            <strong>LangGraph</strong>
+          </p>
 
           <div
             className="rounded-lg border border-white/10 overflow-hidden"
@@ -561,7 +745,8 @@ response = client.chat.completions.create(
           >
             <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
               <span className="text-xs text-white/50 font-mono">python</span>
-              <CopyButton code={`import mlflow
+              <CopyButton
+                code={`import mlflow
 
 # Enable automatic tracing for LangChain
 mlflow.langchain.autolog()
@@ -571,7 +756,8 @@ from langchain.agents import initialize_agent, AgentType
 
 llm = ChatOpenAI(model="gpt-5.2")
 agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION)
-agent.run("What is the weather in San Francisco?")`} />
+agent.run("What is the weather in San Francisco?")`}
+              />
             </div>
             <div className="p-3 overflow-x-auto">
               <Highlight
@@ -610,15 +796,20 @@ agent.run("What is the weather in San Francisco?")`}
             </div>
           </div>
 
-          <p style={{ marginTop: "32px", marginBottom: "0px" }}><strong>Vercel AI SDK</strong></p>
+          <p style={{ marginTop: "32px", marginBottom: "0px" }}>
+            <strong>Vercel AI SDK</strong>
+          </p>
 
           <div
             className="rounded-lg border border-white/10 overflow-hidden"
             style={{ backgroundColor: CODE_BG, margin: "8px 0" }}
           >
             <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
-              <span className="text-xs text-white/50 font-mono">typescript</span>
-              <CopyButton code={`import { generateText } from 'ai';
+              <span className="text-xs text-white/50 font-mono">
+                typescript
+              </span>
+              <CopyButton
+                code={`import { generateText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 
 // Configure OpenTelemetry to send traces to MLflow
@@ -629,7 +820,8 @@ const result = await generateText({
   model: openai('gpt-5.2'),
   prompt: 'What is MLflow?',
   experimental_telemetry: { isEnabled: true }
-});`} />
+});`}
+              />
             </div>
             <div className="p-3 overflow-x-auto">
               <Highlight
@@ -673,38 +865,79 @@ const result = await generateText({
             <img
               src={ObservabilityHero}
               alt="MLflow Trace UI showing captured LLM calls with prompts, responses, and metadata"
-              style={{ width: "100%", borderRadius: "8px", boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)" }}
+              style={{
+                width: "100%",
+                borderRadius: "8px",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+              }}
             />
-            <p style={{ marginTop: "12px", fontSize: "14px", color: "#6b7280", fontStyle: "italic" }}>
-              The MLflow UI automatically captures and displays traces for every LLM call
+            <p
+              style={{
+                marginTop: "12px",
+                fontSize: "14px",
+                color: "#6b7280",
+                fontStyle: "italic",
+              }}
+            >
+              The MLflow UI automatically captures and displays traces for every
+              LLM call
             </p>
           </div>
 
           <div className="info-box">
             <p>
-              <Link href="/genai" style={{ color: "#007bff" }}><strong>MLflow</strong></Link> is the largest open-source AI platform, backed by the
-              Linux Foundation and licensed under Apache 2.0. With 20,000+ GitHub stars and
-              900+ contributors, it provides a complete observability stack with no vendor lock-in.
-              {" "}<Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
+              <Link href="/genai" style={{ color: "#007bff" }}>
+                <strong>MLflow</strong>
+              </Link>{" "}
+              is the largest open-source AI platform, backed by the Linux
+              Foundation and licensed under Apache 2.0. With 20,000+ GitHub
+              stars and 900+ contributors, it provides a complete observability
+              stack with no vendor lock-in.{" "}
+              <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>
 
           <h2>Open Source vs. Proprietary AI Observability</h2>
 
           <p>
-            When choosing an AI observability platform, the decision between open source and proprietary SaaS tools has significant long-term implications for your team, infrastructure, and data ownership.
+            When choosing an AI observability platform, the decision between
+            open source and proprietary SaaS tools has significant long-term
+            implications for your team, infrastructure, and data ownership.
           </p>
 
           <p>
-            <strong>Open Source (<Link href="/genai">MLflow</Link>):</strong> With MLflow, you maintain complete control over your observability infrastructure and data. Deploy on your own infrastructure or use managed versions on Databricks, AWS, or other platforms. There are no per-seat fees, no usage limits, and no vendor lock-in. Your telemetry data stays under your control, and you can customize the platform to your exact needs. MLflow integrates with any LLM provider and agent framework through OpenTelemetry-compatible tracing.
+            <strong>
+              Open Source (<Link href="/genai">MLflow</Link>):
+            </strong>{" "}
+            With MLflow, you maintain complete control over your observability
+            infrastructure and data. Deploy on your own infrastructure or use
+            managed versions on Databricks, AWS, or other platforms. There are
+            no per-seat fees, no usage limits, and no vendor lock-in. Your
+            telemetry data stays under your control, and you can customize the
+            platform to your exact needs. MLflow integrates with any LLM
+            provider and agent framework through OpenTelemetry-compatible
+            tracing.
           </p>
 
           <p>
-            <strong>Proprietary SaaS Tools:</strong> Commercial observability platforms offer convenience but at the cost of flexibility and control. They typically charge per seat or per trace volume, which can become expensive at scale. Your data is sent to their servers, raising privacy and compliance concerns. You're locked into their ecosystem, making it difficult to switch providers or customize functionality. Most proprietary tools only support a subset of LLM providers and frameworks.
+            <strong>Proprietary SaaS Tools:</strong> Commercial observability
+            platforms offer convenience but at the cost of flexibility and
+            control. They typically charge per seat or per trace volume, which
+            can become expensive at scale. Your data is sent to their servers,
+            raising privacy and compliance concerns. You're locked into their
+            ecosystem, making it difficult to switch providers or customize
+            functionality. Most proprietary tools only support a subset of LLM
+            providers and frameworks.
           </p>
 
           <p>
-            <strong>Why Teams Choose Open Source:</strong> Organizations building production AI applications increasingly choose MLflow because it offers enterprise-grade observability without compromising on data sovereignty, cost predictability, or flexibility. The Apache 2.0 license and Linux Foundation backing ensure MLflow remains truly open and community-driven, not controlled by a single vendor.
+            <strong>Why Teams Choose Open Source:</strong> Organizations
+            building production AI applications increasingly choose MLflow
+            because it offers enterprise-grade observability without
+            compromising on data sovereignty, cost predictability, or
+            flexibility. The Apache 2.0 license and Linux Foundation backing
+            ensure MLflow remains truly open and community-driven, not
+            controlled by a single vendor.
           </p>
 
           <h2>Frequently Asked Questions</h2>
@@ -714,17 +947,19 @@ const result = await generateText({
               <div key={index} className="faq-item">
                 <button
                   className="faq-question"
-                  onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                  onClick={() =>
+                    setOpenFaqIndex(openFaqIndex === index ? null : index)
+                  }
                 >
                   <span>{faq.question}</span>
-                  <span className={`faq-chevron ${openFaqIndex === index ? 'open' : ''}`}>
+                  <span
+                    className={`faq-chevron ${openFaqIndex === index ? "open" : ""}`}
+                  >
                     ▼
                   </span>
                 </button>
                 {openFaqIndex === index && (
-                  <div className="faq-answer">
-                    {faq.answer}
-                  </div>
+                  <div className="faq-answer">{faq.answer}</div>
                 )}
               </div>
             ))}
@@ -733,10 +968,24 @@ const result = await generateText({
           <h2>Related Resources</h2>
 
           <ul>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>LLM Tracing Documentation</Link></li>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>Agent Evaluation Guide</Link></li>
-            <li><Link href="/genai">MLflow for Agents and LLMs Overview</Link></li>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL}>MLflow for Agents and LLMs Documentation</Link></li>
+            <li>
+              <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
+                LLM Tracing Documentation
+              </Link>
+            </li>
+            <li>
+              <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
+                Agent Evaluation Guide
+              </Link>
+            </li>
+            <li>
+              <Link href="/genai">MLflow for Agents and LLMs Overview</Link>
+            </li>
+            <li>
+              <Link href={MLFLOW_GENAI_DOCS_URL}>
+                MLflow for Agents and LLMs Documentation
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
