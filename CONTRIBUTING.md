@@ -48,7 +48,7 @@ Aim for a **rendered page length** between 3 and 8 pages, including code example
 
 #### How to determine blog post length
 
-When estimating the total length of your blog, ensure that you are evaluating the final rendered blog (built locally, using `yarn`, abiding by the guidance in [the development guide](DEVELOPMENT_GUIDE.md)) in a browser window set at 100% zoom at a 1080p resolution.
+When estimating the total length of your blog, ensure that you are evaluating the final rendered blog (built locally, using `npm`, abiding by the guidance in [the development guide](DEVELOPMENT_GUIDE.md)) in a browser window set at 100% zoom at a 1080p resolution.
 
 ### Tone
 

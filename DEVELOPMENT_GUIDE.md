@@ -19,9 +19,9 @@ We highly recommend using [Node Version Manager (nvm)](https://github.com/nvm-sh
 
 Once you have `nvm` installed, you will need to ensure that you have a Node.js version that is `v18` or later. You can follow the instructions in [this guide](https://nodesource.com/blog/installing-node-js-tutorial-using-nvm-on-mac-os-x-and-ubuntu/) to install and activate an appropriate version.
 
-### Yarn setup
+### npm setup
 
-With the above steps completed, nvm will have acquired both node and `npm` (The Node package manager). To install `yarn`, follow either [this guide](https://yarnpkg.com/getting-started/install) or the legacy npm-based [guide here](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable) to ensure that you have yarn installed on your system.
+With the above steps completed, nvm will have acquired both node and `npm` (The Node package manager). npm is included with Node.js, so no additional installation is required.
 
 ## Building your development environment
 
@@ -34,7 +34,7 @@ cd website
 From this directory, run the following command:
 
 ```bash
-yarn
+npm install
 ```
 
 This will fetch the required packages and ensure that your environment is up to date with required dependencies to build or start an interactive environment.
@@ -51,13 +51,13 @@ The recommended development process for validating changes for these two differe
 ### Core site development
 
 When working on new pages or updating existing pages within the website, it can beneficial to use the live viewer mode for Docusaurus.
-In this mode, `yarn` will start a local server that will respond to the state of the files from your development branch, dynamically updating
+In this mode, `npm` will start a local server that will respond to the state of the files from your development branch, dynamically updating
 a live view of the site within a browser window.
 
 To enable live preview, simply run:
 
 ```bash
-yarn start
+npm start
 ```
 
 This will initialize the local development server, providing a local url that can be opened for live feedback as you make changes.
@@ -66,12 +66,12 @@ This will initialize the local development server, providing a local url that ca
 
 Example PRs for adding new blog posts: [#3](https://github.com/mlflow/mlflow-website/pull/3) [#39](https://github.com/mlflow/mlflow-website/pull/39)
 
-Our blogs are written in markdown format. To test your changes after drafting a post, you can either start a local server with `yarn start` or fully build the website as a static site.
+Our blogs are written in markdown format. To test your changes after drafting a post, you can either start a local server with `npm start` or fully build the website as a static site.
 
 To build the full static site content, you can run:
 
 ```bash
-yarn build
+npm run build
 ```
 
 ### Linting
@@ -81,7 +81,7 @@ Prior to pushing your changes to your remote fork (and definitely prior to filin
 the lint formatter:
 
 ```bash
-yarn fmt
+npm run fmt
 ```
 
 This will automatically adjust your file contents to ensure that the linting rules are adhered to.
@@ -107,7 +107,7 @@ cp -r build/html/* /path/to/mlflow-website/website/docs/latest
 ### Release tooling
 
 If you are manually editing release notes or updating an existing release note, you can validate the generated links locally prior to pushing a PR by
-running the script ``yarn fmt-notes`` to run local generation for all release notes that are within the ``releases`` directory.
+running the script ``npm run fmt-notes`` to run local generation for all release notes that are within the ``releases`` directory.
 
 ### Preview
 
@@ -124,7 +124,7 @@ An example PR for adding a new page to the site: [#22](https://github.com/mlflow
 #### Requirements
 
 - `node>=18`
-- `yarn`
+- `npm`
 
 #### Commands
 
@@ -132,17 +132,17 @@ An example PR for adding a new page to the site: [#22](https://github.com/mlflow
 cd website
 
 # Install dependencies
-yarn
+npm install
 
 # Start development server
-yarn start
+npm start
 
 # Build production website
-yarn build
+npm run build
 
 # Format code
-yarn fmt
+npm run fmt
 
 # Generate links within release notes
-yarn fmt-notes
+npm run fmt-notes
 ```

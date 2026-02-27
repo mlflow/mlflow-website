@@ -4,11 +4,13 @@ import type { PropsWithChildren } from "react";
 const styles = cva(["font-regular leading-[140%] tracking-[0%]"], {
   variants: {
     size: {
+      xl: "text-[22px]",
       l: "text-[18px]",
       m: "text-[16px]",
       s: "text-[14px]",
     },
     align: {
+      left: "text-left",
       center: "text-center",
     },
     margin: {

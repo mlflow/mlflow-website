@@ -2,7 +2,7 @@
 
 This repository contains the source code for the [MLflow website](https://mlflow.org/), which is built using [Docusaurus](https://docusaurus.io/).
 
-You can preview the website at: https://mlflow.github.io/mlflow-website/
+Preview: https://main--test-mlflow-website.netlify.app
 
 ## Blog Contributions
 

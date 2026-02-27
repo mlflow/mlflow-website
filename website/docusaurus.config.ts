@@ -27,6 +27,11 @@ const config: Config = {
   onBrokenLinks: "throw",
   onBrokenAnchors: "throw",
 
+  future: {
+    v4: true, // opt-in for Docusaurus v4 planned changes
+    experimental_faster: true, // turns Docusaurus Faster on globally
+  },
+
   markdown: {
     hooks: {
       onBrokenMarkdownLinks: "throw",
@@ -129,7 +134,7 @@ const config: Config = {
     ],
     [
       // This plugin is always inactive in development and only active in production because it works on the build output.
-      // Run `yarn build` and then `yarn serve` for testing.
+      // Run `npm run build` and then `npm run serve` for testing.
       "@docusaurus/plugin-client-redirects",
       {
         redirects: [
