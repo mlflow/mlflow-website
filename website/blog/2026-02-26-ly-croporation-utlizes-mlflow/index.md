@@ -2,7 +2,7 @@
 title: "Enterprise-Scale MLflow Operations and Security Practices at LY Corporation"
 slug: ly-corporation-utilizes-mlflow
 tags: [mlflow, authorization]
-authors: [motoki-yuhara,  mlflow-maintainers]
+authors: [motoki-yuhara, mlflow-maintainers]
 thumbnail: /img/blog/ly-utilizes-mlflow/AIPF.png
 ---
 
