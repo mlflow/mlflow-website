@@ -10,7 +10,7 @@ image: /img/blog/mlflow-trulens-evaluation-thumbnail.png
 
 MLflow's [third-party scorer framework](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/third-party/) already supports LLM-as-a-judge evaluations from [DeepEval, RAGAS, and Phoenix](/blog/third-party-scorers) across an ecosystem with 18M+ monthly PyPI downloads. Those scorers look at inputs and outputs. Did the response answer the question? Was it grounded in the context? That's enough for chatbots and RAG pipelines, but agents are a different problem. The [TruLens](https://www.trulens.org/) integration ([PR #19492](https://github.com/mlflow/mlflow/pull/19492)) changes that by evaluating what happens inside the execution trace.
 
-An agent doesn't just produce an answer. It makes a plan, picks tools, executes a multi-step workflow, and adapts when steps fail. A correct final answer can mask a flawed plan, redundant tool calls, or broken reasoning along the way. To catch those problems, you need to evaluate what happened *inside* the execution trace, not just what came out the other end.
+An agent doesn't just produce an answer. It makes a plan, picks tools, executes a multi-step workflow, and adapts when steps fail. A correct final answer can mask a flawed plan, redundant tool calls, or broken reasoning along the way. To catch those problems, you need to evaluate what happened _inside_ the execution trace, not just what came out the other end.
 
 {/* truncate */}
 
@@ -51,14 +51,14 @@ print(feedback.value)      # Raw score from GPA evaluation
 print(feedback.rationale)  # Chain-of-thought reasoning explaining the score
 ```
 
-| Scorer | Alignment | What it checks |
-|--------|-----------|----------------|
-| `PlanQuality` | Goal-Plan | Does the plan decompose the goal into feasible subtasks? |
-| `ToolSelection` | Goal-Plan | Did the agent pick the right tools for each subtask? |
-| `PlanAdherence` | Plan-Action | Did the agent follow its plan, or skip and reorder steps? |
-| `ToolCalling` | Plan-Action | Are tool calls valid with correct parameters and complete inputs? |
-| `LogicalConsistency` | Holistic | Is each step coherent with prior context and reasoning? |
-| `ExecutionEfficiency` | Holistic | Did the agent reach the goal without redundant calls? |
+| Scorer                | Alignment   | What it checks                                                    |
+| --------------------- | ----------- | ----------------------------------------------------------------- |
+| `PlanQuality`         | Goal-Plan   | Does the plan decompose the goal into feasible subtasks?          |
+| `ToolSelection`       | Goal-Plan   | Did the agent pick the right tools for each subtask?              |
+| `PlanAdherence`       | Plan-Action | Did the agent follow its plan, or skip and reorder steps?         |
+| `ToolCalling`         | Plan-Action | Are tool calls valid with correct parameters and complete inputs? |
+| `LogicalConsistency`  | Holistic    | Is each step coherent with prior context and reasoning?           |
+| `ExecutionEfficiency` | Holistic    | Did the agent reach the goal without redundant calls?             |
 
 Pass a trace and nothing else. Under the hood, the integration serializes your MLflow trace to JSON and passes the full span tree to TruLens' provider, which evaluates each dimension with chain-of-thought reasoning. You get back a score and a rationale explaining what it found. No manual span extraction needed.
 
@@ -223,6 +223,7 @@ I contributed the TruLens integration ([PR #19492](https://github.com/mlflow/mlf
 [Josh Reini](https://www.snowflake.com/en/engineering-blog/trace-aware-agent-evaluation-mlflow/) (TruLens maintainer, Snowflake) reviewed the integration's scorer semantics and validated the trace-aware evaluation behavior. Reini published a [companion post on the Snowflake Engineering Blog](https://www.snowflake.com/en/engineering-blog/trace-aware-agent-evaluation-mlflow/) covering the Agent GPA research and TRAIL benchmark results in depth. A cross-project [documentation PR](https://github.com/truera/trulens/pull/2344) was also merged into the TruLens repository.
 
 Related artifacts:
+
 - [Upstream MLflow TruLens PR #19492](https://github.com/mlflow/mlflow/pull/19492) (merged)
 - [TruLens documentation PR #2344](https://github.com/truera/trulens/pull/2344) (merged, cross-project)
 - [Introducing DeepEval, RAGAS, and Phoenix Judges in MLflow](/blog/third-party-scorers) (companion blog)
