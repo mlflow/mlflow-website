@@ -469,12 +469,12 @@ export default function AIObservability() {
           </p>
 
           <ul>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>Tracing:</Link> Capture end-to-end execution of every request including prompts, retrievals, tool calls, and responses.</li>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>Evaluation:</Link> Assess output quality automatically with <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/llm-as-judge/"}>LLM judges</Link> for hallucination, relevance, safety, and custom business metrics.</li>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>Monitoring:</Link> Track quality scores, error rates, and drift in production to catch regressions early.</li>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>Cost & Latency Tracking:</Link> Monitor token usage, response times, and per-request costs to optimize spending.</li>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>Human Feedback:</Link> Collect user ratings, annotations, and corrections to measure real-world satisfaction and create evaluation datasets.</li>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "guides/responsible-ai/"}>Governance:</Link> Maintain complete audit trails, enforce access controls, and apply policy guardrails across your AI stack.</li>
+            <li><Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"} style={{ color: "#007bff", fontWeight: "600" }}>Tracing</Link>: Capture complete execution traces including prompts, tool calls, and responses.</li>
+            <li><Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"} style={{ color: "#007bff", fontWeight: "600" }}>Evaluation</Link>: Automatically assess quality with <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/llm-as-judge/"} style={{ color: "#007bff" }}>LLM judges</Link> for hallucination, relevance, safety, and custom metrics.</li>
+            <li><Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"} style={{ color: "#007bff", fontWeight: "600" }}>Monitoring</Link>: Track quality scores, error rates, and production drift to catch regressions early.</li>
+            <li><Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"} style={{ color: "#007bff", fontWeight: "600" }}>Cost & Latency Tracking</Link>: Monitor token usage, response times, and costs to optimize spending.</li>
+            <li><Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"} style={{ color: "#007bff", fontWeight: "600" }}>Human Feedback</Link>: Collect user ratings and annotations to measure satisfaction and build evaluation datasets.</li>
+            <li><Link href={MLFLOW_GENAI_DOCS_URL + "guides/responsible-ai/"} style={{ color: "#007bff", fontWeight: "600" }}>Governance</Link>: Maintain audit trails, access controls, and policy guardrails for your AI stack.</li>
           </ul>
 
           <h2>Open Source vs. Proprietary AI Observability</h2>
