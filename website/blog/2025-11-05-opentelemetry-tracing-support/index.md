@@ -8,7 +8,7 @@ thumbnail: /img/blog/mlflow-opentelemetry-thumbnail.png
 image: /img/blog/mlflow-opentelemetry-thumbnail.png
 ---
 
-We're excited to announce that MLflow 3.6.0 brings **full OpenTelemetry support** to the open-source MLflow server. This integration represents a major step forward in making MLflow a **vendor-neutral observability platform** for GenAI applications.
+We're excited to announce that MLflow 3.6.0 brings **full OpenTelemetry support** to the open-source MLflow server. This integration represents a major step forward in making MLflow a **vendor-neutral [observability](/faq/ai-observability) platform** for GenAI applications.
 
 <img
 src={require("./hero.png").default}

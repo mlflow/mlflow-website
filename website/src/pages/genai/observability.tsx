@@ -34,7 +34,7 @@ export default function Observability() {
           cards={[
             {
               title: "End to end observability",
-              body: "Capture your app's inputs, outputs, and step-by-step execution: prompts, retrievals, tool calls, and more.",
+              body: "Capture your app's inputs, outputs, and step-by-step execution: prompts, retrievals, tool calls, and more. Learn more about <Link href='/faq/ai-observability'>AI observability</Link>.",
               image: <img src={Card1} alt="" />,
               // Animation of an app going from user request to retriever to LLM to tool call to response
             },

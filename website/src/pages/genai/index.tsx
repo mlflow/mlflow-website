@@ -19,7 +19,7 @@ export default function GenAi(): JSX.Element {
       <AboveTheFold
         title="Ship high-quality GenAI, fast"
         body={[
-          "Enhance your GenAI application with end-to-end tracking, observability, evaluations, all in one integrated platform.",
+          "Enhance your GenAI application with end-to-end tracking, <Link href='/faq/ai-observability'>observability</Link>, evaluations, all in one integrated platform.",
         ]}
         hasGetStartedButton={MLFLOW_GENAI_DOCS_URL}
         bodyColor="white"
@@ -30,7 +30,7 @@ export default function GenAi(): JSX.Element {
           {
             title: "Debug with tracing",
             body: [
-              "Debug and iterate on GenAI applications using MLflow's tracing, which captures your app's entire execution, including prompts, retrievals, tool calls.",
+              "Debug and iterate on GenAI applications using MLflow's <Link href='/faq/ai-observability'>tracing</Link>, which captures your app's entire execution, including prompts, retrievals, tool calls.",
               "MLflow's open-source, OpenTelemetry-compatible tracing SDK helps avoid vendor lock-in.",
             ],
             cta: {

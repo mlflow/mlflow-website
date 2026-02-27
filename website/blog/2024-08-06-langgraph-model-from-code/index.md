@@ -240,7 +240,7 @@ Agent: Your name is Morpheus.
 
 Before concluding, let's demonstrate [MLflow tracing](https://mlflow.org/docs/latest/llms/tracing/index.html).
 
-MLflow Tracing is a feature that enhances LLM observability in your Generative AI (GenAI) applications by capturing detailed information about the execution of your application’s services. Tracing provides a way to record the inputs, outputs, and metadata associated with each intermediate step of a request, enabling you to easily pinpoint the source of bugs and unexpected behaviors.
+MLflow Tracing is a feature that enhances [LLM observability](/faq/ai-observability) in your Generative AI (GenAI) applications by capturing detailed information about the execution of your application's services. Tracing provides a way to record the inputs, outputs, and metadata associated with each intermediate step of a request, enabling you to easily pinpoint the source of bugs and unexpected behaviors.
 
 Start the MLflow server as outlined in the [tracking server docs](https://mlflow.org/docs/latest/tracking/server.html). After entering the MLflow UI, we can see our experiment and corresponding traces.
 
