@@ -31,6 +31,26 @@ const faqs: { question: string; answer: React.ReactNode; answerText?: string }[]
       "A comprehensive AI observability platform includes: tracing (end-to-end execution capture), evaluation (automated quality assessment with LLM judges), monitoring (production metrics and drift detection), cost and latency tracking, human feedback collection, and governance (audit trails and policy enforcement).",
   },
   {
+    question: "Do I need AI observability for my agent or LLM application?",
+    answer:
+      "Yes, if you're building production AI applications. AI observability helps you detect hallucinations, track costs, debug complex agent behaviors, monitor quality over time, and maintain compliance. Without observability, you're flying blind—unable to understand why your AI system produces certain outputs or how to improve it.",
+  },
+  {
+    question: "What's the difference between LLM observability and AI observability?",
+    answer:
+      "LLM observability focuses specifically on large language model calls (prompts, completions, tokens, latency). AI observability is broader, encompassing LLMs plus agents (multi-step reasoning, tool calls), RAG systems (retrieval, chunking, embeddings), and other AI components. MLflow provides comprehensive AI observability that covers all these use cases.",
+  },
+  {
+    question: "What is agent observability?",
+    answer:
+      "Agent observability extends LLM observability to multi-step agentic systems. It traces how agents reason, which tools they call, how they handle errors, and how they chain multiple LLM calls together. MLflow automatically captures agent execution graphs, making it easy to debug when agents get stuck in loops, make incorrect tool choices, or produce unexpected results.",
+  },
+  {
+    question: "What is the best AI observability tool?",
+    answer:
+      "The best AI observability tool depends on your needs. MLflow is the leading open-source option, offering complete tracing, evaluation, and monitoring without vendor lock-in. MLflow supports any agent framework (LangChain, LangGraph, LlamaIndex, CrewAI, AutoGen, etc.), any LLM provider (OpenAI, Anthropic, Bedrock, etc.), is fully OpenTelemetry compatible, and gives you full control over your data. Unlike proprietary SaaS tools, MLflow is backed by a community of 20,000+ GitHub stars and 900+ contributors.",
+  },
+  {
     question: "What agent frameworks and LLMs does MLflow support?",
     answer:
       "MLflow supports any LLM, agent authoring framework, and programming language. This includes popular LLM providers like OpenAI, Anthropic (Claude), AWS Bedrock, Google Gemini, Azure OpenAI, Mistral, Cohere, AI21, Together AI, Anyscale, vLLM, and Ollama. For agent frameworks, MLflow integrates with LangChain, LangGraph, LlamaIndex, CrewAI, AutoGen, DSPy, Haystack, Semantic Kernel, and many more. MLflow SDKs are available for Python, JavaScript, and TypeScript.",
@@ -51,21 +71,6 @@ const faqs: { question: string; answer: React.ReactNode; answerText?: string }[]
       "Yes. MLflow is 100% open source under the Apache 2.0 license, backed by the Linux Foundation. You can use all of its observability features (tracing, evaluation, monitoring, and more) for free, including in commercial applications.",
   },
   {
-    question: "What is the best AI observability tool?",
-    answer:
-      "The best AI observability tool depends on your needs. MLflow is the leading open-source option, offering complete tracing, evaluation, and monitoring without vendor lock-in. Unlike proprietary SaaS tools, MLflow gives you full control over your data, supports any LLM or framework, and is backed by a community of 20,000+ GitHub stars and 900+ contributors.",
-  },
-  {
-    question: "Do I need AI observability for my LLM application?",
-    answer:
-      "Yes, if you're building production LLM applications. AI observability helps you detect hallucinations, track costs, debug complex agent behaviors, monitor quality over time, and maintain compliance. Without observability, you're flying blind—unable to understand why your AI system produces certain outputs or how to improve it.",
-  },
-  {
-    question: "What's the difference between LLM observability and AI observability?",
-    answer:
-      "LLM observability focuses specifically on large language model calls (prompts, completions, tokens, latency). AI observability is broader, encompassing LLMs plus agents (multi-step reasoning, tool calls), RAG systems (retrieval, chunking, embeddings), and other AI components. MLflow provides comprehensive AI observability that covers all these use cases.",
-  },
-  {
     question: "How do I get started with AI observability?",
     answer: (
       <>
@@ -77,14 +82,9 @@ const faqs: { question: string; answer: React.ReactNode; answerText?: string }[]
     answerText: "Getting started with MLflow AI observability takes just one line of code. Install MLflow, call mlflow.openai.autolog() (or the equivalent for your framework), and every LLM call is automatically traced. You can then view traces in the MLflow UI, run evaluations with LLM judges, and monitor production metrics. See the MLflow tracing documentation for framework-specific examples.",
   },
   {
-    question: "Can I use AI observability with my existing tools?",
+    question: "Is it easy to integrate MLflow with my existing agent or LLM application?",
     answer:
       "Yes. MLflow integrates seamlessly with your existing stack. It supports OpenTelemetry for exporting traces to any compatible backend, works with any LLM provider (OpenAI, Anthropic, Bedrock, etc.), and integrates with popular frameworks like LangChain, LangGraph, and LlamaIndex. You can also self-host MLflow or use managed versions on Databricks, AWS, and other platforms.",
-  },
-  {
-    question: "What is agent observability?",
-    answer:
-      "Agent observability extends LLM observability to multi-step agentic systems. It traces how agents reason, which tools they call, how they handle errors, and how they chain multiple LLM calls together. MLflow automatically captures agent execution graphs, making it easy to debug when agents get stuck in loops, make incorrect tool choices, or produce unexpected results.",
   },
 ];
 
@@ -402,17 +402,17 @@ export default function AIObservability() {
           <h2>Why AI Observability Matters</h2>
 
           <p>
-            AI systems introduce unique challenges that traditional software monitoring can't address:
+            AI systems, such as agents, LLM applications, and RAG systems, introduce unique challenges that traditional software monitoring can't address:
           </p>
 
           <div className="grid-2">
             <div className="card">
-              <h3>Quality & Reliability</h3>
+              <h3>Debugging Complexity</h3>
               <p>
-                <strong>Problem:</strong> AI systems can produce hallucinations, regressions, and degraded outputs that undermine user trust.
+                <strong>Problem:</strong> Multi-step agents, tool calls, and retrieval chains create complex execution paths that are difficult to debug.
               </p>
               <p>
-                <strong>Solution:</strong> Detect issues before they reach users. Evaluate every response against quality benchmarks automatically.
+                <strong>Solution:</strong> Tracing makes every step visible and debuggable, from initial request to final response.
               </p>
             </div>
 
@@ -427,12 +427,12 @@ export default function AIObservability() {
             </div>
 
             <div className="card">
-              <h3>Debugging Complexity</h3>
+              <h3>Quality & Reliability</h3>
               <p>
-                <strong>Problem:</strong> Multi-step agents, tool calls, and retrieval chains create complex execution paths that are difficult to debug.
+                <strong>Problem:</strong> AI systems can produce hallucinations, regressions, and degraded outputs that undermine user trust.
               </p>
               <p>
-                <strong>Solution:</strong> Tracing makes every step visible and debuggable, from initial request to final response.
+                <strong>Solution:</strong> Detect issues before they reach users. Evaluate every response against quality benchmarks automatically.
               </p>
             </div>
 
@@ -454,10 +454,10 @@ export default function AIObservability() {
           </p>
 
           <ul>
-            <li><strong>Debugging RAG Hallucinations:</strong> When your <Link href={MLFLOW_GENAI_DOCS_URL + "rag/"}>RAG application</Link> produces incorrect answers, tracing shows exactly which documents were retrieved, how they were chunked, what embeddings were used, and which context was passed to the LLM. This makes it easy to identify whether the problem is in retrieval, ranking, or generation.</li>
-            <li><strong>Monitoring Agent Behavior in Production:</strong> <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>Agents</Link> can behave unpredictably—getting stuck in loops, making incorrect tool choices, or producing inconsistent outputs. MLflow automatically captures agent execution graphs, showing every reasoning step, tool call, and decision point so you can identify and fix problematic patterns.</li>
-            <li><strong>Optimizing LLM Costs:</strong> Track token usage and costs across all LLM calls to identify expensive queries, inefficient prompts, or opportunities to switch to smaller models for specific tasks. MLflow's cost tracking helps teams reduce spend by 30-50% without sacrificing quality.</li>
-            <li><strong>A/B Testing Prompt Changes:</strong> Before deploying prompt modifications to production, use MLflow to run <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>side-by-side evaluations</Link> with LLM judges. Compare quality metrics like relevance, factuality, and safety to ensure changes improve—not degrade—output quality.</li>
+            <li><strong>Debugging Hallucinations:</strong> When your agents, LLM applications, or RAG systems produce incorrect outputs, tracing shows exactly what happened—which documents were retrieved, what tool calls were made, which prompts were sent, and what context was used. This makes it easy to identify whether the problem is in retrieval, reasoning, tool selection, or generation.</li>
+            <li><strong>Monitoring Agent Behavior in Production:</strong> <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>Agents</Link> can behave unpredictably—getting stuck in loops, making incorrect tool choices, or producing inconsistent outputs. AI observability platforms automatically capture agent execution graphs, showing every reasoning step, tool call, and decision point so you can identify and fix problematic patterns.</li>
+            <li><strong>Optimizing LLM Costs:</strong> Track token usage and costs across all LLM calls to identify expensive queries, inefficient prompts, or opportunities to switch to smaller models for specific tasks. AI observability platforms help teams reduce spend by 30-50% without sacrificing quality.</li>
+            <li><strong>A/B Testing Prompt Changes:</strong> Before deploying prompt modifications to production, AI observability platforms let you run <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>side-by-side evaluations</Link> with LLM judges. Compare quality metrics like relevance, factuality, and safety to ensure changes improve—not degrade—output quality.</li>
             <li><strong>Catching Production Regressions:</strong> Monitor quality scores, error rates, and latency over time to detect when model behavior degrades from API updates, prompt changes, or data drift—before users notice.</li>
             <li><strong>Maintaining Compliance:</strong> Capture complete audit trails showing what prompts were sent, what responses were received, and what data was accessed. Enforce PII redaction policies and content guardrails to meet regulatory requirements.</li>
           </ul>
@@ -469,31 +469,13 @@ export default function AIObservability() {
           </p>
 
           <ul>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"} style={{ color: "#007bff", fontWeight: "600" }}>Tracing</Link>: Capture complete execution traces including prompts, tool calls, and responses.</li>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"} style={{ color: "#007bff", fontWeight: "600" }}>Evaluation</Link>: Automatically assess quality with <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/llm-as-judge/"} style={{ color: "#007bff" }}>LLM judges</Link> for hallucination, relevance, safety, and custom metrics.</li>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"} style={{ color: "#007bff", fontWeight: "600" }}>Monitoring</Link>: Track quality scores, error rates, and production drift to catch regressions early.</li>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"} style={{ color: "#007bff", fontWeight: "600" }}>Cost & Latency Tracking</Link>: Monitor token usage, response times, and costs to optimize spending.</li>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"} style={{ color: "#007bff", fontWeight: "600" }}>Human Feedback</Link>: Collect user ratings and annotations to measure satisfaction and build evaluation datasets.</li>
-            <li><Link href={MLFLOW_GENAI_DOCS_URL + "guides/responsible-ai/"} style={{ color: "#007bff", fontWeight: "600" }}>Governance</Link>: Maintain audit trails, access controls, and policy guardrails for your AI stack.</li>
+            <li><Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"} style={{ color: "#007bff", fontWeight: "600" }}>Tracing</Link>: Record every step of request execution with inputs, outputs, and latency for each LLM call, retrieval, and tool use.</li>
+            <li><Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"} style={{ color: "#007bff", fontWeight: "600" }}>Evaluation</Link>: Compare agents and LLM applications side-by-side using automated <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/llm-as-judge/"} style={{ color: "#007bff" }}>LLM judges</Link> or custom scoring logic to measure quality improvements.</li>
+            <li><Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"} style={{ color: "#007bff", fontWeight: "600" }}>Monitoring</Link>: Track quality scores, error rates, and token usage over time to identify regressions and production issues.</li>
+            <li><Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"} style={{ color: "#007bff", fontWeight: "600" }}>Cost & Latency Tracking</Link>: Monitor token consumption and costs per request to optimize spending and performance across models.</li>
+            <li><Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"} style={{ color: "#007bff", fontWeight: "600" }}>Human Feedback</Link>: Gather expert reviews and end-user ratings to identify production failures and turn them into test cases for preventing regressions.</li>
+            <li><Link href={MLFLOW_GENAI_DOCS_URL + "guides/responsible-ai/"} style={{ color: "#007bff", fontWeight: "600" }}>Governance</Link>: Maintain complete audit logs of prompts, responses, and data access for compliance and debugging.</li>
           </ul>
-
-          <h2>Open Source vs. Proprietary AI Observability</h2>
-
-          <p>
-            When choosing an AI observability platform, the decision between open source and proprietary SaaS tools has significant long-term implications for your team, infrastructure, and data ownership.
-          </p>
-
-          <p>
-            <strong>Open Source (<Link href="/genai">MLflow</Link>):</strong> With MLflow, you maintain complete control over your observability infrastructure and data. Deploy on your own infrastructure or use managed versions on Databricks, AWS, or other platforms. There are no per-seat fees, no usage limits, and no vendor lock-in. Your telemetry data stays under your control, and you can customize the platform to your exact needs. MLflow integrates with any LLM provider and agent framework through OpenTelemetry-compatible tracing.
-          </p>
-
-          <p>
-            <strong>Proprietary SaaS Tools:</strong> Commercial observability platforms offer convenience but at the cost of flexibility and control. They typically charge per seat or per trace volume, which can become expensive at scale. Your data is sent to their servers, raising privacy and compliance concerns. You're locked into their ecosystem, making it difficult to switch providers or customize functionality. Most proprietary tools only support a subset of LLM providers and frameworks.
-          </p>
-
-          <p>
-            <strong>Why Teams Choose Open Source:</strong> Organizations building production AI applications increasingly choose MLflow because it offers enterprise-grade observability without compromising on data sovereignty, cost predictability, or flexibility. The Apache 2.0 license and Linux Foundation backing ensure MLflow remains truly open and community-driven, not controlled by a single vendor.
-          </p>
 
           <h2>How to Implement AI Observability</h2>
 
@@ -503,7 +485,7 @@ export default function AIObservability() {
           </p>
 
           <p>
-            With just a single line of code, you can automatically capture traces for every LLM call, including prompts, responses, token usage, latency, and model parameters. These traces are stored locally or sent to your MLflow tracking server, where you can search, filter, and analyze them in the MLflow UI. You can also evaluate traces with LLM judges, monitor production metrics, and debug failures.
+            With just a single line of code, you can automatically capture traces for every LLM call, including prompts, responses, token usage, latency, and model parameters. These traces are stored locally or sent to your MLflow tracking server, where you can search, filter, and analyze them in the MLflow UI. You can then evaluate traces with LLM judges to find quality issues like hallucinations and relevance problems, monitor production metrics to catch regressions, and debug failures.
           </p>
 
           <p>
@@ -706,6 +688,24 @@ const result = await generateText({
               {" "}<Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>
+
+          <h2>Open Source vs. Proprietary AI Observability</h2>
+
+          <p>
+            When choosing an AI observability platform, the decision between open source and proprietary SaaS tools has significant long-term implications for your team, infrastructure, and data ownership.
+          </p>
+
+          <p>
+            <strong>Open Source (<Link href="/genai">MLflow</Link>):</strong> With MLflow, you maintain complete control over your observability infrastructure and data. Deploy on your own infrastructure or use managed versions on Databricks, AWS, or other platforms. There are no per-seat fees, no usage limits, and no vendor lock-in. Your telemetry data stays under your control, and you can customize the platform to your exact needs. MLflow integrates with any LLM provider and agent framework through OpenTelemetry-compatible tracing.
+          </p>
+
+          <p>
+            <strong>Proprietary SaaS Tools:</strong> Commercial observability platforms offer convenience but at the cost of flexibility and control. They typically charge per seat or per trace volume, which can become expensive at scale. Your data is sent to their servers, raising privacy and compliance concerns. You're locked into their ecosystem, making it difficult to switch providers or customize functionality. Most proprietary tools only support a subset of LLM providers and frameworks.
+          </p>
+
+          <p>
+            <strong>Why Teams Choose Open Source:</strong> Organizations building production AI applications increasingly choose MLflow because it offers enterprise-grade observability without compromising on data sovereignty, cost predictability, or flexibility. The Apache 2.0 license and Linux Foundation backing ensure MLflow remains truly open and community-driven, not controlled by a single vendor.
+          </p>
 
           <h2>Frequently Asked Questions</h2>
 
