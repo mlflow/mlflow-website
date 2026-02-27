@@ -164,6 +164,7 @@ export default function Evaluations() {
         title="Agent Evaluation"
         body="Confidently evaluate quality in development and production to identify issues and iteratively test improvements."
         hasGetStartedButton={`${MLFLOW_GENAI_DOCS_URL}eval-monitor/quickstart/`}
+        minHeight="none"
       >
         <HeroImage src={CardHero} alt="" />
       </AboveTheFold>

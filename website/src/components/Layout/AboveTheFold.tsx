@@ -18,6 +18,7 @@ const innerWrapper = cva(
   {
     variants: {
       minHeight: {
+        none: "",
         small: "min-h-[350px]",
         default: "min-h-[550px]",
       },
@@ -33,6 +34,7 @@ export function AboveTheFold({
   hasGetStartedButton,
   actions,
   bodyColor,
+  bodySize = "l",
   minHeight = "default",
 }: Props) {
   const bodyParts = Array.isArray(body) ? body : [body];
@@ -45,7 +47,7 @@ export function AboveTheFold({
         </div>
         <div className="mx-auto text-pretty">
           {bodyParts.map((part, index) => (
-            <Body key={index} size="l" align="center" color={bodyColor}>
+            <Body key={index} size={bodySize} align="center" color={bodyColor}>
               {part}
             </Body>
           ))}

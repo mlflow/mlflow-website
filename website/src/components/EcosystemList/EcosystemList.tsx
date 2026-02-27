@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Section } from "..";
 import BrowserOnly from "@docusaurus/BrowserOnly";
 import ExpandableGrid from "../ExpandableGrid/ExpandableGrid";
@@ -226,7 +227,7 @@ export const EcosystemList = ({
   title = "Works With Any Framework",
   body = "From LLM agent frameworks to traditional ML libraries - MLflow integrates seamlessly with 100+ tools across the AI ecosystem. Supports Python, TypeScript/JavaScript, Java, R, and natively integrates with OpenTelemetry.",
   items = defaultItems,
-}: { title?: string; body?: string; items?: EcosystemItem[] } = {}) => {
+}: { title?: string; body?: ReactNode; items?: EcosystemItem[] } = {}) => {
   return (
     <div className="w-full px-4 md:px-8 lg:px-16 flex justify-center relative overflow-hidden">
       <Section

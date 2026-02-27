@@ -107,6 +107,7 @@ export default function Observability() {
       <AboveTheFold
         sectionLabel="Observability"
         title="LLM and Agent Observability"
+        minHeight="small"
         body={[
           <>
             Gain visibility into your agent or LLM application's logic to{" "}
@@ -135,7 +136,14 @@ export default function Observability() {
           </div>
         }
       >
-        <HeroImage src={CardHero} alt="" />
+        <div className="relative w-full max-w-[1320px] mx-auto px-4">
+          <video className="rounded-[16px]" width="100%" autoPlay loop muted playsInline>
+            <source
+              src={require("@site/static/img/releases/3.9.0/overview_demo.mp4").default}
+              type="video/mp4"
+            />
+          </video>
+        </div>
       </AboveTheFold>
 
       <Section title="Rich, detailed traces for every request">
@@ -147,7 +155,7 @@ export default function Observability() {
 
       <EcosystemList
         title="Automatic tracing for your entire stack"
-        body="Auto-trace 50+ LLM providers and agent frameworks with a single line of code. MLflow is OpenTelemetry compatible, supporting any programming language, agent, or LLM."
+        body={<>Auto-trace 50+ LLM providers and agent frameworks with a single line of code. MLflow is <a href="https://mlflow.org/docs/latest/genai/tracing/opentelemetry/" className="text-blue-400 !underline decoration-blue-400/50 underline-offset-2 hover:text-blue-300 hover:decoration-blue-300/50 transition-colors">OpenTelemetry compatible</a>, supporting any programming language, agent, or LLM.</>}
         items={genaiIntegrations.map((item) => ({
           ...item,
           src: item.src.startsWith("/") ? item.src : `/${item.src}`,

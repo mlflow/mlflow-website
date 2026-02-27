@@ -20,17 +20,16 @@ export default function Home(): JSX.Element {
     <Layout>
       {/* 1. HERO SECTION */}
       <HeroSection
-        title="Ship Production-Quality Agents and Models, Fast"
+        title="Deliver High-Quality AI, Fast"
         subtitle={
           <>
-            Building high-quality AI products is all about iteration.
+            Building AI products is all about iteration.
             <br />
-            MLflow shortens the path to production, enabling you to{" "}
-            <HighlightedKeyword>build</HighlightedKeyword>,{" "}
-            <HighlightedKeyword>evaluate</HighlightedKeyword>,{" "}
-            <HighlightedKeyword>deploy</HighlightedKeyword>, and{" "}
-            <HighlightedKeyword>monitor</HighlightedKeyword> agents and
-            models at scale — with complete visibility and control.
+            MLflow lets you move 10x faster by simplifying how you{" "}
+            <HighlightedKeyword>debug</HighlightedKeyword>,{" "}
+            <HighlightedKeyword>test</HighlightedKeyword>, and{" "}
+            <HighlightedKeyword>evaluate</HighlightedKeyword> your LLM
+            applications, Agents, and Models.
           </>
         }
         primaryCTA={{

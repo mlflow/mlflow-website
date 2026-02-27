@@ -14,22 +14,22 @@ const GitHubIcon = ({ className }: { className?: string }) => (
 export function TrustPills() {
   const stars = useGitHubStars();
   return (
-    <div className="flex flex-wrap justify-center items-center gap-3 mt-2">
-      <div className="flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-3 py-1.5 text-xs text-white/70">
-        <LinuxFoundationLogo className="h-4 w-auto text-white/70" />
+    <div className="flex flex-wrap justify-center items-center gap-4 mt-2">
+      <div className="flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-5 py-2.5 text-sm text-white/70">
+        <LinuxFoundationLogo className="h-6 w-auto text-white/70" />
       </div>
       <a
         href="https://github.com/mlflow/mlflow"
         target="_blank"
         rel="noreferrer noopener"
-        className="flex items-center gap-1.5 rounded-full bg-white/5 border border-white/10 px-3 py-1.5 text-xs text-white/70 hover:bg-white/10 hover:border-white/20 transition-all"
+        className="flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-5 py-2.5 text-sm text-white/70 hover:bg-white/10 hover:border-white/20 transition-all"
       >
-        <GitHubIcon className="w-3.5 h-3.5" />
-        <Star className="w-3 h-3" fill="currentColor" />
+        <GitHubIcon className="w-5 h-5" />
+        <Star className="w-4 h-4" fill="currentColor" />
         {stars && <span>{stars}+ Stars</span>}
       </a>
-      <div className="flex items-center gap-1.5 rounded-full bg-white/5 border border-white/10 px-3 py-1.5 text-xs text-white/70">
-        <Download className="w-3 h-3" />
+      <div className="flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-5 py-2.5 text-sm text-white/70">
+        <Download className="w-4 h-4" />
         <span>30M+ Downloads/mo</span>
       </div>
     </div>

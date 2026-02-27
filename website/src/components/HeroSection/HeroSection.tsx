@@ -88,7 +88,7 @@ export function HighlightedKeyword({
   if (href) {
     return (
       <Link to={href}>
-        <span className="text-white underline decoration-white/50 underline-offset-4 hover:decoration-white transition-all cursor-pointer">
+        <span className="text-white font-semibold underline decoration-white/50 underline-offset-4 hover:decoration-white transition-all cursor-pointer">
           {children}
         </span>
       </Link>
@@ -96,7 +96,7 @@ export function HighlightedKeyword({
   }
 
   return (
-    <span className="text-white underline decoration-white/50 underline-offset-4">
+    <span className="text-white font-semibold underline decoration-white/50 underline-offset-4">
       {children}
     </span>
   );

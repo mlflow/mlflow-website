@@ -271,7 +271,7 @@ export default function GenAi(): JSX.Element {
   return (
     <Layout>
       <AboveTheFold
-        title={<strong>Open Source Agent Platform</strong>}
+        title={<span className="text-[48px] xxs:text-[64px] xs:text-[80px] leading-[110%]">Open Source Agent Engineering Platform</span>}
         body={[
           <>
             Confidently ship agents and LLM applications to production
@@ -285,6 +285,7 @@ export default function GenAi(): JSX.Element {
           </>,
         ]}
         bodyColor="white"
+        bodySize="xl"
         actions={
           <div className="flex flex-col items-center gap-4">
             <div className="flex flex-wrap justify-center items-center gap-4">
