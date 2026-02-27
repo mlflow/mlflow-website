@@ -336,7 +336,7 @@ export default function GenAi(): JSX.Element {
         </div>
       </div>
 
-      <StatsBand title="Most Adopted Open Source Agent Platform" />
+      <StatsBand title="Most Adopted Open Source AI Platform" />
       <EcosystemList
         title="Works with Any LLM and Agent Framework"
         body="From LLM providers to agent frameworks — MLflow integrates seamlessly with 100+ tools across the AI ecosystem. Supports any programming language and natively integrates with OpenTelemetry and MCP."
