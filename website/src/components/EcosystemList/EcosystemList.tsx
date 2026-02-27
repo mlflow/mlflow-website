@@ -223,7 +223,7 @@ const defaultItems: EcosystemItem[] = [
 ];
 
 export const EcosystemList = ({
-  title = "Works With Any LLM Framework",
+  title = "Works With Any Framework",
   body = "From LLM agent frameworks to traditional ML libraries - MLflow integrates seamlessly with 100+ tools across the AI ecosystem. Supports Python, TypeScript/JavaScript, Java, R, and natively integrates with OpenTelemetry.",
   items = defaultItems,
 }: { title?: string; body?: string; items?: EcosystemItem[] } = {}) => {
