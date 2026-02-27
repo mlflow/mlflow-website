@@ -1,6 +1,6 @@
 ---
-title: "Ship LLM Agents Faster with Coding Agents and MLflow Skills"
-description: How coding agents and MLflow create a tight feedback loop for building better LLM agents - trace, analyze, evaluate, fix, repeat.
+title: "Ship LLM Agents Faster with Coding Assistants and MLflow Skills"
+description: How MLflow provides coding assistants with the required feedback loop to build better LLM agents - trace, analyze, fix, validate, repeat.
 slug: self-improving-agent-loop
 authors: [yuki-watanabe]
 tags: [genai, evaluation, tracing, coding-agents]
@@ -12,7 +12,7 @@ import TOCInline from "@theme/TOCInline";
 
 Building LLM agents often feels like flying blind. You tweak a prompt, manually test a few queries, hope it's better, and repeat. There's no systematic way to know if your last change actually improved things or quietly broke something else.
 
-We've seen this story play out across teams. Everyone knows they *should* evaluate their agent, but the deadline is looming, the manager wants an MVP yesterday, and learning evaluation frameworks feels like a detour. So testing gets pushed to "after launch... someday."
+We've seen this story play out across teams. Everyone knows they _should_ evaluate their agent, but the deadline is looming, the manager wants an MVP yesterday, and learning evaluation frameworks feels like a detour. So testing gets pushed to "after launch... someday." And then bad responses in production create bigger headaches and raise the urgency to fix the agent reactively.
 
 Coding agents can change this. If they can double or triple our productivity for writing software, why not for agent development too? The catch is that they lack the context. Agent development requires specialized tools and practices that are quite different from regular software engineering.
 
@@ -30,10 +30,10 @@ The core idea is a six-step cycle where your coding agent drives most of the wor
 2. **Run your agent**: traces land in MLflow automatically
 3. **Find issues from traces**: the coding agent analyzes traces via MCP or CLI
 4. **Test via judges**: the coding agent writes scorers to quantify problems
-5. **Fix the code**: the coding agent suggests and applies changes
-6. **Go to 2**: re-run and verify the fix with evidence
+5. **Fix the code**: the coding agent suggests and applies changes, and uses the same judges to _verify_ that the fixes work (and no other errors have been introduced).
+6. Repeat until no issues remain.
 
-Steps 1, 3, 4, and 5 are all driven by the coding agent with MLflow Skills. You focus on the decisions; the agent handles the mechanics.
+Steps 1 through 5 are all driven by the coding agent with MLflow Skills. You focus on the decisions; the agent handles the mechanics.
 
 ## Getting Started: One Command
 
@@ -48,7 +48,7 @@ $ npx skills add mlflow/skills
 This installs official MLflow skills that teach your coding agent how to set up tracing, run evaluations, analyze traces, and more. Now ask the coding agent to set up tracing for your project:
 
 ```
-> Set up MLflow tracing for this project.
+> Integrate MLflow tracing in my agent.
 ```
 
 The coding agent configures autologging for your stack (e.g., `mlflow.langchain.autolog()`) and ensures traces flow to MLflow. No manual setup required.
@@ -76,7 +76,11 @@ Run your agent on a set of test queries. Every call (retrieval, LLM generation, 
 
 How do we find issues in the traces? Manually reviewing them is ok when there are only a few traces. But when there are tens of traces, it is time-consuming.
 
-<img src={require("./trace-list.png").default} alt="Screenshot of MLflow trace list showing recent agent traces with status, latency, and token usage" width="100%" />
+<img
+  src={require("./trace-list.png").default}
+  alt="Screenshot of MLflow trace list showing recent agent traces with status, latency, and token usage"
+  width="100%"
+/>
 
 Instead, you can ask the coding agent to find issues for you.
 
@@ -177,16 +181,15 @@ Once the evaluation is complete, you can check the results in MLflow UI. MLflow 
 
 The results show response groundedness is the most impactful issue. Now we know exactly where to focus.
 
-
 ### Fix: Apply and Verify
 
 With failing traces identified and scores quantified, fix the issue:
 
 ```
-> Based on the evaluation results, suggest fixes to improve groundedness.
+> Based on the evaluation results, suggest fixes to improve groundedness. Use the scorers to verify that the fixes work.
 ```
 
-The coding agent proposes targeted changes: adding a query rewriting step to preserve conversation context, and system prompt guidance like *"Only answer based on the retrieved documents. If the context doesn't contain the answer, say you don't know."*
+The coding agent proposes targeted changes: adding a query rewriting step to preserve conversation context, and system prompt guidance like _"Only answer based on the retrieved documents. If the context doesn't contain the answer, say you don't know."_
 
 Run groundedness against the new traces. Compare with previous results.
 
@@ -197,8 +200,6 @@ Run groundedness against the new traces. Compare with previous results.
 />
 
 The trace now includes `rewrite_queries` step that rewrites the search query to reflect the full conversation context rather than the single query. Now the search query includes "Google ADK" in addition to "MLflow tracing setup" and the final response becomes more relevant to the user query.
-
-Now you can re-run the evaluation to verify the fix. It gives you an evidence that the change worked, not a gut feeling. Commit the fix and ship with confidence.
 
 ## The Loop Inside the UI: MLflow Assistant
 
@@ -219,12 +220,12 @@ The Assistant can analyze traces, generate scorers, and suggest fixes, all while
 
 The improvement loop using coding agent and MLflow Skills is applicable to any coding agent.
 
-| Coding Agent   | Skills | MCP | CLI |
-| -------------- | ------ | --- | --- |
-| **Claude Code** | Yes   | Yes | Yes |
-| **Codex**       | Yes   | Yes | Yes |
-| **Gemini CLI**  | Yes   | Yes | Yes |
-| **OpenCode**    | Yes   | Yes | Yes |
+| Coding Agent    | Skills | MCP | CLI |
+| --------------- | ------ | --- | --- |
+| **Claude Code** | Yes    | Yes | Yes |
+| **Codex**       | Yes    | Yes | Yes |
+| **Gemini CLI**  | Yes    | Yes | Yes |
+| **OpenCode**    | Yes    | Yes | Yes |
 
 ## Conclusion
 
