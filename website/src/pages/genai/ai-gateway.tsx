@@ -26,7 +26,7 @@ export default function AiGateway() {
       <StickyGrid
         cards={[
           {
-            title: "Configure endpoints",
+            title: "Access 50+ Model Providers"
             body: "Define and manage multiple LLM endpoints across providers in a single place, enabling centralized API key management and seamless integration.",
             image: <img src={Card1} alt="Configure endpoints" />,
           },
