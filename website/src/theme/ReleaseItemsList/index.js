@@ -11,7 +11,7 @@ export default function ReleaseItemsList({ items, ...layoutProps }) {
           key={BlogPostContent.metadata.permalink}
           content={BlogPostContent}
         >
-          <BlogPostItem className="max-w-4xl **:[h2>a]:!text-2xl">
+          <BlogPostItem className="max-w-4xl">
             <BlogPostContent />
           </BlogPostItem>
         </BlogPostProvider>
