@@ -8,48 +8,36 @@ thumbnail: /img/blog/mlflow-trulens-evaluation-thumbnail.png
 image: /img/blog/mlflow-trulens-evaluation-thumbnail.png
 ---
 
-MLflow's [third-party scorer framework](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/third-party/) already supports LLM-as-a-judge evaluations from [DeepEval, RAGAS, and Phoenix](/blog/third-party-scorers) across an ecosystem with 18M+ monthly PyPI downloads. Those scorers look at inputs and outputs. Did the response answer the question? Was it grounded in the context? That's enough for chatbots and RAG pipelines, but agents are a different problem. The [TruLens](https://www.trulens.org/) integration ([PR #19492](https://github.com/mlflow/mlflow/pull/19492)) changes that by evaluating what happens inside the execution trace.
+MLflow's [third-party scorer framework](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/third-party/) already supports LLM-as-a-judge evaluations from [DeepEval, RAGAS, and Phoenix](/blog/third-party-scorers), an ecosystem with 18M+ monthly PyPI downloads. We're excited to announce the [TruLens](https://www.trulens.org/) integration as we continue our efforts to expand support for various third-party evaluation frameworks.
 
 An agent doesn't just produce an answer. It makes a plan, picks tools, executes a multi-step workflow, and adapts when steps fail. A correct final answer can mask a flawed plan, redundant tool calls, or broken reasoning along the way. To catch those problems, you need to evaluate what happened _inside_ the execution trace, not just what came out the other end.
 
 {/* truncate */}
 
-The integration adds 10 scorers that bring trace-aware agent evaluation to the scorer framework for the first time. You pass an MLflow trace, and the scorer reads the full span tree (plans, tool calls, intermediate outputs, everything) using the [Agent GPA framework](https://www.snowflake.com/en/engineering-blog/ai-agent-evaluation-gpa-framework/) developed by the TruLens team at Snowflake.
+The integration adds 10 scorers that bring the [Agent GPA framework](https://www.snowflake.com/en/engineering-blog/ai-agent-evaluation-gpa-framework/) to MLflow. You pass an MLflow trace, and the scorer reads the full span tree (plans, tool calls, intermediate outputs) to evaluate agent behavior. MLflow already supports [trace-based judges](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/#trace-based-judges) and agentic metrics from DeepEval and RAGAS. TruLens adds a structured three-dimensional lens (Goal, Plan, Action) developed by the TruLens team at Snowflake.
 
 ## The Agent GPA Framework
 
-GPA stands for Goal-Plan-Action, and it evaluates the three alignment dimensions in an agent's execution:
+GPA stands for Goal-Plan-Action, and it evaluates three alignment dimensions in an agent's execution:
 
-**Goal-Plan alignment** asks: did the agent make a good strategy? `PlanQuality` checks whether the plan decomposes the goal into feasible subtasks. `ToolSelection` checks whether the agent picked the right tools for each subtask. An agent that gets the right answer by brute-forcing every available tool has a Goal-Plan problem even if the output looks fine.
+**Goal-Plan alignment** asks: did the agent make a good strategy? An agent that gets the right answer by brute-forcing every available tool has a Goal-Plan problem even if the output looks fine.
 
-**Plan-Action alignment** asks: did the agent follow through? `PlanAdherence` checks whether the agent's actual actions match its stated plan. Did it skip steps, reorder things, or repeat work? `ToolCalling` checks whether function calls are valid, with correct parameters and complete inputs.
+- `PlanQuality` checks whether the plan decomposes the goal into feasible subtasks.
+- `ToolSelection` checks whether the agent picked the right tools for each subtask.
 
-**Holistic alignment** looks at the trajectory as a whole. `LogicalConsistency` checks whether each step is coherent with prior context and reasoning. `ExecutionEfficiency` checks whether the agent reached the goal without redundant calls.
+**Plan-Action alignment** asks: did the agent follow through? Did it skip steps, reorder things, or repeat work?
+
+- `PlanAdherence` checks whether the agent's actual actions match its stated plan.
+- `ToolCalling` checks whether function calls are valid, with correct parameters and complete inputs.
+
+**Holistic alignment** looks at the trajectory as a whole.
+
+- `LogicalConsistency` checks whether each step is coherent with prior context and reasoning.
+- `ExecutionEfficiency` checks whether the agent reached the goal without redundant calls.
 
 On the [TRAIL/GAIA benchmark](https://arxiv.org/abs/2510.08847), GPA judges identify 95% of human-labeled agent errors (267/281), compared to 55% for standard judges that only look at final outputs. That 40-percentage-point gap is what you leave on the table when you only evaluate the answer.
 
-## Agent Trace Scorers
-
-The integration brings GPA evaluation to MLflow's scorer API, making it accessible through the same `mlflow.genai.evaluate()` interface used for all other scorers.
-
-The integration exposes six scorers, one for each GPA dimension:
-
-```python
-from mlflow.genai.scorers.trulens import (
-    PlanQuality,
-    ToolSelection,
-    PlanAdherence,
-    ToolCalling,
-    LogicalConsistency,
-    ExecutionEfficiency,
-)
-
-scorer = PlanAdherence(model="openai:/gpt-4o")
-feedback = scorer(trace=my_agent_trace)
-
-print(feedback.value)      # Raw score from GPA evaluation
-print(feedback.rationale)  # Chain-of-thought reasoning explaining the score
-```
+The integration exposes six agent scorers covering the three GPA dimensions:
 
 | Scorer                | Alignment   | What it checks                                                    |
 | --------------------- | ----------- | ----------------------------------------------------------------- |
@@ -60,12 +48,17 @@ print(feedback.rationale)  # Chain-of-thought reasoning explaining the score
 | `LogicalConsistency`  | Holistic    | Is each step coherent with prior context and reasoning?           |
 | `ExecutionEfficiency` | Holistic    | Did the agent reach the goal without redundant calls?             |
 
-Pass a trace and nothing else. Under the hood, the integration serializes your MLflow trace to JSON and passes the full span tree to TruLens' provider, which evaluates each dimension with chain-of-thought reasoning. You get back a score and a rationale explaining what it found. No manual span extraction needed.
+Pass a trace and the scorer handles the rest. Under the hood, the integration serializes your MLflow trace to JSON and passes the full span tree to TruLens' provider, which evaluates each dimension with chain-of-thought reasoning. You get back a score and a rationale explaining what it found.
 
 <img
   src={require("./trulens-pipeline.png").default}
-  alt="Architecture diagram showing the TruLens trace evaluation pipeline: MLflow agent trace with spans is serialized to JSON, passed to the TruLens GPA Provider backed by a model provider, which evaluates across six scorer dimensions (PlanQuality, ToolSelection, PlanAdherence, ToolCalling, LogicalConsistency, ExecutionEfficiency) grouped by Goal-Plan, Plan-Action, and Holistic alignment, producing scores and rationales that flow into MLflow Feedback and the assessment table UI"
-  style={{ width: "100%", margin: "0 auto", display: "block" }}
+  alt="Architecture diagram showing the TruLens trace evaluation pipeline: MLflow agent trace with spans is serialized to JSON, passed to the TruLens GPA Provider backed by a model provider, which evaluates across six scorer dimensions grouped by Goal-Plan, Plan-Action, and Holistic alignment, producing scores and rationales that flow into MLflow Feedback and the assessment table UI"
+  style={{
+    maxWidth: "680px",
+    width: "100%",
+    margin: "0 auto",
+    display: "block",
+  }}
 />
 
 ## How Trace Evaluation Catches What Output Evaluation Misses
@@ -73,114 +66,56 @@ Pass a trace and nothing else. Under the hood, the integration serializes your M
 Here's a concrete scenario. Say you have a travel-planning agent that should: (1) search for flights, (2) check hotel availability, (3) book both. The agent returns "Your trip is booked!" and it looks correct. But the trace tells a different story:
 
 ```
-Span 1: search_flights("NYC", "LAX", "2026-04-01") → 3 results
-Span 2: search_flights("NYC", "LAX", "2026-04-01") → 3 results  ← duplicate
-Span 3: search_hotels("LAX", "2026-04-01") → 2 results
-Span 4: book_flight(flight_id="FL123") → confirmed
-Span 5: book_hotel(hotel_id=None) → error, retried with "H456" → confirmed
+Span 1: search_flights("NYC", "LAX", "2026-04-01") -> 3 results
+Span 2: search_flights("NYC", "LAX", "2026-04-01") -> 3 results  <- duplicate
+Span 3: book_flight(flight_id="FL123") -> confirmed
+Span 4: search_hotels("LAX", "2026-04-01") -> 2 results
+Span 5: book_hotel(hotel_id=None) -> error
+Span 6: book_hotel(hotel_id="H456") -> confirmed
 ```
 
 Output-only evaluation gives this a pass. The trip got booked. Trace-level evaluation catches three problems:
 
 - **ExecutionEfficiency**: redundant flight search (Span 2 duplicates Span 1)
 - **ToolCalling**: `book_hotel` called with `None` before retry (Span 5)
-- **PlanAdherence**: the agent didn't check hotel results before booking a flight
+- **PlanAdherence**: the agent booked a flight before searching for hotels
 
-You'd evaluate this with:
+## Combining Agent and RAG Evaluation
+
+You can mix agent trace scorers, RAG scorers, and scorers from other frameworks in a single `mlflow.genai.evaluate()` call. The trace scorers read the span tree, while RAG scorers like `Groundedness` extract context from retrieval spans in the trace automatically. All scorers support a `model` parameter for choosing your LLM provider (OpenAI, Anthropic, or any LiteLLM-compatible provider).
 
 ```python
 import mlflow
 from mlflow.genai.scorers.trulens import (
-    ExecutionEfficiency,
-    ToolCalling,
+    Groundedness,
     PlanAdherence,
+    ExecutionEfficiency,
 )
+from mlflow.genai.scorers.phoenix import Hallucination
 
-traces = mlflow.search_traces(experiment_ids=["1"])
+traces = mlflow.search_traces(locations=["..."])
 
 results = mlflow.genai.evaluate(
     data=traces,
     scorers=[
-        ExecutionEfficiency(model="openai:/gpt-4o"),
-        ToolCalling(model="openai:/gpt-4o"),
-        PlanAdherence(model="openai:/gpt-4o"),
+        # Agent behavior (reads the full span tree)
+        PlanAdherence(model="openai:/gpt-5-mini"),
+        ExecutionEfficiency(model="openai:/gpt-5-mini"),
+        # RAG quality (extracts context from retrieval spans)
+        Groundedness(model="openai:/gpt-5-mini"),
+        # Content quality (Phoenix)
+        Hallucination(model="openai:/gpt-5-mini"),
     ],
 )
 ```
 
-Results land in the MLflow experiment alongside any other evaluation results. Same UI, same assessment table, same filtering and search.
+Each scorer runs independently and writes results to the same experiment. Results land in the MLflow assessment table alongside any other evaluation results.
 
 <img
   src={require("./mlflow-trace-detail.png").default}
-  alt="MLflow trace detail showing travel-planning agent with 7 spans (plan_trip, search_flights x2, search_hotels, book_flight, book_hotel, book_hotel_retry) on the left, and 6 TruLens GPA assessments on the right with execution_efficiency expanded to show its rationale: the agent made a redundant search_flights call and failed the first book_hotel attempt"
+  alt="MLflow trace detail showing travel-planning agent with spans on the left, and TruLens GPA assessments on the right with execution_efficiency expanded to show its rationale"
   width="100%"
 />
-
-## RAG Scorers
-
-The integration also includes four RAG evaluation scorers. These follow the same pattern as the existing [DeepEval, RAGAS, and Phoenix judges](/blog/third-party-scorers). They evaluate inputs and outputs rather than traces:
-
-```python
-from mlflow.genai.scorers.trulens import Groundedness, ContextRelevance
-
-scorer = Groundedness(model="openai:/gpt-4o", threshold=0.6)
-feedback = scorer(
-    outputs="MLflow is an open-source ML platform.",
-    expectations={"context": "MLflow documentation text..."},
-)
-
-print(feedback.value)              # "yes" or "no" (based on threshold)
-print(feedback.metadata["score"])  # 0.85
-```
-
-The four RAG scorers (`Groundedness`, `ContextRelevance`, `AnswerRelevance`, and `Coherence`) return `YES` or `NO` based on a configurable threshold, with the raw float score in metadata.
-
-The difference from the agent trace scorers is that RAG scorers work with inputs, outputs, and expectations (like every other third-party scorer), while agent trace scorers require a trace object. You can use both in the same evaluation call. Just pass traces as your data, and each scorer takes what it needs.
-
-## Provider Routing
-
-Agent trace evaluation is expensive. Each scorer sends the full span tree to an LLM judge, and you're typically running multiple scorers per trace. Being locked into a single provider means you can't optimize cost by running cheaper scorers on a faster model or route sensitive traces through a private endpoint. TruLens scorers support the same model URI format as Phoenix and the other third-party integrations, so you pick the right provider for each scorer:
-
-```python
-# Databricks managed judge (built-in, no API key needed)
-scorer = Groundedness(model="databricks")
-
-# Databricks serving endpoint
-scorer = Groundedness(model="databricks:/my-judge-endpoint")
-
-# OpenAI
-scorer = Groundedness(model="openai:/gpt-4o")
-
-# Any LiteLLM-supported provider
-scorer = Groundedness(model="anthropic:/claude-sonnet-4-5-20250514")
-```
-
-For `"databricks"`, the integration uses MLflow's managed judge adapter. For everything else, it creates a LiteLLM provider. The routing happens inside the integration, so you just pass the URI.
-
-## Combining Trace and Output Evaluation
-
-With both trace-aware agent scorers and traditional input/output scorers in the same framework, MLflow can now evaluate agent behavior and output quality in a single API call. Where this gets interesting is mixing evaluation types in one call. Run agent trace scorers alongside RAG scorers and scorers from other frameworks:
-
-```python
-import mlflow
-from mlflow.genai.scorers.trulens import Groundedness, PlanAdherence, ExecutionEfficiency
-from mlflow.genai.scorers.phoenix import Hallucination
-
-results = mlflow.genai.evaluate(
-    data=traces,
-    scorers=[
-        # Agent behavior (trace-aware)
-        PlanAdherence(model="openai:/gpt-4o"),
-        ExecutionEfficiency(model="openai:/gpt-4o"),
-        # RAG quality
-        Groundedness(model="openai:/gpt-4o"),
-        # Content quality (Phoenix)
-        Hallucination(model="openai:/gpt-4o"),
-    ],
-)
-```
-
-Each scorer runs independently and writes results to the same experiment. The trace scorers read the span tree, and the RAG and content scorers read inputs/outputs. All results show up in the same MLflow assessment table.
 
 <img
   src={require("./mlflow-traces-assessments.png").default}
@@ -191,25 +126,30 @@ Each scorer runs independently and writes results to the same experiment. The tr
 ## Getting Started
 
 ```bash
-pip install mlflow trulens trulens-providers-litellm
+pip install mlflow>=3.10.0 trulens trulens-providers-litellm
 ```
 
-The `trulens-providers-litellm` package is needed for non-Databricks model providers (OpenAI, Anthropic, etc.). If you only use the Databricks managed judge, the base `trulens` package is enough.
-
 ```python
-from mlflow.genai.scorers.trulens import get_scorer
+from mlflow.genai.scorers.trulens import PlanAdherence, Groundedness
 
-# Create RAG scorers by name
-scorer = get_scorer("Groundedness", model="openai:/gpt-4o")
+# Agent trace scorer
+scorer = PlanAdherence(model="openai:/gpt-5-mini")
+feedback = scorer(trace=my_agent_trace)
+print(feedback.value)      # "yes" or "no" based on threshold
+print(feedback.rationale)  # Chain-of-thought reasoning
 
-# Agent trace scorers: instantiate directly
-from mlflow.genai.scorers.trulens import PlanAdherence
-scorer = PlanAdherence(model="openai:/gpt-4o")
+# RAG scorer (extracts context from retrieval spans in trace)
+scorer = Groundedness(model="openai:/gpt-5-mini", threshold=0.6)
+feedback = scorer(trace=my_rag_trace)
+print(feedback.value)              # "yes" or "no"
+print(feedback.rationale)          # Why it passed or failed
+print(feedback.metadata["score"])  # 0.85
 ```
 
 ## Resources
 
 - [Third-Party Scorers Overview](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/third-party/)
+- [Trace-Based Judges](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/#trace-based-judges)
 - [Agent GPA Framework (Snowflake Engineering Blog)](https://www.snowflake.com/en/engineering-blog/ai-agent-evaluation-gpa-framework/)
 - [Trace-Aware Agent Evaluation for MLflow (Snowflake Engineering Blog)](https://www.snowflake.com/en/engineering-blog/trace-aware-agent-evaluation-mlflow/)
 - [Agent GPA Paper (arXiv)](https://arxiv.org/abs/2510.08847)
