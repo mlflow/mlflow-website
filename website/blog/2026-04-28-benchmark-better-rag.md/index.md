@@ -7,7 +7,7 @@ thumbnail: /img/blog/tnb.png
 image: /img/blog/tnb.png
 ---
 
-## Summary
+## High-level summary: problems, approaches, and takeways for better RAG with MLflow
 
 **The problem**: Vector Search has many tuning knobs (embedding model, chunk size, search mode, reranker, filters), but most teams pick defaults and never measure the impact. Without a benchmark, you're tuning blind.
 
