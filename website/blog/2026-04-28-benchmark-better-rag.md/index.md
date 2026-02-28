@@ -7,10 +7,8 @@ thumbnail: /img/blog/tnb.png
 image: /img/blog/tnb.png
 ---
 
-
-
-
 ## Summary
+
 **The problem**: Vector Search has many tuning knobs (embedding model, chunk size, search mode, reranker, filters), but most teams pick defaults and never measure the impact. Without a benchmark, you're tuning blind.
 
 **The approach**: Build a ground-truth evaluation set once, then use MLflow's retriever evaluation to benchmark each configuration change with precision@k, recall@k, and nDCG@k — all tracked and comparable in the MLflow Experiment UI.
@@ -32,11 +30,11 @@ This guide assumes familiarity with MLflow for Agents and LLM Applications. For 
 
 We'll run three benchmark rounds, each isolating a single tuning knob:
 
-| Round | Tuning Knob | Configurations to Benchmark |
-|-------|-------------|----------------------------|
-| 1 | Embedding model | gte-large-en vs. bge-large-en (or any two models) |
-| 2 | Chunk size | 256 tokens vs. 512 tokens vs. 1024 tokens |
-| 3 | Search mode | ANN vs. Hybrid vs. Hybrid + Reranker |
+| Round | Tuning Knob     | Configurations to Benchmark                       |
+| ----- | --------------- | ------------------------------------------------- |
+| 1     | Embedding model | gte-large-en vs. bge-large-en (or any two models) |
+| 2     | Chunk size      | 256 tokens vs. 512 tokens vs. 1024 tokens         |
+| 3     | Search mode     | ANN vs. Hybrid vs. Hybrid + Reranker              |
 
 The code below shows each round implemented against three different vector stores — Databricks Vector Search, Pinecone, and LanceDB — to demonstrate that the MLflow evaluation pattern is the same regardless of the retriever underneath.
 
@@ -71,6 +69,7 @@ eval_data = [
 ]
 eval_df = pd.DataFrame(eval_data)
 ```
+
 This benchmark set is your measuring stick. Build it once, use it across every experiment. For production, aim for 50–100+ annotated queries.
 
 ## Step 2: Write a Retriever for Each Vector Store
@@ -127,7 +126,7 @@ mlflow.set_experiment("vector-search-benchmark")
 
 def benchmark_retriever(
     run_name: str,
-    retriever_fn,       
+    retriever_fn,
     eval_df: pd.DataFrame,
     extra_params: dict = None,
 ):
@@ -164,7 +163,7 @@ def benchmark_retriever(
 
 ## Round 1: Benchmarking Embedding Models
 
-### Tuning knob: Embedding model 
+### Tuning knob: Embedding model
 
 This is the first knob most teams reach for — and for good reason. Different embedding models represent text differently in vector space. A query about "API authentication" might rank completely different documents depending on whether you use GTE, BGE, or OpenAI's `text-embedding-3-large`.
 
@@ -215,8 +214,8 @@ In the MLflow Experiment UI, compare these two runs side-by-side. Looking at the
 
 ![Comparison Experiment 2_2](./comparison_img_2_2.png)
 
-
 ## Round 2: Benchmarking Chunk Size
+
 ### Tuning knob: Chunk size
 
 This is the round where deduplication and document-level metrics matter most. Without them, smaller chunks artificially inflate precision and recall by returning multiple chunks from the same document.
@@ -234,6 +233,7 @@ for chunk_size in [256, 512, 1024]:
         extra_params={"chunk_size": chunk_size, "embedding_model": "gte-large"},
     )
 ```
+
 In this example, chunk size made no measurable difference — all three configs landed at the same nDCG@5. It tells you chunk size isn't the bottleneck here, and you can move on to tuning something that actually moves the needle.
 
 That won't always be the case. On other datasets, watch for the precision–recall trade-off: smaller chunks tend to win on precision@1 (more focused matches), while larger chunks pull ahead on recall@5 (more context per result). When the results do diverge, nDCG@5 is a good single metric for picking a winner — it rewards both relevance and ranking.
@@ -245,6 +245,7 @@ That won't always be the case. On other datasets, watch for the precision–reca
 ![Comparison Experiment 3_2](./comparision_img_3_2.png)
 
 ## Round 3: Benchmarking Search Modes
+
 ### Tuning knob: Search mode
 
 This round varies by vector store — not all providers support the same search modes. But wherever hybrid or reranking is available, it's worth testing:
@@ -303,8 +304,8 @@ benchmark_retriever(
     extra_params={"vector_store": "lancedb", "search_mode": "hybrid"},
 )
 ```
-Compare precision@1 across the three runs. Hybrid + reranker came out on top here.If the reranker consistently puts the right document first, that improvement in top-of-list quality may be worth the added latency for your use case.
 
+Compare precision@1 across the three runs. Hybrid + reranker came out on top here.If the reranker consistently puts the right document first, that improvement in top-of-list quality may be worth the added latency for your use case.
 
 ![Comparing run 3_1](./comparing_runs_3_1.png)
 
@@ -337,8 +338,9 @@ display(leaderboard)
 ```
 
 The most useful views in the MLflow Experiment UI:
- * Parallel coordinates chart: See how each tuning knob correlates with nDCG@5. This instantly reveals which knobs matter most.
- * Table view: Sort by nDCG@5 to rank every configuration — across providers and settings.
+
+- Parallel coordinates chart: See how each tuning knob correlates with nDCG@5. This instantly reveals which knobs matter most.
+- Table view: Sort by nDCG@5 to rank every configuration — across providers and settings.
 
 The overall winner: **bge-large-en, hybrid search, with reranker** — 0.942 nDCG@5.
 
@@ -352,7 +354,6 @@ This is exactly why you benchmark one knob at a time — each round gives you a 
 
 ![Leaderboard_2](./leader_board_2.png)
 
-
 ## What We Learned
 
 The biggest takeaway: tune one knob at a time, and let the numbers decide. Embedding model, chunk size, search mode, and rerankers all matter — but their impact depends on your data and queries. The only way to know is to measure.
@@ -363,54 +364,15 @@ Once you've identified which knobs matter most, you can go further. Since every 
 
 ## What's Next?
 
-* Try it yourself. Try the notebook [here](https://e2-demo-field-eng.cloud.databricks.com/editor/notebooks/1247802216066734?o=1444828305810485#command/5694118208353140) on your own vector store and ground-truth queries, and run your first benchmark in under 30 minutes.
-* Go end-to-end. Once you've found your best retrieval config, add MLflow's GenAI scorers ([RetrievalGroundedness](https://docs.databricks.com/en/mlflow/llm-evaluate.html), [RelevanceToQuery](https://docs.databricks.com/en/mlflow/llm-evaluate.html)) to measure how retrieval quality affects your full RAG pipeline.
-* Make it permanent. Wire the benchmark into CI/CD so every index rebuild is automatically scored — no regressions in production.
+- Try it yourself. Try the notebook [here](https://e2-demo-field-eng.cloud.databricks.com/editor/notebooks/1247802216066734?o=1444828305810485#command/5694118208353140) on your own vector store and ground-truth queries, and run your first benchmark in under 30 minutes.
+- Go end-to-end. Once you've found your best retrieval config, add MLflow's GenAI scorers ([RetrievalGroundedness](https://docs.databricks.com/en/mlflow/llm-evaluate.html), [RelevanceToQuery](https://docs.databricks.com/en/mlflow/llm-evaluate.html)) to measure how retrieval quality affects your full RAG pipeline.
+- Make it permanent. Wire the benchmark into CI/CD so every index rebuild is automatically scored — no regressions in production.
 
-If this is useful, give us a  ⭐ on [GitHub](https://github.com/mlflow/mlflow)mlflow
+If this is useful, give us a ⭐ on [GitHub](https://github.com/mlflow/mlflow)mlflow
 
 ## Resources and References
- * [Practical AI Observability: Getting Started with MLflow Tracing](https://mlflow.org/blog/ai-observability-mlflow-tracing) — Add one line of code to trace every search and LLM call in your application.
- * [Building Advanced RAG with MLflow and LlamaIndex Workflow](https://mlflow.org/blog/mlflow-llama-index-workflow) — Combine vector search, BM25, and web search in a single RAG pipeline with MLflow evaluation.
- * [Introducing DeepEval, RAGAS, and Phoenix Judges in MLflow](https://mlflow.org/blog/third-party-scorers) — Go beyond retrieval metrics with third-party evaluation scorers.
- *  [MLflow 3.10.0 Highlights: Multi-Workspace Support, Multi-Turn Evaluation, and many UI Enhancements](https://mlflow.org/releases/3.10.0/)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- [Practical AI Observability: Getting Started with MLflow Tracing](https://mlflow.org/blog/ai-observability-mlflow-tracing) — Add one line of code to trace every search and LLM call in your application.
+- [Building Advanced RAG with MLflow and LlamaIndex Workflow](https://mlflow.org/blog/mlflow-llama-index-workflow) — Combine vector search, BM25, and web search in a single RAG pipeline with MLflow evaluation.
+- [Introducing DeepEval, RAGAS, and Phoenix Judges in MLflow](https://mlflow.org/blog/third-party-scorers) — Go beyond retrieval metrics with third-party evaluation scorers.
+- [MLflow 3.10.0 Highlights: Multi-Workspace Support, Multi-Turn Evaluation, and many UI Enhancements](https://mlflow.org/releases/3.10.0/)
