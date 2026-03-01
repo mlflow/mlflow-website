@@ -866,7 +866,7 @@ export default function AIGateway() {
           </p>
 
           <p style={{ marginTop: "32px", marginBottom: "0px" }}>
-            <strong>Standard OpenAI-Compatible Endpoint</strong>
+            <strong>Example: Querying with OpenAI SDK</strong>
           </p>
 
           <div
@@ -927,7 +927,7 @@ response = client.chat.completions.create(
           </div>
 
           <p style={{ marginTop: "32px", marginBottom: "0px" }}>
-            <strong>Passthrough Endpoint (Provider-Specific SDK)</strong>
+            <strong>Example: Querying with Anthropic Claude SDK</strong>
           </p>
 
           <div
