@@ -138,10 +138,7 @@ export default function LLMTracing() {
         <meta property="og:title" content={SEO_TITLE} />
         <meta property="og:description" content={SEO_DESCRIPTION} />
         <meta property="og:type" content="website" />
-        <meta
-          property="og:url"
-          content="https://mlflow.org/faq/llm-tracing"
-        />
+        <meta property="og:url" content="https://mlflow.org/faq/llm-tracing" />
         <link rel="canonical" href="https://mlflow.org/faq/llm-tracing" />
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
         <script type="application/ld+json">
@@ -381,8 +378,8 @@ export default function LLMTracing() {
           <h1>LLM Tracing and AI Tracing</h1>
 
           <p>
-            LLM tracing is the practice of capturing detailed execution data
-            for every large language model call in your application, including
+            LLM tracing is the practice of capturing detailed execution data for
+            every large language model call in your application, including
             prompts, completions, model parameters, token counts, latency, and
             metadata. When tracing extends beyond individual LLM calls to cover
             entire AI system stacks (embeddings, retrievers, RAG pipelines),
@@ -411,8 +408,8 @@ export default function LLMTracing() {
           </p>
 
           <p>
-            Unlike traditional logging, LLM tracing captures the full context
-            of AI execution in a structured, queryable format. It records{" "}
+            Unlike traditional logging, LLM tracing captures the full context of
+            AI execution in a structured, queryable format. It records{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "prompts/"}>prompts</Link>,
             model responses,{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>tool calls</Link>,
@@ -508,8 +505,8 @@ export default function LLMTracing() {
             <div className="card">
               <h3>Debugging Non-Determinism</h3>
               <p>
-                <strong>Problem:</strong> LLMs produce different outputs for
-                the same input. Traditional logs can't capture the full context
+                <strong>Problem:</strong> LLMs produce different outputs for the
+                same input. Traditional logs can't capture the full context
                 needed to debug why a specific output was generated.
               </p>
               <p>
@@ -527,7 +524,9 @@ export default function LLMTracing() {
               </p>
               <p>
                 <strong>Solution:</strong>{" "}
-                <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/token-usage-cost/"}>
+                <Link
+                  href={MLFLOW_GENAI_DOCS_URL + "tracing/token-usage-cost/"}
+                >
                   Track token usage
                 </Link>{" "}
                 per request, identify inefficient prompts, and find
@@ -562,10 +561,8 @@ export default function LLMTracing() {
               <p>
                 <strong>Solution:</strong> Continuous tracing provides a
                 baseline for{" "}
-                <Link href="/faq/ai-observability">
-                  detecting regressions
-                </Link>
-                , latency spikes, and cost anomalies.
+                <Link href="/faq/ai-observability">detecting regressions</Link>,
+                latency spikes, and cost anomalies.
               </p>
             </div>
           </div>
@@ -603,8 +600,8 @@ export default function LLMTracing() {
               time, and server-side processing time.
             </li>
             <li>
-              <strong>Metadata:</strong> User IDs, session IDs, request IDs,
-              and custom tags for filtering and analysis.
+              <strong>Metadata:</strong> User IDs, session IDs, request IDs, and
+              custom tags for filtering and analysis.
             </li>
           </ul>
 
@@ -671,7 +668,9 @@ export default function LLMTracing() {
             </Link>
             , you can trace any component of your AI stack, not just LLM calls.
             Use{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/tracing-with-decorators/"}>
+            <Link
+              href={MLFLOW_GENAI_DOCS_URL + "tracing/tracing-with-decorators/"}
+            >
               <code>@mlflow.trace</code> decorators
             </Link>{" "}
             to instrument custom functions, or rely on automatic tracing for
@@ -703,8 +702,8 @@ export default function LLMTracing() {
           <p>
             Agents built with frameworks like LangGraph, CrewAI, or AutoGen make
             dynamic decisions: which tools to call, when to retry, how to
-            recover from errors, and when to ask for help. Agent tracing captures
-            this execution graph:
+            recover from errors, and when to ask for help. Agent tracing
+            captures this execution graph:
           </p>
 
           <ul>

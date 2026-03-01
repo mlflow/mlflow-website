@@ -11,8 +11,7 @@ import {
   CODE_BG,
 } from "../../components/CodeSnippet/codeTheme";
 
-const SEO_TITLE =
-  "AI Observability for LLMs & Agents | MLflow Agent Platform";
+const SEO_TITLE = "AI Observability for LLMs & Agents | MLflow Agent Platform";
 const SEO_DESCRIPTION =
   "Learn AI observability, LLM observability, and agent observability with MLflow—the comprehensive, open-source agent engineering and ops platform.";
 
@@ -409,11 +408,11 @@ export default function AIObservability() {
             <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>
               agents
             </Link>
-            , this is known as <a href="#agent-observability">
-              agent observability
-            </a>. LLM observability helps you track prompt quality, token usage,
-            and response accuracy. Agent observability helps you debug
-            multi-step workflows, tool calls, and reasoning chains.
+            , this is known as{" "}
+            <a href="#agent-observability">agent observability</a>. LLM
+            observability helps you track prompt quality, token usage, and
+            response accuracy. Agent observability helps you debug multi-step
+            workflows, tool calls, and reasoning chains.
           </p>
 
           <p>
@@ -586,20 +585,20 @@ export default function AIObservability() {
 
           <p>
             Agent observability extends LLM observability to multi-step agentic
-            systems. While LLM observability tracks individual model calls, agent
-            observability captures the complete execution graph of autonomous
-            agents: how they reason about tasks, which tools they call and in
-            what order, how they handle errors and retries, and how they chain
-            multiple LLM calls together to accomplish complex goals.
+            systems. While LLM observability tracks individual model calls,
+            agent observability captures the complete execution graph of
+            autonomous agents: how they reason about tasks, which tools they
+            call and in what order, how they handle errors and retries, and how
+            they chain multiple LLM calls together to accomplish complex goals.
           </p>
 
           <p>
             Agents built with frameworks like LangGraph, CrewAI, or AutoGen can
             behave unpredictably—getting stuck in loops, making incorrect tool
             choices, or producing inconsistent outputs across runs. Agent
-            observability makes every reasoning step visible: you can see exactly
-            which tools were called with what arguments, what the agent learned
-            from each step, and how it decided what to do next.
+            observability makes every reasoning step visible: you can see
+            exactly which tools were called with what arguments, what the agent
+            learned from each step, and how it decided what to do next.
           </p>
 
           <p>
@@ -608,9 +607,9 @@ export default function AIObservability() {
             </Link>
             , capturing the full directed acyclic graph (DAG) of execution,
             including parallel tool calls, conditional branches, and iterative
-            reasoning loops. This makes it easy to debug agent failures, optimize
-            agent prompts and tool selection logic, and monitor agent behavior in
-            production.
+            reasoning loops. This makes it easy to debug agent failures,
+            optimize agent prompts and tool selection logic, and monitor agent
+            behavior in production.
           </p>
 
           <h2>Common Use Cases for AI Observability</h2>
