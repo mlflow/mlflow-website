@@ -872,7 +872,7 @@ export default function AIGateway() {
             every request.
           </p>
 
-          <p style={{ marginTop: "32px", marginBottom: "0px" }}>
+          <p style={{ marginTop: "48px", marginBottom: "12px" }}>
             <strong>Example: Querying with OpenAI SDK</strong>
           </p>
 
@@ -933,7 +933,7 @@ response = client.chat.completions.create(
             </div>
           </div>
 
-          <p style={{ marginTop: "32px", marginBottom: "0px" }}>
+          <p style={{ marginTop: "48px", marginBottom: "12px" }}>
             <strong>Example: Querying with Anthropic Claude SDK</strong>
           </p>
 
