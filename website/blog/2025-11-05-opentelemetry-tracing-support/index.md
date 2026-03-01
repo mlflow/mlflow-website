@@ -18,7 +18,7 @@ width="100%"
 
 ## What's New?
 
-MLflow has always been committed to providing powerful tracing capabilities for GenAI applications. With the addition of comprehensive OpenTelemetry integration, you can now:
+MLflow has always been committed to providing powerful [LLM tracing](/faq/llm-tracing) capabilities for GenAI applications. With the addition of comprehensive OpenTelemetry integration, you can now:
 
 - **Create unified traces** that combine MLflow SDK instrumentation with OpenTelemetry auto-instrumentation from third-party libraries
 - **Ingest OpenTelemetry spans** directly into the MLflow tracking server

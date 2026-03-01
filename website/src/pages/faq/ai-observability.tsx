@@ -12,10 +12,9 @@ import {
 } from "../../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE =
-  "AI Observability for LLMs, Agents & RAG | Open Source MLflow Platform";
+  "AI Observability for LLMs & Agents | MLflow Agent Platform";
 const SEO_DESCRIPTION =
-  "Complete AI observability platform for LLM tracing, agent evaluation, and production monitoring. " +
-  "Open source, no vendor lock-in. Supports OpenAI, Anthropic, LangChain, LangGraph & more.";
+  "Learn AI observability, LLM observability, and agent observability with MLflow—the comprehensive, open-source agent engineering and ops platform.";
 
 const faqs: {
   question: string;
@@ -35,7 +34,17 @@ const faqs: {
   },
   {
     question: "What are the key components of an AI observability platform?",
-    answer:
+    answer: (
+      <>
+        A comprehensive AI observability platform includes:{" "}
+        <Link href="/faq/llm-tracing">tracing</Link> (end-to-end execution
+        capture), evaluation (automated quality assessment with LLM judges),
+        monitoring (production metrics and drift detection), cost and latency
+        tracking, human feedback collection, and governance (audit trails and
+        policy enforcement).
+      </>
+    ),
+    answerText:
       "A comprehensive AI observability platform includes: tracing (end-to-end execution capture), evaluation (automated quality assessment with LLM judges), monitoring (production metrics and drift detection), cost and latency tracking, human feedback collection, and governance (audit trails and policy enforcement).",
   },
   {
@@ -389,17 +398,22 @@ export default function AIObservability() {
         <Header />
 
         <div className="article-container">
-          <h1>What is AI Observability?</h1>
+          <h1>AI Observability for LLMs and Agents</h1>
 
           <p>
             AI observability is the practice of collecting, analyzing, and
-            correlating telemetry data across AI systems (including{" "}
+            correlating telemetry data across AI systems to understand how they
+            behave in development and production. For LLM applications, this is
+            known as <a href="#llm-observability">LLM observability</a>. For
+            autonomous{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>
               agents
             </Link>
-            , <Link href="/genai">LLMs</Link>, and{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "rag/"}>RAG applications</Link>)
-            to understand how they behave in development and production.
+            , this is known as <a href="#agent-observability">
+              agent observability
+            </a>. LLM observability helps you track prompt quality, token usage,
+            and response accuracy. Agent observability helps you debug
+            multi-step workflows, tool calls, and reasoning chains.
           </p>
 
           <p>
@@ -443,6 +457,37 @@ export default function AIObservability() {
               />
               Your browser does not support the video tag.
             </video>
+          </div>
+
+          <div
+            style={{
+              background: "#f9fafb",
+              border: "1px solid #e5e7eb",
+              borderRadius: "8px",
+              padding: "20px 24px",
+              margin: "40px 0",
+            }}
+          >
+            <p style={{ marginBottom: "12px" }}>
+              <strong>Quick Navigation:</strong>
+            </p>
+            <ul style={{ margin: 0, paddingLeft: "24px" }}>
+              <li style={{ marginBottom: "8px" }}>
+                <a href="#llm-observability">LLM Observability</a>
+              </li>
+              <li style={{ marginBottom: "8px" }}>
+                <a href="#agent-observability">Agent Observability</a>
+              </li>
+              <li style={{ marginBottom: "8px" }}>
+                <a href="#key-components">Key Components</a>
+              </li>
+              <li style={{ marginBottom: "8px" }}>
+                <a href="#how-to-implement">How to Implement</a>
+              </li>
+              <li style={{ marginBottom: "0" }}>
+                <a href="#faq">FAQ</a>
+              </li>
+            </ul>
           </div>
 
           <h2>Why AI Observability Matters</h2>
@@ -508,6 +553,66 @@ export default function AIObservability() {
             </div>
           </div>
 
+          <h2 id="llm-observability">LLM Observability</h2>
+
+          <p>
+            LLM observability focuses on monitoring individual large language
+            model calls and LLM-powered applications. This includes tracking
+            prompts sent to models like GPT, Claude, or Gemini, capturing the
+            completions they return, measuring token consumption and costs, and
+            monitoring response latency and quality.
+          </p>
+
+          <p>
+            For LLM applications (chatbots, content generators, summarization
+            tools), observability helps you understand which prompts produce the
+            best results, identify expensive or slow queries, and detect quality
+            regressions when models are updated. By tracing every LLM call with
+            full context (system prompts, user messages, temperature settings,
+            token counts), you can debug hallucinations, optimize prompt
+            templates, and track costs across different models and use cases.
+          </p>
+
+          <p>
+            <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
+              MLflow's automatic tracing
+            </Link>{" "}
+            captures all of this telemetry with a single line of code, storing
+            traces locally or sending them to your tracking server for analysis,
+            evaluation, and monitoring.
+          </p>
+
+          <h2 id="agent-observability">Agent Observability</h2>
+
+          <p>
+            Agent observability extends LLM observability to multi-step agentic
+            systems. While LLM observability tracks individual model calls, agent
+            observability captures the complete execution graph of autonomous
+            agents: how they reason about tasks, which tools they call and in
+            what order, how they handle errors and retries, and how they chain
+            multiple LLM calls together to accomplish complex goals.
+          </p>
+
+          <p>
+            Agents built with frameworks like LangGraph, CrewAI, or AutoGen can
+            behave unpredictably—getting stuck in loops, making incorrect tool
+            choices, or producing inconsistent outputs across runs. Agent
+            observability makes every reasoning step visible: you can see exactly
+            which tools were called with what arguments, what the agent learned
+            from each step, and how it decided what to do next.
+          </p>
+
+          <p>
+            <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>
+              MLflow automatically traces agent workflows
+            </Link>
+            , capturing the full directed acyclic graph (DAG) of execution,
+            including parallel tool calls, conditional branches, and iterative
+            reasoning loops. This makes it easy to debug agent failures, optimize
+            agent prompts and tool selection logic, and monitor agent behavior in
+            production.
+          </p>
+
           <h2>Common Use Cases for AI Observability</h2>
 
           <p>
@@ -567,7 +672,7 @@ export default function AIObservability() {
             </li>
           </ul>
 
-          <h2>Key Components of AI Observability</h2>
+          <h2 id="key-components">Key Components of AI Observability</h2>
 
           <p>
             A comprehensive AI observability platform combines six capabilities:
@@ -643,7 +748,7 @@ export default function AIObservability() {
             </li>
           </ul>
 
-          <h2>How to Implement AI Observability</h2>
+          <h2 id="how-to-implement">How to Implement AI Observability</h2>
 
           <p>
             Modern open-source AI platforms like{" "}
@@ -940,7 +1045,7 @@ const result = await generateText({
             controlled by a single vendor.
           </p>
 
-          <h2>Frequently Asked Questions</h2>
+          <h2 id="faq">Frequently Asked Questions</h2>
 
           <div className="faq-list">
             {faqs.map((faq, index) => (
