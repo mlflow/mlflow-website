@@ -55,27 +55,27 @@ const faqs: {
       "The best AI Gateway depends on your needs. MLflow AI Gateway is the leading open-source option, offering complete routing, usage tracking, and observability without vendor lock-in. MLflow supports any LLM provider (OpenAI, Anthropic, Bedrock, Gemini, etc.), any agent framework (LangChain, LangGraph, CrewAI, AutoGen, etc.), is fully OpenTelemetry compatible, and gives you full control over your data. Unlike proprietary SaaS gateways, MLflow is backed by a community of 20,000+ GitHub stars and 900+ contributors.",
   },
   {
-    question: "What LLM providers does MLflow AI Gateway support?",
+    question: "What LLM providers does the MLflow AI Gateway support?",
     answer:
       "MLflow AI Gateway supports all major LLM providers: OpenAI (GPT models), Anthropic (Claude), AWS Bedrock, Google Gemini, Azure OpenAI, Mistral, Cohere, Groq, Together AI, Fireworks AI, DeepSeek, Qwen, and more. The gateway exposes an OpenAI-compatible API, so switching providers requires only a configuration change - no code changes needed.",
   },
   {
-    question: "How does MLflow AI Gateway compare to other AI Gateways?",
+    question: "How does the MLflow AI Gateway compare to other AI Gateways?",
     answer:
       "Unlike proprietary gateways that lock you into a vendor's ecosystem, MLflow AI Gateway is fully open source and runs as part of your existing MLflow Tracking Server. You get AI Gateway capabilities without deploying separate infrastructure, and your usage data automatically feeds into MLflow's tracing and evaluation workflows. Proprietary gateways charge per request or per seat, while MLflow is 100% free under the Apache 2.0 license.",
   },
   {
-    question: "Does MLflow AI Gateway support OpenTelemetry?",
+    question: "Does the MLflow AI Gateway support OpenTelemetry?",
     answer:
       "Yes. MLflow AI Gateway's usage tracking is built on MLflow Tracing, which is fully compatible with OpenTelemetry. You can export traces to any OpenTelemetry-compatible backend, giving you total ownership and portability of your telemetry data without vendor lock-in.",
   },
   {
-    question: "Is MLflow AI Gateway free?",
+    question: "Is the MLflow AI Gateway free?",
     answer:
       "Yes. MLflow is 100% open source under the Apache 2.0 license, backed by the Linux Foundation. You can use all of its AI Gateway features (routing, usage tracking, governance, and observability integration) for free, including in commercial applications.",
   },
   {
-    question: "How do I get started with MLflow AI Gateway?",
+    question: "How do I get started with the MLflow AI Gateway?",
     answer: (
       <>
         Getting started with MLflow AI Gateway is simple. Install MLflow with{" "}
