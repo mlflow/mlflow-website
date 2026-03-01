@@ -739,7 +739,7 @@ export default function AIGateway() {
             Setting Up MLflow AI Gateway
           </h3>
 
-          <p>
+          <p style={{ marginBottom: "32px" }}>
             For a comprehensive setup guide, visit the{" "}
             <Link
               href={
@@ -751,7 +751,7 @@ export default function AIGateway() {
             . Here's a quick overview to get started:
           </p>
 
-          <p style={{ marginTop: "24px", marginBottom: "12px" }}>
+          <p style={{ marginTop: "32px", marginBottom: "12px" }}>
             <strong>1. Install MLflow with GenAI support:</strong>
           </p>
 
