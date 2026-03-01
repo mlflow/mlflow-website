@@ -5,11 +5,12 @@ import PromptTabImg from "@site/static/img/GenAI_home/GenAI_prompts_darkmode.png
 import ExperimentTrackingImg from "@site/static/img/GenAI_home/model_training_darkmode.png";
 import ModelRegistryImg from "@site/static/img/GenAI_home/model_registry_darkmode.png";
 import DeploymentImg from "@site/static/img/GenAI_home/deployment.png";
+import Link from "@docusaurus/Link";
 
 export type Feature = {
   id: string;
   title: string;
-  description: string;
+  description: string | React.ReactNode;
   imageSrc?: string;
   imageZoom?: number;
   imagePosition?: string;
@@ -103,8 +104,20 @@ formatted = prompt.format(num_sentences=2, content="...")`,
   {
     id: "gateway",
     title: "AI Gateway",
-    description:
-      "Unified API gateway for all LLM providers. Route requests, manage rate limits, handle fallbacks, and control costs through a unified OpenAI-compatible interface.",
+    description: (
+      <>
+        Unified API{" "}
+        <Link
+          href="/faq/ai-gateway"
+          className="text-white/90 hover:text-white underline"
+        >
+          gateway
+        </Link>{" "}
+        for all LLM providers. Route requests, manage rate limits, handle
+        fallbacks, and control costs through a unified OpenAI-compatible
+        interface.
+      </>
+    ),
     imageSrc: GatewayTabImg,
     imagePosition: "0% top",
     quickstartLink:

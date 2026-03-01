@@ -7,7 +7,6 @@ import {
   EcosystemList,
   ProcessSection,
 } from "../../components";
-import Link from "@docusaurus/Link";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import type { EcosystemItem } from "../../components/EcosystemList/EcosystemList";
 import CardHero from "@site/static/img/GenAI_gateway/GenAI_gateway_hero.png";
@@ -150,28 +149,7 @@ export default function AiGateway() {
         ]}
       />
 
-      <div
-        style={{
-          maxWidth: "1200px",
-          margin: "80px auto 40px",
-          padding: "0 20px",
-          textAlign: "center",
-        }}
-      >
-        <p style={{ fontSize: "18px", color: "#6b7280", marginBottom: "16px" }}>
-          For a comprehensive guide to AI Gateway concepts, common use cases,
-          and implementation patterns, see the{" "}
-          <Link
-            href="/faq/ai-gateway"
-            style={{ color: "#007bff", fontWeight: "600" }}
-          >
-            AI Gateway FAQ
-          </Link>
-          .
-        </p>
-      </div>
-
-      <BelowTheFold contentType="genai" />
+      <BelowTheFold contentType="genai" hideGetStarted />
     </Layout>
   );
 }
