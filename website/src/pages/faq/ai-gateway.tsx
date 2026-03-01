@@ -1184,7 +1184,7 @@ response = client.messages.create(
             </li>
             <li>
               <Link href="/blog/mlflow-ai-gateway">
-                Introducing MLflow AI Gateway Blog Post
+                MLflow AI Gateway Announcement
               </Link>
             </li>
             <li>
