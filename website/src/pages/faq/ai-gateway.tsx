@@ -859,11 +859,11 @@ export default function AIGateway() {
             traffic splitting and fallback chains.
           </p>
 
-          <h3 style={{ marginTop: "48px", marginBottom: "24px" }}>
+          <h3 style={{ marginTop: "48px", marginBottom: "32px" }}>
             Querying the Gateway
           </h3>
 
-          <p>
+          <p style={{ marginTop: "16px" }}>
             Once your gateway is configured, point your application to the
             gateway's base URL using the OpenAI SDK (or any OpenAI-compatible
             client). The gateway handles authentication, routes requests to the
@@ -872,7 +872,7 @@ export default function AIGateway() {
             every request.
           </p>
 
-          <p style={{ marginTop: "48px", marginBottom: "12px" }}>
+          <p style={{ marginTop: "32px", marginBottom: "0px" }}>
             <strong>Example: Querying with OpenAI SDK</strong>
           </p>
 
@@ -933,7 +933,7 @@ response = client.chat.completions.create(
             </div>
           </div>
 
-          <p style={{ marginTop: "48px", marginBottom: "12px" }}>
+          <p style={{ marginTop: "32px", marginBottom: "0px" }}>
             <strong>Example: Querying with Anthropic Claude SDK</strong>
           </p>
 
