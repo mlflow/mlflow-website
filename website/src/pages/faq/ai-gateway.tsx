@@ -735,15 +735,17 @@ export default function AIGateway() {
             infrastructure to deploy or maintain.
           </p>
 
-          <h3>Setting Up MLflow AI Gateway</h3>
+          <h3 style={{ marginTop: "48px", marginBottom: "24px" }}>
+            Setting Up MLflow AI Gateway
+          </h3>
 
-          <p>
+          <p style={{ marginTop: "24px", marginBottom: "12px" }}>
             <strong>1. Install MLflow with GenAI support:</strong>
           </p>
 
           <div
             className="rounded-lg border border-white/10 overflow-hidden"
-            style={{ backgroundColor: CODE_BG, margin: "8px 0 24px 0" }}
+            style={{ backgroundColor: CODE_BG, margin: "16px 0 32px 0" }}
           >
             <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
               <span className="text-xs text-white/50 font-mono">bash</span>
@@ -776,13 +778,13 @@ export default function AIGateway() {
             </div>
           </div>
 
-          <p>
+          <p style={{ marginTop: "24px", marginBottom: "12px" }}>
             <strong>2. Start the MLflow server:</strong>
           </p>
 
           <div
             className="rounded-lg border border-white/10 overflow-hidden"
-            style={{ backgroundColor: CODE_BG, margin: "8px 0 24px 0" }}
+            style={{ backgroundColor: CODE_BG, margin: "16px 0 32px 0" }}
           >
             <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
               <span className="text-xs text-white/50 font-mono">bash</span>
@@ -815,7 +817,7 @@ export default function AIGateway() {
             </div>
           </div>
 
-          <p>
+          <p style={{ marginTop: "24px", marginBottom: "12px" }}>
             <strong>
               3. Configure your first gateway endpoint in the MLflow UI:
             </strong>
@@ -823,7 +825,7 @@ export default function AIGateway() {
 
           <div
             style={{
-              margin: "16px 0 32px 0",
+              margin: "16px 0 40px 0",
               borderRadius: "8px",
               overflow: "hidden",
               border: "1px solid #e5e7eb",
@@ -832,7 +834,7 @@ export default function AIGateway() {
             <video width="100%" controls loop muted playsInline>
               <source
                 src={
-                  require("@site/blog/2026-02-24-mlflow-ai-gateway/gateway-usage-tracking.mp4")
+                  require("@site/static/img/blog/mlflow-ai-gateway/gateway-usage-tracking.mp4")
                     .default
                 }
                 type="video/mp4"
@@ -857,7 +859,9 @@ export default function AIGateway() {
             traffic splitting and fallback chains.
           </p>
 
-          <h3>Querying the Gateway</h3>
+          <h3 style={{ marginTop: "48px", marginBottom: "24px" }}>
+            Querying the Gateway
+          </h3>
 
           <p>
             Once your gateway is configured, point your application to the
