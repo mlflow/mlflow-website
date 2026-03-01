@@ -390,18 +390,17 @@ export default function AIGateway() {
 
           <p>
             An AI Gateway is a centralized proxy layer that routes requests to
-            LLM providers (OpenAI, Anthropic, Bedrock, Gemini, etc.) through a
-            single, unified API. For LLM applications built with GPT or Claude,
-            this is known as an <a href="#llm-gateway">LLM Gateway</a>. For
-            autonomous{" "}
+            LLM providers through a single, unified API. It manages credentials,
+            tracks usage, enforces governance policies, and provides complete
+            observability across all LLM calls. For LLM applications, this is
+            known as an <a href="#llm-gateway">LLM Gateway</a>. For autonomous{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>
               agents
-            </Link>{" "}
-            built with LangGraph or CrewAI, this is known as an{" "}
-            <a href="#agent-gateway">Agent Gateway</a>. LLM Gateways centralize
-            API key management and track usage across providers. Agent Gateways
-            extend this to multi-step agentic workflows with end-to-end tracing
-            and cost tracking.
+            </Link>
+            , this is known as an <a href="#agent-gateway">Agent Gateway</a>.
+            LLM Gateways centralize API key management and track usage across
+            providers. Agent Gateways extend this to multi-step agentic
+            workflows with end-to-end tracing and cost tracking.
           </p>
 
           <p>
