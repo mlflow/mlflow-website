@@ -659,7 +659,7 @@ export default function AIGateway() {
               >
                 Unified API
               </Link>
-              : Single OpenAI-compatible endpoint for all LLM providers. Switch
+              : Single OpenAI-compatible API for all LLM providers. Switch
               models by changing configuration, not code.
             </li>
             <li>
