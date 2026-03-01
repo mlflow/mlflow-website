@@ -602,7 +602,7 @@ export default function AIGateway() {
             AI Gateway solves real-world problems across production AI systems:
           </p>
 
-          <ul>
+          <ul style={{ paddingLeft: "20px" }}>
             <li>
               <strong>Securing API Keys:</strong> Instead of distributing OpenAI
               or Anthropic API keys to every developer and service, store them
@@ -651,7 +651,7 @@ export default function AIGateway() {
             A comprehensive AI Gateway platform combines seven capabilities:
           </p>
 
-          <ul>
+          <ul style={{ paddingLeft: "20px" }}>
             <li>
               <Link
                 href={MLFLOW_GENAI_DOCS_URL + "governance/ai-gateway/"}
