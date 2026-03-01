@@ -739,6 +739,18 @@ export default function AIGateway() {
             Setting Up MLflow AI Gateway
           </h3>
 
+          <p>
+            For a comprehensive setup guide, visit the{" "}
+            <Link
+              href={
+                MLFLOW_GENAI_DOCS_URL + "governance/ai-gateway/quickstart/"
+              }
+            >
+              MLflow AI Gateway quickstart documentation
+            </Link>
+            . Here's a quick overview to get started:
+          </p>
+
           <p style={{ marginTop: "24px", marginBottom: "12px" }}>
             <strong>1. Install MLflow with GenAI support:</strong>
           </p>
