@@ -705,7 +705,7 @@ export default function AIGateway() {
             </li>
           </ul>
 
-          <h2 id="how-to-implement">How to Implement AI Gateway</h2>
+          <h2 id="how-to-implement">Getting Started with AI Gateways</h2>
 
           <p>
             Modern open-source AI platforms like{" "}
