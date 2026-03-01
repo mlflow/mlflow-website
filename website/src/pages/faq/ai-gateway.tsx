@@ -714,7 +714,7 @@ export default function AIGateway() {
             </li>
             <li>
               <Link
-                href={MLFLOW_GENAI_DOCS_URL + "guides/responsible-ai/"}
+                href={MLFLOW_GENAI_DOCS_URL + "governance/ai-gateway/"}
                 style={{ color: "#007bff", fontWeight: "600" }}
               >
                 Guardrails & Policy Enforcement
