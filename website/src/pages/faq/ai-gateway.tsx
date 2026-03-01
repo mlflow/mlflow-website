@@ -735,11 +735,11 @@ export default function AIGateway() {
             infrastructure to deploy or maintain.
           </p>
 
-          <h3 style={{ marginTop: "48px", marginBottom: "24px" }}>
-            Setting Up MLflow AI Gateway
+          <h3 style={{ marginTop: "48px", marginBottom: "32px" }}>
+            Setting Up the MLflow AI Gateway
           </h3>
 
-          <p style={{ marginBottom: "32px" }}>
+          <p style={{ marginTop: "16px", marginBottom: "32px" }}>
             For a comprehensive setup guide, visit the{" "}
             <Link
               href={
