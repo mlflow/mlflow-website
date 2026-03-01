@@ -657,7 +657,7 @@ export default function AIGateway() {
                 href={MLFLOW_GENAI_DOCS_URL + "governance/ai-gateway/"}
                 style={{ color: "#007bff", fontWeight: "600" }}
               >
-                Unified API Endpoint
+                Unified API
               </Link>
               : Single OpenAI-compatible endpoint for all LLM providers. Switch
               models by changing configuration, not code.
