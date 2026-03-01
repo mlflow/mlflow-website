@@ -831,7 +831,10 @@ export default function AIGateway() {
           >
             <video width="100%" controls loop muted playsInline>
               <source
-                src="https://mlflow.org/blog/mlflow-ai-gateway/gateway-usage-tracking.mp4"
+                src={
+                  require("@site/blog/2026-02-24-mlflow-ai-gateway/gateway-usage-tracking.mp4")
+                    .default
+                }
                 type="video/mp4"
               />
               Your browser does not support the video tag.
