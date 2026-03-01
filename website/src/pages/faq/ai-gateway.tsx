@@ -425,6 +425,26 @@ export default function AIGateway() {
 
           <div
             style={{
+              margin: "40px 0",
+              borderRadius: "8px",
+              overflow: "hidden",
+              border: "1px solid #e5e7eb",
+            }}
+          >
+            <video width="100%" controls autoPlay loop muted playsInline>
+              <source
+                src={
+                  require("@site/static/img/releases/3.10.0/gateway-usage.mp4")
+                    .default
+                }
+                type="video/mp4"
+              />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+
+          <div
+            style={{
               background: "#f9fafb",
               border: "1px solid #e5e7eb",
               borderRadius: "8px",
@@ -715,23 +735,137 @@ export default function AIGateway() {
             infrastructure to deploy or maintain.
           </p>
 
+          <h3>Setting Up MLflow AI Gateway</h3>
+
           <p>
-            Install MLflow, start the server, and configure your first endpoint
-            in the UI. Then point your application to the gateway's base URL
-            using the OpenAI SDK (or any OpenAI-compatible client). The gateway
-            handles authentication, routes requests to the correct provider, and
-            automatically captures{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>traces</Link> for
-            every request.
+            <strong>1. Install MLflow with GenAI support:</strong>
+          </p>
+
+          <div
+            className="rounded-lg border border-white/10 overflow-hidden"
+            style={{ backgroundColor: CODE_BG, margin: "8px 0 24px 0" }}
+          >
+            <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
+              <span className="text-xs text-white/50 font-mono">bash</span>
+              <CopyButton code={`pip install 'mlflow[genai]'`} />
+            </div>
+            <div className="p-3 overflow-x-auto">
+              <Highlight
+                theme={customNightOwl}
+                code={`pip install 'mlflow[genai]'`}
+                language="bash"
+              >
+                {({ style, tokens, getLineProps, getTokenProps }) => (
+                  <pre
+                    className="text-xs font-mono !m-0 !p-0 text-left"
+                    style={{
+                      ...style,
+                      backgroundColor: "transparent",
+                    }}
+                  >
+                    {tokens.map((line, i) => (
+                      <div key={i} {...getLineProps({ line })}>
+                        {line.map((token, key) => (
+                          <span key={key} {...getTokenProps({ token })} />
+                        ))}
+                      </div>
+                    ))}
+                  </pre>
+                )}
+              </Highlight>
+            </div>
+          </div>
+
+          <p>
+            <strong>2. Start the MLflow server:</strong>
+          </p>
+
+          <div
+            className="rounded-lg border border-white/10 overflow-hidden"
+            style={{ backgroundColor: CODE_BG, margin: "8px 0 24px 0" }}
+          >
+            <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
+              <span className="text-xs text-white/50 font-mono">bash</span>
+              <CopyButton code={`mlflow server`} />
+            </div>
+            <div className="p-3 overflow-x-auto">
+              <Highlight
+                theme={customNightOwl}
+                code={`mlflow server`}
+                language="bash"
+              >
+                {({ style, tokens, getLineProps, getTokenProps }) => (
+                  <pre
+                    className="text-xs font-mono !m-0 !p-0 text-left"
+                    style={{
+                      ...style,
+                      backgroundColor: "transparent",
+                    }}
+                  >
+                    {tokens.map((line, i) => (
+                      <div key={i} {...getLineProps({ line })}>
+                        {line.map((token, key) => (
+                          <span key={key} {...getTokenProps({ token })} />
+                        ))}
+                      </div>
+                    ))}
+                  </pre>
+                )}
+              </Highlight>
+            </div>
+          </div>
+
+          <p>
+            <strong>
+              3. Configure your first gateway endpoint in the MLflow UI:
+            </strong>
+          </p>
+
+          <div
+            style={{
+              margin: "16px 0 32px 0",
+              borderRadius: "8px",
+              overflow: "hidden",
+              border: "1px solid #e5e7eb",
+            }}
+          >
+            <video width="100%" controls loop muted playsInline>
+              <source
+                src={
+                  require("@site/static/img/releases/3.10.0/gateway-usage.mp4")
+                    .default
+                }
+                type="video/mp4"
+              />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+
+          <p>
+            Navigate to the AI Gateway tab in the MLflow UI, create a new
+            endpoint, select your LLM provider (OpenAI, Anthropic, Bedrock,
+            etc.), configure your API credentials, and save. The gateway is now
+            ready to route requests.
           </p>
 
           <p>
-            Here are quick examples of using MLflow AI Gateway. Check out the{" "}
+            Check out the{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "governance/ai-gateway/"}>
               MLflow AI Gateway documentation
             </Link>{" "}
-            for detailed setup instructions, configuration options, and advanced
-            features like traffic splitting and fallback chains.
+            for detailed configuration options and advanced features like
+            traffic splitting and fallback chains.
+          </p>
+
+          <h3>Querying the Gateway</h3>
+
+          <p>
+            Once your gateway is configured, point your application to the
+            gateway's base URL using the OpenAI SDK (or any OpenAI-compatible
+            client). The gateway handles authentication, routes requests to the
+            correct provider, and automatically captures{" "}
+            <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>traces</Link> for
+            every request.
           </p>
 
           <p style={{ marginTop: "32px", marginBottom: "0px" }}>
