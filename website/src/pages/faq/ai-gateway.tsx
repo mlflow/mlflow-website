@@ -42,12 +42,12 @@ const faqs: {
   {
     question: "What's the difference between an LLM Gateway and an AI Gateway?",
     answer:
-      "LLM Gateway and AI Gateway are often used interchangeably. Historically, LLM Gateway referred specifically to routing calls to large language models like GPT or Claude. AI Gateway is broader, encompassing LLMs plus other AI services. In practice, most modern AI Gateways focus primarily on LLM routing and governance, making the terms functionally equivalent.",
+      "LLM Gateway and AI Gateway are often used interchangeably. Historically, LLM Gateway referred specifically to routing calls to large language models like GPT or Claude. AI Gateway is broader, encompassing LLMs plus other AI services. Most modern AI Gateways focus on LLM routing and governance, making the terms functionally equivalent.",
   },
   {
     question: "What is an Agent Gateway?",
     answer:
-      "Agent Gateway extends LLM Gateway capabilities to multi-step agentic systems. While an LLM Gateway routes individual model calls, an Agent Gateway handles complex agent workflows involving multiple LLM calls, tool invocations, and retrieval steps. It provides end-to-end tracing across agent execution graphs, tracks costs for entire agent sessions (not just individual calls), and enforces governance policies at every step of agent reasoning.",
+      "Agent Gateway extends LLM Gateway capabilities to multi-step agentic systems. While an LLM Gateway routes individual model calls, an Agent Gateway handles complex agent workflows involving multiple LLM calls, tool invocations, and retrieval steps. It provides end-to-end tracing across agent execution graphs, aggregates costs across all calls in an agent session, and enforces governance policies at every step of agent reasoning.",
   },
   {
     question: "What is the best AI Gateway?",
@@ -62,7 +62,7 @@ const faqs: {
   {
     question: "How does MLflow AI Gateway compare to other AI Gateways?",
     answer:
-      "Unlike proprietary gateways that lock you into a vendor's ecosystem, MLflow AI Gateway is fully open source and runs as part of your existing MLflow Tracking Server. This means you get AI Gateway capabilities without deploying separate infrastructure, and your usage data automatically feeds into MLflow's tracing and evaluation workflows. Proprietary gateways charge per request or per seat, while MLflow is 100% free under the Apache 2.0 license.",
+      "Unlike proprietary gateways that lock you into a vendor's ecosystem, MLflow AI Gateway is fully open source and runs as part of your existing MLflow Tracking Server. You get AI Gateway capabilities without deploying separate infrastructure, and your usage data automatically feeds into MLflow's tracing and evaluation workflows. Proprietary gateways charge per request or per seat, while MLflow is 100% free under the Apache 2.0 license.",
   },
   {
     question: "Does MLflow AI Gateway support OpenTelemetry?",
@@ -405,11 +405,11 @@ export default function AIGateway() {
 
           <p>
             AI Gateways give engineering teams centralized control over how
-            their applications access LLMs: not just routing requests, but
-            managing credentials securely, tracking token costs, enforcing
-            governance policies, and maintaining complete audit trails. As AI
-            systems move from prototypes to production, gateways become
-            essential for security, compliance, and cost control.
+            their applications access LLMs. They route requests, manage
+            credentials securely, track token costs, enforce governance
+            policies, and maintain complete audit trails. As AI systems move
+            from prototypes to production, gateways become essential for
+            security, compliance, and cost control.
           </p>
 
           <p>
@@ -559,8 +559,7 @@ export default function AIGateway() {
           <p>
             Agents built with frameworks like LangGraph, CrewAI, or AutoGen make
             dozens or hundreds of LLM calls per user request. An Agent Gateway
-            tracks costs for the entire agent session (not just individual
-            calls), provides end-to-end{" "}
+            aggregates costs across entire agent sessions, provides end-to-end{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>tracing</Link>{" "}
             across the agent's execution graph, enforces governance policies at
             every step, and automatically captures usage metrics for debugging
@@ -875,12 +874,11 @@ response = client.messages.create(
           <h2>End-to-End Platform vs. Standalone Gateway</h2>
 
           <p>
-            When evaluating AI Gateway solutions, the most important decision
-            isn't just which gateway to use - it's whether to use a standalone
-            gateway or one integrated into an end-to-end AI platform. This
-            choice has significant implications for your team's productivity,
-            infrastructure complexity, and ability to debug and improve AI
-            applications.
+            When evaluating AI Gateway solutions, the most important decision is
+            whether to use a standalone gateway or one integrated into an
+            end-to-end AI platform. This choice has significant implications for
+            your team's productivity, infrastructure complexity, and ability to
+            debug and improve AI applications.
           </p>
 
           <p>
@@ -933,9 +931,9 @@ response = client.messages.create(
               context-switching between tools.
             </li>
             <li>
-              <strong>Cost data has context:</strong> Token usage isn't just a
-              billing number; it's tied to application traces, so you can answer{" "}
-              <em>why</em> costs changed, not just <em>that</em> they changed.
+              <strong>Cost data has context:</strong> Token costs link to
+              application traces, showing you exactly why spending increased or
+              decreased.
             </li>
           </ul>
 
