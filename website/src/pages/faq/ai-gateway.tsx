@@ -12,7 +12,7 @@ import {
 
 const SEO_TITLE = "AI Gateway for LLMs & Agents | MLflow Agent Platform";
 const SEO_DESCRIPTION =
-  "Learn AI Gateway, LLM Gateway, and Agent Gateway with MLflow—the comprehensive, open-source agent engineering and ops platform.";
+  "Learn AI Gateway, LLM Gateway, and Agent Gateway with MLflow - the comprehensive, open-source agent engineering and ops platform.";
 
 const faqs: {
   question: string;
@@ -57,7 +57,7 @@ const faqs: {
   {
     question: "What LLM providers does MLflow AI Gateway support?",
     answer:
-      "MLflow AI Gateway supports all major LLM providers: OpenAI (GPT models), Anthropic (Claude), AWS Bedrock, Google Gemini, Azure OpenAI, Mistral, Cohere, Groq, Together AI, Fireworks AI, DeepSeek, Qwen, and more. The gateway exposes an OpenAI-compatible API, so switching providers requires only a configuration change—no code changes needed.",
+      "MLflow AI Gateway supports all major LLM providers: OpenAI (GPT models), Anthropic (Claude), AWS Bedrock, Google Gemini, Azure OpenAI, Mistral, Cohere, Groq, Together AI, Fireworks AI, DeepSeek, Qwen, and more. The gateway exposes an OpenAI-compatible API, so switching providers requires only a configuration change - no code changes needed.",
   },
   {
     question: "How does MLflow AI Gateway compare to other AI Gateways?",
@@ -876,7 +876,7 @@ response = client.messages.create(
 
           <p>
             When evaluating AI Gateway solutions, the most important decision
-            isn't just which gateway to use—it's whether to use a standalone
+            isn't just which gateway to use - it's whether to use a standalone
             gateway or one integrated into an end-to-end AI platform. This
             choice has significant implications for your team's productivity,
             infrastructure complexity, and ability to debug and improve AI
@@ -929,7 +929,7 @@ response = client.messages.create(
             <li>
               <strong>Debugging is one click away:</strong> When the usage
               dashboard shows a latency spike or error rate increase, you can
-              drill straight into the individual traces that caused it—no
+              drill straight into the individual traces that caused it - no
               context-switching between tools.
             </li>
             <li>
@@ -940,12 +940,13 @@ response = client.messages.create(
           </ul>
 
           <p>
-            The alternative—stitching together a gateway, an observability
-            platform, and an evaluation framework—creates data silos, duplicated
-            configuration, and a fragile integration surface. MLflow's approach
-            is to make the gateway a natural extension of the platform teams are
-            already using for GenAI development, so that governance and
-            observability come for free rather than as an afterthought.
+            The alternative - stitching together a gateway, an observability
+            platform, and an evaluation framework - creates data silos,
+            duplicated configuration, and a fragile integration surface.
+            MLflow's approach is to make the gateway a natural extension of the
+            platform teams are already using for GenAI development, so that
+            governance and observability come for free rather than as an
+            afterthought.
           </p>
 
           <h2>Open Source vs. Proprietary AI Gateway</h2>
