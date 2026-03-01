@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Section } from "../Section/Section";
 import { ChevronDown } from "lucide-react";
+import Link from "@docusaurus/Link";
 
 const faqs = [
   {
@@ -29,6 +30,20 @@ const faqs = [
     answer:
       "Yes, MLflow is trusted by many enterprise organizations who operate at scale. If you don't want to manage MLflow infrastructure yourself, try managed MLflow services provided by Databricks, AWS SageMaker, Nebius or others.",
   },
+  {
+    question: "How do I secure and govern my LLM API calls?",
+    answer: (
+      <>
+        MLflow AI Gateway provides centralized credential management, usage tracking,
+        and governance for all your LLM providers through a single OpenAI-compatible
+        API. Learn more in our{" "}
+        <Link href="/faq/ai-gateway" style={{ color: "#007bff", textDecoration: "underline" }}>
+          AI Gateway FAQ
+        </Link>
+        .
+      </>
+    ),
+  },
 ];
 
 function FAQItem({
@@ -39,7 +54,7 @@ function FAQItem({
   index,
 }: {
   question: string;
-  answer: string;
+  answer: string | React.ReactNode;
   isOpen: boolean;
   onClick: () => void;
   index: number;
