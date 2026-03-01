@@ -7,6 +7,7 @@ import {
   EcosystemList,
   ProcessSection,
 } from "../../components";
+import Link from "@docusaurus/Link";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import type { EcosystemItem } from "../../components/EcosystemList/EcosystemList";
 import CardHero from "@site/static/img/GenAI_gateway/GenAI_gateway_hero.png";
@@ -111,7 +112,25 @@ export default function AiGateway() {
 
       <EcosystemList
         title="Supported providers"
-        body="Route requests to any major LLM provider through a single, unified interface. The gateway handles credentials, usage tracking, and failover so your application code stays provider-agnostic."
+        body={
+          <>
+            Route requests to any major LLM provider through a single, unified
+            interface. The gateway handles credentials, usage tracking, and
+            failover so your application code stays provider-agnostic. Learn
+            more in our{" "}
+            <Link
+              href="/faq/ai-gateway"
+              style={{
+                color: "inherit",
+                textDecoration: "underline",
+                opacity: 0.9,
+              }}
+            >
+              AI Gateway FAQ
+            </Link>
+            .
+          </>
+        }
         items={gatewayProviders}
       />
 
