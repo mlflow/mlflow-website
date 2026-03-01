@@ -613,9 +613,10 @@ export default function AIGateway() {
               application code.
             </li>
             <li>
-              <strong>Enforcing PII Policies:</strong> Deploy PII redaction at
-              the gateway level to ensure sensitive data never reaches
-              third-party APIs, regardless of which application makes the call.
+              <strong>Enforcing Content Guardrails:</strong> Apply content
+              safety filters, PII redaction, and toxicity detection at the
+              gateway level to ensure all LLM requests and responses meet
+              compliance and safety requirements before reaching users.
             </li>
             <li>
               <strong>Compliance Audit Trails:</strong> Capture complete logs of
@@ -627,7 +628,9 @@ export default function AIGateway() {
 
           <h2 id="key-components">Key Components of AI Gateway</h2>
 
-          <p>A comprehensive AI Gateway platform combines six capabilities:</p>
+          <p>
+            A comprehensive AI Gateway platform combines seven capabilities:
+          </p>
 
           <ul>
             <li>
@@ -689,6 +692,17 @@ export default function AIGateway() {
               </Link>
               : Native integration with tracing platforms to capture request
               context, evaluate responses, and monitor production metrics.
+            </li>
+            <li>
+              <Link
+                href={MLFLOW_GENAI_DOCS_URL + "guides/responsible-ai/"}
+                style={{ color: "#007bff", fontWeight: "600" }}
+              >
+                Guardrails & Policy Enforcement
+              </Link>
+              : Apply content filters, PII redaction, and safety policies at the
+              gateway level to ensure all LLM requests meet compliance and
+              security requirements.
             </li>
           </ul>
 
@@ -857,6 +871,82 @@ response = client.messages.create(
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>
+
+          <h2>End-to-End Platform vs. Standalone Gateway</h2>
+
+          <p>
+            When evaluating AI Gateway solutions, the most important decision
+            isn't just which gateway to use—it's whether to use a standalone
+            gateway or one integrated into an end-to-end AI platform. This
+            choice has significant implications for your team's productivity,
+            infrastructure complexity, and ability to debug and improve AI
+            applications.
+          </p>
+
+          <p>
+            <strong>Standalone Gateways (LiteLLM, etc.):</strong> A standalone
+            AI gateway solves one piece of the puzzle: it proxies your LLM calls
+            and centralizes credentials. But in practice, routing requests is
+            just the beginning. You still need to trace what happened inside
+            your application after the LLM responded, evaluate whether the
+            output was actually good, and tie cost and latency data back to
+            specific features, prompts, or model versions. With a standalone
+            gateway, that means integrating a separate observability tool, a
+            separate evaluation framework, and building the glue code to connect
+            them all to the same data. Every new tool in the stack is another
+            thing to deploy, monitor, and keep in sync.
+          </p>
+
+          <p>
+            <strong>
+              End-to-End Platform (<Link href="/genai">MLflow</Link>):
+            </strong>{" "}
+            MLflow eliminates the integration tax. Because the AI Gateway,
+            tracing, and evaluation all live in the same platform, you get
+            automatic benefits that standalone gateways can't provide:
+          </p>
+
+          <ul>
+            <li>
+              <strong>Traces are automatic:</strong> Every gateway request
+              becomes an{" "}
+              <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
+                MLflow trace
+              </Link>
+              , no additional SDK or instrumentation required. Those traces
+              include the full request/response payload alongside latency and
+              token counts.
+            </li>
+            <li>
+              <strong>Evaluation runs on real traffic:</strong> Traces captured
+              through the gateway feed directly into{" "}
+              <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>
+                MLflow's evaluation APIs
+              </Link>
+              , so you can run LLM judges over production data without exporting
+              anything or wiring up a pipeline.
+            </li>
+            <li>
+              <strong>Debugging is one click away:</strong> When the usage
+              dashboard shows a latency spike or error rate increase, you can
+              drill straight into the individual traces that caused it—no
+              context-switching between tools.
+            </li>
+            <li>
+              <strong>Cost data has context:</strong> Token usage isn't just a
+              billing number; it's tied to application traces, so you can answer{" "}
+              <em>why</em> costs changed, not just <em>that</em> they changed.
+            </li>
+          </ul>
+
+          <p>
+            The alternative—stitching together a gateway, an observability
+            platform, and an evaluation framework—creates data silos, duplicated
+            configuration, and a fragile integration surface. MLflow's approach
+            is to make the gateway a natural extension of the platform teams are
+            already using for GenAI development, so that governance and
+            observability come for free rather than as an afterthought.
+          </p>
 
           <h2>Open Source vs. Proprietary AI Gateway</h2>
 
