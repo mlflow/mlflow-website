@@ -1058,7 +1058,7 @@ const result = await generateText({
               is the largest open-source AI platform, with over 30 million
               monthly downloads. Thousands of organizations, developers, and
               research teams use MLflow each day to build and deploy
-              high-quality agents and LLM applications. Backed by the Linux
+              production-grade agents and LLM applications. Backed by the Linux
               Foundation and licensed under Apache 2.0, it provides a complete
               observability stack with no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
