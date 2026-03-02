@@ -30,7 +30,7 @@ In this blog post, we’ll walk you through the process of building a Multi-Ling
 
 We’ll start by demonstrating how to leverage [LangGraph’s](https://www.langchain.com/langgraph) capabilities to build a dynamic AI workflow. This workflow integrates OpenAI and external data sources, such as a Vector Store and a SQLite database, to process user input, perform safety checks, query databases, and generate meaningful responses.
 
-Throughout this post, we’ll leverage [MLflow’s Models from Code](https://mlflow.org/docs/latest/model/models-from-code.html) feature to enable seamless tracking and versioning of AI Workflows. Additionally, we’ll deep dive into [MLflow’s Tracing](https://mlflow.org/docs/latest/llms/tracing/index.html) feature, designed to enhance the observability of the many different components of an AI workflow by tracking inputs, outputs, and metadata associated with each intermediate step. This enables easy identification of bugs and unexpected behaviors, providing greater transparency over the workflow.
+Throughout this post, we'll leverage [MLflow's Models from Code](https://mlflow.org/docs/latest/model/models-from-code.html) feature to enable seamless tracking and versioning of AI Workflows. Additionally, we'll deep dive into [MLflow's Tracing](https://mlflow.org/docs/latest/llms/tracing/index.html) feature, designed to enhance the [observability](/faq/ai-observability) of the many different components of an AI workflow by tracking inputs, outputs, and metadata associated with each intermediate step. This enables easy identification of bugs and unexpected behaviors, providing greater transparency over the workflow.
 
 ## Prerequisites
 
@@ -1344,7 +1344,7 @@ The Project follows a simple file structure:
 
 ## MLflow Tracing
 
-[MLflow Automated Tracing](https://mlflow.org/docs/latest/llms/tracing/index.html) provides fully automated integrations with various GenAI libraries such as LangChain, OpenAI, LlamaIndex, DSPy, and AutoGen. Since our AI Workflow is built using LangGraph, we can activate automated LangChain tracing by enabling `mlflow.langchain.autolog()`.
+[MLflow Automated Tracing](https://mlflow.org/docs/latest/llms/tracing/index.html) provides fully automated integrations with various GenAI libraries such as LangChain, OpenAI, LlamaIndex, DSPy, and AutoGen. [LLM tracing](/faq/llm-tracing) captures execution data for every model call, and since our AI Workflow is built using LangGraph, we can activate automated LangChain tracing by enabling `mlflow.langchain.autolog()`.
 
 With LangChain autologging, traces are automatically logged to the active MLflow experiment whenever invocation APIs are called on chains. This seamless integration ensures that every interaction is captured for monitoring and analysis.
 
