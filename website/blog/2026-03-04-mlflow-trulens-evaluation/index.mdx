@@ -14,7 +14,7 @@ An agent doesn't just produce an answer. It makes a plan, picks tools, executes 
 
 {/* truncate */}
 
-The integration adds 10 scorers that bring the [Agent GPA framework](https://www.snowflake.com/en/engineering-blog/ai-agent-evaluation-gpa-framework/) to MLflow. You pass an MLflow trace, and the scorer reads the full span tree (plans, tool calls, intermediate outputs) to evaluate agent behavior. MLflow already supports [trace-based judges](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/#trace-based-judges) and agentic metrics from DeepEval and RAGAS. TruLens adds a structured three-dimensional lens (Goal, Plan, Action) developed by the TruLens team at Snowflake.
+The integration adds 10 scorers that bring the [Agent GPA framework](https://www.snowflake.com/en/engineering-blog/ai-agent-evaluation-gpa-framework/) to MLflow. You pass an MLflow trace, and the scorer reads the full span tree (plans, tool calls, intermediate outputs) to evaluate agent behavior. MLflow already supports [trace-based judges](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/#trace-based-judges) and agentic metrics from DeepEval and RAGAS, but with the TruLens integration, MLflow now supports the structured three-dimensional lens (Goal, Plan, Action) developed by the TruLens team at Snowflake.
 
 ## The Agent GPA Framework
 
@@ -37,24 +37,13 @@ GPA stands for Goal-Plan-Action, and it evaluates three alignment dimensions in 
 
 On the [TRAIL/GAIA benchmark](https://arxiv.org/abs/2510.08847), GPA judges identify 95% of human-labeled agent errors (267/281), compared to 55% for standard judges that only look at final outputs. That 40-percentage-point gap is what you leave on the table when you only evaluate the answer.
 
-The integration exposes six agent scorers covering the three GPA dimensions:
-
-| Scorer                | Alignment   | What it checks                                                    |
-| --------------------- | ----------- | ----------------------------------------------------------------- |
-| `PlanQuality`         | Goal-Plan   | Does the plan decompose the goal into feasible subtasks?          |
-| `ToolSelection`       | Goal-Plan   | Did the agent pick the right tools for each subtask?              |
-| `PlanAdherence`       | Plan-Action | Did the agent follow its plan, or skip and reorder steps?         |
-| `ToolCalling`         | Plan-Action | Are tool calls valid with correct parameters and complete inputs? |
-| `LogicalConsistency`  | Holistic    | Is each step coherent with prior context and reasoning?           |
-| `ExecutionEfficiency` | Holistic    | Did the agent reach the goal without redundant calls?             |
-
 Pass a trace and the scorer handles the rest. Under the hood, the integration serializes your MLflow trace to JSON and passes the full span tree to TruLens' provider, which evaluates each dimension with chain-of-thought reasoning. You get back a score and a rationale explaining what it found.
 
 <img
   src={require("./trulens-pipeline.png").default}
   alt="Architecture diagram showing the TruLens trace evaluation pipeline: MLflow agent trace with spans is serialized to JSON, passed to the TruLens GPA Provider backed by a model provider, which evaluates across six scorer dimensions grouped by Goal-Plan, Plan-Action, and Holistic alignment, producing scores and rationales that flow into MLflow Feedback and the assessment table UI"
   style={{
-    maxWidth: "680px",
+    maxWidth: "800px",
     width: "100%",
     margin: "0 auto",
     display: "block",
@@ -74,7 +63,7 @@ Span 5: book_hotel(hotel_id=None) -> error
 Span 6: book_hotel(hotel_id="H456") -> confirmed
 ```
 
-Output-only evaluation gives this a pass. The trip got booked. Trace-level evaluation catches three problems:
+Output-only evaluation gives this a pass - the trip got booked. However, trace-level evaluation catches three problems:
 
 - **ExecutionEfficiency**: redundant flight search (Span 2 duplicates Span 1)
 - **ToolCalling**: `book_hotel` called with `None` before retry (Span 5)
@@ -117,6 +106,8 @@ Each scorer runs independently and writes results to the same experiment. Result
   width="100%"
 />
 
+The trace detail view shows the full span tree on the left and TruLens GPA assessments on the right. Expand any assessment to see the chain-of-thought reasoning behind the score.
+
 <img
   src={require("./mlflow-traces-assessments.png").default}
   alt="MLflow Traces list showing one agent trace with assessment columns: execution_efficiency (0.67), logical_consistency (0.67), plan_adherence (0.67) with average score bar charts for each scorer"
@@ -124,6 +115,8 @@ Each scorer runs independently and writes results to the same experiment. Result
 />
 
 ## Getting Started
+
+To get started, install MLflow and TruLens with the LiteLLM provider. For full API details, see the [TruLens scorers documentation](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/third-party/trulens/).
 
 ```bash
 pip install mlflow>=3.10.0 trulens trulens-providers-litellm
