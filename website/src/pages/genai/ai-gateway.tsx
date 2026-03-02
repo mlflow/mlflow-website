@@ -140,6 +140,11 @@ const gatewayProviders: EcosystemItem[] = [
     src: "/img/vllm.svg",
     href: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
   },
+  {
+    title: "Any OpenAI-compatible API",
+    src: "/img/openai-compatible.svg",
+    href: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
+  },
 ];
 
 export default function AiGateway() {
@@ -176,7 +181,7 @@ export default function AiGateway() {
 
       <EcosystemList
         title="Supported providers"
-        body="Route requests to any major LLM provider through a single, unified interface. The gateway handles credentials, usage tracking, and failover so your application code stays provider-agnostic."
+        body="Route requests to any LLM provider — including any OpenAI-compatible API or custom model endpoint — through a single, unified interface. The gateway handles credentials, usage tracking, and failover so your application code stays provider-agnostic."
         items={gatewayProviders}
       />
 
