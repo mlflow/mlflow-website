@@ -1055,10 +1055,10 @@ const result = await generateText({
               <Link href="/genai" style={{ color: "#007bff" }}>
                 <strong>MLflow</strong>
               </Link>{" "}
-              is the largest open-source AI platform, backed by the Linux
-              Foundation and licensed under Apache 2.0. With 20,000+ GitHub
-              stars and 900+ contributors, it provides a complete observability
-              stack with no vendor lock-in.{" "}
+              is the largest open-source AI platform, with over 30 million
+              monthly downloads. Backed by the Linux Foundation and licensed
+              under Apache 2.0, it provides a complete observability stack with
+              no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>
