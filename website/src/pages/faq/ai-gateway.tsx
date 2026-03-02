@@ -1015,7 +1015,7 @@ response = client.messages.create(
               monthly downloads. Thousands of organizations, developers, and
               research teams use MLflow each day to build and deploy
               production-grade agents and LLM applications. Backed by the Linux
-              Foundation and licensed under Apache 2.0, it provides a complete
+              Foundation and licensed under Apache 2.0, MLflow provides a complete
               AI Gateway solution with no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
