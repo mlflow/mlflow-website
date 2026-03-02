@@ -1186,9 +1186,6 @@ response = client.messages.create(
               </Link>
             </li>
             <li>
-              <Link href="/faq/ai-observability">AI Observability FAQ</Link>
-            </li>
-            <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>
             </li>
             <li>
