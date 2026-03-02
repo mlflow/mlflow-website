@@ -299,7 +299,12 @@ export default function GenAi(): JSX.Element {
             <HighlightedKeyword href="/genai/ai-gateway">
               cost controls
             </HighlightedKeyword>
-            , and much more.
+            , and much more. Learn{" "}
+            <HighlightedKeyword href="/llmops">LLMOps</HighlightedKeyword> and{" "}
+            <HighlightedKeyword href="/llmops#agentops">
+              AgentOps
+            </HighlightedKeyword>{" "}
+            best practices.
           </>,
         ]}
         bodyColor="white"

@@ -29,7 +29,8 @@ export default function Home(): JSX.Element {
             <HighlightedKeyword>debug</HighlightedKeyword>,{" "}
             <HighlightedKeyword>test</HighlightedKeyword>, and{" "}
             <HighlightedKeyword>evaluate</HighlightedKeyword> your LLM
-            applications, Agents, and Models.
+            applications, Agents, and Models. Master{" "}
+            <HighlightedKeyword href="/llmops">LLMOps</HighlightedKeyword>.
           </>
         }
         primaryCTA={{
