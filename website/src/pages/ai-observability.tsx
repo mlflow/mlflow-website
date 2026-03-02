@@ -6,10 +6,7 @@ import { Header } from "../components/Header/Header";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import ObservabilityHero from "@site/static/img/GenAI_observability/GenAI_observability_hero.png";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
-import {
-  customNightOwl,
-  CODE_BG,
-} from "../components/CodeSnippet/codeTheme";
+import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE = "AI Observability for LLMs & Agents | MLflow Agent Platform";
 const SEO_DESCRIPTION =
@@ -36,11 +33,11 @@ const faqs: {
     answer: (
       <>
         A comprehensive AI observability platform includes:{" "}
-        <Link href="/llm-tracing">tracing</Link> (end-to-end execution
-        capture), evaluation (automated quality assessment with LLM judges),
-        monitoring (production metrics and drift detection), cost and latency
-        tracking, human feedback collection, and governance (audit trails and
-        policy enforcement).
+        <Link href="/llm-tracing">tracing</Link> (end-to-end execution capture),
+        evaluation (automated quality assessment with LLM judges), monitoring
+        (production metrics and drift detection), cost and latency tracking,
+        human feedback collection, and governance (audit trails and policy
+        enforcement).
       </>
     ),
     answerText:
@@ -120,11 +117,11 @@ const faqs: {
     answer: (
       <>
         MLflow provides multiple layers for governance and compliance.{" "}
-        <Link href="/llm-tracing">LLM tracing</Link> creates comprehensive
-        audit trails of all inputs, outputs, and model interactions - essential
-        for regulatory compliance and incident investigation. The AI Gateway
-        adds real-time policy enforcement through guardrails that filter inputs
-        for prompt injection attempts and outputs for PII, toxicity, or policy
+        <Link href="/llm-tracing">LLM tracing</Link> creates comprehensive audit
+        trails of all inputs, outputs, and model interactions - essential for
+        regulatory compliance and incident investigation. The AI Gateway adds
+        real-time policy enforcement through guardrails that filter inputs for
+        prompt injection attempts and outputs for PII, toxicity, or policy
         violations. Combined with LLM judges that continuously assess safety and
         responsible AI metrics, you get end-to-end visibility and control over
         your AI systems' behavior.
@@ -219,10 +216,7 @@ export default function AIObservability() {
         <meta property="og:title" content={SEO_TITLE} />
         <meta property="og:description" content={SEO_DESCRIPTION} />
         <meta property="og:type" content="website" />
-        <meta
-          property="og:url"
-          content="https://mlflow.org/ai-observability"
-        />
+        <meta property="og:url" content="https://mlflow.org/ai-observability" />
         <link rel="canonical" href="https://mlflow.org/ai-observability" />
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
         <script type="application/ld+json">
@@ -1059,8 +1053,8 @@ const result = await generateText({
               monthly downloads. Thousands of organizations, developers, and
               research teams use MLflow each day to build and deploy
               production-grade agents and LLM applications. Backed by the Linux
-              Foundation and licensed under Apache 2.0, MLflow provides a complete
-              observability stack with no vendor lock-in.{" "}
+              Foundation and licensed under Apache 2.0, MLflow provides a
+              complete observability stack with no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>

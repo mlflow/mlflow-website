@@ -5,10 +5,7 @@ import { Highlight } from "prism-react-renderer";
 import { Header } from "../components/Header/Header";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
-import {
-  customNightOwl,
-  CODE_BG,
-} from "../components/CodeSnippet/codeTheme";
+import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE = "AI Gateway for LLMs & Agents | MLflow Agent Platform";
 const SEO_DESCRIPTION =
@@ -1015,8 +1012,8 @@ response = client.messages.create(
               monthly downloads. Thousands of organizations, developers, and
               research teams use MLflow each day to build and deploy
               production-grade agents and LLM applications. Backed by the Linux
-              Foundation and licensed under Apache 2.0, MLflow provides a complete
-              AI Gateway solution with no vendor lock-in.{" "}
+              Foundation and licensed under Apache 2.0, MLflow provides a
+              complete AI Gateway solution with no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>

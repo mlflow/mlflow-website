@@ -6,10 +6,7 @@ import { Header } from "../components/Header/Header";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import TracingHero from "@site/static/img/GenAI_observability/GenAI_observability_hero.png";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
-import {
-  customNightOwl,
-  CODE_BG,
-} from "../components/CodeSnippet/codeTheme";
+import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE = "LLM Tracing & AI Tracing for Agents | MLflow Agent Platform";
 const SEO_DESCRIPTION =
@@ -1051,8 +1048,8 @@ const result = await generateText({
               monthly downloads. Thousands of organizations, developers, and
               research teams use MLflow each day to build and deploy
               production-grade agents and LLM applications. Backed by the Linux
-              Foundation and licensed under Apache 2.0, MLflow provides complete LLM
-              tracing with no vendor lock-in.{" "}
+              Foundation and licensed under Apache 2.0, MLflow provides complete
+              LLM tracing with no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>
