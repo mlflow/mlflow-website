@@ -2,13 +2,13 @@ import { useState } from "react";
 import Head from "@docusaurus/Head";
 import Link from "@docusaurus/Link";
 import { Highlight } from "prism-react-renderer";
-import { Header } from "../../components/Header/Header";
+import { Header } from "../components/Header/Header";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
-import { CopyButton } from "../../components/CodeSnippet/CopyButton";
+import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import {
   customNightOwl,
   CODE_BG,
-} from "../../components/CodeSnippet/codeTheme";
+} from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE = "AI Gateway for LLMs & Agents | MLflow Agent Platform";
 const SEO_DESCRIPTION =
