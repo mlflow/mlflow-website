@@ -114,6 +114,68 @@ const faqs: {
     answer:
       "Yes. MLflow integrates seamlessly with your existing stack. It supports OpenTelemetry for exporting traces to any compatible backend, works with any LLM provider (OpenAI, Anthropic, Bedrock, etc.), and integrates with popular frameworks like LangChain, LangGraph, and LlamaIndex. You can also self-host MLflow or use managed versions on Databricks, AWS, and other platforms.",
   },
+  {
+    question:
+      "How does MLflow AI Observability help with compliance, governance, and policy enforcement?",
+    answer: (
+      <>
+        MLflow provides multiple layers for governance and compliance.{" "}
+        <Link href="/faq/llm-tracing">LLM tracing</Link> creates comprehensive
+        audit trails of all inputs, outputs, and model interactions - essential
+        for regulatory compliance and incident investigation. The AI Gateway
+        adds real-time policy enforcement through guardrails that filter inputs
+        for prompt injection attempts and outputs for PII, toxicity, or policy
+        violations. Combined with LLM judges that continuously assess safety and
+        responsible AI metrics, you get end-to-end visibility and control over
+        your AI systems' behavior.
+      </>
+    ),
+    answerText:
+      "MLflow provides multiple layers for governance and compliance. LLM tracing creates comprehensive audit trails of all inputs, outputs, and model interactions - essential for regulatory compliance and incident investigation. The AI Gateway adds real-time policy enforcement through guardrails that filter inputs for prompt injection attempts and outputs for PII, toxicity, or policy violations. Combined with LLM judges that continuously assess safety and responsible AI metrics, you get end-to-end visibility and control over your AI systems' behavior.",
+  },
+  {
+    question: "How does MLflow AI Observability help prevent runaway costs?",
+    answer: (
+      <>
+        MLflow tracks LLM costs at multiple levels.{" "}
+        <Link href="https://mlflow.org/docs/latest/genai/tracing/token-usage-cost/">
+          Trace-level cost tracking
+        </Link>{" "}
+        automatically calculates spending per request based on token usage and
+        model pricing, with aggregated dashboards showing cost trends and
+        expensive queries. The AI Gateway adds proactive controls through rate
+        limiting and cost budgets per endpoint. Together, these give you both
+        real-time visibility into spending and guardrails to prevent cost
+        overruns before they happen.
+      </>
+    ),
+    answerText:
+      "MLflow tracks LLM costs at multiple levels. Trace-level cost tracking automatically calculates spending per request based on token usage and model pricing, with aggregated dashboards showing cost trends and expensive queries. The AI Gateway adds proactive controls through rate limiting and cost budgets per endpoint. Together, these give you both real-time visibility into spending and guardrails to prevent cost overruns before they happen.",
+  },
+  {
+    question:
+      "How can I monitor the operational health of my agent or LLM application in production?",
+    answer: (
+      <>
+        MLflow's Observability dashboards provide real-time metrics on latency,
+        throughput, error rates, and quality scores across all your agent
+        deployments. <Link href="/faq/ai-observability">AI observability</Link>{" "}
+        combines distributed tracing (to understand execution flows), automated
+        evaluation (to measure quality continuously), and custom judges (to
+        monitor application-specific KPIs). You can set up alerts on any metric
+        and drill down from high-level trends to individual trace details when
+        investigating issues.
+      </>
+    ),
+    answerText:
+      "MLflow's Observability dashboards provide real-time metrics on latency, throughput, error rates, and quality scores across all your agent deployments. AI observability combines distributed tracing (to understand execution flows), automated evaluation (to measure quality continuously), and custom judges (to monitor application-specific KPIs). You can set up alerts on any metric and drill down from high-level trends to individual trace details when investigating issues.",
+  },
+  {
+    question:
+      "How do I ensure my agent or LLM application is delivering value and meeting user needs?",
+    answer:
+      "MLflow offers 70+ pre-built LLM judges covering conversation quality (completeness, coherence), relevance (context relevance, groundedness), safety (toxicity, bias), and user experience (frustration detection, helpfulness). You can run these as batch evaluations during development or enable continuous monitoring in production to score every interaction. Combine automated judges with human feedback collection to get a complete picture of whether your agent meets user expectations. The evaluation framework is fully customizable - create domain-specific judges tailored to your use case.",
+  },
 ];
 
 const faqJsonLd = {
@@ -737,7 +799,7 @@ export default function AIObservability() {
             </li>
             <li>
               <Link
-                href={MLFLOW_GENAI_DOCS_URL + "guides/responsible-ai/"}
+                href={MLFLOW_GENAI_DOCS_URL + "governance/ai-gateway/"}
                 style={{ color: "#007bff", fontWeight: "600" }}
               >
                 Governance
@@ -1081,12 +1143,6 @@ const result = await generateText({
               <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
                 Agent Evaluation Guide
               </Link>
-            </li>
-            <li>
-              <Link href="/llmops">LLMOps Guide</Link>
-            </li>
-            <li>
-              <Link href="/aiops">AIOps Guide</Link>
             </li>
             <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>

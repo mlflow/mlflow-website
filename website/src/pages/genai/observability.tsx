@@ -160,7 +160,14 @@ export default function Observability() {
         body={
           <>
             Auto-trace 50+ LLM providers and agent frameworks with a single line
-            of code. MLflow is{" "}
+            of code.{" "}
+            <Link
+              to="/faq/llm-tracing"
+              className="text-blue-400 !underline decoration-blue-400/50 underline-offset-2 hover:text-blue-300 hover:decoration-blue-300/50 transition-colors"
+            >
+              LLM tracing
+            </Link>{" "}
+            captures every execution step, and MLflow is{" "}
             <a
               href="https://mlflow.org/docs/latest/genai/tracing/opentelemetry/"
               className="text-blue-400 !underline decoration-blue-400/50 underline-offset-2 hover:text-blue-300 hover:decoration-blue-300/50 transition-colors"
