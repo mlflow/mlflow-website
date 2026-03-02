@@ -2,7 +2,7 @@
 title: "Agent Trace Evaluation with TruLens Scorers in MLflow"
 description: Score agent plans, tool calls, and reasoning with TruLens GPA framework through mlflow.genai.evaluate().
 slug: mlflow-trulens-evaluation
-authors: [debu-sinha]
+authors: [debu-sinha, josh-reini]
 tags: [genai, evaluation, trulens, agents, tracing]
 thumbnail: /img/blog/mlflow-trulens-evaluation-thumbnail.png
 image: /img/blog/mlflow-trulens-evaluation-thumbnail.png
@@ -35,9 +35,9 @@ GPA stands for Goal-Plan-Action, and it evaluates three alignment dimensions in 
 - `LogicalConsistency` checks whether each step is coherent with prior context and reasoning.
 - `ExecutionEfficiency` checks whether the agent reached the goal without redundant calls.
 
-On the [TRAIL/GAIA benchmark](https://arxiv.org/abs/2510.08847), GPA judges identify 95% of human-labeled agent errors (267/281), compared to 55% for standard judges that only look at final outputs. That 40-percentage-point gap is what you leave on the table when you only evaluate the answer.
+On the [TRAIL benchmark](https://arxiv.org/abs/2505.08638), GPA judges identify 95% of human-labeled agent errors (267/281), compared to 55% for baseline trace-aware judges that also read the execution trace but lack the structured Goal-Plan-Action decomposition. That 40-percentage-point gap shows that reading the trace is necessary but not sufficient -- how you structure the evaluation matters.
 
-Pass a trace and the scorer handles the rest. Under the hood, the integration serializes your MLflow trace to JSON and passes the full span tree to TruLens' provider, which evaluates each dimension with chain-of-thought reasoning. You get back a score and a rationale explaining what it found.
+Pass a trace and the scorer handles the rest. Because agent traces often exceed LLM context windows, TruLens GPA scorers pre-process the trace to reduce its size while preserving key information including the agent plan and tool calls. Under the hood, the integration serializes your MLflow trace to JSON and passes the processed span tree to TruLens' provider, which evaluates each dimension with chain-of-thought reasoning. You get back a score and a rationale explaining what it found.
 
 <img
   src={require("./trulens-pipeline.png").default}
@@ -88,12 +88,12 @@ results = mlflow.genai.evaluate(
     data=traces,
     scorers=[
         # Agent behavior (reads the full span tree)
-        PlanAdherence(model="openai:/gpt-5-mini"),
-        ExecutionEfficiency(model="openai:/gpt-5-mini"),
+        PlanAdherence(model="openai:/gpt-5.2"),
+        ExecutionEfficiency(model="openai:/gpt-5.2"),
         # RAG quality (extracts context from retrieval spans)
-        Groundedness(model="openai:/gpt-5-mini"),
+        Groundedness(model="openai:/gpt-5.2"),
         # Content quality (Phoenix)
-        Hallucination(model="openai:/gpt-5-mini"),
+        Hallucination(model="openai:/gpt-5.2"),
     ],
 )
 ```
@@ -126,13 +126,13 @@ pip install mlflow>=3.10.0 trulens trulens-providers-litellm
 from mlflow.genai.scorers.trulens import PlanAdherence, Groundedness
 
 # Agent trace scorer
-scorer = PlanAdherence(model="openai:/gpt-5-mini")
+scorer = PlanAdherence(model="openai:/gpt-5.2")
 feedback = scorer(trace=my_agent_trace)
 print(feedback.value)      # "yes" or "no" based on threshold
 print(feedback.rationale)  # Chain-of-thought reasoning
 
 # RAG scorer (extracts context from retrieval spans in trace)
-scorer = Groundedness(model="openai:/gpt-5-mini", threshold=0.6)
+scorer = Groundedness(model="openai:/gpt-5.2", threshold=0.6)
 feedback = scorer(trace=my_rag_trace)
 print(feedback.value)              # "yes" or "no"
 print(feedback.rationale)          # Why it passed or failed
@@ -146,7 +146,8 @@ print(feedback.metadata["score"])  # 0.85
 - [Agent GPA Framework (Snowflake Engineering Blog)](https://www.snowflake.com/en/engineering-blog/ai-agent-evaluation-gpa-framework/)
 - [Trace-Aware Agent Evaluation for MLflow (Snowflake Engineering Blog)](https://www.snowflake.com/en/engineering-blog/trace-aware-agent-evaluation-mlflow/)
 - [Agent GPA Paper (arXiv)](https://arxiv.org/abs/2510.08847)
-- [TruLens Documentation](https://www.trulens.org/getting_started/)
+- [TRAIL: Trace Reasoning and Agentic Issue Localization (arXiv)](https://arxiv.org/abs/2505.08638)
+- [TruLens MLflow Integration Documentation](https://www.trulens.org/component_guides/evaluation/mlflow/)
 - [Introducing DeepEval, RAGAS, and Phoenix Judges in MLflow](/blog/third-party-scorers)
 
 ## Provenance
