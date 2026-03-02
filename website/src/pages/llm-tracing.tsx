@@ -138,8 +138,8 @@ export default function LLMTracing() {
         <meta property="og:title" content={SEO_TITLE} />
         <meta property="og:description" content={SEO_DESCRIPTION} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://mlflow.org/faq/llm-tracing" />
-        <link rel="canonical" href="https://mlflow.org/faq/llm-tracing" />
+        <meta property="og:url" content="https://mlflow.org/llm-tracing" />
+        <link rel="canonical" href="https://mlflow.org/llm-tracing" />
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
         <script type="application/ld+json">
           {JSON.stringify(softwareJsonLd)}
@@ -394,7 +394,7 @@ export default function LLMTracing() {
 
           <p>
             LLM tracing is a foundational component of{" "}
-            <Link href="/faq/ai-observability">AI observability</Link>. While
+            <Link href="/ai-observability">AI observability</Link>. While
             observability encompasses tracing, evaluation, monitoring, and
             feedback collection, tracing provides the raw execution data that
             makes all other observability capabilities possible. LLM tracing
@@ -561,7 +561,7 @@ export default function LLMTracing() {
               <p>
                 <strong>Solution:</strong> Continuous tracing provides a
                 baseline for{" "}
-                <Link href="/faq/ai-observability">detecting regressions</Link>,
+                <Link href="/ai-observability">detecting regressions</Link>,
                 latency spikes, and cost anomalies.
               </p>
             </div>
@@ -1133,7 +1133,7 @@ const result = await generateText({
               </Link>
             </li>
             <li>
-              <Link href="/faq/ai-observability">AI Observability Guide</Link>
+              <Link href="/ai-observability">AI Observability Guide</Link>
             </li>
             <li>
               <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>

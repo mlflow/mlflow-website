@@ -36,7 +36,7 @@ const faqs: {
     answer: (
       <>
         A comprehensive AI observability platform includes:{" "}
-        <Link href="/faq/llm-tracing">tracing</Link> (end-to-end execution
+        <Link href="/llm-tracing">tracing</Link> (end-to-end execution
         capture), evaluation (automated quality assessment with LLM judges),
         monitoring (production metrics and drift detection), cost and latency
         tracking, human feedback collection, and governance (audit trails and
@@ -120,7 +120,7 @@ const faqs: {
     answer: (
       <>
         MLflow provides multiple layers for governance and compliance.{" "}
-        <Link href="/faq/llm-tracing">LLM tracing</Link> creates comprehensive
+        <Link href="/llm-tracing">LLM tracing</Link> creates comprehensive
         audit trails of all inputs, outputs, and model interactions - essential
         for regulatory compliance and incident investigation. The AI Gateway
         adds real-time policy enforcement through guardrails that filter inputs
@@ -159,7 +159,7 @@ const faqs: {
       <>
         MLflow's Observability dashboards provide real-time metrics on latency,
         throughput, error rates, and quality scores across all your agent
-        deployments. <Link href="/faq/ai-observability">AI observability</Link>{" "}
+        deployments. <Link href="/ai-observability">AI observability</Link>{" "}
         combines distributed tracing (to understand execution flows), automated
         evaluation (to measure quality continuously), and custom judges (to
         monitor application-specific KPIs). You can set up alerts on any metric
@@ -221,9 +221,9 @@ export default function AIObservability() {
         <meta property="og:type" content="website" />
         <meta
           property="og:url"
-          content="https://mlflow.org/faq/ai-observability"
+          content="https://mlflow.org/ai-observability"
         />
-        <link rel="canonical" href="https://mlflow.org/faq/ai-observability" />
+        <link rel="canonical" href="https://mlflow.org/ai-observability" />
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
         <script type="application/ld+json">
           {JSON.stringify(softwareJsonLd)}

@@ -145,8 +145,8 @@ export default function AIGateway() {
         <meta property="og:title" content={SEO_TITLE} />
         <meta property="og:description" content={SEO_DESCRIPTION} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://mlflow.org/faq/ai-gateway" />
-        <link rel="canonical" href="https://mlflow.org/faq/ai-gateway" />
+        <meta property="og:url" content="https://mlflow.org/ai-gateway" />
+        <link rel="canonical" href="https://mlflow.org/ai-gateway" />
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
         <script type="application/ld+json">
           {JSON.stringify(softwareJsonLd)}

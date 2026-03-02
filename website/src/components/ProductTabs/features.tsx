@@ -36,14 +36,14 @@ const llmAgentFeatures: Feature[] = [
       <>
         Capture complete{" "}
         <Link
-          href="/faq/llm-tracing"
+          href="/llm-tracing"
           className="text-white/90 hover:text-white underline"
         >
           traces
         </Link>{" "}
         of your LLM applications and agents to get deep{" "}
         <Link
-          href="/faq/ai-observability"
+          href="/ai-observability"
           className="text-white/90 hover:text-white underline"
         >
           insights
@@ -127,7 +127,7 @@ formatted = prompt.format(num_sentences=2, content="...")`,
       <>
         Unified API{" "}
         <Link
-          href="/faq/ai-gateway"
+          href="/ai-gateway"
           className="text-white/90 hover:text-white underline"
         >
           gateway

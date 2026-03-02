@@ -119,7 +119,7 @@ export default function AiGateway() {
             failover so your application code stays provider-agnostic. Learn
             more in our{" "}
             <Link
-              href="/faq/ai-gateway"
+              href="/ai-gateway"
               style={{
                 color: "inherit",
                 textDecoration: "underline",
