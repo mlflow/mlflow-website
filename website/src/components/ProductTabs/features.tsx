@@ -1,3 +1,4 @@
+import React from "react";
 import TracingTabImg from "@site/static/img/GenAI_home/GenAI_trace_darkmode.png";
 import EvaluationTabImg from "@site/static/img/GenAI_home/GenAI_evaluation_darkmode.png";
 import GatewayTabImg from "@site/static/img/GenAI_home/GenAI_gateway_darkmode.png";
@@ -10,7 +11,7 @@ import Link from "@docusaurus/Link";
 export type Feature = {
   id: string;
   title: string;
-  description: string | React.ReactNode;
+  description: string | React.ReactElement;
   imageSrc?: string;
   imageZoom?: number;
   imagePosition?: string;
@@ -31,8 +32,26 @@ const llmAgentFeatures: Feature[] = [
   {
     id: "observability",
     title: "Observability",
-    description:
-      "Capture complete traces of your LLM applications and agents to get deep insights into their behavior. Built on OpenTelemetry and supports any LLM provider and agent framework.",
+    description: (
+      <>
+        Capture complete{" "}
+        <Link
+          href="/faq/llm-tracing"
+          className="text-white/90 hover:text-white underline"
+        >
+          traces
+        </Link>{" "}
+        of your LLM applications and agents to get deep{" "}
+        <Link
+          href="/faq/ai-observability"
+          className="text-white/90 hover:text-white underline"
+        >
+          insights
+        </Link>{" "}
+        into their behavior. Built on OpenTelemetry and supports any LLM
+        provider and agent framework.
+      </>
+    ),
     imageSrc: TracingTabImg,
     imageZoom: 160,
     quickstartLink: "https://mlflow.org/docs/latest/genai/tracing/quickstart/",
