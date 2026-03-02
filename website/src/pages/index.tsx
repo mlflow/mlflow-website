@@ -61,14 +61,21 @@ export default function Home(): JSX.Element {
           <>
             Backed by Linux Foundation, MLflow has been fully committed to
             open-source for 5+ years. Now trusted by thousands of organizations
-            and research teams worldwide. Learn{" "}
+            and research teams worldwide to power their{" "}
             <Link
               href="/llmops"
               style={{ color: "inherit", textDecoration: "underline" }}
             >
-              LLMOps best practices
-            </Link>
-            .
+              LLMOps
+            </Link>{" "}
+            and{" "}
+            <Link
+              href="/classical-ml"
+              style={{ color: "inherit", textDecoration: "underline" }}
+            >
+              MLOps
+            </Link>{" "}
+            workflows.
           </>
         }
       />

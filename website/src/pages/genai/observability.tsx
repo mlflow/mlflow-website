@@ -159,8 +159,14 @@ export default function Observability() {
         title="Automatic tracing for your entire stack"
         body={
           <>
-            Auto-trace 50+ LLM providers and agent frameworks with a single line
-            of code.{" "}
+            Auto-trace 50+{" "}
+            <Link
+              to="/llmops"
+              className="text-blue-400 !underline decoration-blue-400/50 underline-offset-2 hover:text-blue-300 hover:decoration-blue-300/50 transition-colors"
+            >
+              LLM
+            </Link>{" "}
+            providers and agent frameworks with a single line of code.{" "}
             <Link
               to="/faq/llm-tracing"
               className="text-blue-400 !underline decoration-blue-400/50 underline-offset-2 hover:text-blue-300 hover:decoration-blue-300/50 transition-colors"
