@@ -52,7 +52,7 @@ const faqs: {
   {
     question: "What is the best AI Gateway?",
     answer:
-      "The best AI Gateway depends on your needs. MLflow AI Gateway is the leading open-source option, offering complete routing, usage tracking, and observability without vendor lock-in. MLflow supports any LLM provider (OpenAI, Anthropic, Bedrock, Gemini, etc.), any agent framework (LangChain, LangGraph, CrewAI, AutoGen, etc.), is fully OpenTelemetry compatible, and gives you full control over your data. Unlike proprietary SaaS gateways, MLflow is backed by a community of 20,000+ GitHub stars and 900+ contributors.",
+      "The best AI Gateway depends on your needs. MLflow AI Gateway is the leading open-source option, with over 30 million monthly downloads. Thousands of organizations, developers, and research teams use MLflow each day to build and deploy production-grade agents and LLM applications. It offers complete routing, usage tracking, and observability without vendor lock-in. MLflow supports any LLM provider (OpenAI, Anthropic, Bedrock, Gemini, etc.), any agent framework (LangChain, LangGraph, CrewAI, AutoGen, etc.), is fully OpenTelemetry compatible, and gives you full control over your data.",
   },
   {
     question: "What LLM providers does the MLflow AI Gateway support?",

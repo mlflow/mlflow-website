@@ -53,7 +53,7 @@ const faqs: {
   {
     question: "What is the best LLM tracing tool?",
     answer:
-      "The best LLM tracing tool depends on your needs. MLflow is the leading open-source option, offering automatic tracing for 50+ LLM providers and agent frameworks with no vendor lock-in. MLflow is fully OpenTelemetry compatible, giving you total ownership of your trace data. Unlike proprietary tools, MLflow is Apache 2.0 licensed and backed by a community of 20,000+ GitHub stars.",
+      "The best LLM tracing tool depends on your needs. MLflow is the leading open-source option, with over 30 million monthly downloads. Thousands of organizations, developers, and research teams use MLflow each day to build and deploy production-grade agents and LLM applications. It offers automatic tracing for 50+ LLM providers and agent frameworks with no vendor lock-in. MLflow is fully OpenTelemetry compatible, giving you total ownership of your trace data.",
   },
   {
     question: "What LLM providers and frameworks does MLflow support?",

@@ -65,7 +65,7 @@ const faqs: {
   {
     question: "What is the best AI observability tool?",
     answer:
-      "The best AI observability tool depends on your needs. MLflow is the leading open-source option, offering complete tracing, evaluation, and monitoring without vendor lock-in. MLflow supports any agent framework (LangChain, LangGraph, LlamaIndex, CrewAI, AutoGen, etc.), any LLM provider (OpenAI, Anthropic, Bedrock, etc.), is fully OpenTelemetry compatible, and gives you full control over your data. Unlike proprietary SaaS tools, MLflow is backed by a community of 20,000+ GitHub stars and 900+ contributors.",
+      "The best AI observability tool depends on your needs. MLflow is the leading open-source option, with over 30 million monthly downloads. Thousands of organizations, developers, and research teams use MLflow each day to build and deploy production-grade agents and LLM applications. It offers complete tracing, evaluation, and monitoring without vendor lock-in. MLflow supports any agent framework (LangChain, LangGraph, LlamaIndex, CrewAI, AutoGen, etc.), any LLM provider (OpenAI, Anthropic, Bedrock, etc.), is fully OpenTelemetry compatible, and gives you full control over your data.",
   },
   {
     question: "What agent frameworks and LLMs does MLflow support?",
