@@ -17,7 +17,7 @@ export const StatsBand = ({
   body = "Backed by Linux Foundation, MLflow has been fully committed to open-source for 5+ years. Now trusted by thousands of organizations and research teams worldwide.",
 }: {
   title?: string;
-  body?: string;
+  body?: React.ReactNode;
 } = {}) => {
   return (
     <Section title={title} body={body} align="center">

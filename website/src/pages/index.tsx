@@ -14,6 +14,7 @@ import {
   TrustPills,
 } from "../components";
 import { MLFLOW_DOCS_URL } from "../constants";
+import Link from "@docusaurus/Link";
 
 export default function Home(): JSX.Element {
   return (
@@ -29,8 +30,7 @@ export default function Home(): JSX.Element {
             <HighlightedKeyword>debug</HighlightedKeyword>,{" "}
             <HighlightedKeyword>test</HighlightedKeyword>, and{" "}
             <HighlightedKeyword>evaluate</HighlightedKeyword> your LLM
-            applications, Agents, and Models. Master{" "}
-            <HighlightedKeyword href="/llmops">LLMOps</HighlightedKeyword>.
+            applications, Agents, and Models.
           </>
         }
         primaryCTA={{
@@ -56,7 +56,22 @@ export default function Home(): JSX.Element {
       </div>
 
       {/* 4. TRUST LOGOS */}
-      <StatsBand />
+      <StatsBand
+        body={
+          <>
+            Backed by Linux Foundation, MLflow has been fully committed to
+            open-source for 5+ years. Now trusted by thousands of organizations
+            and research teams worldwide. Learn{" "}
+            <Link
+              href="/llmops"
+              style={{ color: "inherit", textDecoration: "underline" }}
+            >
+              LLMOps best practices
+            </Link>
+            .
+          </>
+        }
+      />
 
       {/* 4. OPEN AND NEUTRAL - Vendor lock-in free, integrations */}
       <EcosystemList />
