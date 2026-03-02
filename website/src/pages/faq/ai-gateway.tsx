@@ -1012,9 +1012,11 @@ response = client.messages.create(
                 <strong>MLflow</strong>
               </Link>{" "}
               is the largest open-source AI platform, with over 30 million
-              monthly downloads. Backed by the Linux Foundation and licensed
-              under Apache 2.0, it provides a complete AI Gateway solution with
-              no vendor lock-in.{" "}
+              monthly downloads. Thousands of organizations, developers, and
+              research teams use MLflow each day to build and deploy
+              high-quality agents and LLM applications. Backed by the Linux
+              Foundation and licensed under Apache 2.0, it provides a complete
+              AI Gateway solution with no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>
