@@ -742,9 +742,7 @@ export default function AIGateway() {
           <p style={{ marginTop: "16px", marginBottom: "32px" }}>
             For a comprehensive setup guide, visit the{" "}
             <Link
-              href={
-                MLFLOW_GENAI_DOCS_URL + "governance/ai-gateway/quickstart/"
-              }
+              href={MLFLOW_GENAI_DOCS_URL + "governance/ai-gateway/quickstart/"}
             >
               MLflow AI Gateway quickstart documentation
             </Link>
