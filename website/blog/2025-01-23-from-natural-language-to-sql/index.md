@@ -30,7 +30,7 @@ In this blog post, we’ll walk you through the process of building a Multi-Ling
 
 We’ll start by demonstrating how to leverage [LangGraph’s](https://www.langchain.com/langgraph) capabilities to build a dynamic AI workflow. This workflow integrates OpenAI and external data sources, such as a Vector Store and a SQLite database, to process user input, perform safety checks, query databases, and generate meaningful responses.
 
-Throughout this post, we'll leverage [MLflow's Models from Code](https://mlflow.org/docs/latest/model/models-from-code.html) feature to enable seamless tracking and versioning of AI Workflows. Additionally, we'll deep dive into [MLflow's Tracing](https://mlflow.org/docs/latest/llms/tracing/index.html) feature, designed to enhance the [observability](/faq/ai-observability) of the many different components of an AI workflow by tracking inputs, outputs, and metadata associated with each intermediate step. This enables easy identification of bugs and unexpected behaviors, providing greater transparency over the workflow.
+Throughout this post, we’ll leverage [MLflow’s Models from Code](https://mlflow.org/docs/latest/model/models-from-code.html) feature to enable seamless tracking and versioning of AI Workflows. Additionally, we’ll deep dive into [MLflow’s Tracing](https://mlflow.org/docs/latest/llms/tracing/index.html) feature, designed to enhance the observability of the many different components of an AI workflow by tracking inputs, outputs, and metadata associated with each intermediate step. This enables easy identification of bugs and unexpected behaviors, providing greater transparency over the workflow.
 
 ## Prerequisites
 
