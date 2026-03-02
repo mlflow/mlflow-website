@@ -636,8 +636,8 @@ export default function LLMOps() {
           </p>
 
           <p>
-            LLMOps is closely related to <Link href="/aiops">AIOps</Link> (the
-            broader discipline of running all AI applications in production) and{" "}
+            LLMOps is closely related to AIOps (the broader discipline of
+            running all AI applications in production) and{" "}
             <Link href="/faq/ai-observability">AI observability</Link> (the
             monitoring and debugging subset). LLMOps specifically targets
             LLM-powered applications, while AIOps also covers traditional ML
@@ -987,9 +987,6 @@ export default function LLMOps() {
             </li>
             <li>
               <Link href="/faq/llm-tracing">LLM Tracing Guide</Link>
-            </li>
-            <li>
-              <Link href="/aiops">AIOps Guide</Link>
             </li>
             <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>
