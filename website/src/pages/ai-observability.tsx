@@ -461,7 +461,7 @@ export default function AIObservability() {
             behave in development and production. For LLM applications, this is
             known as <a href="#llm-observability">LLM observability</a>. For
             autonomous{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>
+            <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
               agents
             </Link>
             , this is known as{" "}
@@ -658,7 +658,7 @@ export default function AIObservability() {
           </p>
 
           <p>
-            <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>
+            <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
               MLflow automatically traces agent workflows
             </Link>
             , capturing the full directed acyclic graph (DAG) of execution,
@@ -686,7 +686,7 @@ export default function AIObservability() {
             </li>
             <li>
               <strong>Monitoring Agent Behavior in Production:</strong>{" "}
-              <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>
+              <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
                 Agents
               </Link>{" "}
               can behave unpredictably—getting stuck in loops, making incorrect

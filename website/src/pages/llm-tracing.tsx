@@ -382,7 +382,7 @@ export default function LLMTracing() {
             entire AI system stacks (embeddings, retrievers, RAG pipelines),
             this is known as <a href="#ai-tracing">AI tracing</a>. For
             multi-step autonomous{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>
+            <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
               agents
             </Link>
             , tracing the complete decision-making process is known as{" "}
@@ -734,7 +734,7 @@ export default function LLMTracing() {
           </p>
 
           <p>
-            <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>
+            <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
               MLflow automatically traces agent workflows
             </Link>
             , capturing the full directed acyclic graph (DAG) of execution. You
@@ -783,7 +783,7 @@ export default function LLMTracing() {
             </li>
             <li>
               <strong>Understanding Agent Behavior:</strong>{" "}
-              <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>
+              <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
                 Agents
               </Link>{" "}
               can behave unpredictably—getting stuck in loops, making incorrect
