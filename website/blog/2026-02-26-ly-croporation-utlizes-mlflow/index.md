@@ -4,6 +4,7 @@ slug: ly-corporation-utilizes-mlflow
 tags: [mlflow, authorization]
 authors: [motoki-yuhara, mlflow-maintainers]
 thumbnail: /img/blog/ly-utilizes-mlflow/AIPF.png
+image: /img/blog/ly-utilizes-mlflow/AIPF.png
 ---
 
 ## How LY Corporation Uses MLflow: An Overview

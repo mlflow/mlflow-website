@@ -219,7 +219,7 @@ export default function AiGateway() {
         ]}
       />
 
-      <BelowTheFold contentType="genai" />
+      <BelowTheFold contentType="genai" hideGetStarted />
     </Layout>
   );
 }

@@ -36,14 +36,14 @@ const llmAgentFeatures: Feature[] = [
       <>
         Capture complete{" "}
         <Link
-          href="/faq/llm-tracing"
+          href="/llm-tracing"
           className="text-white/90 hover:text-white underline"
         >
           traces
         </Link>{" "}
         of your LLM applications and agents to get deep{" "}
         <Link
-          href="/faq/ai-observability"
+          href="/ai-observability"
           className="text-white/90 hover:text-white underline"
         >
           insights
@@ -123,8 +123,20 @@ formatted = prompt.format(num_sentences=2, content="...")`,
   {
     id: "gateway",
     title: "AI Gateway",
-    description:
-      "Unified API gateway for all LLM providers. Route requests, manage rate limits, handle fallbacks, and control costs through a unified OpenAI-compatible interface.",
+    description: (
+      <>
+        Unified API{" "}
+        <Link
+          href="/ai-gateway"
+          className="text-white/90 hover:text-white underline"
+        >
+          gateway
+        </Link>{" "}
+        for all LLM providers. Route requests, manage rate limits, handle
+        fallbacks, and control costs through a unified OpenAI-compatible
+        interface.
+      </>
+    ),
     imageSrc: GatewayTabImg,
     imagePosition: "0% top",
     quickstartLink:
