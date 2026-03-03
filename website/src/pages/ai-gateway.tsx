@@ -1063,7 +1063,7 @@ response = client.messages.create(
             <li>
               <strong>Evaluation runs on real traffic:</strong> Traces captured
               through the gateway feed directly into{" "}
-              <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>
+              <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
                 MLflow's evaluation APIs
               </Link>
               , so you can run LLM judges over production data without exporting
