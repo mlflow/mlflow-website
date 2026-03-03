@@ -461,10 +461,8 @@ export default function AIObservability() {
             behave in development and production. For LLM applications, this is
             known as <a href="#llm-observability">LLM observability</a>. For
             autonomous{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
-              agents
-            </Link>
-            , this is known as{" "}
+            <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>agents</Link>,
+            this is known as{" "}
             <a href="#agent-observability">agent observability</a>. LLM
             observability helps you track prompt quality, token usage, and
             response accuracy. Agent observability helps you debug multi-step
@@ -686,9 +684,7 @@ export default function AIObservability() {
             </li>
             <li>
               <strong>Monitoring Agent Behavior in Production:</strong>{" "}
-              <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
-                Agents
-              </Link>{" "}
+              <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>Agents</Link>{" "}
               can behave unpredictably—getting stuck in loops, making incorrect
               tool choices, or producing inconsistent outputs. AI observability
               platforms automatically capture agent execution graphs, showing
