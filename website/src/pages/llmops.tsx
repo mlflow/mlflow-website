@@ -35,9 +35,9 @@ const faqs: {
         An LLMOps platform typically includes:{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>tracing</Link>{" "}
         (execution capture for debugging),{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>evaluation</Link>{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>evaluation</Link>{" "}
         (automated quality assessment with LLM judges),{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "prompts/"}>prompt management</Link>{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>prompt management</Link>{" "}
         (versioning and registry), deployment infrastructure, and{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
           production monitoring
@@ -80,11 +80,11 @@ const faqs: {
         MLflow provides a complete LLMOps stack:{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>automatic tracing</Link>{" "}
         for debugging and monitoring,{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
           evaluation with LLM judges
         </Link>{" "}
         for quality assurance,{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "prompts/"}>a prompt registry</Link>{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>a prompt registry</Link>{" "}
         for version control, and{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
           production monitoring
@@ -117,9 +117,9 @@ const faqs: {
         </Link>{" "}
         with a single line of code, and every LLM call is captured with full
         context. From there, add{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>evaluations</Link>{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>evaluations</Link>{" "}
         to assess quality and{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "prompts/"}>
+        <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>
           register your prompts
         </Link>{" "}
         for version control.
@@ -462,11 +462,11 @@ export default function LLMOps() {
             teams need to move LLM-powered applications from prototype to
             production, including{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>tracing</Link>,{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>
+            <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
               evaluation
             </Link>
             ,{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "prompts/"}>
+            <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>
               prompt management
             </Link>
             , <Link href="/genai/ai-gateway">AI Gateways</Link> for governed
@@ -480,7 +480,7 @@ export default function LLMOps() {
 
           <p>
             As LLM applications evolve from single-turn chatbots to multi-step{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>
+            <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
               agents
             </Link>{" "}
             and RAG systems, the operational challenges grow significantly. LLMs
@@ -569,7 +569,7 @@ export default function LLMOps() {
               </p>
               <p>
                 <strong>Solution:</strong> LLMOps uses{" "}
-                <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>
+                <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
                   automated evaluation
                 </Link>{" "}
                 with LLM judges to assess quality at scale, replacing brittle
@@ -586,7 +586,7 @@ export default function LLMOps() {
               </p>
               <p>
                 <strong>Solution:</strong>{" "}
-                <Link href={MLFLOW_GENAI_DOCS_URL + "prompts/"}>
+                <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>
                   Prompt registries
                 </Link>{" "}
                 provide version control, A/B testing, and rollback capabilities
@@ -669,7 +669,7 @@ export default function LLMOps() {
               execution graph visualization
             </Link>{" "}
             to debug reasoning loops,{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>
+            <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
               agent evaluation
             </Link>{" "}
             with multi-turn testing, tool call correctness scoring, and
@@ -697,14 +697,14 @@ export default function LLMOps() {
             </li>
             <li>
               <Link
-                href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}
+                href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}
                 style={{ color: "#007bff", fontWeight: "600" }}
               >
                 Evaluation
               </Link>
               : Assess output quality using{" "}
               <Link
-                href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/llm-as-judge/"}
+                href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}
                 style={{ color: "#007bff" }}
               >
                 LLM judges
@@ -713,7 +713,7 @@ export default function LLMOps() {
             </li>
             <li>
               <Link
-                href={MLFLOW_GENAI_DOCS_URL + "prompts/"}
+                href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}
                 style={{ color: "#007bff", fontWeight: "600" }}
               >
                 Prompt Management
@@ -744,7 +744,7 @@ export default function LLMOps() {
             </li>
             <li>
               <Link
-                href={MLFLOW_GENAI_DOCS_URL + "guides/responsible-ai/"}
+                href={MLFLOW_GENAI_DOCS_URL + "governance/ai-gateway/"}
                 style={{ color: "#007bff", fontWeight: "600" }}
               >
                 Governance & Safety
@@ -778,13 +778,13 @@ export default function LLMOps() {
             </li>
             <li>
               <Link
-                href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}
+                href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}
                 style={{ color: "#0194e2", fontWeight: 700 }}
               >
                 MLflow LLM Evaluation
               </Link>{" "}
               — Score outputs with{" "}
-              <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/llm-as-judge/"}>
+              <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
                 LLM judges
               </Link>
               , custom scorers, and{" "}
@@ -793,7 +793,7 @@ export default function LLMOps() {
             </li>
             <li>
               <Link
-                href={MLFLOW_GENAI_DOCS_URL + "prompts/"}
+                href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}
                 style={{ color: "#0194e2", fontWeight: 700 }}
               >
                 MLflow Prompt Registry
@@ -825,7 +825,7 @@ export default function LLMOps() {
             </li>
             <li>
               <Link
-                href={MLFLOW_GENAI_DOCS_URL + "agent-server/"}
+                href={MLFLOW_GENAI_DOCS_URL + "serving/"}
                 style={{ color: "#0194e2", fontWeight: 700 }}
               >
                 MLflow Agent Server
@@ -980,12 +980,12 @@ export default function LLMOps() {
               </Link>
             </li>
             <li>
-              <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>
+              <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
                 LLM Evaluation Guide
               </Link>
             </li>
             <li>
-              <Link href={MLFLOW_GENAI_DOCS_URL + "prompts/"}>
+              <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>
                 Prompt Registry Documentation
               </Link>
             </li>
