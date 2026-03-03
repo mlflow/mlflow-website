@@ -10,7 +10,7 @@ import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE = "AI Observability for LLMs & Agents | MLflow AI Platform";
 const SEO_DESCRIPTION =
-  "Learn AI observability, LLM observability, and agent observability with MLflow—the comprehensive, open-source agent engineering and ops platform.";
+  "AI observability captures traces, evaluations, and metrics across agent and LLM workflows. Explore AI observability on MLflow's open-source AI platform.";
 
 const faqs: {
   question: string;

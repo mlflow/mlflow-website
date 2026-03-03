@@ -9,7 +9,7 @@ import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE = "AI Gateway for LLMs & Agents | MLflow AI Platform";
 const SEO_DESCRIPTION =
-  "An AI Gateway (or LLM Gateway) routes LLM and MCP requests, manages keys, tracks costs, and enforces agent governance. Explore MLflow's open-source AI Gateway.";
+  "An AI Gateway (or LLM Gateway) routes requests, manages keys, tracks costs, and enforces agent governance. Explore AI Gateways on MLflow's open-source AI platform.";
 
 const faqs: {
   question: string;

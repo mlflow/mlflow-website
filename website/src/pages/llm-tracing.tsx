@@ -10,7 +10,7 @@ import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE = "LLM Tracing & AI Tracing for Agents | MLflow AI Platform";
 const SEO_DESCRIPTION =
-  "Learn LLM tracing, AI tracing, and agent tracing with MLflow—the comprehensive, open-source agent engineering and ops platform.";
+  "LLM tracing (or AI tracing) records every step of agent execution — inputs, outputs, latency, and costs. Explore LLM tracing on MLflow's open-source AI platform.";
 
 const faqs: {
   question: string;
