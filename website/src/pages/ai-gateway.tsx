@@ -9,7 +9,7 @@ import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE = "AI Gateway for LLMs & Agents | MLflow AI Platform";
 const SEO_DESCRIPTION =
-  "Manage LLM access, control costs, and get full observability with MLflow AI Gateway. Route requests to any provider, track usage, and enforce governance — part of the open-source MLflow AI engineering platform for agents, evaluation, and monitoring.";
+  "An AI Gateway is a centralized proxy that routes LLM requests, manages credentials, tracks costs, and enforces governance across providers. Learn how MLflow AI Gateway delivers full observability, evaluation, and monitoring for agents and LLM applications — all open source.";
 
 const faqs: {
   question: string;
