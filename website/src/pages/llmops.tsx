@@ -132,7 +132,7 @@ const faqs: {
     question: "What's the difference between LLMOps and AI observability?",
     answer: (
       <>
-        <Link href="/faq/ai-observability">AI observability</Link> is a subset
+        <Link href="/ai-observability">AI observability</Link> is a subset
         of LLMOps focused on monitoring and understanding AI system behavior
         (tracing, metrics, evaluation). LLMOps is broader, also encompassing
         prompt management, deployment workflows, CI/CD for LLM applications, and
@@ -568,8 +568,11 @@ export default function LLMOps() {
                 applications with traditional assertions.
               </p>
               <p>
-                <strong>Solution:</strong> LLMOps uses automated evaluation with
-                LLM judges to assess quality at scale, replacing brittle
+                <strong>Solution:</strong> LLMOps uses{" "}
+                <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>
+                  automated evaluation
+                </Link>{" "}
+                with LLM judges to assess quality at scale, replacing brittle
                 exact-match tests with semantic quality scoring.
               </p>
             </div>
@@ -582,9 +585,13 @@ export default function LLMOps() {
                 version control for prompt templates.
               </p>
               <p>
-                <strong>Solution:</strong> Prompt registries provide version
-                control, A/B testing, and rollback capabilities for prompt
-                templates, bringing Git-like rigor to prompt engineering.
+                <strong>Solution:</strong>{" "}
+                <Link href={MLFLOW_GENAI_DOCS_URL + "prompts/"}>
+                  Prompt registries
+                </Link>{" "}
+                provide version control, A/B testing, and rollback capabilities
+                for prompt templates, bringing Git-like rigor to prompt
+                engineering.
               </p>
             </div>
 
@@ -601,7 +608,7 @@ export default function LLMOps() {
                 <Link href="/genai/ai-gateway">AI Gateways</Link> provide a
                 single control plane for model access with rate limiting,
                 authentication, fallback routing, and cost tracking.{" "}
-                <Link href="/faq/llm-tracing">Tracing</Link> captures token
+                <Link href="/llm-tracing">Tracing</Link> captures token
                 usage and latency per span, making it easy to find expensive
                 operations and debug unexpected behavior.
               </p>
@@ -616,7 +623,7 @@ export default function LLMOps() {
               </p>
               <p>
                 <strong>Solution:</strong>{" "}
-                <Link href="/faq/llm-tracing">End-to-end tracing</Link> makes
+                <Link href="/llm-tracing">End-to-end tracing</Link> makes
                 every step visible and debuggable, from initial request through
                 tool calls to final response.
               </p>
@@ -638,7 +645,7 @@ export default function LLMOps() {
           <p>
             LLMOps is closely related to AIOps (the broader discipline of
             running all AI applications in production) and{" "}
-            <Link href="/faq/ai-observability">AI observability</Link> (the
+            <Link href="/ai-observability">AI observability</Link> (the
             monitoring and debugging subset). LLMOps specifically targets
             LLM-powered applications, while AIOps also covers traditional ML
             experiment tracking and model management.
@@ -668,8 +675,8 @@ export default function LLMOps() {
             with multi-turn testing, tool call correctness scoring, and
             optimization of agent workflows to reduce token costs and latency.
             MLflow provides complete AgentOps support for all agent frameworks,
-            including LangGraph, CrewAI, AutoGen, and custom agent
-            implementations.
+            including LangGraph, CrewAI, Pydantic AI, Google ADK, and custom
+            agent implementations.
           </p>
 
           <h2 id="key-components">Key Components of LLMOps</h2>
@@ -983,10 +990,10 @@ export default function LLMOps() {
               </Link>
             </li>
             <li>
-              <Link href="/faq/ai-observability">AI Observability Guide</Link>
+              <Link href="/ai-observability">AI Observability Guide</Link>
             </li>
             <li>
-              <Link href="/faq/llm-tracing">LLM Tracing Guide</Link>
+              <Link href="/llm-tracing">LLM Tracing Guide</Link>
             </li>
             <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>
