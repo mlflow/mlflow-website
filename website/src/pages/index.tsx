@@ -14,7 +14,7 @@ import {
   TrustPills,
 } from "../components";
 import { MLFLOW_DOCS_URL } from "../constants";
-import Link from "@docusaurus/Link";
+import { MLFLOW_GENAI_DOCS_URL } from "../constants";
 
 export default function Home(): JSX.Element {
   return (
@@ -27,10 +27,18 @@ export default function Home(): JSX.Element {
             Building AI products is all about iteration.
             <br />
             MLflow lets you move 10x faster by simplifying how you <br />
-            <HighlightedKeyword>debug</HighlightedKeyword>,{" "}
-            <HighlightedKeyword>test</HighlightedKeyword>, and{" "}
-            <HighlightedKeyword>evaluate</HighlightedKeyword> your LLM
-            applications, Agents, and Models.
+            <HighlightedKeyword href="https://mlflow.org/docs/latest/genai/tracing/">
+              debug
+            </HighlightedKeyword>
+            ,{" "}
+            <HighlightedKeyword href="https://mlflow.org/docs/latest/genai/eval-monitor/">
+              evaluate
+            </HighlightedKeyword>
+            , and{" "}
+            <HighlightedKeyword href="https://mlflow.org/docs/latest/genai/tracing/prod-tracing/">
+              monitor
+            </HighlightedKeyword>{" "}
+            your LLM applications, Agents, and Models.
           </>
         }
         primaryCTA={{
@@ -39,7 +47,7 @@ export default function Home(): JSX.Element {
         }}
         secondaryCTA={{
           label: "View Docs",
-          href: MLFLOW_DOCS_URL,
+          href: MLFLOW_GENAI_DOCS_URL,
         }}
       >
         <TrustPills />
