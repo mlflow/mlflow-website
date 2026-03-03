@@ -4,6 +4,7 @@ slug: mlflow-prompt-evaluate
 tags: [mlflow, genai, evaluation, prompt-registry, tracing]
 authors: [allison-bennett, shyam-sankararaman, michael-berk, mlflow-maintainers]
 thumbnail: /img/blog/prompt-evaluate/prompt-evaluate.png
+image: /img/blog/prompt-evaluate/prompt-evaluate.png
 ---
 
 Building GenAI tools presents a unique set of challenges. As we evaluate accuracy, iterate on prompts, and enable collaboration, we often encounter bottlenecks that slow down our progress toward production.

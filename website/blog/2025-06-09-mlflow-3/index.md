@@ -9,7 +9,7 @@ image: /img/blog/mlflow-3-trace-ui.png
 
 The open source MLflow community has reached a major milestone. Today, we're releasing **MLflow 3**, which brings production-ready generative AI capabilities to the platform that millions of developers trust for ML operations.
 
-This isn't just another feature update. MLflow 3 fundamentally expands what's possible with open source ML tooling, addressing the [observability](/faq/ai-observability) and quality challenges that have made GenAI deployment feel like a leap of faith.
+This isn't just another feature update. MLflow 3 fundamentally expands what's possible with open source ML tooling, addressing the [observability](/ai-observability) and quality challenges that have made GenAI deployment feel like a leap of faith.
 
 ## Why GenAI Breaks Traditional MLOps
 
@@ -30,7 +30,7 @@ MLflow 3 takes a different approach. Instead of building yet another specialized
 
 This means you can instrument a transformer training pipeline and a multi-agent RAG system with the same tools, deploy them through the same registry, and monitor them with unified observability infrastructure.
 
-### Deep [Observability](/faq/ai-observability) with MLflow Tracing
+### Deep [Observability](/ai-observability) with MLflow Tracing
 
 The centerpiece of MLflow 3 is comprehensive tracing that works across the entire GenAI ecosystem. Unlike logging frameworks that capture basic inputs and outputs, MLflow Tracing provides hierarchical visibility into complex execution flows.
 

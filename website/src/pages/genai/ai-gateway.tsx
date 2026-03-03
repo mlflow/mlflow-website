@@ -75,6 +75,76 @@ const gatewayProviders: EcosystemItem[] = [
     src: "/img/ollama.png",
     href: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
   },
+  {
+    title: "Azure OpenAI",
+    src: "/img/azureml.svg",
+    href: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
+  },
+  {
+    title: "HuggingFace",
+    src: "/img/huggingface.svg",
+    href: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
+  },
+  {
+    title: "Qwen",
+    src: "/img/qwen-logo.png",
+    href: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
+  },
+  {
+    title: "Kimi",
+    src: "/img/kimi-logo.png",
+    href: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
+  },
+  {
+    title: "GLM",
+    src: "/img/glm-logo.png",
+    href: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
+  },
+  {
+    title: "LiteLLM",
+    src: "/img/litellm.png",
+    href: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
+  },
+  {
+    title: "NVIDIA NIM",
+    src: "/img/nvidia.svg",
+    href: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
+  },
+  {
+    title: "xAI",
+    src: "/img/xai.svg",
+    href: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
+  },
+  {
+    title: "Perplexity",
+    src: "/img/perplexity.svg",
+    href: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
+  },
+  {
+    title: "AI21",
+    src: "/img/ai21.svg",
+    href: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
+  },
+  {
+    title: "Cerebras",
+    src: "/img/cerebras.svg",
+    href: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
+  },
+  {
+    title: "SambaNova",
+    src: "/img/sambanova.svg",
+    href: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
+  },
+  {
+    title: "vLLM",
+    src: "/img/vllm.svg",
+    href: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
+  },
+  {
+    title: "Any OpenAI-compatible API",
+    src: "/img/openai-compatible.svg",
+    href: `${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`,
+  },
 ];
 
 export default function AiGateway() {
@@ -111,7 +181,7 @@ export default function AiGateway() {
 
       <EcosystemList
         title="Supported providers"
-        body="Route requests to any major LLM provider through a single, unified interface. The gateway handles credentials, usage tracking, and failover so your application code stays provider-agnostic."
+        body="Route requests to any LLM provider — including any OpenAI-compatible API or custom model endpoint — through a single, unified interface. The gateway handles credentials, usage tracking, and failover so your application code stays provider-agnostic."
         items={gatewayProviders}
       />
 
@@ -149,7 +219,7 @@ export default function AiGateway() {
         ]}
       />
 
-      <BelowTheFold contentType="genai" />
+      <BelowTheFold contentType="genai" hideGetStarted />
     </Layout>
   );
 }
