@@ -9,7 +9,7 @@ import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE = "AI Gateway for LLMs & Agents | MLflow Agent Platform";
 const SEO_DESCRIPTION =
-  "Learn AI Gateway, LLM Gateway, and Agent Gateway with MLflow - the comprehensive, open-source agent engineering and ops platform.";
+  "Learn AI Gateway and LLM Gateway with MLflow - the comprehensive, open-source agent engineering and ops platform.";
 
 const faqs: {
   question: string;
@@ -42,9 +42,9 @@ const faqs: {
       "LLM Gateway and AI Gateway are often used interchangeably. Historically, LLM Gateway referred specifically to routing calls to large language models like GPT or Claude. AI Gateway is broader, encompassing LLMs plus other AI services. Most modern AI Gateways focus on LLM routing and governance, making the terms functionally equivalent.",
   },
   {
-    question: "What is an Agent Gateway?",
+    question: "Does the AI Gateway support MCP (Model Context Protocol)?",
     answer:
-      "Agent Gateway extends LLM Gateway capabilities to multi-step agentic systems. While an LLM Gateway routes individual model calls, an Agent Gateway handles complex agent workflows involving multiple LLM calls, tool invocations, and retrieval steps. It provides end-to-end tracing across agent execution graphs, aggregates costs across all calls in an agent session, and enforces governance policies at every step of agent reasoning.",
+      "Yes. As agents increasingly connect to external tools and data sources through MCP servers, AI Gateway provides a centralized layer for securely managing that access. You can govern which MCP servers your agents can reach, track tool usage across sessions, and enforce policies — all without modifying your agent code.",
   },
   {
     question: "What is the best AI Gateway?",
@@ -389,15 +389,13 @@ export default function AIGateway() {
             An AI Gateway is a centralized proxy layer that routes requests to
             LLM providers through a single, unified API. It manages credentials,
             tracks usage, enforces governance policies, and provides complete
-            observability across all LLM calls. For LLM applications, this is
-            known as an <a href="#llm-gateway">LLM Gateway</a>. For autonomous{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "agent-evaluation/"}>
-              agents
-            </Link>
-            , this is known as an <a href="#agent-gateway">Agent Gateway</a>.
-            LLM Gateways centralize API key management and track usage across
-            providers. Agent Gateways extend this to multi-step agentic
-            workflows with end-to-end tracing and cost tracking.
+            observability across all LLM calls. As agents increasingly connect
+            to external tools and data sources through{" "}
+            <a href="https://modelcontextprotocol.io/">
+              MCP (Model Context Protocol)
+            </a>{" "}
+            servers, AI Gateways also provide a centralized layer for securely
+            managing access to those MCP servers and related tools.
           </p>
 
           <p>
@@ -455,9 +453,6 @@ export default function AIGateway() {
             <ul style={{ margin: 0, paddingLeft: "24px" }}>
               <li style={{ marginBottom: "8px" }}>
                 <a href="#llm-gateway">LLM Gateway</a>
-              </li>
-              <li style={{ marginBottom: "8px" }}>
-                <a href="#agent-gateway">Agent Gateway</a>
               </li>
               <li style={{ marginBottom: "8px" }}>
                 <a href="#key-components">Key Components</a>
@@ -564,23 +559,18 @@ export default function AIGateway() {
             switching providers or models.
           </p>
 
-          <h2 id="agent-gateway">Agent Gateway</h2>
+          <h2 id="mcp-support">MCP Server Access Management</h2>
 
           <p>
-            An Agent Gateway extends LLM Gateway capabilities to multi-step
-            agentic systems. While an LLM Gateway routes individual model calls,
-            an Agent Gateway handles complex agent workflows involving multiple
-            LLM calls, tool invocations, retrieval steps, and reasoning loops.
-          </p>
-
-          <p>
-            Agents built with frameworks like LangGraph, CrewAI, or AutoGen make
-            dozens or hundreds of LLM calls per user request. An Agent Gateway
-            aggregates costs across entire agent sessions, provides end-to-end{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>tracing</Link>{" "}
-            across the agent's execution graph, enforces governance policies at
-            every step, and automatically captures usage metrics for debugging
-            and optimization.
+            As AI agents grow more capable, they increasingly connect to
+            external tools and data sources through{" "}
+            <a href="https://modelcontextprotocol.io/">
+              MCP (Model Context Protocol)
+            </a>{" "}
+            servers. AI Gateway provides a centralized layer for securely
+            managing that access — governing which MCP servers your agents can
+            reach, tracking tool usage across sessions, and enforcing policies
+            without modifying your agent code.
           </p>
 
           <p>
@@ -588,9 +578,10 @@ export default function AIGateway() {
               MLflow AI Gateway
             </Link>{" "}
             integrates natively with MLflow Tracing, so every request through
-            the gateway automatically becomes an MLflow trace. This gives you
-            complete visibility into agent behavior, token costs, and quality
-            metrics without additional instrumentation.
+            the gateway — whether to an LLM provider or an MCP server —
+            automatically becomes an MLflow trace. This gives you complete
+            visibility into agent behavior, token costs, and tool usage without
+            additional instrumentation.
           </p>
 
           <h2>Common Use Cases for AI Gateway</h2>
@@ -639,6 +630,13 @@ export default function AIGateway() {
               every request and response passing through the gateway.
               Demonstrate compliance with data policies and regulatory
               requirements.
+            </li>
+            <li>
+              <strong>Governing MCP Server Access:</strong> As agents connect to
+              external tools and data sources through MCP servers, the gateway
+              provides centralized control over which servers your agents can
+              reach, tracks tool usage across sessions, and enforces access
+              policies — all without modifying your agent code.
             </li>
           </ul>
 
