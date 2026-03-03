@@ -37,7 +37,9 @@ const faqs: {
         (execution capture for debugging),{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>evaluation</Link>{" "}
         (automated quality assessment with LLM judges),{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>prompt management</Link>{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>
+          prompt management
+        </Link>{" "}
         (versioning and registry), deployment infrastructure, and{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
           production monitoring
@@ -84,7 +86,9 @@ const faqs: {
           evaluation with LLM judges
         </Link>{" "}
         for quality assurance,{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>a prompt registry</Link>{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>
+          a prompt registry
+        </Link>{" "}
         for version control, and{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
           production monitoring
@@ -132,8 +136,8 @@ const faqs: {
     question: "What's the difference between LLMOps and AI observability?",
     answer: (
       <>
-        <Link href="/ai-observability">AI observability</Link> is a subset
-        of LLMOps focused on monitoring and understanding AI system behavior
+        <Link href="/ai-observability">AI observability</Link> is a subset of
+        LLMOps focused on monitoring and understanding AI system behavior
         (tracing, metrics, evaluation). LLMOps is broader, also encompassing
         prompt management, deployment workflows, CI/CD for LLM applications, and
         the full operational lifecycle from development through production.
@@ -480,9 +484,7 @@ export default function LLMOps() {
 
           <p>
             As LLM applications evolve from single-turn chatbots to multi-step{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
-              agents
-            </Link>{" "}
+            <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>agents</Link>{" "}
             and RAG systems, the operational challenges grow significantly. LLMs
             are non-deterministic, expensive, and difficult to evaluate with
             traditional software testing. LLMOps gives teams the tools to manage
@@ -608,8 +610,8 @@ export default function LLMOps() {
                 <Link href="/genai/ai-gateway">AI Gateways</Link> provide a
                 single control plane for model access with rate limiting,
                 authentication, fallback routing, and cost tracking.{" "}
-                <Link href="/llm-tracing">Tracing</Link> captures token
-                usage and latency per span, making it easy to find expensive
+                <Link href="/llm-tracing">Tracing</Link> captures token usage
+                and latency per span, making it easy to find expensive
                 operations and debug unexpected behavior.
               </p>
             </div>
@@ -623,9 +625,9 @@ export default function LLMOps() {
               </p>
               <p>
                 <strong>Solution:</strong>{" "}
-                <Link href="/llm-tracing">End-to-end tracing</Link> makes
-                every step visible and debuggable, from initial request through
-                tool calls to final response.
+                <Link href="/llm-tracing">End-to-end tracing</Link> makes every
+                step visible and debuggable, from initial request through tool
+                calls to final response.
               </p>
             </div>
           </div>
