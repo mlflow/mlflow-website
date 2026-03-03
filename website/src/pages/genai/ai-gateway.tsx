@@ -7,7 +7,6 @@ import {
   EcosystemList,
   ProcessSection,
 } from "../../components";
-import Link from "@docusaurus/Link";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import type { EcosystemItem } from "../../components/EcosystemList/EcosystemList";
 import CardHero from "@site/static/img/GenAI_gateway/GenAI_gateway_hero.png";
