@@ -13,7 +13,8 @@ import {
   FAQSection,
   TrustPills,
 } from "../components";
-import { MLFLOW_GENAI_DOCS_URL } from "../constants";
+import Link from "@docusaurus/Link";
+import { MLFLOW_DOCS_URL } from "../constants";
 
 export default function Home(): JSX.Element {
   return (
@@ -46,7 +47,7 @@ export default function Home(): JSX.Element {
         }}
         secondaryCTA={{
           label: "View Docs",
-          href: MLFLOW_GENAI_DOCS_URL,
+          href: MLFLOW_DOCS_URL,
         }}
       >
         <TrustPills />
@@ -63,7 +64,29 @@ export default function Home(): JSX.Element {
       </div>
 
       {/* 4. TRUST LOGOS */}
-      <StatsBand />
+      <StatsBand
+        body={
+          <>
+            Backed by Linux Foundation, MLflow has been fully committed to
+            open-source for 5+ years. Now trusted by thousands of organizations
+            and research teams worldwide to power their{" "}
+            <Link
+              href="/llmops"
+              style={{ color: "inherit", textDecoration: "underline" }}
+            >
+              LLMOps
+            </Link>{" "}
+            and{" "}
+            <Link
+              href="/classical-ml"
+              style={{ color: "inherit", textDecoration: "underline" }}
+            >
+              MLOps
+            </Link>{" "}
+            workflows.
+          </>
+        }
+      />
 
       {/* 4. OPEN AND NEUTRAL - Vendor lock-in free, integrations */}
       <EcosystemList />

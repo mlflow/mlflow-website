@@ -336,7 +336,23 @@ export default function GenAi(): JSX.Element {
         </div>
       </div>
 
-      <StatsBand title="Most Adopted Open Source AI Platform" />
+      <StatsBand
+        title="Most Adopted Open Source AI Platform"
+        body={
+          <>
+            Backed by Linux Foundation, MLflow has been fully committed to
+            open-source for 5+ years. Now trusted by thousands of organizations
+            and research teams worldwide to power their{" "}
+            <Link
+              href="/llmops"
+              style={{ color: "inherit", textDecoration: "underline" }}
+            >
+              LLMOps
+            </Link>{" "}
+            workflows.
+          </>
+        }
+      />
       <EcosystemList
         title="Works with Any LLM and Agent Framework"
         body="From LLM providers to agent frameworks — MLflow integrates seamlessly with 100+ tools across the AI ecosystem. Supports any programming language and natively integrates with OpenTelemetry and MCP."
