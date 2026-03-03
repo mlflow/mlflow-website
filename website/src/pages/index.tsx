@@ -13,8 +13,8 @@ import {
   FAQSection,
   TrustPills,
 } from "../components";
+import Link from "@docusaurus/Link";
 import { MLFLOW_DOCS_URL } from "../constants";
-import { MLFLOW_GENAI_DOCS_URL } from "../constants";
 
 export default function Home(): JSX.Element {
   return (
@@ -47,7 +47,7 @@ export default function Home(): JSX.Element {
         }}
         secondaryCTA={{
           label: "View Docs",
-          href: MLFLOW_GENAI_DOCS_URL,
+          href: MLFLOW_DOCS_URL,
         }}
       >
         <TrustPills />
