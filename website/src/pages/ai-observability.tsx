@@ -8,7 +8,7 @@ import ObservabilityHero from "@site/static/img/GenAI_observability/GenAI_observ
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
-const SEO_TITLE = "AI Observability for LLMs & Agents | MLflow Agent Platform";
+const SEO_TITLE = "AI Observability for LLMs & Agents | MLflow AI Platform";
 const SEO_DESCRIPTION =
   "Learn AI observability, LLM observability, and agent observability with MLflow—the comprehensive, open-source agent engineering and ops platform.";
 

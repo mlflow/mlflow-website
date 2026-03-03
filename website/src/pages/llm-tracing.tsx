@@ -8,7 +8,7 @@ import TracingHero from "@site/static/img/GenAI_observability/GenAI_observabilit
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
-const SEO_TITLE = "LLM Tracing & AI Tracing for Agents | MLflow Agent Platform";
+const SEO_TITLE = "LLM Tracing & AI Tracing for Agents | MLflow AI Platform";
 const SEO_DESCRIPTION =
   "Learn LLM tracing, AI tracing, and agent tracing with MLflow—the comprehensive, open-source agent engineering and ops platform.";
 

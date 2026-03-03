@@ -7,7 +7,7 @@ import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
-const SEO_TITLE = "AI Gateway for LLMs & Agents | MLflow Agent Platform";
+const SEO_TITLE = "AI Gateway for LLMs & Agents | MLflow AI Platform";
 const SEO_DESCRIPTION =
   "Learn AI Gateway and LLM Gateway with MLflow - the comprehensive, open-source agent engineering and ops platform.";
 
