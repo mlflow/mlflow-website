@@ -4,7 +4,7 @@ import { cva, VariantProps } from "class-variance-authority";
 
 type Props = VariantProps<typeof innerWrapper> &
   PropsWithChildren<{
-    title: string;
+    title: ReactNode;
     body: ReactNode | ReactNode[];
     sectionLabel?: string;
     hasGetStartedButton?: true | string;
@@ -18,6 +18,7 @@ const innerWrapper = cva(
   {
     variants: {
       minHeight: {
+        none: "",
         small: "min-h-[350px]",
         default: "min-h-[550px]",
       },
@@ -33,6 +34,7 @@ export function AboveTheFold({
   hasGetStartedButton,
   actions,
   bodyColor,
+  bodySize = "l",
   minHeight = "default",
 }: Props) {
   const bodyParts = Array.isArray(body) ? body : [body];
@@ -40,12 +42,12 @@ export function AboveTheFold({
     <div className="flex flex-col gap-6">
       <div className={innerWrapper({ minHeight })}>
         {sectionLabel && <SectionLabel label={sectionLabel} />}
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <Heading level={1}>{title}</Heading>
         </div>
         <div className="mx-auto text-pretty">
           {bodyParts.map((part, index) => (
-            <Body key={index} size="l" align="center" color={bodyColor}>
+            <Body key={index} size={bodySize} align="center" color={bodyColor}>
               {part}
             </Body>
           ))}
