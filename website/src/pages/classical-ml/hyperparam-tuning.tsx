@@ -22,37 +22,37 @@ export default function HyperparamTuning() {
         <meta property="og:title" content={SEO_TITLE} />
       </Head>
       <Layout>
-      <AboveTheFold
-        sectionLabel="Hyperparam tuning"
-        title="Simplify your model training workflow"
-        body="Use state-of-the-art hyperparameter optimization techniques with an intuitive set of APIs"
-        hasGetStartedButton={MLFLOW_DOCS_URL}
-      >
-        <HeroImage src={CardHero} alt="" />
-      </AboveTheFold>
+        <AboveTheFold
+          sectionLabel="Hyperparam tuning"
+          title="Simplify your model training workflow"
+          body="Use state-of-the-art hyperparameter optimization techniques with an intuitive set of APIs"
+          hasGetStartedButton={MLFLOW_DOCS_URL}
+        >
+          <HeroImage src={CardHero} alt="" />
+        </AboveTheFold>
 
-      <StickyGrid
-        cards={[
-          {
-            title: "Native ML library integrations with mlflow.autolog",
-            body: "mlflow.autolog() integrates with popular ML libraries to automatically log hyperparameters, metrics, and artifacts—enabling efficient tracking and comparison of tuning experiments with no manual effort.",
-            image: <img src={Card1} alt="" />,
-          },
-          {
-            title: "Scalable Hyper Parameter Tuning",
-            body: "Leverage the native integration between MLflow and Optuna to run distributed hyperparameter optimization at scale using Spark UDFs. The MLflow tracking server provides robust trial data storage that persists through node failures, ensuring your optimization jobs complete successfully even in complex scalable distributed environments.",
-            image: <img src={Card2} alt="" />,
-          },
-          {
-            title: "Identify the best model for production",
-            body: "By visualizing metrics across runs directly in the MLflow UI, users can quickly evaluate tradeoffs and identify the best model for production.",
-            image: <img src={Card3} alt="" />,
-          },
-        ]}
-      />
+        <StickyGrid
+          cards={[
+            {
+              title: "Native ML library integrations with mlflow.autolog",
+              body: "mlflow.autolog() integrates with popular ML libraries to automatically log hyperparameters, metrics, and artifacts—enabling efficient tracking and comparison of tuning experiments with no manual effort.",
+              image: <img src={Card1} alt="" />,
+            },
+            {
+              title: "Scalable Hyper Parameter Tuning",
+              body: "Leverage the native integration between MLflow and Optuna to run distributed hyperparameter optimization at scale using Spark UDFs. The MLflow tracking server provides robust trial data storage that persists through node failures, ensuring your optimization jobs complete successfully even in complex scalable distributed environments.",
+              image: <img src={Card2} alt="" />,
+            },
+            {
+              title: "Identify the best model for production",
+              body: "By visualizing metrics across runs directly in the MLflow UI, users can quickly evaluate tradeoffs and identify the best model for production.",
+              image: <img src={Card3} alt="" />,
+            },
+          ]}
+        />
 
-      <BelowTheFold contentType="classical-ml" />
-    </Layout>
+        <BelowTheFold contentType="classical-ml" />
+      </Layout>
     </>
   );
 }
