@@ -1,5 +1,6 @@
-import { MLFLOW_DOCS_URL } from "@site/src/constants";
+import { MLFLOW_ML_DOCS_URL } from "@site/src/constants";
 import Head from "@docusaurus/Head";
+import Link from "@docusaurus/Link";
 import {
   Layout,
   LogosCarousel,
@@ -8,7 +9,11 @@ import {
   BelowTheFold,
   StickyGrid,
   ValuePropWidget,
+  HighlightedKeyword,
+  Button,
+  ProcessSection,
 } from "../../components";
+import { TrustPills } from "../../components/TrustPills/TrustPills";
 import Card1 from "@site/static/img/Classical_home/Classical_home_1.png";
 import Card2 from "@site/static/img/Classical_home/Classical_home_2.png";
 import Card3 from "@site/static/img/Classical_home/Classical_home_3.png";
@@ -26,11 +31,51 @@ export default function GenAi(): JSX.Element {
       </Head>
       <Layout>
         <AboveTheFold
-          title={<strong>Master the ML Lifecycle</strong>}
-          body="From experiment to production, MLflow streamlines your complete machine learning journey with end-to-end tracking, model management, and deployment."
-          hasGetStartedButton="#get-started"
+          title={
+            <span className="text-[48px] xxs:text-[64px] xs:text-[80px] leading-[110%]">
+              Master the ML Lifecycle
+            </span>
+          }
+          body={
+            <>
+              From experimentation to production, MLflow for machine learning
+              models streamlines your complete ML journey, with comprehensive{" "}
+              <HighlightedKeyword href="/classical-ml/experiment-tracking">
+                experiment tracking
+              </HighlightedKeyword>
+              ,{" "}
+              <HighlightedKeyword href="/classical-ml/model-registry">
+                model management
+              </HighlightedKeyword>
+              , and{" "}
+              <HighlightedKeyword href="/classical-ml/models">
+                deployment
+              </HighlightedKeyword>
+              .
+            </>
+          }
           bodyColor="white"
+          bodySize="xl"
+          actions={
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex flex-wrap justify-center items-center gap-4">
+                <Link to="#get-started">
+                  <Button variant="primary" size="medium">
+                    Get Started
+                  </Button>
+                </Link>
+                <Link to={MLFLOW_ML_DOCS_URL}>
+                  <Button variant="outline" size="medium">
+                    View Docs
+                  </Button>
+                </Link>
+              </div>
+              <TrustPills />
+            </div>
+          }
         />
+
+        <LogosCarousel />
 
         <StickyGrid
           cards={[
@@ -82,10 +127,58 @@ export default function GenAi(): JSX.Element {
           ]}
         />
 
-        <LogosCarousel />
         <ValuePropWidget />
 
-        <BelowTheFold contentType="classical-ml">
+        <ProcessSection
+          subtitle="From zero to full experiment tracking in minutes. No complex setup required."
+          colorTheme="default"
+          getStartedLink="https://mlflow.org/docs/latest/ml/"
+          steps={[
+            {
+              number: "1",
+              title: "Start MLflow Server",
+              description:
+                "One command to get started. Docker setup is also available.",
+              time: "~30 seconds",
+              code: "uvx mlflow server",
+              language: "bash",
+            },
+            {
+              number: "2",
+              title: "Enable Autologging",
+              description:
+                "One line to automatically capture parameters, metrics, and models.",
+              time: "~30 seconds",
+              code: `import mlflow
+
+mlflow.set_tracking_uri(
+    "http://localhost:5000"
+)
+mlflow.sklearn.autolog()`,
+              language: "python",
+            },
+            {
+              number: "3",
+              title: "Train Your Model",
+              description:
+                "Train as usual. Explore runs, metrics, and models in the MLflow UI.",
+              time: "~1 minute",
+              code: `from sklearn.ensemble import (
+    RandomForestClassifier,
+)
+from sklearn.datasets import (
+    load_iris,
+)
+
+X, y = load_iris(return_X_y=True)
+clf = RandomForestClassifier()
+clf.fit(X, y)`,
+              language: "python",
+            },
+          ]}
+        />
+
+        <BelowTheFold contentType="classical-ml" hideGetStarted>
           <LatestNews />
         </BelowTheFold>
       </Layout>

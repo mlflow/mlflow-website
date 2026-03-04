@@ -98,7 +98,7 @@ export function ProcessSection({
       align="center"
     >
       <div
-        className={`${steps.length > 3 ? "max-w-[90rem]" : "max-w-5xl"} mx-auto`}
+        className={`${steps.length > 3 ? "max-w-[90rem]" : "max-w-6xl"} mx-auto`}
       >
         {/* Steps container */}
         <div className="relative">
@@ -113,19 +113,19 @@ export function ProcessSection({
             {steps.map((step, index) => {
               const defaultStepColors = [
                 {
-                  bg: "linear-gradient(135deg, #4a3366 0%, #3a4580 50%, #2a4a7a 100%)",
-                  shadow: "rgba(42, 74, 122, 0.4)",
-                  pulse: "rgba(42, 74, 122, 0.5)",
+                  bg: "linear-gradient(135deg, #1a4a7a 0%, #2a5a8a 50%, #1a6a9a 100%)",
+                  shadow: "rgba(26, 74, 122, 0.4)",
+                  pulse: "rgba(26, 74, 122, 0.5)",
                 },
                 {
-                  bg: "linear-gradient(135deg, #702848 0%, #4a3366 50%, #3a4080 100%)",
-                  shadow: "rgba(74, 51, 102, 0.4)",
-                  pulse: "rgba(74, 51, 102, 0.5)",
+                  bg: "linear-gradient(135deg, #1a5a8a 0%, #2a6a9a 50%, #1a7aaa 100%)",
+                  shadow: "rgba(26, 90, 138, 0.4)",
+                  pulse: "rgba(26, 90, 138, 0.5)",
                 },
                 {
-                  bg: "linear-gradient(135deg, #8a2a4a 0%, #6a2850 50%, #4a3366 100%)",
-                  shadow: "rgba(138, 42, 74, 0.4)",
-                  pulse: "rgba(138, 42, 74, 0.5)",
+                  bg: "linear-gradient(135deg, #1a6a9a 0%, #2a7aaa 50%, #1a8aba 100%)",
+                  shadow: "rgba(26, 106, 154, 0.4)",
+                  pulse: "rgba(26, 106, 154, 0.5)",
                 },
               ];
               const redStepColors = [
