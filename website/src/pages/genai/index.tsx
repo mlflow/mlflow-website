@@ -358,7 +358,7 @@ export default function GenAi(): JSX.Element {
         body={
           <>
             Backed by Linux Foundation, MLflow has been fully committed to
-            open source for 5+ years. Now trusted by thousands of organizations
+            open source for 5+ years. Trusted by thousands of organizations
             and research teams worldwide to power their{" "}
             <Link
               href="/llmops"
