@@ -1,4 +1,5 @@
 import Head from "@docusaurus/Head";
+import Link from "@docusaurus/Link";
 import {
   Layout,
   AboveTheFold,
@@ -162,7 +163,19 @@ export default function Evaluations() {
       <AboveTheFold
         sectionLabel="Evaluations"
         title="Agent Evaluation"
-        body="Confidently evaluate quality in development and production to identify issues and iteratively test improvements."
+        body={
+          <>
+            Confidently{" "}
+            <Link
+              to="/llm-evaluation"
+              className="text-blue-400 !underline decoration-blue-400/50 underline-offset-2 hover:text-blue-300 hover:decoration-blue-300/50 transition-colors"
+            >
+              evaluate
+            </Link>{" "}
+            quality in development and production to identify issues and
+            iteratively test improvements.
+          </>
+        }
         hasGetStartedButton={`${MLFLOW_GENAI_DOCS_URL}eval-monitor/quickstart/`}
         minHeight="none"
       >
