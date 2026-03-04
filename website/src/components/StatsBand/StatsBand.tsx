@@ -20,7 +20,6 @@ export const StatsBand = ({
   title?: string;
   body?: React.ReactNode;
 } = {}) => {
-  const stars = useGitHubStars();
   return (
     <Section title={title} body={body} align="center">
       <div className="flex w-full flex-col items-center gap-16 relative">
@@ -53,7 +52,7 @@ export const StatsBand = ({
             <span className="text-md font-semibold">mlflow/mlflow</span>
             <div className="flex items-center gap-1.5 text-sm font-semibold text-white/80">
               <Star className="w-4 h-4" fill="currentColor" />
-              {stars ?? "23K"}
+              {useGitHubStars()}
             </div>
           </a>
 
