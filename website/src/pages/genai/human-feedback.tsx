@@ -1,3 +1,4 @@
+import Head from "@docusaurus/Head";
 import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
@@ -12,10 +13,25 @@ import Card2 from "@site/static/img/GenAI_humanfeedback/GenAI_humanfeedback_2.pn
 import Card3 from "@site/static/img/GenAI_humanfeedback/GenAI_humanfeedback_3.png";
 import Card4 from "@site/static/img/GenAI_humanfeedback/GenAI_humanfeedback_4.png";
 
+const SEO_TITLE = "Human Feedback | MLflow AI Platform";
+const SEO_DESCRIPTION =
+  "Collect and track human feedback with MLflow's AI Engineering Platform. Align LLM judges with expert judgment and debug quality issues with integrated labeling UIs.";
+
 export default function HumanFeedback() {
   return (
-    <Layout>
-      <AboveTheFold
+    <>
+      <Head>
+        <title>{SEO_TITLE}</title>
+        <meta name="description" content={SEO_DESCRIPTION} />
+        <meta property="og:title" content={SEO_TITLE} />
+        <meta property="og:description" content={SEO_DESCRIPTION} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://mlflow.org/genai/human-feedback" />
+        <link rel="canonical" href="https://mlflow.org/genai/human-feedback" />
+      </Head>
+
+      <Layout>
+        <AboveTheFold
         sectionLabel="Human feedback"
         title="Incorporate human insight to understand and improve quality"
         body={[
@@ -58,5 +74,6 @@ export default function HumanFeedback() {
 
       <BelowTheFold contentType="genai" />
     </Layout>
+    </>
   );
 }

@@ -1,4 +1,5 @@
 import Link from "@docusaurus/Link";
+import Head from "@docusaurus/Head";
 import {
   Layout,
   LogosCarousel,
@@ -17,6 +18,11 @@ import { categories } from "../../components/ProductTabs/features";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import { TrustPills } from "../../components/TrustPills/TrustPills";
 import type { EcosystemItem } from "../../components/EcosystemList/EcosystemList";
+
+const SEO_TITLE =
+  "Open Source Agent Engineering Platform | MLflow AI Platform";
+const SEO_DESCRIPTION =
+  "Ship AI agents and LLM apps to production with MLflow's AI Engineering Platform. Built-in observability, evaluation, prompt management, and monitoring. 100+ integrations.";
 
 export const genaiIntegrations: EcosystemItem[] = [
   // --- Major LLM Providers ---
@@ -269,7 +275,18 @@ export const genaiIntegrations: EcosystemItem[] = [
 
 export default function GenAi(): JSX.Element {
   return (
-    <Layout>
+    <>
+      <Head>
+        <title>{SEO_TITLE}</title>
+        <meta name="description" content={SEO_DESCRIPTION} />
+        <meta property="og:title" content={SEO_TITLE} />
+        <meta property="og:description" content={SEO_DESCRIPTION} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://mlflow.org/genai" />
+        <link rel="canonical" href="https://mlflow.org/genai" />
+      </Head>
+
+      <Layout>
       <AboveTheFold
         title={
           <span className="text-[48px] xxs:text-[64px] xs:text-[80px] leading-[110%]">
@@ -367,5 +384,6 @@ export default function GenAi(): JSX.Element {
         <LatestNews />
       </BelowTheFold>
     </Layout>
+    </>
   );
 }

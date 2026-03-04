@@ -1,3 +1,4 @@
+import Head from "@docusaurus/Head";
 import {
   Layout,
   AboveTheFold,
@@ -147,10 +148,25 @@ const gatewayProviders: EcosystemItem[] = [
   },
 ];
 
+const SEO_TITLE = "AI Gateway | MLflow AI Platform";
+const SEO_DESCRIPTION =
+  "Unified access to 50+ LLM providers through MLflow's AI Engineering Platform. Centralized API key management, traffic routing, fallbacks, and usage tracking.";
+
 export default function AiGateway() {
   return (
-    <Layout>
-      <AboveTheFold
+    <>
+      <Head>
+        <title>{SEO_TITLE}</title>
+        <meta name="description" content={SEO_DESCRIPTION} />
+        <meta property="og:title" content={SEO_TITLE} />
+        <meta property="og:description" content={SEO_DESCRIPTION} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://mlflow.org/genai/ai-gateway" />
+        <link rel="canonical" href="https://mlflow.org/genai/ai-gateway" />
+      </Head>
+
+      <Layout>
+        <AboveTheFold
         sectionLabel="AI gateway"
         title="Unified access to all AI models"
         body="Standardize how you interact with different LLM providers using one central interface."
@@ -221,5 +237,6 @@ export default function AiGateway() {
 
       <BelowTheFold contentType="genai" hideGetStarted />
     </Layout>
+    </>
   );
 }

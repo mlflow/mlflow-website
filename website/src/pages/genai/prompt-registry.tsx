@@ -1,3 +1,4 @@
+import Head from "@docusaurus/Head";
 import {
   Layout,
   AboveTheFold,
@@ -12,10 +13,25 @@ import Card2 from "@site/static/img/GenAI_prompts/GenAI_prompts_2.png";
 import Card3 from "@site/static/img/GenAI_prompts/GenAI_prompts_3.png";
 import Card4 from "@site/static/img/GenAI_prompts/GenAI_prompts_4.png";
 
+const SEO_TITLE = "Prompt Registry | MLflow AI Platform";
+const SEO_DESCRIPTION =
+  "Create, version, and manage prompt templates with MLflow's AI Engineering Platform. Compare changes, evaluate prompt versions, and manage lifecycle with aliases.";
+
 export default function PromptRegistryVersioning() {
   return (
-    <Layout>
-      <AboveTheFold
+    <>
+      <Head>
+        <title>{SEO_TITLE}</title>
+        <meta name="description" content={SEO_DESCRIPTION} />
+        <meta property="og:title" content={SEO_TITLE} />
+        <meta property="og:description" content={SEO_DESCRIPTION} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://mlflow.org/genai/prompt-registry" />
+        <link rel="canonical" href="https://mlflow.org/genai/prompt-registry" />
+      </Head>
+
+      <Layout>
+        <AboveTheFold
         sectionLabel="Prompt registry"
         title="The single source of truth for your prompts"
         body="Create, store, and version prompts easily in the Prompt Registry."
@@ -51,5 +67,6 @@ export default function PromptRegistryVersioning() {
 
       <BelowTheFold contentType="genai" />
     </Layout>
+    </>
   );
 }
