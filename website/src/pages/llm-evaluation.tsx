@@ -9,7 +9,7 @@ import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE =
-  "LLM Evaluation & Agent Evaluation for LLMs & Agents | MLflow AI Platform";
+  "LLM Evaluation and Agent Evaluation | MLflow AI Platform";
 const SEO_DESCRIPTION =
   "Agent evaluation and LLM evaluation systematically assess how well agents and LLM applications perform. Explore evaluation on MLflow's open-source AI platform.";
 
