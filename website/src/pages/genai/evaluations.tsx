@@ -166,7 +166,10 @@ export default function Evaluations() {
         <meta property="og:title" content={SEO_TITLE} />
         <meta property="og:description" content={SEO_DESCRIPTION} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://mlflow.org/genai/evaluations" />
+        <meta
+          property="og:url"
+          content="https://mlflow.org/genai/evaluations"
+        />
         <link rel="canonical" href="https://mlflow.org/genai/evaluations" />
       </Head>
       <AboveTheFold

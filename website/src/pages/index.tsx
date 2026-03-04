@@ -35,92 +35,92 @@ export default function Home(): JSX.Element {
       </Head>
 
       <Layout>
-      {/* 1. HERO SECTION */}
-      <HeroSection
-        title="Deliver High-Quality AI, Fast"
-        subtitle={
-          <>
-            Building AI products is all about iteration.
-            <br />
-            MLflow lets you move 10x faster by simplifying how you <br />
-            <HighlightedKeyword href="https://mlflow.org/docs/latest/genai/tracing/">
-              debug
-            </HighlightedKeyword>
-            ,{" "}
-            <HighlightedKeyword href="https://mlflow.org/docs/latest/genai/eval-monitor/">
-              evaluate
-            </HighlightedKeyword>
-            , and{" "}
-            <HighlightedKeyword href="https://mlflow.org/docs/latest/genai/tracing/prod-tracing/">
-              monitor
-            </HighlightedKeyword>{" "}
-            your LLM applications, Agents, and Models.
-          </>
-        }
-        primaryCTA={{
-          label: "Get Started",
-          href: `#get-started`,
-        }}
-        secondaryCTA={{
-          label: "View Docs",
-          href: MLFLOW_DOCS_URL,
-        }}
-      >
-        <TrustPills />
-      </HeroSection>
+        {/* 1. HERO SECTION */}
+        <HeroSection
+          title="Deliver High-Quality AI, Fast"
+          subtitle={
+            <>
+              Building AI products is all about iteration.
+              <br />
+              MLflow lets you move 10x faster by simplifying how you <br />
+              <HighlightedKeyword href="https://mlflow.org/docs/latest/genai/tracing/">
+                debug
+              </HighlightedKeyword>
+              ,{" "}
+              <HighlightedKeyword href="https://mlflow.org/docs/latest/genai/eval-monitor/">
+                evaluate
+              </HighlightedKeyword>
+              , and{" "}
+              <HighlightedKeyword href="https://mlflow.org/docs/latest/genai/tracing/prod-tracing/">
+                monitor
+              </HighlightedKeyword>{" "}
+              your LLM applications, Agents, and Models.
+            </>
+          }
+          primaryCTA={{
+            label: "Get Started",
+            href: `#get-started`,
+          }}
+          secondaryCTA={{
+            label: "View Docs",
+            href: MLFLOW_DOCS_URL,
+          }}
+        >
+          <TrustPills />
+        </HeroSection>
 
-      {/* 2. COMPANY LOGOS */}
-      <LogosCarousel />
+        {/* 2. COMPANY LOGOS */}
+        <LogosCarousel />
 
-      {/* 3. FEATURES SECTION - Two categories with features */}
-      <div className="w-full px-4 md:px-8 lg:px-16 pb-36">
-        <div className="max-w-7xl mx-auto">
-          <ProductTabs />
+        {/* 3. FEATURES SECTION - Two categories with features */}
+        <div className="w-full px-4 md:px-8 lg:px-16 pb-36">
+          <div className="max-w-7xl mx-auto">
+            <ProductTabs />
+          </div>
         </div>
-      </div>
 
-      {/* 4. TRUST LOGOS */}
-      <StatsBand
-        body={
-          <>
-            Backed by Linux Foundation, MLflow has been fully committed to
-            open-source for 5+ years. Now trusted by thousands of organizations
-            and research teams worldwide to power their{" "}
-            <Link
-              href="/llmops"
-              style={{ color: "inherit", textDecoration: "underline" }}
-            >
-              LLMOps
-            </Link>{" "}
-            and{" "}
-            <Link
-              href="/classical-ml"
-              style={{ color: "inherit", textDecoration: "underline" }}
-            >
-              MLOps
-            </Link>{" "}
-            workflows.
-          </>
-        }
-      />
+        {/* 4. TRUST LOGOS */}
+        <StatsBand
+          body={
+            <>
+              Backed by Linux Foundation, MLflow has been fully committed to
+              open-source for 5+ years. Now trusted by thousands of
+              organizations and research teams worldwide to power their{" "}
+              <Link
+                href="/llmops"
+                style={{ color: "inherit", textDecoration: "underline" }}
+              >
+                LLMOps
+              </Link>{" "}
+              and{" "}
+              <Link
+                href="/classical-ml"
+                style={{ color: "inherit", textDecoration: "underline" }}
+              >
+                MLOps
+              </Link>{" "}
+              workflows.
+            </>
+          }
+        />
 
-      {/* 4. OPEN AND NEUTRAL - Vendor lock-in free, integrations */}
-      <EcosystemList />
+        {/* 4. OPEN AND NEUTRAL - Vendor lock-in free, integrations */}
+        <EcosystemList />
 
-      {/* 5. BENEFITS SECTION - Why teams choose MLflow */}
-      <BenefitsSection />
+        {/* 5. BENEFITS SECTION - Why teams choose MLflow */}
+        <BenefitsSection />
 
-      {/* 6. PROCESS SECTION - 1-2-3 getting started steps */}
-      <ProcessSection />
+        {/* 6. PROCESS SECTION - 1-2-3 getting started steps */}
+        <ProcessSection />
 
-      {/* 7. FAQ SECTION - Common questions */}
-      <FAQSection />
+        {/* 7. FAQ SECTION - Common questions */}
+        <FAQSection />
 
-      {/* 12. COMMUNITY & LATEST NEWS */}
-      <BelowTheFold hideGetStarted>
-        <LatestNews />
-      </BelowTheFold>
-    </Layout>
+        {/* 12. COMMUNITY & LATEST NEWS */}
+        <BelowTheFold hideGetStarted>
+          <LatestNews />
+        </BelowTheFold>
+      </Layout>
     </>
   );
 }

@@ -26,47 +26,50 @@ export default function PromptRegistryVersioning() {
         <meta property="og:title" content={SEO_TITLE} />
         <meta property="og:description" content={SEO_DESCRIPTION} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://mlflow.org/genai/prompt-registry" />
+        <meta
+          property="og:url"
+          content="https://mlflow.org/genai/prompt-registry"
+        />
         <link rel="canonical" href="https://mlflow.org/genai/prompt-registry" />
       </Head>
 
       <Layout>
         <AboveTheFold
-        sectionLabel="Prompt registry"
-        title="The single source of truth for your prompts"
-        body="Create, store, and version prompts easily in the Prompt Registry."
-        hasGetStartedButton={`${MLFLOW_GENAI_DOCS_URL}prompt-registry/create-and-edit-prompts/`}
-      >
-        <HeroImage src={CardHero} alt="" />
-      </AboveTheFold>
+          sectionLabel="Prompt registry"
+          title="The single source of truth for your prompts"
+          body="Create, store, and version prompts easily in the Prompt Registry."
+          hasGetStartedButton={`${MLFLOW_GENAI_DOCS_URL}prompt-registry/create-and-edit-prompts/`}
+        >
+          <HeroImage src={CardHero} alt="" />
+        </AboveTheFold>
 
-      <StickyGrid
-        cards={[
-          {
-            title: "Create and edit prompts",
-            body: "Define prompt templates with variables, manage versions with commit messages and metadata, and compare changes.",
-            image: <img src={Card1} alt="" />,
-          },
-          {
-            title: "Compare prompts",
-            body: "Track changes across prompt versions with a built-in diff view for easier prompt iteration and change management.",
-            image: <img src={Card2} alt="" />,
-          },
-          {
-            title: "Evaluate Prompts",
-            body: "Set up evaluation experiments, compare different prompt versions, analyze results, and select the most effective prompts.",
-            image: <img src={Card3} alt="" />,
-          },
-          {
-            title: "Manage prompt lifecycle with aliases",
-            body: "Use aliases (e.g., development, staging, production) to manage prompt versions across environments and implement governance.",
-            image: <img src={Card4} alt="" />,
-          },
-        ]}
-      />
+        <StickyGrid
+          cards={[
+            {
+              title: "Create and edit prompts",
+              body: "Define prompt templates with variables, manage versions with commit messages and metadata, and compare changes.",
+              image: <img src={Card1} alt="" />,
+            },
+            {
+              title: "Compare prompts",
+              body: "Track changes across prompt versions with a built-in diff view for easier prompt iteration and change management.",
+              image: <img src={Card2} alt="" />,
+            },
+            {
+              title: "Evaluate Prompts",
+              body: "Set up evaluation experiments, compare different prompt versions, analyze results, and select the most effective prompts.",
+              image: <img src={Card3} alt="" />,
+            },
+            {
+              title: "Manage prompt lifecycle with aliases",
+              body: "Use aliases (e.g., development, staging, production) to manage prompt versions across environments and implement governance.",
+              image: <img src={Card4} alt="" />,
+            },
+          ]}
+        />
 
-      <BelowTheFold contentType="genai" />
-    </Layout>
+        <BelowTheFold contentType="genai" />
+      </Layout>
     </>
   );
 }

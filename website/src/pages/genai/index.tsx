@@ -19,8 +19,7 @@ import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import { TrustPills } from "../../components/TrustPills/TrustPills";
 import type { EcosystemItem } from "../../components/EcosystemList/EcosystemList";
 
-const SEO_TITLE =
-  "Open Source Agent Engineering Platform | MLflow AI Platform";
+const SEO_TITLE = "Open Source Agent Engineering Platform | MLflow AI Platform";
 const SEO_DESCRIPTION =
   "Ship AI agents and LLM apps to production with MLflow's AI Engineering Platform. Built-in observability, evaluation, prompt management, and monitoring. 100+ integrations.";
 
@@ -287,103 +286,103 @@ export default function GenAi(): JSX.Element {
       </Head>
 
       <Layout>
-      <AboveTheFold
-        title={
-          <span className="text-[48px] xxs:text-[64px] xs:text-[80px] leading-[110%]">
-            Open Source Agent Engineering Platform
-          </span>
-        }
-        body={[
-          <>
-            Confidently ship agents and LLM applications to production with
-            built-in{" "}
-            <HighlightedKeyword href="/genai/observability">
-              observability
-            </HighlightedKeyword>
-            ,{" "}
-            <HighlightedKeyword href="/genai/evaluations">
-              evaluation
-            </HighlightedKeyword>
-            ,{" "}
-            <HighlightedKeyword href="/genai/prompt-registry">
-              prompt management
-            </HighlightedKeyword>
-            ,{" "}
-            <HighlightedKeyword href="/genai/observability">
-              monitoring
-            </HighlightedKeyword>
-            ,{" "}
-            <HighlightedKeyword href="/genai/ai-gateway">
-              cost controls
-            </HighlightedKeyword>
-            , and much more.
-          </>,
-        ]}
-        bodyColor="white"
-        bodySize="xl"
-        actions={
-          <div className="flex flex-col items-center gap-4">
-            <div className="flex flex-wrap justify-center items-center gap-4">
-              <Link to="#get-started">
-                <Button variant="primary" size="medium">
-                  Get Started
-                </Button>
-              </Link>
-              <Link to={MLFLOW_GENAI_DOCS_URL}>
-                <Button variant="outline" size="medium">
-                  View Docs
-                </Button>
-              </Link>
+        <AboveTheFold
+          title={
+            <span className="text-[48px] xxs:text-[64px] xs:text-[80px] leading-[110%]">
+              Open Source Agent Engineering Platform
+            </span>
+          }
+          body={[
+            <>
+              Confidently ship agents and LLM applications to production with
+              built-in{" "}
+              <HighlightedKeyword href="/genai/observability">
+                observability
+              </HighlightedKeyword>
+              ,{" "}
+              <HighlightedKeyword href="/genai/evaluations">
+                evaluation
+              </HighlightedKeyword>
+              ,{" "}
+              <HighlightedKeyword href="/genai/prompt-registry">
+                prompt management
+              </HighlightedKeyword>
+              ,{" "}
+              <HighlightedKeyword href="/genai/observability">
+                monitoring
+              </HighlightedKeyword>
+              ,{" "}
+              <HighlightedKeyword href="/genai/ai-gateway">
+                cost controls
+              </HighlightedKeyword>
+              , and much more.
+            </>,
+          ]}
+          bodyColor="white"
+          bodySize="xl"
+          actions={
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex flex-wrap justify-center items-center gap-4">
+                <Link to="#get-started">
+                  <Button variant="primary" size="medium">
+                    Get Started
+                  </Button>
+                </Link>
+                <Link to={MLFLOW_GENAI_DOCS_URL}>
+                  <Button variant="outline" size="medium">
+                    View Docs
+                  </Button>
+                </Link>
+              </div>
+              <TrustPills />
             </div>
-            <TrustPills />
+          }
+        />
+
+        <LogosCarousel />
+
+        <div className="w-full px-4 md:px-8 lg:px-16 pb-36">
+          <div className="max-w-7xl mx-auto">
+            <StickyFeaturesGrid
+              features={
+                categories.find((c) => c.id === "llm-agents")?.features ?? []
+              }
+              colorTheme="red"
+            />
           </div>
-        }
-      />
-
-      <LogosCarousel />
-
-      <div className="w-full px-4 md:px-8 lg:px-16 pb-36">
-        <div className="max-w-7xl mx-auto">
-          <StickyFeaturesGrid
-            features={
-              categories.find((c) => c.id === "llm-agents")?.features ?? []
-            }
-            colorTheme="red"
-          />
         </div>
-      </div>
 
-      <StatsBand
-        title="Most Adopted Open Source AI Platform"
-        body={
-          <>
-            Backed by Linux Foundation, MLflow has been fully committed to
-            open source for 5+ years. Trusted by thousands of organizations
-            and research teams worldwide to power their{" "}
-            <Link
-              href="/llmops"
-              style={{ color: "inherit", textDecoration: "underline" }}
-            >
-              LLMOps
-            </Link>{" "}
-            workflows.
-          </>
-        }
-      />
-      <EcosystemList
-        title="Works with Any LLM and Agent Framework"
-        body="From LLM providers to agent frameworks — MLflow integrates seamlessly with 100+ tools across the AI ecosystem. Supports any programming language and natively integrates with OpenTelemetry and MCP."
-        items={genaiIntegrations}
-      />
-      <BenefitsSection communityLabel="LLMOps" />
-      <ProcessSection
-        subtitle="From zero to production-ready agents in minutes. No complex setup or major code changes required."
-        colorTheme="red"
-      />
-      <BelowTheFold contentType="genai" hideGetStarted>
-        <LatestNews />
-      </BelowTheFold>
-    </Layout>
+        <StatsBand
+          title="Most Adopted Open Source AI Platform"
+          body={
+            <>
+              Backed by Linux Foundation, MLflow has been fully committed to
+              open source for 5+ years. Trusted by thousands of organizations
+              and research teams worldwide to power their{" "}
+              <Link
+                href="/llmops"
+                style={{ color: "inherit", textDecoration: "underline" }}
+              >
+                LLMOps
+              </Link>{" "}
+              workflows.
+            </>
+          }
+        />
+        <EcosystemList
+          title="Works with Any LLM and Agent Framework"
+          body="From LLM providers to agent frameworks — MLflow integrates seamlessly with 100+ tools across the AI ecosystem. Supports any programming language and natively integrates with OpenTelemetry and MCP."
+          items={genaiIntegrations}
+        />
+        <BenefitsSection communityLabel="LLMOps" />
+        <ProcessSection
+          subtitle="From zero to production-ready agents in minutes. No complex setup or major code changes required."
+          colorTheme="red"
+        />
+        <BelowTheFold contentType="genai" hideGetStarted>
+          <LatestNews />
+        </BelowTheFold>
+      </Layout>
     </>
   );
 }

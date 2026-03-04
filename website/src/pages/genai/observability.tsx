@@ -110,7 +110,10 @@ export default function Observability() {
         <meta property="og:title" content={SEO_TITLE} />
         <meta property="og:description" content={SEO_DESCRIPTION} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://mlflow.org/genai/observability" />
+        <meta
+          property="og:url"
+          content="https://mlflow.org/genai/observability"
+        />
         <link rel="canonical" href="https://mlflow.org/genai/observability" />
       </Head>
       <AboveTheFold
