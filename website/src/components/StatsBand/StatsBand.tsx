@@ -2,6 +2,7 @@ import LinuxFoundationLogo from "@site/static/img/linux-foundation.svg";
 import { Section } from "../Section/Section";
 import { Star } from "lucide-react";
 import type { SVGProps } from "react";
+import { useGitHubStars } from "../../hooks/useGitHubStars";
 
 const GitHubIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 48 48" fill="none" {...props}>
@@ -19,6 +20,7 @@ export const StatsBand = ({
   title?: string;
   body?: React.ReactNode;
 } = {}) => {
+  const stars = useGitHubStars();
   return (
     <Section title={title} body={body} align="center">
       <div className="flex w-full flex-col items-center gap-16 relative">
@@ -51,7 +53,7 @@ export const StatsBand = ({
             <span className="text-md font-semibold">mlflow/mlflow</span>
             <div className="flex items-center gap-1.5 text-sm font-semibold text-white/80">
               <Star className="w-4 h-4" fill="currentColor" />
-              23K
+              {stars ?? "23K"}
             </div>
           </a>
 
