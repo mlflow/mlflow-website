@@ -6,10 +6,7 @@ import { Header } from "../components/Header/Header";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import EvaluationHero from "@site/static/img/GenAI_evaluations/GenAI_evaluations_hero.png";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
-import {
-  customNightOwl,
-  CODE_BG,
-} from "../components/CodeSnippet/codeTheme";
+import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE =
   "LLM Evaluation & Agent Evaluation for LLMs & Agents | MLflow AI Platform";
@@ -39,9 +36,8 @@ const faqs: {
         An LLM judge is a language model used to automatically evaluate the
         outputs of an agent or LLM application. Instead of relying solely on
         human review (which is slow and expensive), LLM judges can assess
-        thousands of
-        responses for qualities like correctness, relevance, safety, and
-        helpfulness.{" "}
+        thousands of responses for qualities like correctness, relevance,
+        safety, and helpfulness.{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/"}>
           MLflow provides built-in judges
         </Link>{" "}
@@ -145,10 +141,10 @@ const faqs: {
         <Link href={MLFLOW_GENAI_DOCS_URL + "datasets/"}>
           MLflow Evaluation Datasets
         </Link>{" "}
-        let you version your data, track which evaluations used which
-        versions, and incrementally add examples as you discover new failure
-        patterns. Quality datasets are often small but representative, covering
-        the full range of your application's expected behavior.
+        let you version your data, track which evaluations used which versions,
+        and incrementally add examples as you discover new failure patterns.
+        Quality datasets are often small but representative, covering the full
+        range of your application's expected behavior.
       </>
     ),
     answerText:
@@ -209,23 +205,32 @@ const faqs: {
     answer: (
       <>
         MLflow includes{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/predefined/"}>
+        <Link
+          href={
+            MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/predefined/"
+          }
+        >
           70+ built-in judges
         </Link>{" "}
         covering response quality (Safety, Correctness, RelevanceToQuery,
-        Groundedness, Fluency), RAG (RetrievalRelevance,
-        RetrievalGroundedness), agent behavior (ToolCallEfficiency,
-        RoleAdherence), and multi-turn conversations
-        (ConversationalSafety). Beyond built-in judges, MLflow supports{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/custom-judges/"}>
+        Groundedness, Fluency), RAG (RetrievalRelevance, RetrievalGroundedness),
+        agent behavior (ToolCallEfficiency, RoleAdherence), and multi-turn
+        conversations (ConversationalSafety). Beyond built-in judges, MLflow
+        supports{" "}
+        <Link
+          href={
+            MLFLOW_GENAI_DOCS_URL +
+            "eval-monitor/scorers/llm-judge/custom-judges/"
+          }
+        >
           custom LLM judges
         </Link>{" "}
         and{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/custom/"}>
           code-based scorers
         </Link>{" "}
-        for domain-specific evaluation. MLflow also integrates with
-        DeepEval and RAGAS for additional metrics.
+        for domain-specific evaluation. MLflow also integrates with DeepEval and
+        RAGAS for additional metrics.
       </>
     ),
     answerText:
@@ -330,10 +335,7 @@ export default function AgentEvaluation() {
         <meta property="og:title" content={SEO_TITLE} />
         <meta property="og:description" content={SEO_DESCRIPTION} />
         <meta property="og:type" content="website" />
-        <meta
-          property="og:url"
-          content="https://mlflow.org/llm-evaluation"
-        />
+        <meta property="og:url" content="https://mlflow.org/llm-evaluation" />
         <link rel="canonical" href="https://mlflow.org/llm-evaluation" />
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
         <script type="application/ld+json">
@@ -573,25 +575,22 @@ export default function AgentEvaluation() {
           <h1>LLM Evaluation and Agent Evaluation</h1>
 
           <p>
-            <a href="#llm-evaluation">LLM evaluation</a> systematically
-            measures the quality of LLM applications across dimensions like
-            correctness, relevance, safety, and coherence.{" "}
+            <a href="#llm-evaluation">LLM evaluation</a> systematically measures
+            the quality of LLM applications across dimensions like correctness,
+            relevance, safety, and coherence.{" "}
             <a href="#agent-evaluation">Agent evaluation</a> extends LLM
-            evaluation to also assess multi-step reasoning, tool selection,
-            task completion, and beyond for autonomous{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
-              agents
-            </Link>
-            .
+            evaluation to also assess multi-step reasoning, tool selection, task
+            completion, and beyond for autonomous{" "}
+            <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>agents</Link>.
           </p>
 
           <p>
-            Evaluation gives engineering teams confidence that their agents and LLM
-            applications actually work well: not just whether they run, but
+            Evaluation gives engineering teams confidence that their agents and
+            LLM applications actually work well: not just whether they run, but
             whether they produce correct, safe, and useful results. As agents
-            move from prototypes to production-critical applications,
-            evaluation becomes essential for maintaining quality and enabling
-            continuous improvement.
+            move from prototypes to production-critical applications, evaluation
+            becomes essential for maintaining quality and enabling continuous
+            improvement.
           </p>
 
           <p>
@@ -664,9 +663,8 @@ export default function AgentEvaluation() {
           <h2>Why LLM and Agent Evaluation Matters</h2>
 
           <p>
-            Agents, LLM applications, and RAG systems
-            introduce unique challenges that traditional software testing can't
-            address:
+            Agents, LLM applications, and RAG systems introduce unique
+            challenges that traditional software testing can't address:
           </p>
 
           <div className="grid-2">
@@ -700,8 +698,8 @@ export default function AgentEvaluation() {
               <h3>Agent Debugging</h3>
               <p>
                 <strong>Problem:</strong> Multi-step agents make complex
-                decisions about tool use, data access, and control flow
-                that are hard to understand and debug.
+                decisions about tool use, data access, and control flow that are
+                hard to understand and debug.
               </p>
               <p>
                 <strong>Solution:</strong> Evaluate agent trajectories
@@ -713,9 +711,9 @@ export default function AgentEvaluation() {
             <div className="card">
               <h3>Safety & Compliance</h3>
               <p>
-                <strong>Problem:</strong> Agents can produce harmful,
-                off-topic, or policy-violating outputs that are hard to
-                catch with static rules.
+                <strong>Problem:</strong> Agents can produce harmful, off-topic,
+                or policy-violating outputs that are hard to catch with static
+                rules.
               </p>
               <p>
                 <strong>Solution:</strong> Use LLM judges to assess safety,
@@ -766,13 +764,13 @@ export default function AgentEvaluation() {
           </p>
 
           <p>
-            Agents built with frameworks like LangGraph, CrewAI, ADK, or Pydantic AI can
-            behave unpredictably: getting stuck in loops, making incorrect tool
-            choices, or producing inconsistent outputs across runs. Agent
-            evaluation captures the full execution graph, enabling you to assess
-            whether the agent chose the right tools, used them with correct
-            arguments, recovered gracefully from errors, and completed
-            objectives efficiently.
+            Agents built with frameworks like LangGraph, CrewAI, ADK, or
+            Pydantic AI can behave unpredictably: getting stuck in loops, making
+            incorrect tool choices, or producing inconsistent outputs across
+            runs. Agent evaluation captures the full execution graph, enabling
+            you to assess whether the agent chose the right tools, used them
+            with correct arguments, recovered gracefully from errors, and
+            completed objectives efficiently.
           </p>
 
           <p>
@@ -961,16 +959,77 @@ export default function AgentEvaluation() {
                     MLflow Scorers
                   </td>
                   <td style={{ padding: "16px", color: "#3d3d3d" }}>
-                    <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/predefined/#response-quality"}>Safety</Link>,{" "}
-                    <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/predefined/#response-quality"}>Correctness</Link>,{" "}
-                    <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/predefined/#response-quality"}>RelevanceToQuery</Link>,{" "}
-                    <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/predefined/#rag"}>Groundedness</Link>
+                    <Link
+                      href={
+                        MLFLOW_GENAI_DOCS_URL +
+                        "eval-monitor/scorers/llm-judge/predefined/#response-quality"
+                      }
+                    >
+                      Safety
+                    </Link>
+                    ,{" "}
+                    <Link
+                      href={
+                        MLFLOW_GENAI_DOCS_URL +
+                        "eval-monitor/scorers/llm-judge/predefined/#response-quality"
+                      }
+                    >
+                      Correctness
+                    </Link>
+                    ,{" "}
+                    <Link
+                      href={
+                        MLFLOW_GENAI_DOCS_URL +
+                        "eval-monitor/scorers/llm-judge/predefined/#response-quality"
+                      }
+                    >
+                      RelevanceToQuery
+                    </Link>
+                    ,{" "}
+                    <Link
+                      href={
+                        MLFLOW_GENAI_DOCS_URL +
+                        "eval-monitor/scorers/llm-judge/predefined/#rag"
+                      }
+                    >
+                      Groundedness
+                    </Link>
                   </td>
                   <td style={{ padding: "16px", color: "#3d3d3d" }}>
-                    <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/predefined/#tool-call"}>ToolCallEfficiency</Link>,{" "}
-                    <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/predefined/#multi-turn"}>RoleAdherence</Link>,{" "}
-                    <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/predefined/#multi-turn"}>ConversationalSafety</Link>,{" "}
-                    <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/custom/"}>custom trajectory scorers</Link>
+                    <Link
+                      href={
+                        MLFLOW_GENAI_DOCS_URL +
+                        "eval-monitor/scorers/llm-judge/predefined/#tool-call"
+                      }
+                    >
+                      ToolCallEfficiency
+                    </Link>
+                    ,{" "}
+                    <Link
+                      href={
+                        MLFLOW_GENAI_DOCS_URL +
+                        "eval-monitor/scorers/llm-judge/predefined/#multi-turn"
+                      }
+                    >
+                      RoleAdherence
+                    </Link>
+                    ,{" "}
+                    <Link
+                      href={
+                        MLFLOW_GENAI_DOCS_URL +
+                        "eval-monitor/scorers/llm-judge/predefined/#multi-turn"
+                      }
+                    >
+                      ConversationalSafety
+                    </Link>
+                    ,{" "}
+                    <Link
+                      href={
+                        MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/custom/"
+                      }
+                    >
+                      custom trajectory scorers
+                    </Link>
                   </td>
                 </tr>
               </tbody>
@@ -1030,8 +1089,8 @@ export default function AgentEvaluation() {
                   lineHeight: "1.5",
                 }}
               >
-                Run evaluations as you develop. Test changes to
-                prompts, tools, and logic and compare results instantly.
+                Run evaluations as you develop. Test changes to prompts, tools,
+                and logic and compare results instantly.
               </div>
             </div>
 
@@ -1187,8 +1246,8 @@ export default function AgentEvaluation() {
               application produces incorrect outputs, evaluation pinpoints the
               root cause. Was the retrieval poor? The reasoning flawed? The tool
               selection wrong? Evaluation results combined with{" "}
-              <Link href="/llm-tracing">traces</Link> reveal exactly what
-              went wrong.
+              <Link href="/llm-tracing">traces</Link> reveal exactly what went
+              wrong.
             </li>
             <li>
               <strong>A/B Testing Prompt Changes:</strong> Before deploying
@@ -1296,8 +1355,8 @@ export default function AgentEvaluation() {
             With just a few lines of code, you can evaluate your application
             against datasets using built-in or custom scorers. Results are
             tracked in MLflow, where you can compare versions, drill into
-            failures, collect human feedback, and monitor quality over time.
-            You can evaluate during development (testing new prompts), before
+            failures, collect human feedback, and monitor quality over time. You
+            can evaluate during development (testing new prompts), before
             deployment (comprehensive benchmark testing), and in production
             (continuous monitoring).
           </p>
@@ -1583,12 +1642,12 @@ results = mlflow.genai.evaluate(
               </Link>{" "}
               is the largest open-source{" "}
               <strong>AI engineering platform</strong>, with over 30 million
-              monthly downloads. Thousands of organizations use MLflow to
-              debug, evaluate, monitor, and optimize production-quality AI
-              agents and LLM applications while controlling costs
-              and managing access to models and data. Backed by the Linux
-              Foundation and licensed under Apache 2.0, MLflow provides a
-              complete evaluation solution with no vendor lock-in.{" "}
+              monthly downloads. Thousands of organizations use MLflow to debug,
+              evaluate, monitor, and optimize production-quality AI agents and
+              LLM applications while controlling costs and managing access to
+              models and data. Backed by the Linux Foundation and licensed under
+              Apache 2.0, MLflow provides a complete evaluation solution with no
+              vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>
@@ -1625,10 +1684,10 @@ results = mlflow.genai.evaluate(
 
           <p>
             <strong>Why Teams Choose Open Source:</strong> Organizations
-            building production agents increasingly choose MLflow
-            because it offers enterprise-grade evaluation without compromising
-            on data sovereignty, cost predictability, or flexibility. The Apache
-            2.0 license and Linux Foundation backing ensure MLflow remains truly
+            building production agents increasingly choose MLflow because it
+            offers enterprise-grade evaluation without compromising on data
+            sovereignty, cost predictability, or flexibility. The Apache 2.0
+            license and Linux Foundation backing ensure MLflow remains truly
             open and community-driven, not controlled by a single vendor.
           </p>
 
@@ -1671,9 +1730,7 @@ results = mlflow.genai.evaluate(
               </Link>
             </li>
             <li>
-              <Link
-                href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/"}
-              >
+              <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/"}>
                 Custom Scorers Documentation
               </Link>
             </li>
