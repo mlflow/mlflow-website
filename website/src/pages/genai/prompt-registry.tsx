@@ -15,7 +15,7 @@ import Card4 from "@site/static/img/GenAI_prompts/GenAI_prompts_4.png";
 
 const SEO_TITLE = "Prompt Registry | MLflow AI Platform";
 const SEO_DESCRIPTION =
-  "Create, version, and manage prompt templates with MLflow's AI Engineering Platform. Compare changes, evaluate prompt versions, and manage lifecycle with aliases.";
+  "Create, version, and manage prompt templates with MLflow's AI Engineering Platform. Compare changes, evaluate prompt versions, and automatically optimize prompts.";
 
 export default function PromptRegistryVersioning() {
   return (

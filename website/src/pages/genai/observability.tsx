@@ -99,7 +99,7 @@ print(f"Total tokens: {total}")`,
 
 const SEO_TITLE = "LLM & Agent Observability | MLflow AI Platform";
 const SEO_DESCRIPTION =
-  "Debug and monitor AI agents and LLM apps with MLflow's AI Engineering Platform. Full execution traces, quality monitoring, and trend analysis. Auto-trace 50+ frameworks.";
+  "Debug and monitor AI agents and LLM apps with MLflow's AI Engineering Platform. Full execution traces, quality monitoring, and trend analysis. Supports all frameworks and LLMs.";
 
 export default function Observability() {
   return (

@@ -10,7 +10,7 @@ import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE = "LLM Tracing & AI Tracing for Agents | MLflow AI Platform";
 const SEO_DESCRIPTION =
-  "LLM tracing (or AI tracing) records every step of agent execution — inputs, outputs, latency, and costs. Explore LLM tracing on MLflow's open-source AI platform.";
+  "LLM tracing (or AI tracing) records every step of agent execution — inputs, outputs, latency, and costs. Explore LLM tracing on MLflow's open source AI platform.";
 
 const faqs: {
   question: string;
@@ -50,7 +50,7 @@ const faqs: {
   {
     question: "What is the best LLM tracing tool?",
     answer:
-      "The best LLM tracing tool depends on your needs. MLflow is the leading open-source option, with over 30 million monthly downloads. Thousands of organizations, developers, and research teams use MLflow each day to build and deploy production-grade agents and LLM applications. It offers automatic tracing for 50+ LLM providers and agent frameworks with no vendor lock-in. MLflow is fully OpenTelemetry compatible, giving you total ownership of your trace data.",
+      "The best LLM tracing tool depends on your needs. MLflow is the leading open source option, with over 30 million monthly downloads. Thousands of organizations, developers, and research teams use MLflow each day to build and deploy production-grade agents and LLM applications. It offers automatic tracing for 50+ LLM providers and agent frameworks with no vendor lock-in. MLflow is fully OpenTelemetry compatible, giving you total ownership of your trace data.",
   },
   {
     question: "What LLM providers and frameworks does MLflow support?",
@@ -60,7 +60,7 @@ const faqs: {
   {
     question: "How does MLflow tracing compare to other tools?",
     answer:
-      "Unlike proprietary tracing tools that lock you into a vendor's ecosystem, MLflow provides complete, open-source tracing with no vendor lock-in. It supports any LLM or agent framework, is OpenTelemetry compatible, and gives you full control over your trace data. MLflow is also available on Databricks, AWS, and other platforms.",
+      "Unlike proprietary tracing tools that lock you into a vendor's ecosystem, MLflow provides complete, open source tracing with no vendor lock-in. It supports any LLM or agent framework, is OpenTelemetry compatible, and gives you full control over your trace data. MLflow is also available on Databricks, AWS, and other platforms.",
   },
   {
     question: "Is MLflow free for LLM tracing?",
@@ -801,7 +801,7 @@ export default function LLMTracing() {
           <h2 id="how-to-implement">How to Implement LLM Tracing</h2>
 
           <p>
-            Modern open-source AI platforms like{" "}
+            Modern open source AI platforms like{" "}
             <Link href="/genai">MLflow</Link> make it easy to add
             production-grade LLM tracing with minimal code changes.
           </p>
@@ -1040,7 +1040,7 @@ const result = await generateText({
               <Link href="/genai" style={{ color: "#007bff" }}>
                 <strong>MLflow</strong>
               </Link>{" "}
-              is the largest open-source AI platform, with over 30 million
+              is the largest open source AI platform, with over 30 million
               monthly downloads. Thousands of organizations, developers, and
               research teams use MLflow each day to build and deploy
               production-grade agents and LLM applications. Backed by the Linux

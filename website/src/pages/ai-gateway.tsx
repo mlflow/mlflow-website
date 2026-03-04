@@ -9,7 +9,7 @@ import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE = "AI Gateway for LLMs & Agents | MLflow AI Platform";
 const SEO_DESCRIPTION =
-  "An AI Gateway (or LLM Gateway) routes requests, manages keys, tracks costs, and enforces agent governance. Explore AI Gateways on MLflow's open-source AI platform.";
+  "An AI Gateway (or LLM Gateway) routes requests, manages keys, tracks costs, and enforces agent governance. Explore AI Gateways on MLflow's open source AI platform.";
 
 const faqs: {
   question: string;
@@ -49,7 +49,7 @@ const faqs: {
   {
     question: "What is the best AI Gateway?",
     answer:
-      "The best AI Gateway depends on your needs. MLflow AI Gateway is the leading open-source option, with over 30 million monthly downloads. Thousands of organizations, developers, and research teams use MLflow each day to build and deploy production-grade agents and LLM applications. It offers complete routing, usage tracking, and observability without vendor lock-in. MLflow supports any LLM provider (OpenAI, Anthropic, Bedrock, Gemini, etc.), any agent framework (LangChain, LangGraph, CrewAI, AutoGen, etc.), is fully OpenTelemetry compatible, and gives you full control over your data.",
+      "The best AI Gateway depends on your needs. MLflow AI Gateway is the leading open source option, with over 30 million monthly downloads. Thousands of organizations, developers, and research teams use MLflow each day to build and deploy production-grade agents and LLM applications. It offers complete routing, usage tracking, and observability without vendor lock-in. MLflow supports any LLM provider (OpenAI, Anthropic, Bedrock, Gemini, etc.), any agent framework (LangChain, LangGraph, CrewAI, AutoGen, etc.), is fully OpenTelemetry compatible, and gives you full control over your data.",
   },
   {
     question: "What LLM providers does the MLflow AI Gateway support?",
@@ -723,7 +723,7 @@ export default function AIGateway() {
           <h2 id="how-to-implement">Getting Started with AI Gateways</h2>
 
           <p>
-            Modern open-source AI platforms like{" "}
+            Modern open source AI platforms like{" "}
             <Link href="/genai">MLflow</Link> make it easy to deploy a
             production-grade AI Gateway with minimal setup. MLflow AI Gateway
             runs as part of the MLflow Tracking Server, so there's no separate
@@ -1006,7 +1006,7 @@ response = client.messages.create(
               <Link href="/genai" style={{ color: "#007bff" }}>
                 <strong>MLflow</strong>
               </Link>{" "}
-              is the largest open-source AI platform, with over 30 million
+              is the largest open source AI platform, with over 30 million
               monthly downloads. Thousands of organizations, developers, and
               research teams use MLflow each day to build and deploy
               production-grade agents and LLM applications. Backed by the Linux

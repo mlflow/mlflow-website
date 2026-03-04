@@ -85,7 +85,7 @@ export default function Home(): JSX.Element {
           body={
             <>
               Backed by Linux Foundation, MLflow has been fully committed to
-              open-source for 5+ years. Now trusted by thousands of
+              open source for 5+ years. Now trusted by thousands of
               organizations and research teams worldwide to power their{" "}
               <Link
                 href="/llmops"

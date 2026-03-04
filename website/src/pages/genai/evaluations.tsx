@@ -155,7 +155,7 @@ for version in [agent_v1, agent_v2]:
 
 const SEO_TITLE = "Agent & LLM Evaluation | MLflow AI Platform";
 const SEO_DESCRIPTION =
-  "Evaluate AI agent and LLM quality with MLflow's AI Engineering Platform. Built-in judges, custom metrics, human feedback, and side-by-side version comparison.";
+  "Evaluate AI agent and LLM quality with MLflow's AI Engineering Platform. LLM judges, custom metrics, human feedback, and side-by-side version comparison.";
 
 export default function Evaluations() {
   return (
