@@ -1,4 +1,5 @@
 import { MLFLOW_DOCS_URL } from "@site/src/constants";
+import Head from "@docusaurus/Head";
 import {
   Layout,
   AboveTheFold,
@@ -11,9 +12,16 @@ import Card1 from "@site/static/img/Classical_serving/classical_serving_1.png";
 import Card2 from "@site/static/img/Classical_serving/classical_serving_2.png";
 import Card3 from "@site/static/img/Classical_serving/classical_serving_3.png";
 
+const SEO_TITLE = "ML Model Serving | MLflow AI Platform";
+
 export default function Serving() {
   return (
-    <Layout>
+    <>
+      <Head>
+        <title>{SEO_TITLE}</title>
+        <meta property="og:title" content={SEO_TITLE} />
+      </Head>
+      <Layout>
       <AboveTheFold
         sectionLabel="Serving"
         title="Flexible Model Deployment"
@@ -45,5 +53,6 @@ export default function Serving() {
 
       <BelowTheFold contentType="classical-ml" />
     </Layout>
+    </>
   );
 }

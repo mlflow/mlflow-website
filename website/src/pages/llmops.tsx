@@ -9,7 +9,7 @@ import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE =
-  "What is LLMOps? LLM Operations Guide | MLflow Agent Platform";
+  "What is LLMOps? LLM Operations Guide | MLflow AI Platform";
 const SEO_DESCRIPTION =
   "Learn LLMOps (LLM Operations) and AgentOps with MLflow, the open-source platform for tracing, evaluating, and deploying large language model applications and agents.";
 

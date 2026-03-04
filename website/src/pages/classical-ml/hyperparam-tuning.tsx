@@ -1,4 +1,5 @@
 import { MLFLOW_DOCS_URL } from "@site/src/constants";
+import Head from "@docusaurus/Head";
 import {
   Layout,
   AboveTheFold,
@@ -11,9 +12,16 @@ import Card1 from "@site/static/img/Classical_hyperparam/classical_hyperparam_1.
 import Card2 from "@site/static/img/Classical_hyperparam/classical_hyperparam_2.png";
 import Card3 from "@site/static/img/Classical_hyperparam/classical_hyperparam_3.png";
 
+const SEO_TITLE = "ML Hyperparameter Tuning | MLflow AI Platform";
+
 export default function HyperparamTuning() {
   return (
-    <Layout>
+    <>
+      <Head>
+        <title>{SEO_TITLE}</title>
+        <meta property="og:title" content={SEO_TITLE} />
+      </Head>
+      <Layout>
       <AboveTheFold
         sectionLabel="Hyperparam tuning"
         title="Simplify your model training workflow"
@@ -45,5 +53,6 @@ export default function HyperparamTuning() {
 
       <BelowTheFold contentType="classical-ml" />
     </Layout>
+    </>
   );
 }

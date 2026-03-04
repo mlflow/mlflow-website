@@ -1,3 +1,4 @@
+import Head from "@docusaurus/Head";
 import {
   Layout,
   AboveTheFold,
@@ -9,9 +10,16 @@ import CardHero from "@site/static/img/Classical_registry/classical_registry_her
 import Card1 from "@site/static/img/Classical_registry/classical_registry_1.png";
 import Card2 from "@site/static/img/Classical_registry/classical_registry_2.png";
 
+const SEO_TITLE = "ML Model Registry | MLflow AI Platform";
+
 export default function ModelRegistryAndDeployment() {
   return (
-    <Layout>
+    <>
+      <Head>
+        <title>{SEO_TITLE}</title>
+        <meta property="og:title" content={SEO_TITLE} />
+      </Head>
+      <Layout>
       <AboveTheFold
         sectionLabel="Model registry & deployment"
         title="Deploy and manage models in production"
@@ -38,5 +46,6 @@ export default function ModelRegistryAndDeployment() {
 
       <BelowTheFold contentType="classical-ml" />
     </Layout>
+    </>
   );
 }

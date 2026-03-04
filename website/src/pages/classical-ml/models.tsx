@@ -1,3 +1,4 @@
+import Head from "@docusaurus/Head";
 import {
   Layout,
   AboveTheFold,
@@ -9,9 +10,16 @@ import CardHero from "@site/static/img/Classical_models/classical_models_hero.pn
 import Card1 from "@site/static/img/Classical_models/classical_models_1.png";
 import Card2 from "@site/static/img/Classical_models/classical_models_2.png";
 
+const SEO_TITLE = "ML Model Packaging | MLflow AI Platform";
+
 export default function Models() {
   return (
-    <Layout>
+    <>
+      <Head>
+        <title>{SEO_TITLE}</title>
+        <meta property="og:title" content={SEO_TITLE} />
+      </Head>
+      <Layout>
       <AboveTheFold
         sectionLabel="MLflow Models"
         title="Unified model packaging"
@@ -38,5 +46,6 @@ export default function Models() {
 
       <BelowTheFold contentType="classical-ml" />
     </Layout>
+    </>
   );
 }

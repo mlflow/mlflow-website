@@ -1,3 +1,4 @@
+import Head from "@docusaurus/Head";
 import {
   Layout,
   AboveTheFold,
@@ -9,9 +10,16 @@ import CardHero from "@site/static/img/Classical_evaluations/classical_evaluatio
 import Card1 from "@site/static/img/Classical_evaluations/classical_evaluation_1.png";
 import Card2 from "@site/static/img/Classical_evaluations/classical_evaluation_2.png";
 
+const SEO_TITLE = "ML Model Evaluation | MLflow AI Platform";
+
 export default function ModelEvaluation() {
   return (
-    <Layout>
+    <>
+      <Head>
+        <title>{SEO_TITLE}</title>
+        <meta property="og:title" content={SEO_TITLE} />
+      </Head>
+      <Layout>
       <AboveTheFold
         sectionLabel="Model evaluation"
         title="Evaluate models with confidence"
@@ -38,5 +46,6 @@ export default function ModelEvaluation() {
 
       <BelowTheFold contentType="classical-ml" />
     </Layout>
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import Head from "@docusaurus/Head";
 import {
   Layout,
   AboveTheFold,
@@ -13,9 +14,16 @@ import Card4 from "@site/static/img/Classical_tracking/classical_tracking_4.png"
 import Card5 from "@site/static/img/Classical_tracking/classical_tracking_5.png";
 import Card6 from "@site/static/img/Classical_tracking/classical_tracking_6.png";
 
+const SEO_TITLE = "ML Experiment Tracking | MLflow AI Platform";
+
 export default function Tracking() {
   return (
-    <Layout>
+    <>
+      <Head>
+        <title>{SEO_TITLE}</title>
+        <meta property="og:title" content={SEO_TITLE} />
+      </Head>
+      <Layout>
       <AboveTheFold
         sectionLabel="Experiment tracking"
         title="Comprehensive experiment tracking"
@@ -62,5 +70,6 @@ export default function Tracking() {
 
       <BelowTheFold contentType="classical-ml" />
     </Layout>
+    </>
   );
 }

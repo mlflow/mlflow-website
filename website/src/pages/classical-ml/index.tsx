@@ -1,4 +1,5 @@
 import { MLFLOW_DOCS_URL } from "@site/src/constants";
+import Head from "@docusaurus/Head";
 import {
   Layout,
   LogosCarousel,
@@ -14,9 +15,16 @@ import Card3 from "@site/static/img/Classical_home/Classical_home_3.png";
 import Card4 from "@site/static/img/Classical_home/Classical_home_4.png";
 import Card5 from "@site/static/img/Classical_home/Classical_home_5.png";
 
+const SEO_TITLE = "MLflow for ML Models | MLflow AI Platform";
+
 export default function GenAi(): JSX.Element {
   return (
-    <Layout>
+    <>
+      <Head>
+        <title>{SEO_TITLE}</title>
+        <meta property="og:title" content={SEO_TITLE} />
+      </Head>
+      <Layout>
       <AboveTheFold
         title={<strong>Master the ML Lifecycle</strong>}
         body="From experiment to production, MLflow streamlines your complete machine learning journey with end-to-end tracking, model management, and deployment."
@@ -81,5 +89,6 @@ export default function GenAi(): JSX.Element {
         <LatestNews />
       </BelowTheFold>
     </Layout>
+    </>
   );
 }
