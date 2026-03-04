@@ -283,6 +283,23 @@ export default function GenAi(): JSX.Element {
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://mlflow.org/genai" />
         <link rel="canonical" href="https://mlflow.org/genai" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "MLflow",
+            applicationCategory: "DeveloperApplication",
+            operatingSystem: "Cross-platform",
+            offers: {
+              "@type": "Offer",
+              price: "0",
+              priceCurrency: "USD",
+            },
+            description: SEO_DESCRIPTION,
+            url: "https://mlflow.org/genai",
+            license: "https://www.apache.org/licenses/LICENSE-2.0",
+          })}
+        </script>
       </Head>
 
       <Layout>

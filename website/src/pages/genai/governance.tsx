@@ -22,7 +22,7 @@ export default function Governance() {
         body="MLflow is integrated with Unity Catalog to track the lifecycle and lineage of your app’s assets - models, prompts, datasets, and metrics - and apply access controls."
         hasGetStartedButton={MLFLOW_DOCS_URL}
       >
-        <HeroImage src={CardHero} alt="" />
+        <HeroImage src={CardHero} alt="MLflow governance screenshot" />
       </AboveTheFold>
 
       <StickyGrid
@@ -30,12 +30,12 @@ export default function Governance() {
           {
             title: "Unified Data and AI governance",
             body: "Unity Catalog provides central, unified governance over all your data and AI assets - including GenAI and classic/deep learning ML. Enforce access controls and automatically track lineage.",
-            image: <img src={Card1} alt="" />,
+            image: <img src={Card1} alt="MLflow governance screenshot" />,
           },
           {
             title: "Prompt Registry",
             body: "Track every prompt template, its version history, and deployment lifecycle in the Unity Catalog. Each prompt is linked to its associated apps and evaluation results. Integrate prompts into your app’s code base via our SDK to allow non-technical users to edit prompts without access to your code base.",
-            image: <img src={Card2} alt="" />,
+            image: <img src={Card2} alt="MLflow governance screenshot" />,
           },
           {
             title: "App Version Registry",
@@ -43,7 +43,7 @@ export default function Governance() {
               "Track every application version and its associated prompts and evaluation results in the Unity Catalog.",
               "You can store the app’s code as a deployable asset or link to Git commits to integrate with your existing software development lifecycle.",
             ],
-            image: <img src={Card3} alt="" />,
+            image: <img src={Card3} alt="MLflow governance screenshot" />,
           },
           {
             title: "Collaboration & Sharing",
@@ -51,12 +51,12 @@ export default function Governance() {
               "Enable cross-organization discovery and sharing of prompts and apps",
               "You can store the app’s code as a deployable asset or link to Git commits to integrate with your existing software development lifecycle.",
             ],
-            image: <img src={Card4} alt="" />,
+            image: <img src={Card4} alt="MLflow governance screenshot" />,
           },
           {
             title: "Evaluation Dataset & Metric Registry",
             body: "Track and manage evaluation datasets and custom metrics as UC assets.",
-            image: <img src={Card5} alt="" />,
+            image: <img src={Card5} alt="MLflow governance screenshot" />,
           },
         ]}
       />

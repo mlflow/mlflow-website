@@ -21,13 +21,37 @@ import Card4 from "@site/static/img/Classical_home/Classical_home_4.png";
 import Card5 from "@site/static/img/Classical_home/Classical_home_5.png";
 
 const SEO_TITLE = "MLflow for ML Models | MLflow AI Platform";
+const SEO_DESCRIPTION =
+  "MLflow for machine learning models. Manage the full ML and deep learning lifecycle with experiment tracking, hyperparameter tuning, model registry, and deployment.";
 
-export default function GenAi(): JSX.Element {
+export default function ClassicalML(): JSX.Element {
   return (
     <>
       <Head>
         <title>{SEO_TITLE}</title>
+        <meta name="description" content={SEO_DESCRIPTION} />
         <meta property="og:title" content={SEO_TITLE} />
+        <meta property="og:description" content={SEO_DESCRIPTION} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://mlflow.org/classical-ml" />
+        <link rel="canonical" href="https://mlflow.org/classical-ml" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "MLflow",
+            applicationCategory: "DeveloperApplication",
+            operatingSystem: "Cross-platform",
+            offers: {
+              "@type": "Offer",
+              price: "0",
+              priceCurrency: "USD",
+            },
+            description: SEO_DESCRIPTION,
+            url: "https://mlflow.org/classical-ml",
+            license: "https://www.apache.org/licenses/LICENSE-2.0",
+          })}
+        </script>
       </Head>
       <Layout>
         <AboveTheFold
@@ -86,7 +110,12 @@ export default function GenAi(): JSX.Element {
                 text: "Learn more",
                 href: "/classical-ml/experiment-tracking",
               },
-              image: <img src={Card1} alt="" />,
+              image: (
+                <img
+                  src={Card1}
+                  alt="Building production quality ML models with MLflow"
+                />
+              ),
             },
             {
               title: "Framework neutral",
@@ -95,7 +124,12 @@ export default function GenAi(): JSX.Element {
                 text: "Learn more",
                 href: "/classical-ml/experiment-tracking",
               },
-              image: <img src={Card2} alt="" />,
+              image: (
+                <img
+                  src={Card2}
+                  alt="MLflow integrations with scikit-learn, PyTorch, TensorFlow, and XGBoost"
+                />
+              ),
             },
             {
               title: "Reliable reproducibility",
@@ -104,7 +138,12 @@ export default function GenAi(): JSX.Element {
                 text: "Learn more",
                 href: "/classical-ml/experiment-tracking",
               },
-              image: <img src={Card3} alt="" />,
+              image: (
+                <img
+                  src={Card3}
+                  alt="MLflow logging parameters, artifacts, and dependencies for reproducible experiments"
+                />
+              ),
             },
             {
               title: "Deployment ready",
@@ -113,7 +152,12 @@ export default function GenAi(): JSX.Element {
                 text: "Learn more",
                 href: "/classical-ml/model-registry",
               },
-              image: <img src={Card4} alt="" />,
+              image: (
+                <img
+                  src={Card4}
+                  alt="MLflow model registry with lifecycle management and deployment controls"
+                />
+              ),
             },
             {
               title: "Unified workflow",
@@ -122,7 +166,12 @@ export default function GenAi(): JSX.Element {
                 text: "Learn more",
                 href: "/classical-ml/models",
               },
-              image: <img src={Card5} alt="" />,
+              image: (
+                <img
+                  src={Card5}
+                  alt="Unified ML workflow from experimentation to production"
+                />
+              ),
             },
           ]}
         />

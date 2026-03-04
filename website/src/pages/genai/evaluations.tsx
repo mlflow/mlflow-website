@@ -192,7 +192,7 @@ export default function Evaluations() {
         hasGetStartedButton={`${MLFLOW_GENAI_DOCS_URL}eval-monitor/quickstart/`}
         minHeight="none"
       >
-        <HeroImage src={CardHero} alt="" />
+        <HeroImage src={CardHero} alt="MLflow evaluations screenshot" />
       </AboveTheFold>
 
       <Section

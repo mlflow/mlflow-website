@@ -172,7 +172,7 @@ export default function AiGateway() {
           body="Standardize how you interact with different LLM providers using one central interface."
           hasGetStartedButton={`${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/setup/`}
         >
-          <HeroImage src={CardHero} alt="" />
+          <HeroImage src={CardHero} alt="MLflow AI Gateway screenshot" />
         </AboveTheFold>
 
         <StickyGrid
