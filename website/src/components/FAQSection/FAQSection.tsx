@@ -9,9 +9,9 @@ const faqs: { question: string; answer: ReactNode }[] = [
     question: "What is MLflow?",
     answer: (
       <>
-        MLflow is the largest <strong>open source AI engineering platform</strong>.
-        MLflow
-        enables teams of all sizes to debug, evaluate, monitor, and optimize
+        MLflow is the largest{" "}
+        <strong>open source AI engineering platform</strong>. MLflow enables
+        teams of all sizes to debug, evaluate, monitor, and optimize
         production-quality{" "}
         <Link
           to="/genai"
