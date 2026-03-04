@@ -173,6 +173,11 @@ const config: Config = {
   ],
 
   themeConfig: {
+    metadata: [
+      { property: "og:site_name", content: "MLflow AI Engineering Platform" },
+      { property: "og:image", content: "https://mlflow.org/img/mlflow-card.png" },
+      { name: "twitter:image", content: "https://mlflow.org/img/mlflow-card.png" },
+    ],
     prism: {
       theme: prismThemes.vsDark,
       darkTheme: prismThemes.vsDark,
