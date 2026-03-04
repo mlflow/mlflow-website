@@ -1,16 +1,121 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import Link from "@docusaurus/Link";
 import { Section } from "../Section/Section";
 import { ChevronDown } from "lucide-react";
 
-const faqs = [
+const faqs: { question: string; answer: ReactNode }[] = [
+  {
+    question: "What is MLflow?",
+    answer: (
+      <>
+        MLflow is the largest <strong>open source AI engineering platform</strong>.
+        MLflow
+        enables teams of all sizes to debug, evaluate, monitor, and optimize
+        production-quality{" "}
+        <Link
+          to="/genai"
+          className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
+        >
+          AI agents
+        </Link>
+        ,{" "}
+        <Link
+          to="/genai"
+          className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
+        >
+          LLM applications
+        </Link>
+        , and{" "}
+        <Link
+          to="/classical-ml"
+          className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
+        >
+          ML models
+        </Link>{" "}
+        while controlling costs and managing access to models and data. With
+        over 30 million monthly downloads, thousands of organizations rely on
+        MLflow each day to ship AI to production with confidence.
+        <br />
+        <br />
+        MLflow's comprehensive feature set for agents and LLM applications
+        includes production-grade{" "}
+        <Link
+          to="/genai/observability"
+          className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
+        >
+          observability
+        </Link>
+        ,{" "}
+        <Link
+          to="/genai/evaluations"
+          className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
+        >
+          evaluation
+        </Link>
+        ,{" "}
+        <Link
+          to="/genai/prompt-registry"
+          className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
+        >
+          prompt management
+        </Link>
+        , an{" "}
+        <Link
+          to="/genai/ai-gateway"
+          className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
+        >
+          AI Gateway
+        </Link>{" "}
+        for managing costs and model access, and more. Learn more at{" "}
+        <Link
+          to="/genai"
+          className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
+        >
+          MLflow for LLMs and Agents
+        </Link>
+        .
+        <br />
+        <br />
+        For machine learning (ML) model development, MLflow provides{" "}
+        <Link
+          to="/classical-ml/experiment-tracking"
+          className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
+        >
+          experiment tracking
+        </Link>
+        ,{" "}
+        <Link
+          to="/classical-ml/model-evaluation"
+          className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
+        >
+          model evaluation
+        </Link>{" "}
+        capabilities, a production{" "}
+        <Link
+          to="/classical-ml/model-registry"
+          className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
+        >
+          model registry
+        </Link>
+        , and{" "}
+        <Link
+          to="/classical-ml/serving"
+          className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
+        >
+          model deployment
+        </Link>{" "}
+        tools.
+      </>
+    ),
+  },
   {
     question: "Is MLflow free?",
     answer:
       "Yes! MLflow is 100% open source under the Apache 2.0 license. You can use it for any purpose, including commercial applications, without any licensing fees. The project is backed by the Linux Foundation, ensuring it remains open and community-driven.",
   },
   {
-    question: "How does MLflow compare to other MLOps/LLMOps tools?",
+    question: "How does MLflow compare to other LLMOps/MLOps tools?",
     answer:
       "Many LLMOps tools are either proprietary or only cover part of the lifecycle. MLflow gives you full stack MLOps and LLMOps capabilities in single open-source platform. Backed by the Linux Foundation, MLflow ensures your AI infrastructure remains open, vendor-neutral, and fully in your control.",
   },
@@ -39,7 +144,7 @@ function FAQItem({
   index,
 }: {
   question: string;
-  answer: string;
+  answer: ReactNode;
   isOpen: boolean;
   onClick: () => void;
   index: number;
