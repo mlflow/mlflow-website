@@ -97,11 +97,24 @@ print(f"Total tokens: {total}")`,
   },
 ];
 
+const SEO_TITLE = "LLM & Agent Observability | MLflow AI Platform";
+const SEO_DESCRIPTION =
+  "Debug and monitor AI agents and LLM apps with MLflow's AI Engineering Platform. Full execution traces, quality monitoring, and trend analysis. Supports all frameworks and LLMs.";
+
 export default function Observability() {
   return (
     <Layout>
       <Head>
-        <title>LLM Observability | MLflow</title>
+        <title>{SEO_TITLE}</title>
+        <meta name="description" content={SEO_DESCRIPTION} />
+        <meta property="og:title" content={SEO_TITLE} />
+        <meta property="og:description" content={SEO_DESCRIPTION} />
+        <meta property="og:type" content="website" />
+        <meta
+          property="og:url"
+          content="https://mlflow.org/genai/observability"
+        />
+        <link rel="canonical" href="https://mlflow.org/genai/observability" />
       </Head>
       <AboveTheFold
         sectionLabel="Observability"

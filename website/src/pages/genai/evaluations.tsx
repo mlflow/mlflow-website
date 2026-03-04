@@ -154,11 +154,24 @@ for version in [agent_v1, agent_v2]:
   },
 ];
 
+const SEO_TITLE = "Agent & LLM Evaluation | MLflow AI Platform";
+const SEO_DESCRIPTION =
+  "Evaluate AI agent and LLM quality with MLflow's AI Engineering Platform. LLM judges, custom metrics, human feedback, and side-by-side version comparison.";
+
 export default function Evaluations() {
   return (
     <Layout>
       <Head>
-        <title>Agent Evaluation | MLflow</title>
+        <title>{SEO_TITLE}</title>
+        <meta name="description" content={SEO_DESCRIPTION} />
+        <meta property="og:title" content={SEO_TITLE} />
+        <meta property="og:description" content={SEO_DESCRIPTION} />
+        <meta property="og:type" content="website" />
+        <meta
+          property="og:url"
+          content="https://mlflow.org/genai/evaluations"
+        />
+        <link rel="canonical" href="https://mlflow.org/genai/evaluations" />
       </Head>
       <AboveTheFold
         sectionLabel="Evaluations"
@@ -179,7 +192,7 @@ export default function Evaluations() {
         hasGetStartedButton={`${MLFLOW_GENAI_DOCS_URL}eval-monitor/quickstart/`}
         minHeight="none"
       >
-        <HeroImage src={CardHero} alt="" />
+        <HeroImage src={CardHero} alt="MLflow evaluations screenshot" />
       </AboveTheFold>
 
       <Section

@@ -10,7 +10,7 @@ import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE = "AI Observability for LLMs & Agents | MLflow AI Platform";
 const SEO_DESCRIPTION =
-  "AI observability captures traces, evaluations, and metrics across agent and LLM workflows. Explore AI observability on MLflow's open-source AI platform.";
+  "AI observability captures traces, evaluations, and metrics across agent and LLM workflows. Explore AI observability on MLflow's open source AI platform.";
 
 const faqs: {
   question: string;
@@ -62,7 +62,7 @@ const faqs: {
   {
     question: "What is the best AI observability tool?",
     answer:
-      "The best AI observability tool depends on your needs. MLflow is the leading open-source option, with over 30 million monthly downloads. Thousands of organizations, developers, and research teams use MLflow each day to build and deploy production-grade agents and LLM applications. It offers complete tracing, evaluation, and monitoring without vendor lock-in. MLflow supports any agent framework (LangChain, LangGraph, LlamaIndex, CrewAI, AutoGen, etc.), any LLM provider (OpenAI, Anthropic, Bedrock, etc.), is fully OpenTelemetry compatible, and gives you full control over your data.",
+      "The best AI observability tool depends on your needs. MLflow is the leading open source option, with over 30 million monthly downloads. Thousands of organizations, developers, and research teams use MLflow each day to build and deploy production-grade agents and LLM applications. It offers complete tracing, evaluation, and monitoring without vendor lock-in. MLflow supports any agent framework (LangChain, LangGraph, LlamaIndex, CrewAI, AutoGen, etc.), any LLM provider (OpenAI, Anthropic, Bedrock, etc.), is fully OpenTelemetry compatible, and gives you full control over your data.",
   },
   {
     question: "What agent frameworks and LLMs does MLflow support?",
@@ -72,7 +72,7 @@ const faqs: {
   {
     question: "How does MLflow compare to other AI observability tools?",
     answer:
-      "Unlike proprietary tools that lock you into a vendor's ecosystem, MLflow provides a complete, open-source observability stack with no vendor lock-in. It supports any LLM or agent authoring framework, is OpenTelemetry compatible, and is trusted by thousands of organizations worldwide. MLflow is also available on Databricks, AWS, and other platforms.",
+      "Unlike proprietary tools that lock you into a vendor's ecosystem, MLflow provides a complete, open source observability stack with no vendor lock-in. It supports any LLM or agent authoring framework, is OpenTelemetry compatible, and is trusted by thousands of organizations worldwide. MLflow is also available on Databricks, AWS, and other platforms.",
   },
   {
     question: "Does MLflow support OpenTelemetry?",
@@ -802,7 +802,7 @@ export default function AIObservability() {
           <h2 id="how-to-implement">How to Implement AI Observability</h2>
 
           <p>
-            Modern open-source AI platforms like{" "}
+            Modern open source AI platforms like{" "}
             <Link href="/genai">MLflow</Link> make it easy to add comprehensive,
             production-grade observability to your agents, LLM applications, and
             RAG systems with minimal code changes.
