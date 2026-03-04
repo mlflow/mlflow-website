@@ -73,8 +73,20 @@ response = client.chat.completions.create(
   {
     id: "evaluation",
     title: "Evaluation",
-    description:
-      "Run systematic evaluations, track quality metrics over time, and catch regressions before they reach production. Choose from 50+ built-in metrics and LLM judges, or define your own with highly flexible APIs.",
+    description: (
+      <>
+        Run systematic{" "}
+        <Link
+          href="/llm-evaluation"
+          className="text-white/90 hover:text-white underline"
+        >
+          evaluations
+        </Link>
+        , track quality metrics over time, and catch regressions before they
+        reach production. Choose from 50+ built-in metrics and LLM judges, or
+        define your own with highly flexible APIs.
+      </>
+    ),
     imageSrc: EvaluationTabImg,
     quickstartLink:
       "https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/",

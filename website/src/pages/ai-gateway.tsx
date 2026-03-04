@@ -1006,10 +1006,12 @@ response = client.messages.create(
               <Link href="/genai" style={{ color: "#007bff" }}>
                 <strong>MLflow</strong>
               </Link>{" "}
-              is the largest open-source AI platform, with over 30 million
-              monthly downloads. Thousands of organizations, developers, and
-              research teams use MLflow each day to build and deploy
-              production-grade agents and LLM applications. Backed by the Linux
+              is the largest open-source{" "}
+              <strong>AI engineering platform</strong>, with over 30 million
+              monthly downloads. Thousands of organizations use MLflow to
+              debug, evaluate, monitor, and optimize production-quality AI
+              agents and LLM applications while controlling costs
+              and managing access to models and data. Backed by the Linux
               Foundation and licensed under Apache 2.0, MLflow provides a
               complete AI Gateway solution with no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
@@ -1180,6 +1182,11 @@ response = client.messages.create(
             <li>
               <Link href="/blog/mlflow-ai-gateway">
                 MLflow AI Gateway Announcement
+              </Link>
+            </li>
+            <li>
+              <Link href="/llm-evaluation">
+                Agent Evaluation FAQ
               </Link>
             </li>
             <li>
