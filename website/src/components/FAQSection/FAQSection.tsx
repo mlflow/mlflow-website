@@ -199,7 +199,18 @@ export function FAQSection() {
   return (
     <Section
       title="Frequently Asked Questions"
-      body="Everything you need to know about MLflow. Can't find what you're looking for? Join our community."
+      body={
+        <>
+          Visit our{" "}
+          <Link
+            to="/faq"
+            className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
+          >
+            FAQ page
+          </Link>{" "}
+          for everything you need to know about MLflow.
+        </>
+      }
       align="center"
       ambient
     >
