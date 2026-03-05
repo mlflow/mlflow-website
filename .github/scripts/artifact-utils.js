@@ -51,9 +51,7 @@ async function deleteBuildArtifacts({ github, context }) {
   });
 
   const artifactsToDelete = artifacts.data.artifacts.filter(
-    (artifact) =>
-      artifact.name === `website-build-${buildId}` ||
-      artifact.name === "build-id"
+    (artifact) => artifact.name === `website-build-${buildId}`
   );
 
   for (const artifact of artifactsToDelete) {

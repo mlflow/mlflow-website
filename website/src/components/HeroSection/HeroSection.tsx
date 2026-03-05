@@ -15,6 +15,7 @@ type Props = {
     href: string;
     icon?: ReactNode;
   };
+  children?: ReactNode;
 };
 
 export function HeroSection({
@@ -22,6 +23,7 @@ export function HeroSection({
   subtitle,
   primaryCTA,
   secondaryCTA,
+  children,
 }: Props) {
   return (
     <div className="w-full px-4 md:px-8 lg:px-16 pt-16 md:pt-24">
@@ -38,7 +40,7 @@ export function HeroSection({
 
         {/* Subtitle */}
         <motion.p
-          className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto"
+          className="text-lg md:text-xl text-white/70 max-w-3xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
@@ -69,6 +71,15 @@ export function HeroSection({
             </Link>
           )}
         </motion.div>
+        {children && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            {children}
+          </motion.div>
+        )}
       </div>
     </div>
   );
@@ -85,7 +96,7 @@ export function HighlightedKeyword({
   if (href) {
     return (
       <Link to={href}>
-        <span className="text-white underline decoration-white/50 underline-offset-4 hover:decoration-white transition-all cursor-pointer">
+        <span className="text-white font-semibold underline decoration-white/50 underline-offset-4 hover:decoration-white transition-all cursor-pointer">
           {children}
         </span>
       </Link>
@@ -93,7 +104,7 @@ export function HighlightedKeyword({
   }
 
   return (
-    <span className="text-white underline decoration-white/50 underline-offset-4">
+    <span className="text-white font-semibold underline decoration-white/50 underline-offset-4">
       {children}
     </span>
   );

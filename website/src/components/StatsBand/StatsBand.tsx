@@ -1,8 +1,8 @@
 import LinuxFoundationLogo from "@site/static/img/linux-foundation.svg";
 import { Section } from "../Section/Section";
-import { LogosCarousel } from "../LogosCarousel/LogosCarousel";
 import { Star } from "lucide-react";
 import type { SVGProps } from "react";
+import { useGitHubStars } from "../../hooks/useGitHubStars";
 
 const GitHubIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 48 48" fill="none" {...props}>
@@ -13,13 +13,15 @@ const GitHubIcon = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-export const StatsBand = () => {
+export const StatsBand = ({
+  title = "Most Adopted Open-Source AIOps Platform",
+  body = "Backed by Linux Foundation, MLflow has been fully committed to open-source for 5+ years. Now trusted by thousands of organizations and research teams worldwide.",
+}: {
+  title?: string;
+  body?: React.ReactNode;
+} = {}) => {
   return (
-    <Section
-      title="Most Adopted Open-Source AI Platform"
-      body="Backed by Linux Foundation, MLflow has been fully committed to open-source for 5+ years. Now trusted by thousands of organizations and research teams worldwide."
-      align="center"
-    >
+    <Section title={title} body={body} align="center">
       <div className="flex w-full flex-col items-center gap-16 relative">
         <div className="grid w-full max-w-4xl grid-cols-1 gap-6 text-center sm:grid-cols-3 relative z-10">
           <div className="flex justify-center">
@@ -50,7 +52,7 @@ export const StatsBand = () => {
             <span className="text-md font-semibold">mlflow/mlflow</span>
             <div className="flex items-center gap-1.5 text-sm font-semibold text-white/80">
               <Star className="w-4 h-4" fill="currentColor" />
-              23K
+              {useGitHubStars()}
             </div>
           </a>
 
@@ -64,7 +66,6 @@ export const StatsBand = () => {
           </div>
         </div>
       </div>
-      <LogosCarousel />
     </Section>
   );
 };

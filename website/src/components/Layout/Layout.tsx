@@ -25,6 +25,7 @@ export function useLayoutVariant() {
 function getLayoutType(pathname: string) {
   const genAI = useBaseUrl("/genai");
   const classicalML = useBaseUrl("/classical-ml");
+  const blog = useBaseUrl("/blog");
 
   if (pathname.startsWith(genAI)) {
     if (pathname === genAI || pathname === `${genAI}/`) {
@@ -38,6 +39,10 @@ function getLayoutType(pathname: string) {
     } else {
       return "classical-ml-subpage";
     }
+  } else if (pathname.startsWith(blog)) {
+    return "blog";
+  } else if (pathname.startsWith(useBaseUrl("/releases"))) {
+    return "releases";
   } else if (pathname === useBaseUrl("/")) {
     return "home";
   } else {
@@ -49,6 +54,7 @@ export const Layout = ({ children }: Props) => {
   const location = useLocation();
 
   const layoutType = getLayoutType(location.pathname);
+  const hasReducedGradient = layoutType === "blog" || layoutType === "releases";
   const variant = layoutType.startsWith("genai")
     ? "red"
     : layoutType.startsWith("classical-ml")
@@ -63,7 +69,7 @@ export const Layout = ({ children }: Props) => {
         <main className="flex flex-col">
           <GradientWrapper
             className={wrapper()}
-            height={820}
+            height={hasReducedGradient ? 56 : 820}
             variant={variant}
             direction={direction}
           >
