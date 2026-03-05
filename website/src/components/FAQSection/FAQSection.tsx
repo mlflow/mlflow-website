@@ -99,14 +99,14 @@ const faqs: { question: string; answer: ReactNode }[] = [
     question: "Why do I need an AI engineering platform like MLflow?",
     answer: (
       <>
-        Getting an AI agent or LLM application to work in a demo is easy. Getting it to work
-        reliably in production is a different problem entirely. Agents can take
-        incorrect or destructive actions, leak sensitive data, generate harmful
-        responses, burn through API budgets with unnecessary model calls, or
-        unexpectedly degrade in quality over time. Overcoming these challenges
-        requires full visibility into what your agents are doing, control over
-        what they can access, and a systematic way to measure and improve their
-        quality. MLflow provides the{" "}
+        Getting an AI agent or LLM application to work in a demo is easy.
+        Getting it to work reliably in production is a different problem
+        entirely. Agents can take incorrect or destructive actions, leak
+        sensitive data, generate harmful responses, burn through API budgets
+        with unnecessary model calls, or unexpectedly degrade in quality over
+        time. Overcoming these challenges requires full visibility into what
+        your agents are doing, control over what they can access, and a
+        systematic way to measure and improve their quality. MLflow provides the{" "}
         <Link
           to="/ai-observability"
           className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
