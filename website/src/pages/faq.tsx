@@ -35,7 +35,8 @@ const faqCategories: FAQCategory[] = [
             MLflow is the largest{" "}
             <strong>open source AI engineering platform</strong>. MLflow enables
             teams of all sizes to debug, evaluate, monitor, and optimize
-            production-quality AI agents, LLM applications, and{" "}
+            production-quality{" "}
+            <Link href="/genai">AI agents, LLM applications</Link>, and{" "}
             <Link href="/classical-ml">ML models</Link> while controlling costs
             and managing access to models and data. With over 30 million monthly
             downloads, thousands of organizations rely on MLflow each day to
