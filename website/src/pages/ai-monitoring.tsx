@@ -8,9 +8,9 @@ import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE =
-  "LLM Production Monitoring & Agent Monitoring | MLflow AI Platform";
+  "AI Monitoring, LLM Monitoring & Agent Monitoring | MLflow AI Platform";
 const SEO_DESCRIPTION =
-  "LLM production monitoring continuously evaluates agent and LLM application quality, detects drift, and controls costs. Monitor with MLflow's open-source AI platform.";
+  "AI monitoring continuously evaluates agent and LLM application quality, detects drift, and controls costs. Monitor with MLflow's open-source AI platform.";
 
 const faqs: {
   question: string;
@@ -19,9 +19,9 @@ const faqs: {
 }[] = [
   // General concept questions
   {
-    question: "What is LLM production monitoring?",
+    question: "What is AI monitoring?",
     answer:
-      "LLM production monitoring is the practice of continuously assessing the quality, performance, cost, and safety of large language model applications running in production. Unlike traditional software monitoring (uptime, error rates), LLM monitoring must evaluate the quality of non-deterministic text outputs, track token costs, detect hallucinations, and identify when model behavior drifts from expected standards.",
+      "AI monitoring is the practice of continuously assessing the quality, performance, cost, and safety of AI applications running in production, including LLM and agent-based systems. Unlike traditional software monitoring (uptime, error rates), AI monitoring must evaluate the quality of non-deterministic text outputs, track token costs, detect hallucinations, and identify when model behavior drifts from expected standards.",
   },
   {
     question:
@@ -342,7 +342,7 @@ const softwareJsonLd = {
     priceCurrency: "USD",
   },
   description:
-    "Open-source platform for LLM production monitoring, agent monitoring, evaluation, and deployment.",
+    "Open-source platform for AI monitoring, LLM monitoring, agent monitoring, evaluation, and deployment.",
   url: "https://mlflow.org",
   license: "https://www.apache.org/licenses/LICENSE-2.0",
 };
@@ -443,7 +443,7 @@ def handle_feedback(
     )
     return {"status": "success", "trace_id": trace.info.trace_id}`;
 
-export default function LlmProductionMonitoring() {
+export default function AiMonitoring() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   return (
@@ -454,14 +454,8 @@ export default function LlmProductionMonitoring() {
         <meta property="og:title" content={SEO_TITLE} />
         <meta property="og:description" content={SEO_DESCRIPTION} />
         <meta property="og:type" content="website" />
-        <meta
-          property="og:url"
-          content="https://mlflow.org/llm-production-monitoring"
-        />
-        <link
-          rel="canonical"
-          href="https://mlflow.org/llm-production-monitoring"
-        />
+        <meta property="og:url" content="https://mlflow.org/ai-monitoring" />
+        <link rel="canonical" href="https://mlflow.org/ai-monitoring" />
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
         <script type="application/ld+json">
           {JSON.stringify(softwareJsonLd)}
@@ -697,7 +691,7 @@ export default function LlmProductionMonitoring() {
         <Header />
 
         <div className="article-container">
-          <h1>LLM Production Monitoring and Agent Monitoring</h1>
+          <h1>AI Monitoring, LLM Monitoring, and Agent Monitoring</h1>
 
           <p>
             Production monitoring for agents and LLM applications goes beyond

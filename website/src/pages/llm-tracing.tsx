@@ -1189,9 +1189,7 @@ const result = await generateText({
               <Link href="/llm-evaluation">Agent Evaluation FAQ</Link>
             </li>
             <li>
-              <Link href="/llm-production-monitoring">
-                LLM Production Monitoring FAQ
-              </Link>
+              <Link href="/ai-monitoring">AI Monitoring FAQ</Link>
             </li>
             <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>
