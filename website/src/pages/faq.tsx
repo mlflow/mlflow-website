@@ -506,8 +506,8 @@ const faqCategories: FAQCategory[] = [
           <>
             Many LLMOps tools are either proprietary or only cover part of the
             lifecycle. MLflow gives you full-stack LLMOps capabilities in a
-            single open source platform:
-            <Link href="/genai/observability"> tracing</Link>,{" "}
+            single open source platform:{" "}
+            <Link href="/genai/observability">tracing</Link>,{" "}
             <Link href="/genai/evaluations">evaluation</Link>,{" "}
             <Link href="/genai/prompt-registry">prompt management</Link>,{" "}
             <Link href="/genai/ai-gateway">AI Gateway</Link>,{" "}
@@ -534,7 +534,7 @@ const faqCategories: FAQCategory[] = [
         answer: (
           <>
             Most MLOps tools focus on a single part of the ML lifecycle. MLflow
-            is unique in providing the complete toolkit:
+            is unique in providing the complete toolkit:{" "}
             <Link href="/classical-ml/experiment-tracking">
               experiment tracking
             </Link>

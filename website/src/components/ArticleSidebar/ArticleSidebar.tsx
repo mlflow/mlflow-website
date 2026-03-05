@@ -39,6 +39,9 @@ export function ArticleSidebar() {
       <p className="toc-title">Resources</p>
       <ul>
         <li>
+          <a href="/faq">MLflow FAQ</a>
+        </li>
+        <li>
           <a href={MLFLOW_GENAI_DOCS_URL}>Documentation</a>
         </li>
         <li>
