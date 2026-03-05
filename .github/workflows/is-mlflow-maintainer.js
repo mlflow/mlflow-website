@@ -3,7 +3,7 @@ const MLFLOW_CORE_MAINTAINERS = [
   "BenWilson2",
   "daniellok-db",
   "harupy",
-  "mlflow-automation",
+  "mlflow-app",
   "serena-ruan",
   "WeichenXu123",
   "TomeHirata",
