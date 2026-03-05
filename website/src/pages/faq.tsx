@@ -1112,6 +1112,13 @@ export default function FAQ() {
                 management from development to production.
               </p>
             </Link>
+            <Link href="/aiops" className="learn-more-card">
+              <h3>AIOps</h3>
+              <p>
+                Unified operations for all AI workloads: LLM applications,
+                agents, and traditional ML models under one platform.
+              </p>
+            </Link>
             <Link href="/genai" className="learn-more-card">
               <h3>MLflow for LLMs & Agents</h3>
               <p>
