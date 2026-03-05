@@ -4,7 +4,6 @@ import Link from "@docusaurus/Link";
 import { Highlight } from "prism-react-renderer";
 import { Header } from "../components/Header/Header";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
-import ObservabilityHero from "@site/static/img/GenAI_observability/GenAI_observability_hero.png";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
@@ -1309,7 +1308,7 @@ export default function LlmProductionMonitoring() {
           </p>
 
           <p style={{ marginTop: "32px", marginBottom: "0px" }}>
-            <strong>Production Tracing with User and Session Context</strong>
+            <strong>Automatic Online Evaluation with Production Judges</strong>
           </p>
 
           <div
@@ -1318,12 +1317,12 @@ export default function LlmProductionMonitoring() {
           >
             <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
               <span className="text-xs text-white/50 font-mono">python</span>
-              <CopyButton code={CODE_PRODUCTION_TRACING} />
+              <CopyButton code={CODE_ONLINE_EVAL} />
             </div>
             <div className="p-3 overflow-x-auto">
               <Highlight
                 theme={customNightOwl}
-                code={CODE_PRODUCTION_TRACING}
+                code={CODE_ONLINE_EVAL}
                 language="python"
               >
                 {({ style, tokens, getLineProps, getTokenProps }) => (
@@ -1348,7 +1347,7 @@ export default function LlmProductionMonitoring() {
           </div>
 
           <p style={{ marginTop: "32px", marginBottom: "0px" }}>
-            <strong>Automatic Online Evaluation with Production Judges</strong>
+            <strong>Production Tracing with User and Session Context</strong>
           </p>
 
           <div
@@ -1357,12 +1356,12 @@ export default function LlmProductionMonitoring() {
           >
             <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
               <span className="text-xs text-white/50 font-mono">python</span>
-              <CopyButton code={CODE_ONLINE_EVAL} />
+              <CopyButton code={CODE_PRODUCTION_TRACING} />
             </div>
             <div className="p-3 overflow-x-auto">
               <Highlight
                 theme={customNightOwl}
-                code={CODE_ONLINE_EVAL}
+                code={CODE_PRODUCTION_TRACING}
                 language="python"
               >
                 {({ style, tokens, getLineProps, getTokenProps }) => (
@@ -1423,29 +1422,6 @@ export default function LlmProductionMonitoring() {
                 )}
               </Highlight>
             </div>
-          </div>
-
-          <div style={{ margin: "40px 0", textAlign: "center" }}>
-            <img
-              src={ObservabilityHero}
-              alt="MLflow production monitoring dashboard showing quality scores, latency, and cost trends across agent deployments"
-              style={{
-                width: "100%",
-                borderRadius: "8px",
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              }}
-            />
-            <p
-              style={{
-                marginTop: "12px",
-                fontSize: "14px",
-                color: "#6b7280",
-                fontStyle: "italic",
-              }}
-            >
-              MLflow production monitoring dashboard showing quality scores,
-              latency, and cost trends across agent deployments
-            </p>
           </div>
 
           <div className="info-box">
