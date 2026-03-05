@@ -3,6 +3,8 @@ import Head from "@docusaurus/Head";
 import Link from "@docusaurus/Link";
 import { Highlight } from "prism-react-renderer";
 import { Header } from "../components/Header/Header";
+import { SocialLinksFooter } from "../components/SocialLinksFooter/SocialLinksFooter";
+import { ArticleSidebar } from "../components/ArticleSidebar/ArticleSidebar";
 import { MLFLOW_GENAI_DOCS_URL, MLFLOW_DOCS_URL } from "@site/src/constants";
 import ObservabilityHero from "@site/static/img/GenAI_observability/GenAI_observability_hero.png";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
@@ -51,7 +53,7 @@ const faqs: {
         An AIOps platform typically provides:{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>tracing</Link>{" "}
         (execution capture for LLM and agent debugging),{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>evaluation</Link>{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>evaluation</Link>{" "}
         (automated quality assessment),{" "}
         <Link href={MLFLOW_DOCS_URL + "ml/tracking/"}>experiment tracking</Link>{" "}
         (for ML and LLM experiments),{" "}
@@ -91,7 +93,7 @@ const faqs: {
         and modern LLM workloads:{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>automatic tracing</Link>{" "}
         for LLM debugging,{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
           evaluation with LLM judges
         </Link>
         ,{" "}
@@ -144,7 +146,7 @@ const faqs: {
     question: "What's the relationship between AIOps and AI observability?",
     answer: (
       <>
-        <Link href="/faq/ai-observability">AI observability</Link> is a core
+        <Link href="/ai-observability">AI observability</Link> is a core
         component of AIOps, focused on monitoring and understanding AI system
         behavior through tracing, metrics, and evaluation. AIOps is broader,
         also encompassing experiment management, model versioning, deployment
@@ -438,6 +440,56 @@ export default function AIOps() {
             line-height: 1.6;
             color: #1e293b;
           }
+          .article-sidebar {
+            position: fixed;
+            top: 100px;
+            left: calc(50% + 900px / 2 + 48px);
+            width: 280px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+          }
+          .article-sidebar .toc-title {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #9ca3af;
+            margin: 0 0 12px 0;
+          }
+          .article-sidebar ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            border-left: 1px solid #e5e7eb;
+          }
+          .article-sidebar li {
+            margin: 0;
+            padding: 0;
+          }
+          .article-sidebar a {
+            font-family: 'DM Sans', sans-serif;
+            display: block;
+            padding: 8px 0 8px 16px;
+            font-size: 16px;
+            color: #0194e2 !important;
+            text-decoration: none !important;
+            transition: all 0.15s ease;
+            line-height: 1.4;
+          }
+          .article-sidebar a:hover {
+            color: #0072b0 !important;
+          }
+          .article-sidebar .toc-divider {
+            border: none;
+            border-top: 1px solid #e5e7eb;
+            margin: 12px 0 12px 0;
+          }
+          @media (max-width: 1400px) {
+            .article-sidebar {
+              display: none;
+            }
+          }
           @media (max-width: 768px) {
             .article-container {
               padding: 40px 20px 80px;
@@ -499,13 +551,13 @@ export default function AIOps() {
 
           <p>
             <Link href="/genai">MLflow</Link> is the most adopted open-source
-            AIOps platform, providing a unified stack for both GenAI operations
-            (<Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>tracing</Link>,{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>
+            AIOps platform, providing a unified stack for both LLMOps (
+            <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>tracing</Link>,{" "}
+            <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
               evaluation
             </Link>
             ,{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "prompts/"}>
+            <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>
               prompt management
             </Link>
             , <Link href="/genai/ai-gateway">AI Gateway</Link>) and traditional
@@ -540,37 +592,6 @@ export default function AIOps() {
             </video>
           </div>
 
-          <div
-            style={{
-              background: "#f9fafb",
-              border: "1px solid #e5e7eb",
-              borderRadius: "8px",
-              padding: "20px 24px",
-              margin: "40px 0",
-            }}
-          >
-            <p style={{ marginBottom: "12px" }}>
-              <strong>Quick Navigation:</strong>
-            </p>
-            <ul style={{ margin: 0, paddingLeft: "24px" }}>
-              <li style={{ marginBottom: "8px" }}>
-                <a href="#why-aiops-matters">Why AIOps Matters</a>
-              </li>
-              <li style={{ marginBottom: "8px" }}>
-                <a href="#what-is-aiops">What is AIOps?</a>
-              </li>
-              <li style={{ marginBottom: "8px" }}>
-                <a href="#key-capabilities">Key AIOps Capabilities</a>
-              </li>
-              <li style={{ marginBottom: "8px" }}>
-                <a href="#how-to-implement">How to Implement AIOps</a>
-              </li>
-              <li style={{ marginBottom: "0" }}>
-                <a href="#faq">FAQ</a>
-              </li>
-            </ul>
-          </div>
-
           <h2 id="why-aiops-matters">Why AIOps Matters</h2>
 
           <p>
@@ -581,7 +602,7 @@ export default function AIOps() {
 
           <div className="grid-2">
             <div className="card">
-              <h3>Unified AI Lifecycle</h3>
+              <h3>Fragmented AI Tooling</h3>
               <p>
                 <strong>Problem:</strong> Teams use separate tools for ML
                 experiment tracking, LLM tracing, evaluation, and deployment,
@@ -648,13 +669,13 @@ export default function AIOps() {
 
           <ul>
             <li>
-              <strong>GenAI Operations:</strong>{" "}
+              <strong>LLMOps / AgentOps:</strong>{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>Tracing</Link>,{" "}
-              <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>
+              <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
                 evaluation
               </Link>
               ,{" "}
-              <Link href={MLFLOW_GENAI_DOCS_URL + "prompts/"}>
+              <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>
                 prompt management
               </Link>
               , and{" "}
@@ -693,7 +714,7 @@ export default function AIOps() {
 
           <p>
             AIOps is closely related to{" "}
-            <Link href="/faq/ai-observability">AI observability</Link> (the
+            <Link href="/ai-observability">AI observability</Link> (the
             monitoring and understanding subset) and{" "}
             <Link href="/llmops">LLMOps</Link> (the LLM-specific subset). AIOps
             is the broadest term, encompassing both and adding experiment
@@ -703,8 +724,8 @@ export default function AIOps() {
           <h2 id="key-capabilities">Key AIOps Capabilities</h2>
 
           <p>
-            A comprehensive AIOps platform combines capabilities for both GenAI
-            and traditional ML workloads:
+            A comprehensive AIOps platform combines capabilities for both
+            LLMOps/AgentOps and traditional ML workloads:
           </p>
 
           <ul>
@@ -721,14 +742,14 @@ export default function AIOps() {
             </li>
             <li>
               <Link
-                href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}
+                href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}
                 style={{ color: "#007bff", fontWeight: "600" }}
               >
                 Evaluation
               </Link>
               : Assess AI output quality using{" "}
               <Link
-                href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/llm-as-judge/"}
+                href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}
                 style={{ color: "#007bff" }}
               >
                 LLM judges
@@ -758,7 +779,7 @@ export default function AIOps() {
             </li>
             <li>
               <Link
-                href={MLFLOW_GENAI_DOCS_URL + "prompts/"}
+                href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}
                 style={{ color: "#007bff", fontWeight: "600" }}
               >
                 Prompt Management
@@ -941,10 +962,10 @@ export default function AIOps() {
               <Link href="/genai" style={{ color: "#007bff" }}>
                 <strong>MLflow</strong>
               </Link>{" "}
-              is the most adopted open-source AIOps platform, with over 30
-              million monthly downloads. Backed by the Linux Foundation and
-              licensed under Apache 2.0, it provides a unified platform for all
-              AI operations with no vendor lock-in.{" "}
+              is the largest open-source AI platform, with over 30 million
+              monthly downloads. Backed by the Linux Foundation and licensed
+              under Apache 2.0, it provides a complete AIOps stack with no
+              vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>
@@ -981,7 +1002,7 @@ export default function AIOps() {
           <p>
             <strong>Why Teams Choose Open Source:</strong> Organizations
             building production AI applications increasingly choose MLflow
-            because it offers production-ready AIOps for both ML and GenAI
+            because it offers production-ready AIOps for both ML and LLM
             workloads without giving up control of their data, cost
             predictability, or flexibility. The Apache 2.0 license and Linux
             Foundation backing ensure MLflow remains truly open and
@@ -1020,10 +1041,10 @@ export default function AIOps() {
               <Link href="/llmops">LLMOps Guide</Link>
             </li>
             <li>
-              <Link href="/faq/ai-observability">AI Observability Guide</Link>
+              <Link href="/ai-observability">AI Observability Guide</Link>
             </li>
             <li>
-              <Link href="/faq/llm-tracing">LLM Tracing Guide</Link>
+              <Link href="/llm-tracing">LLM Tracing Guide</Link>
             </li>
             <li>
               <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
@@ -1031,7 +1052,7 @@ export default function AIOps() {
               </Link>
             </li>
             <li>
-              <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>
+              <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
                 LLM Evaluation Guide
               </Link>
             </li>
@@ -1050,6 +1071,9 @@ export default function AIOps() {
             </li>
           </ul>
         </div>
+
+        <ArticleSidebar />
+        <SocialLinksFooter />
       </div>
     </>
   );
