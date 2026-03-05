@@ -10,9 +10,9 @@ import ObservabilityHero from "@site/static/img/GenAI_observability/GenAI_observ
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
-const SEO_TITLE = "What is AIOps? AI Operations Guide | MLflow";
+const SEO_TITLE = "What is AIOps? AI Operations Guide | MLflow AI Platform";
 const SEO_DESCRIPTION =
-  "Learn AIOps (AI Operations) with MLflow, the open-source platform for managing AI applications in production, from LLM agents and RAG systems to traditional ML models.";
+  "Learn AIOps with MLflow, the largest open source AI engineering platform. Trace, evaluate, and monitor LLM agents, RAG systems, and ML models in production.";
 
 const faqs: {
   question: string;
