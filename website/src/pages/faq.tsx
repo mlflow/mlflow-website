@@ -628,8 +628,8 @@ const faqCategories: FAQCategory[] = [
             <br />
             <br />
             <strong>No per-seat or usage fees:</strong> Use all features
-            (tracing, evaluation, prompt management, AI Gateway, model
-            registry) for free, including in commercial applications.
+            (tracing, evaluation, prompt management, AI Gateway, model registry)
+            for free, including in commercial applications.
             <br />
             <br />
             <strong>Data sovereignty:</strong> Your telemetry data, models, and
