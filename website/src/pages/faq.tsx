@@ -35,8 +35,7 @@ const faqCategories: FAQCategory[] = [
             MLflow is the largest{" "}
             <strong>open source AI engineering platform</strong>. MLflow enables
             teams of all sizes to debug, evaluate, monitor, and optimize
-            production-quality <Link href="/genai">AI agents</Link>,{" "}
-            <Link href="/genai">LLM applications</Link>, and{" "}
+            production-quality AI agents, LLM applications, and{" "}
             <Link href="/classical-ml">ML models</Link> while controlling costs
             and managing access to models and data. With over 30 million monthly
             downloads, thousands of organizations rely on MLflow each day to
@@ -145,7 +144,11 @@ const faqCategories: FAQCategory[] = [
             </Link>{" "}
             and OpenTelemetry integrations work with any programming language.
             For AI and ML frameworks, MLflow integrates with all{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/integrations/"}>
+            <Link
+              href={
+                MLFLOW_GENAI_DOCS_URL + "tracing/integrations/#model-providers"
+              }
+            >
               LLM providers
             </Link>{" "}
             (OpenAI, Anthropic, Gemini, Bedrock, DeepSeek, and more),{" "}
@@ -167,7 +170,7 @@ const faqCategories: FAQCategory[] = [
           <>
             Absolutely. MLflow works on any major cloud provider (AWS, Azure,
             GCP, Databricks) or on-premises infrastructure. You can{" "}
-            <Link href={MLFLOW_DOCS_URL + "getting-started/running-notebooks/"}>
+            <Link href={MLFLOW_DOCS_URL + "self-hosting/"}>
               self-host MLflow
             </Link>{" "}
             or use managed services. Regardless of which platform and framework
@@ -188,7 +191,15 @@ const faqCategories: FAQCategory[] = [
             <Link href={MLFLOW_DBX_TRIAL_URL}>
               managed MLflow on Databricks
             </Link>
-            , AWS SageMaker, Nebius, or others.
+            ,{" "}
+            <Link href="https://docs.aws.amazon.com/sagemaker/latest/dg/mlflow.html">
+              AWS SageMaker
+            </Link>
+            ,{" "}
+            <Link href="https://nebius.com/services/managed-mlflow">
+              Nebius
+            </Link>
+            , or others.
           </>
         ),
         answerText:
@@ -355,7 +366,7 @@ const faqCategories: FAQCategory[] = [
         answer: (
           <>
             MLflow's{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "human-feedback/"}>
+            <Link href={MLFLOW_GENAI_DOCS_URL + "assessments/feedback"}>
               human feedback
             </Link>{" "}
             capabilities let you collect annotations and quality assessments
@@ -512,9 +523,7 @@ const faqCategories: FAQCategory[] = [
             <Link href="/genai/prompt-registry">prompt management</Link>,{" "}
             <Link href="/genai/ai-gateway">AI Gateway</Link>,{" "}
             <Link href="/genai/human-feedback">human feedback</Link>, and{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "deployment/"}>
-              agent serving
-            </Link>
+            <Link href={MLFLOW_GENAI_DOCS_URL + "serving/"}>agent serving</Link>
             . Unlike proprietary alternatives, MLflow supports any LLM provider
             and{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/integrations/"}>
@@ -677,7 +686,10 @@ const faqCategories: FAQCategory[] = [
             depends on your requirements. MLflow is the leading open source
             option, offering 70+{" "}
             <Link
-              href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/built-in-scorers"}
+              href={
+                MLFLOW_GENAI_DOCS_URL +
+                "eval-monitor/scorers/llm-judge/predefined"
+              }
             >
               built-in LLM judges
             </Link>
