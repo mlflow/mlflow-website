@@ -1,4 +1,5 @@
 import Head from "@docusaurus/Head";
+import Link from "@docusaurus/Link";
 import {
   Layout,
   AboveTheFold,
@@ -153,20 +154,45 @@ for version in [agent_v1, agent_v2]:
   },
 ];
 
+const SEO_TITLE = "Agent & LLM Evaluation | MLflow AI Platform";
+const SEO_DESCRIPTION =
+  "Evaluate AI agent and LLM quality with MLflow's AI Engineering Platform. LLM judges, custom metrics, human feedback, and side-by-side version comparison.";
+
 export default function Evaluations() {
   return (
     <Layout>
       <Head>
-        <title>Agent Evaluation | MLflow</title>
+        <title>{SEO_TITLE}</title>
+        <meta name="description" content={SEO_DESCRIPTION} />
+        <meta property="og:title" content={SEO_TITLE} />
+        <meta property="og:description" content={SEO_DESCRIPTION} />
+        <meta property="og:type" content="website" />
+        <meta
+          property="og:url"
+          content="https://mlflow.org/genai/evaluations"
+        />
+        <link rel="canonical" href="https://mlflow.org/genai/evaluations" />
       </Head>
       <AboveTheFold
         sectionLabel="Evaluations"
         title="Agent Evaluation"
-        body="Confidently evaluate quality in development and production to identify issues and iteratively test improvements."
+        body={
+          <>
+            Confidently{" "}
+            <Link
+              to="/llm-evaluation"
+              className="text-blue-400 !underline decoration-blue-400/50 underline-offset-2 hover:text-blue-300 hover:decoration-blue-300/50 transition-colors"
+            >
+              evaluate
+            </Link>{" "}
+            quality in development and production to identify issues and
+            iteratively test improvements.
+          </>
+        }
         hasGetStartedButton={`${MLFLOW_GENAI_DOCS_URL}eval-monitor/quickstart/`}
         minHeight="none"
       >
-        <HeroImage src={CardHero} alt="" />
+        <HeroImage src={CardHero} alt="MLflow evaluations screenshot" />
       </AboveTheFold>
 
       <Section

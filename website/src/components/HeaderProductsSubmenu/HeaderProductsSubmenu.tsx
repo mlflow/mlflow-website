@@ -33,7 +33,9 @@ export const HeaderProductsSubmenu = () => {
         <div className={titleContainer()}>
           <Link to="/genai">
             <h3 className={title()}>LLMs & Agents</h3>
-            <p className={subtitle()}>The leading open-source agent platform</p>
+            <p className={subtitle()}>
+              The leading open source AI engineering platform
+            </p>
           </Link>
         </div>
         <div className={feature()}>

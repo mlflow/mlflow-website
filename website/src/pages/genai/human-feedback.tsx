@@ -1,3 +1,4 @@
+import Head from "@docusaurus/Head";
 import { MLFLOW_DOCS_URL } from "@site/src/constants";
 import {
   Layout,
@@ -12,51 +13,70 @@ import Card2 from "@site/static/img/GenAI_humanfeedback/GenAI_humanfeedback_2.pn
 import Card3 from "@site/static/img/GenAI_humanfeedback/GenAI_humanfeedback_3.png";
 import Card4 from "@site/static/img/GenAI_humanfeedback/GenAI_humanfeedback_4.png";
 
+const SEO_TITLE = "Human Feedback | MLflow AI Platform";
+const SEO_DESCRIPTION =
+  "Collect and track human feedback with MLflow's AI Engineering Platform. Align LLM judges with expert judgment and debug quality issues with integrated labeling UIs.";
+
 export default function HumanFeedback() {
   return (
-    <Layout>
-      <AboveTheFold
-        sectionLabel="Human feedback"
-        title="Incorporate human insight to understand and improve quality"
-        body={[
-          "Capture domain expert feedback to understand how your app should behave and align your custom LLM-judge metrics with those expert's judgement.",
-          "Capture end user feedback to quickly pinpoint quality issues in production.",
-        ]}
-        hasGetStartedButton={MLFLOW_DOCS_URL}
-      >
-        <HeroImage src={CardHero} alt="" />
-      </AboveTheFold>
+    <>
+      <Head>
+        <title>{SEO_TITLE}</title>
+        <meta name="description" content={SEO_DESCRIPTION} />
+        <meta property="og:title" content={SEO_TITLE} />
+        <meta property="og:description" content={SEO_DESCRIPTION} />
+        <meta property="og:type" content="website" />
+        <meta
+          property="og:url"
+          content="https://mlflow.org/genai/human-feedback"
+        />
+        <link rel="canonical" href="https://mlflow.org/genai/human-feedback" />
+      </Head>
 
-      <StickyGrid
-        cards={[
-          {
-            title: "Intuitive labeling UIs for business users",
-            body: "MLflow's Review App enables busy domain experts to quickly provide feedback on production logs. Share logs for review and use predefined or custom questions.",
-            image: <img src={Card1} alt="" />,
-            // Hybrid animation / product GIF of showing a trace in the trace UI, then animating it to go to the review app, and then seeing the review app in action (provide feedback clicked) and then animation to see it on the trace UI
-          },
-          {
-            title: "Track and visualize feedback",
-            body: "MLflow replaces spreadsheets by attaching expert/user feedback to traces as versioned labels. Visualize this data in MLflow Trace UIs and dashboards to swiftly identify quality issues.",
-            image: <img src={Card2} alt="" />,
-            // Animation of an app executing, producing a trace, having feedback attached to it, and then seeing the feedback in the trace UI
-          },
-          {
-            title: "Capture end-user feedback",
-            body: "MLflow scalable feedback APIs allow you to attach end-user feedback from your deployed app to the source MLflow Trace, so you debug negative feedback with access to the step-by-step execution.",
-            image: <img src={Card3} alt="" />,
-            // Product GIF of a fake production app and then seeing the feedback in the trace UI
-          },
-          {
-            title: "Integrated Chat App",
-            body: "Deploy new app versions to the Review App's chat UI. Domain experts can interact, give instant feedback, and help rapidly assess quality and pinpoint issues.",
-            image: <img src={Card4} alt="" />,
-            // Product GIF of the review app chat mode and then seeing the feedback in the trace UI
-          },
-        ]}
-      />
+      <Layout>
+        <AboveTheFold
+          sectionLabel="Human feedback"
+          title="Incorporate human insight to understand and improve quality"
+          body={[
+            "Capture domain expert feedback to understand how your app should behave and align your custom LLM-judge metrics with those expert's judgement.",
+            "Capture end user feedback to quickly pinpoint quality issues in production.",
+          ]}
+          hasGetStartedButton={MLFLOW_DOCS_URL}
+        >
+          <HeroImage src={CardHero} alt="MLflow human feedback screenshot" />
+        </AboveTheFold>
 
-      <BelowTheFold contentType="genai" />
-    </Layout>
+        <StickyGrid
+          cards={[
+            {
+              title: "Intuitive labeling UIs for business users",
+              body: "MLflow's Review App enables busy domain experts to quickly provide feedback on production logs. Share logs for review and use predefined or custom questions.",
+              image: <img src={Card1} alt="MLflow human feedback screenshot" />,
+              // Hybrid animation / product GIF of showing a trace in the trace UI, then animating it to go to the review app, and then seeing the review app in action (provide feedback clicked) and then animation to see it on the trace UI
+            },
+            {
+              title: "Track and visualize feedback",
+              body: "MLflow replaces spreadsheets by attaching expert/user feedback to traces as versioned labels. Visualize this data in MLflow Trace UIs and dashboards to swiftly identify quality issues.",
+              image: <img src={Card2} alt="MLflow human feedback screenshot" />,
+              // Animation of an app executing, producing a trace, having feedback attached to it, and then seeing the feedback in the trace UI
+            },
+            {
+              title: "Capture end-user feedback",
+              body: "MLflow scalable feedback APIs allow you to attach end-user feedback from your deployed app to the source MLflow Trace, so you debug negative feedback with access to the step-by-step execution.",
+              image: <img src={Card3} alt="MLflow human feedback screenshot" />,
+              // Product GIF of a fake production app and then seeing the feedback in the trace UI
+            },
+            {
+              title: "Integrated Chat App",
+              body: "Deploy new app versions to the Review App's chat UI. Domain experts can interact, give instant feedback, and help rapidly assess quality and pinpoint issues.",
+              image: <img src={Card4} alt="MLflow human feedback screenshot" />,
+              // Product GIF of the review app chat mode and then seeing the feedback in the trace UI
+            },
+          ]}
+        />
+
+        <BelowTheFold contentType="genai" />
+      </Layout>
+    </>
   );
 }

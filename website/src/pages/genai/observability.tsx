@@ -97,11 +97,24 @@ print(f"Total tokens: {total}")`,
   },
 ];
 
+const SEO_TITLE = "LLM & Agent Observability | MLflow AI Platform";
+const SEO_DESCRIPTION =
+  "Debug and monitor AI agents and LLM apps with MLflow's AI Engineering Platform. Full execution traces, quality monitoring, and trend analysis. Supports all frameworks and LLMs.";
+
 export default function Observability() {
   return (
     <Layout>
       <Head>
-        <title>LLM Observability | MLflow</title>
+        <title>{SEO_TITLE}</title>
+        <meta name="description" content={SEO_DESCRIPTION} />
+        <meta property="og:title" content={SEO_TITLE} />
+        <meta property="og:description" content={SEO_DESCRIPTION} />
+        <meta property="og:type" content="website" />
+        <meta
+          property="og:url"
+          content="https://mlflow.org/genai/observability"
+        />
+        <link rel="canonical" href="https://mlflow.org/genai/observability" />
       </Head>
       <AboveTheFold
         sectionLabel="Observability"
@@ -159,8 +172,21 @@ export default function Observability() {
         title="Automatic tracing for your entire stack"
         body={
           <>
-            Auto-trace 50+ LLM providers and agent frameworks with a single line
-            of code. MLflow is{" "}
+            Auto-trace 50+{" "}
+            <Link
+              to="/llmops"
+              className="text-blue-400 !underline decoration-blue-400/50 underline-offset-2 hover:text-blue-300 hover:decoration-blue-300/50 transition-colors"
+            >
+              LLM
+            </Link>{" "}
+            providers and agent frameworks with a single line of code.{" "}
+            <Link
+              to="/llm-tracing"
+              className="text-blue-400 !underline decoration-blue-400/50 underline-offset-2 hover:text-blue-300 hover:decoration-blue-300/50 transition-colors"
+            >
+              LLM tracing
+            </Link>{" "}
+            captures every execution step, and MLflow is{" "}
             <a
               href="https://mlflow.org/docs/latest/genai/tracing/opentelemetry/"
               className="text-blue-400 !underline decoration-blue-400/50 underline-offset-2 hover:text-blue-300 hover:decoration-blue-300/50 transition-colors"

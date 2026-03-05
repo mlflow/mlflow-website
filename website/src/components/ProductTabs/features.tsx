@@ -1,3 +1,4 @@
+import React from "react";
 import TracingTabImg from "@site/static/img/GenAI_home/GenAI_trace_darkmode.png";
 import EvaluationTabImg from "@site/static/img/GenAI_home/GenAI_evaluation_darkmode.png";
 import GatewayTabImg from "@site/static/img/GenAI_home/GenAI_gateway_darkmode.png";
@@ -5,11 +6,12 @@ import PromptTabImg from "@site/static/img/GenAI_home/GenAI_prompts_darkmode.png
 import ExperimentTrackingImg from "@site/static/img/GenAI_home/model_training_darkmode.png";
 import ModelRegistryImg from "@site/static/img/GenAI_home/model_registry_darkmode.png";
 import DeploymentImg from "@site/static/img/GenAI_home/deployment.png";
+import Link from "@docusaurus/Link";
 
 export type Feature = {
   id: string;
   title: string;
-  description: string;
+  description: string | React.ReactElement;
   imageSrc?: string;
   imageZoom?: number;
   imagePosition?: string;
@@ -30,8 +32,26 @@ const llmAgentFeatures: Feature[] = [
   {
     id: "observability",
     title: "Observability",
-    description:
-      "Capture complete traces of your LLM applications and agents to get deep insights into their behavior. Built on OpenTelemetry and supports any LLM provider and agent framework.",
+    description: (
+      <>
+        Capture complete{" "}
+        <Link
+          href="/llm-tracing"
+          className="text-white/90 hover:text-white underline"
+        >
+          traces
+        </Link>{" "}
+        of your LLM applications and agents to get deep{" "}
+        <Link
+          href="/ai-observability"
+          className="text-white/90 hover:text-white underline"
+        >
+          insights
+        </Link>{" "}
+        into their behavior. Built on OpenTelemetry and supports any LLM
+        provider and agent framework.
+      </>
+    ),
     imageSrc: TracingTabImg,
     imageZoom: 160,
     quickstartLink: "https://mlflow.org/docs/latest/genai/tracing/quickstart/",
@@ -53,8 +73,20 @@ response = client.chat.completions.create(
   {
     id: "evaluation",
     title: "Evaluation",
-    description:
-      "Run systematic evaluations, track quality metrics over time, and catch regressions before they reach production. Choose from 50+ built-in metrics and LLM judges, or define your own with highly flexible APIs.",
+    description: (
+      <>
+        Run systematic{" "}
+        <Link
+          href="/llm-evaluation"
+          className="text-white/90 hover:text-white underline"
+        >
+          evaluations
+        </Link>
+        , track quality metrics over time, and catch regressions before they
+        reach production. Choose from 50+ built-in metrics and LLM judges, or
+        define your own with highly flexible APIs.
+      </>
+    ),
     imageSrc: EvaluationTabImg,
     quickstartLink:
       "https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/",
@@ -103,8 +135,20 @@ formatted = prompt.format(num_sentences=2, content="...")`,
   {
     id: "gateway",
     title: "AI Gateway",
-    description:
-      "Unified API gateway for all LLM providers. Route requests, manage rate limits, handle fallbacks, and control costs through a unified OpenAI-compatible interface.",
+    description: (
+      <>
+        Unified API{" "}
+        <Link
+          href="/ai-gateway"
+          className="text-white/90 hover:text-white underline"
+        >
+          gateway
+        </Link>{" "}
+        for all LLM providers. Route requests, manage rate limits, handle
+        fallbacks, and control costs through a unified OpenAI-compatible
+        interface.
+      </>
+    ),
     imageSrc: GatewayTabImg,
     imagePosition: "0% top",
     quickstartLink:

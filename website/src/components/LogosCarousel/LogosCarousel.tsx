@@ -1,5 +1,6 @@
 import useBaseUrl from "@docusaurus/useBaseUrl";
 import { cx } from "class-variance-authority";
+import { motion } from "motion/react";
 
 const images = [
   "/img/companies/databricks.svg",
@@ -25,11 +26,17 @@ export const LogosCarousel = () => {
     />
   ));
   return (
-    <div className="flex overflow-x-hidden [mask-image:_linear-gradient(to_right,_transparent_0,_white_128px,white_calc(100%-128px),_transparent_100%)] w-full max-w-7xl mx-auto p-8">
+    <motion.div
+      className="flex overflow-x-hidden [mask-image:_linear-gradient(to_right,_transparent_0,_white_128px,white_calc(100%-128px),_transparent_100%)] w-full max-w-7xl mx-auto p-8"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6 }}
+    >
       <div className={container}>{items}</div>
       <div className={container} aria-hidden>
         {items}
       </div>
-    </div>
+    </motion.div>
   );
 };

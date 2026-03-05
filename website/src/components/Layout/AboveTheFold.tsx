@@ -14,7 +14,7 @@ type Props = VariantProps<typeof innerWrapper> &
   }>;
 
 const innerWrapper = cva(
-  "flex flex-col justify-center items-center flex-1 gap-6 w-full max-w-5xl mx-auto md:px-4",
+  "flex flex-col justify-center items-center flex-1 gap-6 w-full max-w-6xl mx-auto md:px-4",
   {
     variants: {
       minHeight: {
