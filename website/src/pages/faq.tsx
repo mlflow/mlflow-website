@@ -627,13 +627,9 @@ const faqCategories: FAQCategory[] = [
             and not controlled by a single vendor.
             <br />
             <br />
-            <strong>No per-seat or usage fees:</strong> Use all features (
-            <Link href="/llm-tracing">tracing</Link>,{" "}
-            <Link href="/llm-evaluation">evaluation</Link>,{" "}
-            <Link href="/genai/prompt-registry">prompt management</Link>,{" "}
-            <Link href="/ai-gateway">AI Gateway</Link>,{" "}
-            <Link href="/classical-ml/model-registry">model registry</Link>) for
-            free, including in commercial applications.
+            <strong>No per-seat or usage fees:</strong> Use all features
+            (tracing, evaluation, prompt management, AI Gateway, model
+            registry) for free, including in commercial applications.
             <br />
             <br />
             <strong>Data sovereignty:</strong> Your telemetry data, models, and
