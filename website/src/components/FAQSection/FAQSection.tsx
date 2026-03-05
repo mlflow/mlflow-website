@@ -12,7 +12,14 @@ const faqs: { question: string; answer: ReactNode }[] = [
         MLflow is the largest{" "}
         <strong>open source AI engineering platform</strong>. MLflow enables
         teams of all sizes to debug, evaluate, monitor, and optimize
-        production-quality AI agents, LLM applications, and{" "}
+        production-quality{" "}
+        <Link
+          to="/genai"
+          className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
+        >
+          AI agents, LLM applications
+        </Link>
+        , and{" "}
         <Link
           to="/classical-ml"
           className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
