@@ -8,7 +8,7 @@ import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE =
-  "AI Monitoring, LLM Monitoring & Agent Monitoring | MLflow AI Platform";
+  "AI Monitoring for LLMs & Agents | MLflow AI Platform";
 const SEO_DESCRIPTION =
   "AI monitoring continuously evaluates agent and LLM application quality, detects drift, and controls costs. Monitor with MLflow's open-source AI platform.";
 
@@ -691,7 +691,7 @@ export default function AiMonitoring() {
         <Header />
 
         <div className="article-container">
-          <h1>AI Monitoring, LLM Monitoring, and Agent Monitoring</h1>
+          <h1>AI Monitoring for LLMs and Agents</h1>
 
           <p>
             Production monitoring for agents and LLM applications goes beyond
