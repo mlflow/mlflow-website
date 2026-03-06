@@ -818,9 +818,6 @@ export default function PromptOptimization() {
               <Link href="/llmops">LLMOps Guide</Link>
             </li>
             <li>
-              <Link href="/aiops">AIOps Guide</Link>
-            </li>
-            <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>
             </li>
           </ul>
