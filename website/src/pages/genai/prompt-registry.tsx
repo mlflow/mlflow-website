@@ -60,8 +60,12 @@ export default function PromptRegistryVersioning() {
               ),
             },
             {
-              title: "Evaluate Prompts",
-              body: "Set up evaluation experiments, compare different prompt versions, analyze results, and select the most effective prompts.",
+              title: "Evaluate & Optimize Prompts",
+              body: "Set up evaluation experiments, compare different prompt versions, analyze results, and automatically improve prompts with algorithmic prompt optimization.",
+              cta: {
+                href: "/prompt-optimization",
+                text: "Learn about prompt optimization",
+              },
               image: (
                 <img src={Card3} alt="MLflow prompt registry screenshot" />
               ),

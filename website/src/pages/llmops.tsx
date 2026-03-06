@@ -643,8 +643,9 @@ export default function LLMOps() {
                   Prompt registries
                 </Link>{" "}
                 provide version control, A/B testing, and rollback capabilities
-                for prompt templates, bringing Git-like rigor to prompt
-                engineering.
+                for prompt templates, and{" "}
+                <Link href="/prompt-optimization">prompt optimization</Link>{" "}
+                automates improvement using training data.
               </p>
             </div>
 
@@ -772,7 +773,8 @@ export default function LLMOps() {
                 Prompt Management
               </Link>
               : Version-control prompt templates, track which versions are in
-              production, and enable safe rollbacks when quality degrades.
+              production, enable safe rollbacks when quality degrades, and run{" "}
+              <Link href="/prompt-optimization">automated optimization</Link>.
             </li>
             <li>
               <Link
