@@ -524,11 +524,11 @@ export default function PromptOptimization() {
             and eyeballing a few outputs, an optimizer tests the prompt against
             hundreds of examples, uses an LLM to figure out what went wrong,
             rewrites the prompt to fix those problems, and repeats. Leading
-            optimizers like <a href="https://arxiv.org/abs/2506.04218">GEPA</a>,{" "}
-            <a href="https://arxiv.org/abs/2406.11695">MIPROv2</a>,{" "}
-            <a href="https://arxiv.org/abs/2410.07131">SIMBA</a>, and{" "}
-            <a href="https://dspy.ai/">DSPy</a> all follow this same four-step
-            cycle:
+            optimizers like <a href="https://github.com/gepa-ai/gepa">GEPA</a>,{" "}
+            <a href="https://dspy.ai/api/optimizers/MIPROv2/">MIPROv2</a>,{" "}
+            <a href="https://dspy.ai/api/optimizers/SIMBA/">SIMBA</a>, and{" "}
+            <a href="https://github.com/stanfordnlp/dspy">DSPy</a> all follow
+            this same four-step cycle:
           </p>
 
           <DAGLoop
