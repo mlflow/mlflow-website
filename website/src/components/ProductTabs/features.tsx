@@ -113,11 +113,17 @@ results = mlflow.genai.evaluate(
     title: "Prompts & Optimization",
     description: (
       <>
-        Version, test, and deploy prompts with full lineage tracking.
-        Automatically{" "}
+        Version, test, and deploy{" "}
         <Link
-          to="/prompt-optimization"
-          style={{ color: "inherit", textDecoration: "none" }}
+          href="/prompt-registry"
+          className="text-white/90 hover:text-white underline"
+        >
+          prompts
+        </Link>{" "}
+        with full lineage tracking. Automatically{" "}
+        <Link
+          href="/prompt-optimization"
+          className="text-white/90 hover:text-white underline"
         >
           optimize prompts
         </Link>{" "}

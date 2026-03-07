@@ -536,8 +536,7 @@ export default function AIObservability() {
             different outputs depending on model state, retrieved context, and
             multi-step agent reasoning. This makes traditional logging and
             monitoring insufficient. AI observability captures the full
-            execution context (
-            <Link href={MLFLOW_GENAI_DOCS_URL + "prompts/"}>prompts</Link>,
+            execution context (<Link href="/prompt-registry">prompts</Link>,
             model responses,{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>tool calls</Link>,
             retrieval results, and{" "}
@@ -674,8 +673,9 @@ export default function AIObservability() {
             best results, identify expensive or slow queries, and detect quality
             regressions when models are updated. By tracing every LLM call with
             full context (system prompts, user messages, temperature settings,
-            token counts), you can debug hallucinations, optimize prompt
-            templates, and track costs across different models and use cases.
+            token counts), you can debug hallucinations, optimize{" "}
+            <Link href="/prompt-registry">prompt templates</Link>, and track
+            costs across different models and use cases.
           </p>
 
           <p>
