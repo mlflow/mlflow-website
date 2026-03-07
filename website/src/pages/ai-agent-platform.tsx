@@ -1,10 +1,13 @@
-import React, { useState } from "react";
-import Layout from "@theme/Layout";
+import { useState } from "react";
 import Head from "@docusaurus/Head";
 import Link from "@docusaurus/Link";
 import { Highlight } from "prism-react-renderer";
-import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
+import { Header } from "../components/Header/Header";
+import { SocialLinksFooter } from "../components/SocialLinksFooter/SocialLinksFooter";
+import { ArticleSidebar } from "../components/ArticleSidebar/ArticleSidebar";
+import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
+import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE = "AI Platform for LLM Apps & Agents | MLflow Agent Platform";
 const SEO_DESCRIPTION =
@@ -28,17 +31,11 @@ const faqs: {
         operating autonomous AI agents. Agents use LLMs to reason, plan, and
         execute multi-step tasks by calling tools and APIs. An agent platform
         provides the infrastructure to{" "}
-        <Link
-          href="https://mlflow.org/docs/latest/genai/tracing/"
-          style={{ color: "#0194e2", fontWeight: "600" }}
-        >
+        <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
           trace agent execution
         </Link>
         ,{" "}
-        <Link
-          href="https://mlflow.org/docs/latest/genai/eval-monitor/"
-          style={{ color: "#0194e2", fontWeight: "600" }}
-        >
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
           evaluate agent quality
         </Link>
         , and monitor agents in production.
@@ -62,37 +59,41 @@ const faqs: {
         single cloud or LLM provider. It integrates with 20+ frameworks
         including{" "}
         <Link
-          href="https://mlflow.org/docs/latest/genai/tracing/integrations/listing/langchain.html"
-          style={{ color: "#0194e2", fontWeight: "600" }}
+          href={
+            MLFLOW_GENAI_DOCS_URL +
+            "tracing/integrations/listing/langchain.html"
+          }
         >
           LangChain
         </Link>
         ,{" "}
         <Link
-          href="https://mlflow.org/docs/latest/genai/tracing/integrations/listing/langgraph.html"
-          style={{ color: "#0194e2", fontWeight: "600" }}
+          href={
+            MLFLOW_GENAI_DOCS_URL +
+            "tracing/integrations/listing/langgraph.html"
+          }
         >
           LangGraph
         </Link>
         ,{" "}
         <Link
-          href="https://mlflow.org/docs/latest/genai/tracing/integrations/listing/llamaindex.html"
-          style={{ color: "#0194e2", fontWeight: "600" }}
+          href={
+            MLFLOW_GENAI_DOCS_URL +
+            "tracing/integrations/listing/llamaindex.html"
+          }
         >
           LlamaIndex
         </Link>
         , and{" "}
         <Link
-          href="https://mlflow.org/docs/latest/genai/tracing/integrations/listing/crewai.html"
-          style={{ color: "#0194e2", fontWeight: "600" }}
+          href={
+            MLFLOW_GENAI_DOCS_URL + "tracing/integrations/listing/crewai.html"
+          }
         >
           CrewAI
         </Link>
         , and its{" "}
-        <Link
-          href="https://mlflow.org/docs/latest/genai/tracing/"
-          style={{ color: "#0194e2", fontWeight: "600" }}
-        >
+        <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
           OpenTelemetry-compatible tracing
         </Link>{" "}
         ensures portability.
@@ -112,10 +113,7 @@ const faqs: {
       <>
         Evaluating agents requires measuring quality across multi-step
         workflows, not just individual LLM calls. MLflow's{" "}
-        <Link
-          href="https://mlflow.org/docs/latest/genai/eval-monitor/"
-          style={{ color: "#0194e2", fontWeight: "600" }}
-        >
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
           evaluation framework
         </Link>{" "}
         provides LLM-as-a-judge scorers for metrics like correctness,
@@ -131,17 +129,11 @@ const faqs: {
     question: "Can I use MLflow with any LLM provider?",
     answer: (
       <>
-        Yes. MLflow's{" "}
-        <Link
-          href="/genai/ai-gateway"
-          style={{ color: "#0194e2", fontWeight: "600" }}
-        >
-          AI Gateway
-        </Link>{" "}
-        provides a unified interface for routing requests to OpenAI, Anthropic,
-        Google, Amazon Bedrock, Azure OpenAI, and other providers. You can
-        switch between providers without changing application code, manage API
-        keys centrally, and enforce rate limits and access policies.
+        Yes. MLflow's <Link href="/genai/ai-gateway">AI Gateway</Link> provides
+        a unified interface for routing requests to OpenAI, Anthropic, Google,
+        Amazon Bedrock, Azure OpenAI, and other providers. You can switch
+        between providers without changing application code, manage API keys
+        centrally, and enforce rate limits and access policies.
       </>
     ),
     answerText:
@@ -159,18 +151,12 @@ const faqs: {
       <>
         Production monitoring for AI agents requires continuous evaluation of
         trace data. MLflow lets you{" "}
-        <Link
-          href="https://mlflow.org/docs/latest/genai/tracing/"
-          style={{ color: "#0194e2", fontWeight: "600" }}
-        >
+        <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
           instrument your agents with tracing
         </Link>{" "}
         to capture every LLM call, tool invocation, and decision step. You can
         then apply{" "}
-        <Link
-          href="https://mlflow.org/docs/latest/genai/eval-monitor/"
-          style={{ color: "#0194e2", fontWeight: "600" }}
-        >
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
           automated scorers
         </Link>{" "}
         to production traces to detect quality regressions, track cost and
@@ -186,10 +172,7 @@ const faqs: {
       <>
         MLflow is completely free and open-source under the Apache 2.0 license.
         You can self-host it or use{" "}
-        <Link
-          href="https://databricks.com/product/managed-mlflow"
-          style={{ color: "#0194e2", fontWeight: "600" }}
-        >
+        <Link href="https://databricks.com/product/managed-mlflow">
           managed MLflow on Databricks
         </Link>{" "}
         for a hosted experience. The open-source version includes all core
@@ -207,10 +190,7 @@ const faqs: {
         Getting started takes three steps: install MLflow with{" "}
         <code>pip install mlflow</code>, add one line of tracing to your app,
         and open the MLflow UI to see your traces. See the{" "}
-        <Link
-          href="https://mlflow.org/docs/latest/genai/tracing/quickstart/"
-          style={{ color: "#0194e2", fontWeight: "600" }}
-        >
+        <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/quickstart/"}>
           quickstart guide
         </Link>{" "}
         for a complete walkthrough.
@@ -226,35 +206,42 @@ const faqs: {
         MLflow provides automatic tracing integrations for over 20 frameworks
         and providers, including{" "}
         <Link
-          href="https://mlflow.org/docs/latest/genai/tracing/integrations/listing/langchain.html"
-          style={{ color: "#0194e2", fontWeight: "600" }}
+          href={
+            MLFLOW_GENAI_DOCS_URL +
+            "tracing/integrations/listing/langchain.html"
+          }
         >
           LangChain
         </Link>
         ,{" "}
         <Link
-          href="https://mlflow.org/docs/latest/genai/tracing/integrations/listing/langgraph.html"
-          style={{ color: "#0194e2", fontWeight: "600" }}
+          href={
+            MLFLOW_GENAI_DOCS_URL +
+            "tracing/integrations/listing/langgraph.html"
+          }
         >
           LangGraph
         </Link>
         ,{" "}
         <Link
-          href="https://mlflow.org/docs/latest/genai/tracing/integrations/listing/llamaindex.html"
-          style={{ color: "#0194e2", fontWeight: "600" }}
+          href={
+            MLFLOW_GENAI_DOCS_URL +
+            "tracing/integrations/listing/llamaindex.html"
+          }
         >
           LlamaIndex
         </Link>
         ,{" "}
         <Link
-          href="https://mlflow.org/docs/latest/genai/tracing/integrations/listing/crewai.html"
-          style={{ color: "#0194e2", fontWeight: "600" }}
+          href={
+            MLFLOW_GENAI_DOCS_URL + "tracing/integrations/listing/crewai.html"
+          }
         >
           CrewAI
         </Link>
         , OpenAI, Anthropic, Google Gemini, Amazon Bedrock, and more. Each
         integration captures traces with a single line of code, giving you full
-        visibility into your application&apos;s execution.
+        visibility into your application's execution.
       </>
     ),
     answerText:
@@ -262,7 +249,7 @@ const faqs: {
   },
 ];
 
-const faqSchema = {
+const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
   mainEntity: faqs.map((faq) => ({
@@ -275,7 +262,7 @@ const faqSchema = {
   })),
 };
 
-const productSchema = {
+const softwareJsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: "MLflow",
@@ -286,125 +273,109 @@ const productSchema = {
     price: "0",
     priceCurrency: "USD",
   },
+  description:
+    "Open-source platform for building, evaluating, and deploying LLM apps and AI agents.",
+  url: "https://mlflow.org",
+  license: "https://www.apache.org/licenses/LICENSE-2.0",
 };
 
-const tracingExample = `import mlflow
-from openai import OpenAI
+export default function AIAgentPlatform() {
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
-# Enable tracing with one line
-mlflow.openai.autolog()
-
-client = OpenAI()
-
-# Every call is now traced automatically
-response = client.chat.completions.create(
-    model="gpt-4o-mini",
-    messages=[{"role": "user", "content": "Summarize this document."}],
-)`;
-
-const agentTracingExample = `import mlflow
-from langgraph.graph import StateGraph
-
-# Trace your entire agent workflow
-mlflow.langgraph.autolog()
-
-# Build your agent as usual
-graph = StateGraph(AgentState)
-graph.add_node("planner", planner_node)
-graph.add_node("executor", executor_node)
-graph.add_node("reviewer", reviewer_node)
-
-# Run the agent — every step is captured
-app = graph.compile()
-result = app.invoke({"task": "Research competitor pricing"})`;
-
-const evalExample = `import mlflow
-from mlflow.genai.scorers import Correctness, Hallucination
-
-# Evaluate your agent across a dataset
-results = mlflow.genai.evaluate(
-    data=eval_dataset,
-    predict_fn=my_agent,
-    scorers=[Correctness(), Hallucination()],
-)
-
-# View results in the MLflow UI
-print(results.tables["eval_results"])`;
-
-function CodeBlock({
-  code,
-  language = "python",
-  label,
-}: {
-  code: string;
-  language?: string;
-  label?: string;
-}) {
   return (
     <>
-      {label && (
-        <p style={{ marginTop: "32px", marginBottom: "0px" }}>
-          <strong>{label}</strong>
-        </p>
-      )}
-      <div
-        className="rounded-lg border border-white/10 overflow-hidden"
-        style={{ backgroundColor: CODE_BG, margin: "8px 0" }}
-      >
-        <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
-          <span className="text-xs text-white/50 font-mono">{language}</span>
-          <CopyButton code={code} />
-        </div>
-        <div className="p-3 overflow-x-auto">
-          <Highlight theme={customNightOwl} code={code} language={language}>
-            {({ style, tokens, getLineProps, getTokenProps }) => (
-              <pre
-                className="text-xs font-mono !m-0 !p-0 text-left"
-                style={{ ...style, backgroundColor: "transparent" }}
-              >
-                {tokens.map((line, i) => (
-                  <div key={i} {...getLineProps({ line })}>
-                    {line.map((token, key) => (
-                      <span key={key} {...getTokenProps({ token })} />
-                    ))}
-                  </div>
-                ))}
-              </pre>
-            )}
-          </Highlight>
-        </div>
-      </div>
-    </>
-  );
-}
-
-export default function AIAgentPlatform() {
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
-
-  return (
-    <Layout>
       <Head>
         <title>{SEO_TITLE}</title>
         <meta name="description" content={SEO_DESCRIPTION} />
         <meta property="og:title" content={SEO_TITLE} />
         <meta property="og:description" content={SEO_DESCRIPTION} />
-        <meta property="og:type" content="article" />
+        <meta property="og:type" content="website" />
+        <meta
+          property="og:url"
+          content="https://mlflow.org/ai-agent-platform"
+        />
         <link rel="canonical" href="https://mlflow.org/ai-agent-platform" />
-        <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
+        <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
         <script type="application/ld+json">
-          {JSON.stringify(productSchema)}
+          {JSON.stringify(softwareJsonLd)}
         </script>
-      </Head>
-
-      <div
-        style={{
-          backgroundColor: "#FFFFFF",
-          minHeight: "100vh",
-          fontFamily:
-            "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-        }}
-      >
         <style>{`
+          /* Import MLflow docs fonts */
+          @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+
+          /* Black header */
+          header, nav {
+            background: #000000 !important;
+          }
+
+          body {
+            background: #ffffff;
+            margin: 0;
+            padding: 0;
+            font-family: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          }
+          .article-page {
+            background: #ffffff;
+            min-height: 100vh;
+          }
+          .article-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 24px 100px;
+          }
+          .article-container h1 {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 3rem !important;
+            font-weight: 700 !important;
+            color: #1a1a1a !important;
+            margin: 48px 0 32px 0 !important;
+            line-height: 1.0 !important;
+            letter-spacing: -0.03em !important;
+          }
+          .article-container h2 {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 64px 0 32px 0;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+          }
+          .article-container h3 {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 32px 0 16px 0;
+            line-height: 1.2;
+          }
+          .article-container p {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 16px;
+            color: #3d3d3d;
+            line-height: 1.7;
+            margin: 0 0 24px 0;
+          }
+          .article-container strong {
+            font-weight: 600;
+            color: #1a1a1a;
+          }
+          .article-container a {
+            color: #0194e2 !important;
+            text-decoration: none;
+            transition: all 0.2s ease;
+          }
+          .article-container a:hover {
+            color: #0072b0 !important;
+            text-decoration: underline;
+          }
+          .info-box a {
+            color: #0194e2 !important;
+            font-weight: 500;
+          }
+          .info-box a:hover {
+            color: #0072b0 !important;
+          }
           .article-container ul {
             list-style-type: disc;
             margin: 20px 0;
@@ -418,797 +389,862 @@ export default function AIAgentPlatform() {
             line-height: 1.7;
             margin-bottom: 20px;
             padding-left: 8px;
+            text-wrap: pretty;
           }
-          .article-container h2 {
-            font-size: 32px;
-            font-weight: 700;
-            margin-top: 48px;
-            margin-bottom: 20px;
-            color: #1a1a1a;
-          }
-          .article-container h3 {
-            font-size: 24px;
+          .article-container li a {
             font-weight: 600;
-            margin-top: 36px;
-            margin-bottom: 16px;
-            color: #1a1a1a;
+            color: #0194e2 !important;
           }
-          .article-container p {
-            font-size: 16px;
-            line-height: 1.7;
-            color: #3d3d3d;
-            margin-bottom: 20px;
+          .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin: 40px 0 56px 0;
           }
-          .article-container a {
-            color: #0194e2;
+          .card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 32px;
+            box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.05), 0 0 14px 5px rgba(50, 50, 93, 0.08), 0 0 10px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+          }
+          .card:hover {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+          }
+          .card h3 {
+            font-family: 'DM Sans', sans-serif;
+            margin-top: 0 !important;
+            margin-bottom: 32px !important;
+            font-size: 1.3rem;
             font-weight: 600;
-            text-decoration: none;
+            color: #1a1a1a;
+            line-height: 1.2;
           }
-          .article-container a:hover {
-            text-decoration: underline;
+          .card p {
+            font-family: 'DM Sans', sans-serif;
+            margin-bottom: 14px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #505050;
+          }
+          .card p:last-child {
+            margin-bottom: 0;
           }
           .faq-list {
-            margin: 40px 0;
+            margin: 32px 0;
           }
           .faq-item {
-            border-bottom: 1px solid #e5e7eb;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            background: #ffffff;
+            transition: all 0.2s ease;
+          }
+          .faq-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
           }
           .faq-question {
+            font-family: 'DM Sans', sans-serif;
+            padding: 20px 24px;
+            font-size: 18px;
+            font-weight: 500;
+            color: #1a1a1a;
+            cursor: pointer;
+            background: transparent;
+            border: none;
             width: 100%;
+            text-align: left;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
-            background: none;
-            border: none;
-            font-size: 18px;
-            font-weight: 600;
-            color: #1a1a1a;
-            cursor: pointer;
-            text-align: left;
+            transition: background 0.2s ease;
+          }
+          .faq-question:hover {
+            background: #f9fafb;
+          }
+          .faq-answer {
             font-family: 'DM Sans', sans-serif;
+            padding: 0 24px 20px;
+            font-size: 16px;
+            color: #3d3d3d;
+            line-height: 1.6;
           }
           .faq-chevron {
-            transition: transform 0.3s;
-            color: #6b7280;
+            transition: transform 0.2s ease;
             flex-shrink: 0;
             margin-left: 16px;
+            color: #6b7280;
+            font-size: 12px;
           }
           .faq-chevron.open {
             transform: rotate(180deg);
           }
-          .faq-answer {
-            padding-bottom: 20px;
-            color: #3d3d3d;
-            line-height: 1.7;
-            font-size: 16px;
-          }
-          .faq-answer a {
-            font-weight: 600;
-            color: #0194e2 !important;
-            text-decoration: none;
-          }
-          .faq-answer a:hover {
-            text-decoration: underline;
-          }
-          .quick-nav {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
+          .info-box {
+            background: rgb(238, 249, 253);
+            border: 1px solid rgb(41, 120, 115);
             padding: 20px 24px;
-            margin: 32px 0;
+            margin: 40px 0;
+            border-radius: 5.6px;
           }
-          .quick-nav ul {
-            margin: 8px 0 0 0 !important;
-            padding-left: 0 !important;
-            list-style: none !important;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
+          .info-box p {
+            font-family: 'DM Sans', sans-serif;
+            margin: 0;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #1e293b;
           }
-          .quick-nav li {
-            margin: 0 !important;
-            padding: 0 !important;
+          .article-sidebar {
+            position: fixed;
+            top: 100px;
+            left: calc(50% + 900px / 2 + 48px);
+            width: 280px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
           }
-          .quick-nav a {
-            display: inline-block;
-            padding: 6px 14px;
-            background: #e0f2fe;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #0369a1 !important;
-            text-decoration: none;
+          .article-sidebar .toc-title {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #9ca3af;
+            margin: 0 0 12px 0;
           }
-          .quick-nav a:hover {
-            background: #bae6fd;
+          .article-sidebar ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            border-left: 1px solid #e5e7eb;
+          }
+          .article-sidebar li {
+            margin: 0;
+            padding: 0;
+          }
+          .article-sidebar a {
+            font-family: 'DM Sans', sans-serif;
+            display: block;
+            padding: 8px 0 8px 16px;
+            font-size: 16px;
+            color: #0194e2 !important;
+            text-decoration: none !important;
+            transition: all 0.15s ease;
+            line-height: 1.4;
+          }
+          .article-sidebar a:hover {
+            color: #0072b0 !important;
+          }
+          .article-sidebar .toc-divider {
+            border: none;
+            border-top: 1px solid #e5e7eb;
+            margin: 12px 0 12px 0;
+          }
+          @media (max-width: 1400px) {
+            .article-sidebar {
+              display: none;
+            }
+          }
+          @media (max-width: 768px) {
+            .article-container {
+              padding: 40px 20px 80px;
+            }
+            .article-container h1 {
+              font-size: 36px !important;
+              margin-bottom: 24px !important;
+            }
+            .article-container h2 {
+              font-size: 28px;
+              margin: 40px 0 20px 0;
+            }
+            .grid-2 {
+              grid-template-columns: 1fr;
+              gap: 20px;
+            }
+            .card {
+              padding: 24px;
+            }
+            .faq-question {
+              padding: 18px 20px;
+              font-size: 17px;
+            }
+            .faq-answer {
+              padding: 0 20px 20px;
+              font-size: 16px;
+            }
           }
         `}</style>
+      </Head>
 
-        {/* Hero Section */}
-        <div
-          style={{
-            background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-            padding: "80px 20px 60px",
-            textAlign: "center",
-          }}
-        >
-          <div style={{ maxWidth: "800px", margin: "0 auto" }}>
-            <h1
-              style={{
-                fontSize: "48px",
-                fontWeight: 800,
-                color: "#FFFFFF",
-                lineHeight: 1.2,
-                marginBottom: "20px",
-              }}
-            >
-              AI Platform for LLM Apps and Agents
-            </h1>
-            <p
-              style={{
-                fontSize: "20px",
-                color: "#94a3b8",
-                lineHeight: 1.6,
-                maxWidth: "650px",
-                margin: "0 auto 32px",
-              }}
-            >
-              The open-source agent engineering and ops platform to build,
-              evaluate, and deploy production-quality AI applications.
-            </p>
-            <Link
-              href="https://mlflow.org/docs/latest/genai/"
-              style={{
-                display: "inline-block",
-                padding: "14px 32px",
-                backgroundColor: "#0194e2",
-                color: "#FFFFFF",
-                borderRadius: "8px",
-                fontWeight: 600,
-                fontSize: "16px",
-                textDecoration: "none",
-              }}
-            >
-              Get Started with MLflow
+      <div className="article-page">
+        <Header />
+
+        <div className="article-container">
+          <h1>AI Platform for LLM Apps and Agents</h1>
+
+          <p>
+            An AI platform is an integrated environment for building, testing,
+            deploying, and monitoring AI applications throughout their entire
+            lifecycle. Whether you're building LLM applications with OpenAI or
+            Claude, deploying autonomous agents with LangGraph and CrewAI, or
+            running RAG pipelines with LlamaIndex, an AI platform provides the
+            operational layer you need to ship with confidence. For LLM-powered
+            applications, this operational layer is commonly called an{" "}
+            <a href="#llm-platform">LLM platform</a>. For autonomous agents that
+            reason and take actions, it is called an{" "}
+            <a href="#agent-platform">agent platform</a>.
+          </p>
+
+          <p>
+            MLflow is the leading open-source{" "}
+            <a href="#agent-platform">agent platform</a> used by thousands of
+            teams to move from prototype to production. It provides{" "}
+            <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
+              end-to-end tracing
+            </Link>{" "}
+            for debugging,{" "}
+            <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
+              automated evaluation
+            </Link>{" "}
+            for measuring quality, a{" "}
+            <Link href="/genai/prompt-registry">prompt registry</Link> for
+            managing prompt templates, and an{" "}
+            <Link href="/genai/ai-gateway">AI gateway</Link> for unified access
+            to LLM providers—all open-source and vendor-neutral.
+          </p>
+
+          <p>
+            Unlike traditional software, AI applications are{" "}
+            <strong>non-deterministic</strong>: the same input can produce
+            different outputs depending on model state, retrieved context, and
+            multi-step agent reasoning. This makes traditional logging and
+            monitoring insufficient. An AI platform captures the full execution
+            context (
+            <Link href={MLFLOW_GENAI_DOCS_URL + "prompts/"}>prompts</Link>,
+            model responses,{" "}
+            <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>tool calls</Link>,
+            retrieval results, and{" "}
+            <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>
+              evaluation scores
             </Link>
-          </div>
-        </div>
+            ) so teams can understand the "why" behind every output.
+          </p>
 
-        {/* Article Content */}
-        <div
-          style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 20px" }}
-        >
-          <div
-            className="article-container"
-            style={{ maxWidth: "900px", margin: "0 auto" }}
-          >
-            {/* What is an AI Platform */}
-            <p>
-              An AI platform is an integrated environment for building, testing,
-              deploying, and monitoring AI applications throughout their entire
-              lifecycle. Whether you&apos;re building LLM applications with
-              OpenAI or Claude, deploying autonomous agents with LangGraph and
-              CrewAI, or running RAG pipelines with LlamaIndex, an AI platform
-              provides the operational layer you need to ship with confidence.
-              For LLM-powered applications, this operational layer is commonly
-              called an <a href="#llm-platform">LLM platform</a>. For autonomous
-              agents that reason and take actions, it is called an{" "}
-              <a href="#agent-platform">agent platform</a>.
-            </p>
-            <p>
-              MLflow is the leading open-source{" "}
-              <a href="#agent-platform">agent platform</a> used by thousands of
-              teams to move from prototype to production. It provides{" "}
+          <h2 id="why-ai-platform">Why You Need an AI Platform</h2>
+
+          <p>
+            Building an LLM-powered application or agent is straightforward.
+            Making it production-ready is not. Teams encounter the same
+            challenges once they move past the prototype stage:
+          </p>
+
+          <div className="grid-2">
+            <div className="card">
+              <h3>Debugging is Opaque</h3>
+              <p>
+                <strong>Problem:</strong> LLM applications involve multiple
+                steps—retrieval, reasoning, tool calls, prompt construction—and
+                failures can happen at any point. Without tracing, you cannot
+                see what went wrong or why.
+              </p>
+              <p>
+                <strong>Solution:</strong> End-to-end tracing makes every step
+                visible and debuggable, from initial request to final response.
+              </p>
+            </div>
+
+            <div className="card">
+              <h3>Quality is Hard to Measure</h3>
+              <p>
+                <strong>Problem:</strong> Free-form language output cannot be
+                validated with unit tests. You need specialized evaluation
+                methods to assess correctness, hallucination, and relevance at
+                scale.
+              </p>
+              <p>
+                <strong>Solution:</strong> LLM-as-a-judge evaluation
+                automatically scores every response against quality benchmarks.
+              </p>
+            </div>
+
+            <div className="card">
+              <h3>Prompts Drift Silently</h3>
+              <p>
+                <strong>Problem:</strong> A small change to a system prompt can
+                alter behavior across thousands of interactions. Without version
+                control, regressions go unnoticed.
+              </p>
+              <p>
+                <strong>Solution:</strong> A prompt registry versions, compares,
+                and tracks the impact of prompt changes on quality metrics.
+              </p>
+            </div>
+
+            <div className="card">
+              <h3>Provider Management Grows Complex</h3>
+              <p>
+                <strong>Problem:</strong> Routing requests across OpenAI,
+                Anthropic, Gemini, and Bedrock while managing API keys, rate
+                limits, and fallback logic creates compounding overhead.
+              </p>
+              <p>
+                <strong>Solution:</strong> An AI gateway provides a unified
+                interface for all providers with central key management and
+                fallback routing.
+              </p>
+            </div>
+          </div>
+
+          <h2 id="llm-platform">LLM Platform</h2>
+
+          <p>
+            An LLM platform provides the infrastructure to build and operate
+            applications powered by large language models. This includes
+            chatbots, text summarizers, question-answering systems, and any
+            application that relies on LLM inference as a core component.
+          </p>
+
+          <p>
+            The defining capabilities of an LLM platform are tracing LLM calls
+            (capturing prompts, completions, token counts, and latency),
+            evaluating response quality with automated scorers, managing prompt
+            templates with version control, and providing a gateway layer for
+            routing requests to multiple LLM providers.
+          </p>
+
+          <p>
+            <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
+              MLflow serves as an LLM platform
+            </Link>{" "}
+            with one-line tracing integrations for OpenAI, Anthropic, Google
+            Gemini, Amazon Bedrock, and 20+ other providers. Every LLM call is
+            captured automatically with full input/output data, enabling you to
+            debug issues without reproducing them.
+          </p>
+
+          <h2 id="agent-platform">Agent Platform</h2>
+
+          <p>
+            An agent platform extends the LLM platform with capabilities
+            designed for autonomous AI agents. Agents differ from simple LLM
+            applications because they reason across multiple steps, make
+            decisions, call tools, and maintain state over extended
+            interactions.
+          </p>
+
+          <p>
+            Debugging an agent requires visibility into the full execution
+            graph—not just individual LLM calls, but the planning steps, tool
+            invocations, memory retrievals, and decision branches that led to
+            the final output. An agent platform captures this entire chain and
+            provides tools to evaluate whether the agent's reasoning and actions
+            were correct.
+          </p>
+
+          <p>
+            <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
+              MLflow provides native tracing integrations
+            </Link>{" "}
+            for leading agent frameworks, including{" "}
+            <Link
+              href={
+                MLFLOW_GENAI_DOCS_URL +
+                "tracing/integrations/listing/langgraph.html"
+              }
+            >
+              LangGraph
+            </Link>
+            ,{" "}
+            <Link
+              href={
+                MLFLOW_GENAI_DOCS_URL +
+                "tracing/integrations/listing/crewai.html"
+              }
+            >
+              CrewAI
+            </Link>
+            , AutoGen, and Anthropic's Claude Agent SDK. Each integration
+            captures the complete execution trace—planner calls, tool
+            invocations, intermediate reasoning, and final outputs—with a single
+            line of code.
+          </p>
+
+          <h2 id="key-components">Key Components of an AI Platform</h2>
+
+          <p>A comprehensive AI platform combines six capabilities:</p>
+
+          <ul>
+            <li>
               <Link
-                href="https://mlflow.org/docs/latest/genai/tracing/"
-                style={{ color: "#0194e2", fontWeight: "600" }}
+                href={MLFLOW_GENAI_DOCS_URL + "tracing/"}
+                style={{ color: "#007bff", fontWeight: "600" }}
               >
-                end-to-end tracing
-              </Link>{" "}
-              for debugging,{" "}
+                Tracing
+              </Link>
+              : Capture complete execution traces including prompts, tool calls,
+              retrievals, and responses. MLflow's tracing is
+              OpenTelemetry-compatible and supports 20+ frameworks with one-line
+              auto-instrumentation.
+            </li>
+            <li>
               <Link
-                href="https://mlflow.org/docs/latest/genai/eval-monitor/"
-                style={{ color: "#0194e2", fontWeight: "600" }}
+                href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}
+                style={{ color: "#007bff", fontWeight: "600" }}
               >
-                automated evaluation
+                Evaluation
+              </Link>
+              : Measure quality at scale using{" "}
+              <Link
+                href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/llm-as-judge/"}
+                style={{ color: "#007bff" }}
+              >
+                LLM-as-a-judge scorers
               </Link>{" "}
-              for measuring quality, a{" "}
+              for correctness, hallucination, relevance, toxicity, and custom
+              metrics. Run evaluations on datasets or apply them continuously to
+              production traces.
+            </li>
+            <li>
               <Link
                 href="/genai/prompt-registry"
-                style={{ color: "#0194e2", fontWeight: "600" }}
+                style={{ color: "#007bff", fontWeight: "600" }}
               >
-                prompt registry
-              </Link>{" "}
-              for managing prompt templates, and an{" "}
+                Prompt Registry
+              </Link>
+              : Version, compare, and iterate on prompt templates. Track which
+              prompt versions are used by which application versions and measure
+              the impact of prompt changes on quality.
+            </li>
+            <li>
               <Link
                 href="/genai/ai-gateway"
-                style={{ color: "#0194e2", fontWeight: "600" }}
+                style={{ color: "#007bff", fontWeight: "600" }}
               >
-                AI gateway
-              </Link>{" "}
-              for unified access to LLM providers—all open-source and
-              vendor-neutral.
-            </p>
-
-            {/* Quick Navigation */}
-            <div className="quick-nav">
-              <p style={{ margin: 0, fontWeight: 600, color: "#1a1a1a" }}>
-                Quick Navigation
-              </p>
-              <ul>
-                <li>
-                  <a href="#why-ai-platform">Why You Need an AI Platform</a>
-                </li>
-                <li>
-                  <a href="#llm-platform">LLM Platform</a>
-                </li>
-                <li>
-                  <a href="#agent-platform">Agent Platform</a>
-                </li>
-                <li>
-                  <a href="#key-components">Key Components</a>
-                </li>
-                <li>
-                  <a href="#use-cases">Use Cases</a>
-                </li>
-                <li>
-                  <a href="#how-to-implement">How to Implement</a>
-                </li>
-                <li>
-                  <a href="#open-source-vs-proprietary">
-                    Open Source vs. Proprietary
-                  </a>
-                </li>
-                <li>
-                  <a href="#faq">FAQ</a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Why You Need an AI Platform */}
-            <h2 id="why-ai-platform">Why You Need an AI Platform</h2>
-            <p>
-              Building an LLM-powered application or agent is straightforward.
-              Making it production-ready is not. Teams encounter the same
-              challenges once they move past the prototype stage:
-            </p>
-            <ul>
-              <li>
-                <strong>Debugging is opaque:</strong> LLM applications involve
-                multiple steps—retrieval, reasoning, tool calls, prompt
-                construction—and failures can happen at any point. Without
-                tracing, you cannot see what went wrong or why.
-              </li>
-              <li>
-                <strong>Quality is hard to measure:</strong> Free-form language
-                output cannot be validated with unit tests. You need specialized
-                evaluation methods like LLM-as-a-judge to assess correctness,
-                hallucination, relevance, and safety at scale.
-              </li>
-              <li>
-                <strong>Prompts drift silently:</strong> A small change to a
-                system prompt can alter behavior across thousands of
-                interactions. Without version control for prompts, regressions
-                go unnoticed until users complain.
-              </li>
-              <li>
-                <strong>Provider management grows complex:</strong> Routing
-                requests across OpenAI, Anthropic, Gemini, and Bedrock while
-                managing API keys, rate limits, and fallback logic creates
-                operational overhead that compounds over time.
-              </li>
-              <li>
-                <strong>Production monitoring lacks coverage:</strong> Classical
-                APM tools were not designed for AI workloads. You need
-                AI-specific monitoring that evaluates trace quality, tracks
-                token costs, and surfaces regressions continuously.
-              </li>
-            </ul>
-
-            {/* LLM Platform */}
-            <h2 id="llm-platform">LLM Platform</h2>
-            <p>
-              An LLM platform provides the infrastructure to build and operate
-              applications powered by large language models. This includes
-              chatbots, text summarizers, question-answering systems, and any
-              application that relies on LLM inference as a core component.
-            </p>
-            <p>
-              The defining capabilities of an LLM platform are tracing LLM calls
-              (capturing prompts, completions, token counts, and latency),
-              evaluating response quality with automated scorers, managing
-              prompt templates with version control, and providing a gateway
-              layer for routing requests to multiple LLM providers.
-            </p>
-            <p>
-              MLflow serves as an LLM platform with{" "}
-              <Link
-                href="https://mlflow.org/docs/latest/genai/tracing/"
-                style={{ color: "#0194e2", fontWeight: "600" }}
-              >
-                one-line tracing integrations
-              </Link>{" "}
-              for OpenAI, Anthropic, Google Gemini, Amazon Bedrock, and 20+
-              other providers. Every LLM call is captured automatically with
-              full input/output data, enabling you to debug issues without
-              reproducing them.
-            </p>
-
-            {/* Agent Platform */}
-            <h2 id="agent-platform">Agent Platform</h2>
-            <p>
-              An agent platform extends the LLM platform with capabilities
-              designed for autonomous AI agents. Agents differ from simple LLM
-              applications because they reason across multiple steps, make
-              decisions, call tools, and maintain state over extended
-              interactions.
-            </p>
-            <p>
-              Debugging an agent requires visibility into the full execution
-              graph—not just individual LLM calls, but the planning steps, tool
-              invocations, memory retrievals, and decision branches that led to
-              the final output. An agent platform captures this entire chain and
-              provides tools to evaluate whether the agent&apos;s reasoning and
-              actions were correct.
-            </p>
-            <p>
-              MLflow provides native tracing integrations for leading agent
-              frameworks, including{" "}
-              <Link
-                href="https://mlflow.org/docs/latest/genai/tracing/integrations/listing/langgraph.html"
-                style={{ color: "#0194e2", fontWeight: "600" }}
-              >
-                LangGraph
+                AI Gateway
               </Link>
-              ,{" "}
+              : Route requests to any LLM provider through a unified interface.
+              Manage API keys centrally, enforce rate limits, set fallback
+              routes, and track usage across providers.
+            </li>
+            <li>
               <Link
-                href="https://mlflow.org/docs/latest/genai/tracing/integrations/listing/crewai.html"
-                style={{ color: "#0194e2", fontWeight: "600" }}
+                href={MLFLOW_GENAI_DOCS_URL + "tracing/production-tracing/"}
+                style={{ color: "#007bff", fontWeight: "600" }}
               >
-                CrewAI
+                Production Monitoring
               </Link>
-              , AutoGen, and Anthropic&apos;s Claude Agent SDK. Each integration
-              captures the complete execution trace—planner calls, tool
-              invocations, intermediate reasoning, and final outputs—with a
-              single line of code.
-            </p>
-
-            {/* Key Components */}
-            <h2 id="key-components">Key Components of an AI Platform</h2>
-            <ul>
-              <li>
-                <Link
-                  href="https://mlflow.org/docs/latest/genai/tracing/"
-                  style={{ color: "#0194e2", fontWeight: "600" }}
-                >
-                  Tracing
-                </Link>
-                : Capture complete execution traces including prompts, tool
-                calls, retrievals, and responses. MLflow&apos;s tracing is
-                OpenTelemetry-compatible and supports 20+ frameworks with
-                one-line auto-instrumentation.
-              </li>
-              <li>
-                <Link
-                  href="https://mlflow.org/docs/latest/genai/eval-monitor/"
-                  style={{ color: "#0194e2", fontWeight: "600" }}
-                >
-                  Evaluation
-                </Link>
-                : Measure quality at scale using LLM-as-a-judge scorers for
-                correctness, hallucination, relevance, toxicity, and custom
-                metrics. Run evaluations on datasets or apply them continuously
-                to production traces.
-              </li>
-              <li>
-                <Link
-                  href="/genai/prompt-registry"
-                  style={{ color: "#0194e2", fontWeight: "600" }}
-                >
-                  Prompt Registry
-                </Link>
-                : Version, compare, and iterate on prompt templates. Track which
-                prompt versions are used by which application versions and
-                measure the impact of prompt changes on quality.
-              </li>
-              <li>
-                <Link
-                  href="/genai/ai-gateway"
-                  style={{ color: "#0194e2", fontWeight: "600" }}
-                >
-                  AI Gateway
-                </Link>
-                : Route requests to any LLM provider through a unified
-                interface. Manage API keys centrally, enforce rate limits, set
-                fallback routes, and track usage across providers.
-              </li>
-              <li>
-                <Link
-                  href="https://mlflow.org/docs/latest/genai/tracing/production-tracing/"
-                  style={{ color: "#0194e2", fontWeight: "600" }}
-                >
-                  Production Monitoring
-                </Link>
-                : Apply automated scorers to production traces continuously.
-                Detect quality regressions, track cost and latency trends, and
-                surface issues before users report them.
-              </li>
-              <li>
-                <Link
-                  href="/genai/human-feedback"
-                  style={{ color: "#0194e2", fontWeight: "600" }}
-                >
-                  Human Feedback
-                </Link>
-                : Collect structured feedback from users and reviewers. Annotate
-                traces with quality assessments, build evaluation datasets from
-                real interactions, and close the feedback loop between
-                production and development.
-              </li>
-            </ul>
-
-            {/* Use Cases */}
-            <h2 id="use-cases">Common Use Cases</h2>
-            <ul>
-              <li>
-                <strong>Debugging Agent Failures:</strong> When an autonomous
-                agent takes the wrong action, MLflow&apos;s trace UI shows the
-                complete reasoning chain—which tools were called, what context
-                was retrieved, and where the decision went wrong—enabling rapid
-                root cause analysis.
-              </li>
-              <li>
-                <strong>Evaluating RAG Quality:</strong> For{" "}
-                <Link
-                  href="https://mlflow.org/docs/latest/genai/eval-monitor/"
-                  style={{ color: "#0194e2", fontWeight: "600" }}
-                >
-                  RAG applications
-                </Link>
-                , automated scorers measure whether retrieved documents are
-                relevant, whether the generated answer is faithful to the source
-                material, and whether the response actually addresses the
-                question.
-              </li>
-              <li>
-                <strong>Iterating on Prompts:</strong> The{" "}
-                <Link
-                  href="/genai/prompt-registry"
-                  style={{ color: "#0194e2", fontWeight: "600" }}
-                >
-                  prompt registry
-                </Link>{" "}
-                lets you version prompt templates, compare quality metrics
-                across versions, and roll back to previous prompts if a change
-                causes regressions.
-              </li>
-              <li>
-                <strong>Multi-Provider Cost Optimization:</strong> The{" "}
-                <Link
-                  href="/genai/ai-gateway"
-                  style={{ color: "#0194e2", fontWeight: "600" }}
-                >
-                  AI gateway
-                </Link>{" "}
-                combined with{" "}
-                <Link
-                  href="https://mlflow.org/docs/latest/genai/tracing/token-usage-cost/"
-                  style={{ color: "#0194e2", fontWeight: "600" }}
-                >
-                  cost tracking
-                </Link>{" "}
-                helps you route requests to the most cost-effective provider for
-                each use case while monitoring quality to ensure cheaper models
-                meet your standards.
-              </li>
-              <li>
-                <strong>Continuous Quality Monitoring:</strong> Apply scorers to
-                every production trace to detect quality drift, hallucination
-                spikes, or latency increases. Set up alerts based on score
-                thresholds to catch regressions early.
-              </li>
-              <li>
-                <strong>Safety and Governance:</strong> Use{" "}
-                <Link
-                  href="https://mlflow.org/docs/latest/genai/guides/responsible-ai/"
-                  style={{ color: "#0194e2", fontWeight: "600" }}
-                >
-                  responsible AI guardrails
-                </Link>{" "}
-                to detect and filter toxic, biased, or personally identifiable
-                content in both inputs and outputs across your entire AI stack.
-              </li>
-            </ul>
-
-            {/* How to Implement */}
-            <h2 id="how-to-implement">
-              How to Implement an AI Platform with MLflow
-            </h2>
-            <p>
-              MLflow makes it straightforward to add platform-level capabilities
-              to any LLM application or agent. Here are examples for common
-              scenarios.
-            </p>
-
-            <CodeBlock
-              label="Trace an LLM application (OpenAI)"
-              code={tracingExample}
-            />
-
-            <CodeBlock
-              label="Trace a multi-step agent (LangGraph)"
-              code={agentTracingExample}
-            />
-
-            <CodeBlock label="Evaluate agent quality" code={evalExample} />
-
-            <p style={{ marginTop: "32px" }}>
-              Check out the{" "}
+              : Apply automated scorers to production traces continuously.
+              Detect quality regressions, track cost and latency trends, and
+              surface issues before users report them.
+            </li>
+            <li>
               <Link
-                href="https://mlflow.org/docs/latest/genai/tracing/integrations/"
-                style={{ color: "#0194e2", fontWeight: "600" }}
+                href="/genai/human-feedback"
+                style={{ color: "#007bff", fontWeight: "600" }}
               >
-                MLflow tracing integrations documentation
+                Human Feedback
+              </Link>
+              : Collect structured feedback from users and reviewers. Annotate
+              traces with quality assessments, build evaluation datasets from
+              real interactions, and close the feedback loop between production
+              and development.
+            </li>
+          </ul>
+
+          <h2 id="use-cases">Common Use Cases</h2>
+
+          <p>
+            AI platforms solve real-world problems across the AI development
+            lifecycle:
+          </p>
+
+          <ul>
+            <li>
+              <strong>Debugging Agent Failures:</strong> When an autonomous
+              agent takes the wrong action, MLflow's trace UI shows the complete
+              reasoning chain—which tools were called, what context was
+              retrieved, and where the decision went wrong—enabling rapid root
+              cause analysis.
+            </li>
+            <li>
+              <strong>Evaluating RAG Quality:</strong> For{" "}
+              <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
+                RAG applications
+              </Link>
+              , automated scorers measure whether retrieved documents are
+              relevant, whether the generated answer is faithful to the source
+              material, and whether the response actually addresses the
+              question.
+            </li>
+            <li>
+              <strong>Iterating on Prompts:</strong> The{" "}
+              <Link href="/genai/prompt-registry">prompt registry</Link> lets
+              you version prompt templates, compare quality metrics across
+              versions, and roll back to previous prompts if a change causes
+              regressions.
+            </li>
+            <li>
+              <strong>Multi-Provider Cost Optimization:</strong> The{" "}
+              <Link href="/genai/ai-gateway">AI gateway</Link> combined with{" "}
+              <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/token-usage-cost/"}>
+                cost tracking
               </Link>{" "}
-              for examples with LangChain, LangGraph, LlamaIndex, CrewAI,
-              Anthropic, Vercel AI SDK, and other frameworks.
-            </p>
+              helps you route requests to the most cost-effective provider for
+              each use case while monitoring quality to ensure cheaper models
+              meet your standards.
+            </li>
+            <li>
+              <strong>Continuous Quality Monitoring:</strong> Apply scorers to
+              every production trace to detect quality drift, hallucination
+              spikes, or latency increases. Set up alerts based on score
+              thresholds to catch regressions early.
+            </li>
+            <li>
+              <strong>Safety and Governance:</strong> Use{" "}
+              <Link href={MLFLOW_GENAI_DOCS_URL + "guides/responsible-ai/"}>
+                responsible AI guardrails
+              </Link>{" "}
+              to detect and filter toxic, biased, or personally identifiable
+              content in both inputs and outputs across your entire AI stack.
+            </li>
+          </ul>
 
-            {/* Open Source vs. Proprietary */}
-            <h2 id="open-source-vs-proprietary">
-              Open Source vs. Proprietary AI Platforms
-            </h2>
-            <p>
-              Choosing between open-source and proprietary AI platforms involves
-              trade-offs across cost, flexibility, and operational burden. Here
-              is how they compare:
-            </p>
-            <div
-              style={{
-                overflowX: "auto",
-                margin: "24px 0",
-                border: "1px solid #e5e7eb",
-                borderRadius: "8px",
-              }}
-            >
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  fontSize: "15px",
-                }}
-              >
-                <thead>
-                  <tr style={{ backgroundColor: "#f8fafc" }}>
-                    <th
-                      style={{
-                        padding: "14px 16px",
-                        textAlign: "left",
-                        fontWeight: 600,
-                        borderBottom: "2px solid #e5e7eb",
-                      }}
-                    >
-                      Criteria
-                    </th>
-                    <th
-                      style={{
-                        padding: "14px 16px",
-                        textAlign: "left",
-                        fontWeight: 600,
-                        borderBottom: "2px solid #e5e7eb",
-                      }}
-                    >
-                      Open Source (MLflow)
-                    </th>
-                    <th
-                      style={{
-                        padding: "14px 16px",
-                        textAlign: "left",
-                        fontWeight: 600,
-                        borderBottom: "2px solid #e5e7eb",
-                      }}
-                    >
-                      Proprietary Platforms
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    [
-                      "Cost",
-                      "Free, Apache 2.0 license",
-                      "Subscription or usage-based pricing",
-                    ],
-                    [
-                      "Data Ownership",
-                      "Full ownership, self-hosted",
-                      "Data stored on vendor infrastructure",
-                    ],
-                    [
-                      "Vendor Lock-in",
-                      "None—OpenTelemetry-compatible",
-                      "Tied to vendor format and tooling",
-                    ],
-                    [
-                      "Customization",
-                      "Full access to source code",
-                      "Limited to vendor-provided options",
-                    ],
-                    [
-                      "Framework Support",
-                      "20+ integrations, extensible",
-                      "Varies by vendor",
-                    ],
-                    [
-                      "Managed Option",
-                      "Available via Databricks",
-                      "Built-in hosted offering",
-                    ],
-                    [
-                      "Community",
-                      "20M+ downloads/month, active contributors",
-                      "Vendor-controlled development",
-                    ],
-                  ].map((row, i) => (
-                    <tr
-                      key={i}
-                      style={{
-                        borderBottom: "1px solid #e5e7eb",
-                      }}
-                    >
-                      <td
-                        style={{
-                          padding: "12px 16px",
-                          fontWeight: 600,
-                          color: "#1a1a1a",
-                        }}
-                      >
-                        {row[0]}
-                      </td>
-                      <td style={{ padding: "12px 16px", color: "#3d3d3d" }}>
-                        {row[1]}
-                      </td>
-                      <td style={{ padding: "12px 16px", color: "#3d3d3d" }}>
-                        {row[2]}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <h2 id="how-to-implement">
+            How to Implement an AI Platform with MLflow
+          </h2>
+
+          <p>
+            MLflow makes it straightforward to add platform-level capabilities
+            to any LLM application or agent. Here are examples for common
+            scenarios. Check out the{" "}
+            <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/integrations/"}>
+              MLflow tracing integrations documentation
+            </Link>{" "}
+            for examples with LangChain, LangGraph, LlamaIndex, CrewAI,
+            Anthropic, Vercel AI SDK, and other frameworks.
+          </p>
+
+          <p style={{ marginTop: "32px", marginBottom: "0px" }}>
+            <strong>Trace an LLM application (OpenAI)</strong>
+          </p>
+
+          <div
+            className="rounded-lg border border-white/10 overflow-hidden"
+            style={{ backgroundColor: CODE_BG, margin: "8px 0" }}
+          >
+            <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
+              <span className="text-xs text-white/50 font-mono">python</span>
+              <CopyButton
+                code={`import mlflow
+from openai import OpenAI
+
+# Enable tracing with one line
+mlflow.openai.autolog()
+
+client = OpenAI()
+
+# Every call is now traced automatically
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": "Summarize this document."}],
+)`}
+              />
             </div>
+            <div className="p-3 overflow-x-auto">
+              <Highlight
+                theme={customNightOwl}
+                code={`import mlflow
+from openai import OpenAI
 
-            {/* Related Resources */}
-            <h2 id="resources">Related Resources</h2>
-            <ul>
-              <li>
-                <Link
-                  href="https://mlflow.org/docs/latest/genai/"
-                  style={{ color: "#0194e2", fontWeight: "600" }}
-                >
-                  MLflow GenAI Documentation
-                </Link>
-                : Complete reference for all GenAI capabilities
-              </li>
-              <li>
-                <Link
-                  href="https://mlflow.org/docs/latest/genai/tracing/quickstart/"
-                  style={{ color: "#0194e2", fontWeight: "600" }}
-                >
-                  Tracing Quickstart
-                </Link>
-                : Get tracing running in under five minutes
-              </li>
-              <li>
-                <Link
-                  href="https://mlflow.org/docs/latest/genai/eval-monitor/"
-                  style={{ color: "#0194e2", fontWeight: "600" }}
-                >
-                  Evaluation and Monitoring Guide
-                </Link>
-                : Set up automated quality measurement
-              </li>
-              <li>
-                <Link
-                  href="/genai/observability"
-                  style={{ color: "#0194e2", fontWeight: "600" }}
-                >
-                  Observability Overview
-                </Link>
-                : Deep dive into MLflow&apos;s observability capabilities
-              </li>
-              <li>
-                <Link
-                  href="/genai/evaluations"
-                  style={{ color: "#0194e2", fontWeight: "600" }}
-                >
-                  Evaluations Overview
-                </Link>
-                : Explore MLflow&apos;s evaluation framework
-              </li>
-              <li>
-                <Link
-                  href="https://mlflow.org/docs/latest/genai/tracing/integrations/"
-                  style={{ color: "#0194e2", fontWeight: "600" }}
-                >
-                  Framework Integrations
-                </Link>
-                : LangChain, LangGraph, LlamaIndex, CrewAI, and more
-              </li>
-            </ul>
+# Enable tracing with one line
+mlflow.openai.autolog()
 
-            {/* FAQ */}
-            <h2 id="faq">Frequently Asked Questions</h2>
-            <div className="faq-list">
-              {faqs.map((faq, index) => (
-                <div key={index} className="faq-item">
-                  <button
-                    className="faq-question"
-                    onClick={() =>
-                      setOpenFaqIndex(openFaqIndex === index ? null : index)
-                    }
+client = OpenAI()
+
+# Every call is now traced automatically
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": "Summarize this document."}],
+)`}
+                language="python"
+              >
+                {({ style, tokens, getLineProps, getTokenProps }) => (
+                  <pre
+                    className="text-xs font-mono !m-0 !p-0 text-left"
+                    style={{
+                      ...style,
+                      backgroundColor: "transparent",
+                    }}
                   >
-                    <span>{faq.question}</span>
-                    <span
-                      className={`faq-chevron ${openFaqIndex === index ? "open" : ""}`}
-                    >
-                      &#9660;
-                    </span>
-                  </button>
-                  {openFaqIndex === index && (
-                    <div className="faq-answer">{faq.answer}</div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {/* Footer CTA */}
-            <div
-              style={{
-                textAlign: "center",
-                padding: "48px 0",
-                marginTop: "40px",
-                borderTop: "1px solid #e5e7eb",
-              }}
-            >
-              <h2
-                style={{
-                  fontSize: "28px",
-                  fontWeight: 700,
-                  color: "#1a1a1a",
-                  marginBottom: "16px",
-                }}
-              >
-                Start Building with MLflow
-              </h2>
-              <p
-                style={{
-                  fontSize: "16px",
-                  color: "#6b7280",
-                  marginBottom: "24px",
-                }}
-              >
-                Add tracing to your AI application in under five minutes.
-              </p>
-              <Link
-                href="https://mlflow.org/docs/latest/genai/tracing/quickstart/"
-                style={{
-                  display: "inline-block",
-                  padding: "14px 32px",
-                  backgroundColor: "#0194e2",
-                  color: "#FFFFFF",
-                  borderRadius: "8px",
-                  fontWeight: 600,
-                  fontSize: "16px",
-                  textDecoration: "none",
-                }}
-              >
-                Get Started
-              </Link>
+                    {tokens.map((line, i) => (
+                      <div key={i} {...getLineProps({ line })}>
+                        {line.map((token, key) => (
+                          <span key={key} {...getTokenProps({ token })} />
+                        ))}
+                      </div>
+                    ))}
+                  </pre>
+                )}
+              </Highlight>
             </div>
           </div>
+
+          <p style={{ marginTop: "32px", marginBottom: "0px" }}>
+            <strong>Trace a multi-step agent (LangGraph)</strong>
+          </p>
+
+          <div
+            className="rounded-lg border border-white/10 overflow-hidden"
+            style={{ backgroundColor: CODE_BG, margin: "8px 0" }}
+          >
+            <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
+              <span className="text-xs text-white/50 font-mono">python</span>
+              <CopyButton
+                code={`import mlflow
+from langgraph.graph import StateGraph
+
+# Trace your entire agent workflow
+mlflow.langgraph.autolog()
+
+# Build your agent as usual
+graph = StateGraph(AgentState)
+graph.add_node("planner", planner_node)
+graph.add_node("executor", executor_node)
+graph.add_node("reviewer", reviewer_node)
+
+# Run the agent — every step is captured
+app = graph.compile()
+result = app.invoke({"task": "Research competitor pricing"})`}
+              />
+            </div>
+            <div className="p-3 overflow-x-auto">
+              <Highlight
+                theme={customNightOwl}
+                code={`import mlflow
+from langgraph.graph import StateGraph
+
+# Trace your entire agent workflow
+mlflow.langgraph.autolog()
+
+# Build your agent as usual
+graph = StateGraph(AgentState)
+graph.add_node("planner", planner_node)
+graph.add_node("executor", executor_node)
+graph.add_node("reviewer", reviewer_node)
+
+# Run the agent — every step is captured
+app = graph.compile()
+result = app.invoke({"task": "Research competitor pricing"})`}
+                language="python"
+              >
+                {({ style, tokens, getLineProps, getTokenProps }) => (
+                  <pre
+                    className="text-xs font-mono !m-0 !p-0 text-left"
+                    style={{
+                      ...style,
+                      backgroundColor: "transparent",
+                    }}
+                  >
+                    {tokens.map((line, i) => (
+                      <div key={i} {...getLineProps({ line })}>
+                        {line.map((token, key) => (
+                          <span key={key} {...getTokenProps({ token })} />
+                        ))}
+                      </div>
+                    ))}
+                  </pre>
+                )}
+              </Highlight>
+            </div>
+          </div>
+
+          <p style={{ marginTop: "32px", marginBottom: "0px" }}>
+            <strong>Evaluate agent quality</strong>
+          </p>
+
+          <div
+            className="rounded-lg border border-white/10 overflow-hidden"
+            style={{ backgroundColor: CODE_BG, margin: "8px 0" }}
+          >
+            <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
+              <span className="text-xs text-white/50 font-mono">python</span>
+              <CopyButton
+                code={`import mlflow
+from mlflow.genai.scorers import Correctness, Hallucination
+
+# Evaluate your agent across a dataset
+results = mlflow.genai.evaluate(
+    data=eval_dataset,
+    predict_fn=my_agent,
+    scorers=[Correctness(), Hallucination()],
+)
+
+# View results in the MLflow UI
+print(results.tables["eval_results"])`}
+              />
+            </div>
+            <div className="p-3 overflow-x-auto">
+              <Highlight
+                theme={customNightOwl}
+                code={`import mlflow
+from mlflow.genai.scorers import Correctness, Hallucination
+
+# Evaluate your agent across a dataset
+results = mlflow.genai.evaluate(
+    data=eval_dataset,
+    predict_fn=my_agent,
+    scorers=[Correctness(), Hallucination()],
+)
+
+# View results in the MLflow UI
+print(results.tables["eval_results"])`}
+                language="python"
+              >
+                {({ style, tokens, getLineProps, getTokenProps }) => (
+                  <pre
+                    className="text-xs font-mono !m-0 !p-0 text-left"
+                    style={{
+                      ...style,
+                      backgroundColor: "transparent",
+                    }}
+                  >
+                    {tokens.map((line, i) => (
+                      <div key={i} {...getLineProps({ line })}>
+                        {line.map((token, key) => (
+                          <span key={key} {...getTokenProps({ token })} />
+                        ))}
+                      </div>
+                    ))}
+                  </pre>
+                )}
+              </Highlight>
+            </div>
+          </div>
+
+          <div className="info-box">
+            <p>
+              <Link href="/genai" style={{ color: "#007bff" }}>
+                <strong>MLflow</strong>
+              </Link>{" "}
+              is the largest open-source{" "}
+              <strong>AI engineering platform</strong>, with over 30 million
+              monthly downloads. Thousands of organizations use MLflow to build,
+              evaluate, deploy, and monitor production-quality AI agents and LLM
+              applications while controlling costs and managing access to models
+              and data. Backed by the Linux Foundation and licensed under Apache
+              2.0, MLflow provides a complete AI platform with no vendor
+              lock-in.{" "}
+              <Link href={MLFLOW_GENAI_DOCS_URL}>Get started &#8594;</Link>
+            </p>
+          </div>
+
+          <h2 id="open-source-vs-proprietary">
+            Open Source vs. Proprietary AI Platforms
+          </h2>
+
+          <p>
+            When choosing an AI platform, the decision between open source and
+            proprietary SaaS tools has significant long-term implications for
+            your team, infrastructure, and data ownership.
+          </p>
+
+          <p>
+            <strong>
+              Open Source (<Link href="/genai">MLflow</Link>):
+            </strong>{" "}
+            With MLflow, you maintain complete control over your platform
+            infrastructure and data. Deploy on your own infrastructure or use
+            managed versions on Databricks, AWS, or other platforms. There are
+            no per-seat fees, no usage limits, and no vendor lock-in. Your
+            telemetry data stays under your control, and you can customize the
+            platform to your exact needs. MLflow integrates with any LLM
+            provider and agent framework through OpenTelemetry-compatible
+            tracing, supports 20+ framework integrations out of the box, and has
+            an active community with over 20 million monthly downloads.
+          </p>
+
+          <p>
+            <strong>Proprietary SaaS Platforms:</strong> Commercial AI platforms
+            offer convenience but at the cost of flexibility and control. They
+            typically charge per seat or per trace volume, which can become
+            expensive at scale. Your data is sent to their servers, raising
+            privacy and compliance concerns. You're locked into their ecosystem,
+            making it difficult to switch providers or customize functionality.
+            Most proprietary platforms only support a subset of LLM providers
+            and frameworks, and their development roadmap is controlled by the
+            vendor rather than the community.
+          </p>
+
+          <p>
+            <strong>Why Teams Choose Open Source:</strong> Organizations
+            building production AI applications increasingly choose MLflow
+            because it offers enterprise-grade platform capabilities without
+            compromising on data sovereignty, cost predictability, or
+            flexibility. The Apache 2.0 license and Linux Foundation backing
+            ensure MLflow remains truly open and community-driven, not
+            controlled by a single vendor.
+          </p>
+
+          <h2 id="faq">Frequently Asked Questions</h2>
+
+          <div className="faq-list">
+            {faqs.map((faq, index) => (
+              <div key={index} className="faq-item">
+                <button
+                  className="faq-question"
+                  onClick={() =>
+                    setOpenFaqIndex(openFaqIndex === index ? null : index)
+                  }
+                >
+                  <span>{faq.question}</span>
+                  <span
+                    className={`faq-chevron ${openFaqIndex === index ? "open" : ""}`}
+                  >
+                    &#9660;
+                  </span>
+                </button>
+                {openFaqIndex === index && (
+                  <div className="faq-answer">{faq.answer}</div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <h2>Related Resources</h2>
+
+          <ul>
+            <li>
+              <Link href={MLFLOW_GENAI_DOCS_URL}>
+                MLflow GenAI Documentation
+              </Link>
+            </li>
+            <li>
+              <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/quickstart/"}>
+                Tracing Quickstart
+              </Link>
+            </li>
+            <li>
+              <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
+                Evaluation and Monitoring Guide
+              </Link>
+            </li>
+            <li>
+              <Link href="/ai-observability">AI Observability Overview</Link>
+            </li>
+            <li>
+              <Link href="/llm-evaluation">Agent Evaluation FAQ</Link>
+            </li>
+            <li>
+              <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/integrations/"}>
+                Framework Integrations
+              </Link>
+            </li>
+          </ul>
         </div>
+
+        <ArticleSidebar />
+        <SocialLinksFooter />
       </div>
-    </Layout>
+    </>
   );
 }
