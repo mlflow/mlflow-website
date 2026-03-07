@@ -3,6 +3,8 @@ import Head from "@docusaurus/Head";
 import Link from "@docusaurus/Link";
 import { Highlight } from "prism-react-renderer";
 import { Header } from "../components/Header/Header";
+import { SocialLinksFooter } from "../components/SocialLinksFooter/SocialLinksFooter";
+import { ArticleSidebar } from "../components/ArticleSidebar/ArticleSidebar";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
@@ -10,7 +12,7 @@ import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 const SEO_TITLE =
   "AI Monitoring for LLMs & Agents | MLflow AI Platform";
 const SEO_DESCRIPTION =
-  "AI monitoring continuously evaluates agent and LLM application quality, detects drift, and controls costs. Monitor with MLflow's open-source AI platform.";
+  "AI monitoring evaluates agent and LLM quality in production, detects drift, and controls costs. Explore AI monitoring on MLflow's open source AI platform.";
 
 const faqs: {
   question: string;
@@ -25,29 +27,29 @@ const faqs: {
   },
   {
     question:
-      "How is production monitoring for GenAI different from classical ML monitoring?",
+      "How is AI monitoring different from classical ML monitoring?",
     answer:
-      "Classical ML monitoring tracks feature distributions, prediction accuracy on structured outputs, and data drift using statistical tests. GenAI monitoring must handle free-form language outputs, multi-step agent reasoning, tool call chains, retrieval accuracy, subjective quality dimensions, and token-based costs. You can't use distribution histograms to detect when an LLM starts hallucinating or when an agent picks the wrong tool.",
+      "Classical ML monitoring tracks feature distributions, prediction accuracy on structured outputs, and data drift using statistical tests. AI monitoring must handle free-form language outputs, multi-step agent reasoning, tool call chains, retrieval accuracy, subjective quality dimensions, and token-based costs. You can't use distribution histograms to detect when an LLM starts hallucinating or when an agent picks the wrong tool.",
   },
   {
     question: "What is quality drift in LLM and agent applications?",
     answer:
-      "Quality drift occurs when the quality of AI outputs degrades over time without obvious errors. For LLMs and agents, this can manifest as increased hallucinations, declining response relevance, safety regressions, or coherence loss. Root causes include model version updates from providers, prompt template changes, upstream data pipeline modifications, or shifts in user input patterns. Unlike classical ML drift, GenAI quality drift is often subtle and requires LLM judges to detect.",
+      "Quality drift occurs when the quality of AI outputs degrades over time without obvious errors. For LLMs and agents, this can manifest as increased hallucinations, declining response relevance, safety regressions, or coherence loss. Root causes include model version updates from providers, prompt template changes, upstream data pipeline modifications, or shifts in user input patterns. Unlike classical ML drift, AI quality drift is often subtle and requires LLM judges to detect.",
   },
   {
     question:
-      "Why do agents and LLM applications need continuous evaluation in production?",
+      "Why do agents and LLM applications need continuous monitoring in production?",
     answer:
       "Development evaluation uses curated datasets that represent expected inputs. Production traffic is diverse, unpredictable, and evolves over time. New query patterns, adversarial inputs, and edge cases emerge continuously. Without production evaluation, you can't detect when quality degrades on inputs you didn't anticipate during development. Continuous evaluation catches regressions, emerging failure patterns, and quality drift before users lose trust.",
   },
   {
-    question: "What role do traces play in production monitoring?",
+    question: "What role do traces play in AI monitoring?",
     answer:
-      "Traces capture the complete execution graph of every request: LLM calls, tool invocations, retrieval operations, and intermediate reasoning steps, along with inputs, outputs, latency, and token usage at each step. In production monitoring, traces serve three critical functions: (1) they provide the data that LLM judges evaluate for quality, (2) they enable root-cause analysis when quality drops or errors spike, and (3) they power cost and latency tracking across the full request lifecycle.",
+      "Traces capture the complete execution graph of every request: LLM calls, tool invocations, retrieval operations, and intermediate reasoning steps, along with inputs, outputs, latency, and token usage at each step. In AI monitoring, traces serve three critical functions: (1) they provide the data that LLM judges evaluate for quality, (2) they enable root-cause analysis when quality drops or errors spike, and (3) they power cost and latency tracking across the full request lifecycle.",
   },
   {
     question:
-      "What is trace sampling and why is it important for production monitoring?",
+      "What is trace sampling and why is it important for AI monitoring?",
     answer:
       "Trace sampling controls what percentage of production requests are fully traced and evaluated. Running LLM judges on every request is cost-prohibitive at scale. Sampling strategies include global ratios (e.g., 5% of traffic), per-endpoint overrides (100% on critical endpoints, 1% on high-volume ones), and error-biased sampling (always capture failures). Deterministic safety checks (PII detection, format validation) can still run on 100% of traffic since they're fast and cheap.",
   },
@@ -63,12 +65,12 @@ const faqs: {
       "Key metrics span four dimensions: (1) Quality: LLM judge scores (correctness, relevance, safety, groundedness), hallucination rate, task completion rate (agents), user satisfaction scores. (2) Performance: p50/p95/p99 latency, time-to-first-token, error rates, retry rates. (3) Cost: tokens per request, cost per request, cost per task completion, daily/monthly spend trends. (4) Safety: prompt injection detection rate, PII leakage incidents, policy violation rate, jailbreak attempt frequency.",
   },
   {
-    question: "How do feedback loops improve production monitoring?",
+    question: "How do feedback loops improve AI monitoring?",
     answer:
       "User feedback (thumbs up/down, ratings, corrections) provides ground truth that automated judges cannot. Feedback identifies silent failures where outputs look acceptable to judges but fail users. Over time, feedback is used to: calibrate LLM judges (so automated scores match human expectations), build regression datasets from real failures, discover new failure modes to monitor, and prioritize quality improvements.",
   },
   {
-    question: "What security threats should production monitoring detect?",
+    question: "What security threats should AI monitoring detect?",
     answer:
       "Production LLM applications face unique security risks: prompt injection (users manipulating the model to ignore instructions), PII leakage (model exposing sensitive data from training or retrieval), jailbreaks (bypassing safety guidelines to produce harmful content), and data exfiltration through crafted queries. Monitoring must include input scanning, output scanning, behavioral anomaly detection, and comprehensive audit trails for compliance.",
   },
@@ -85,11 +87,11 @@ const faqs: {
   // MLflow-specific questions
   {
     question:
-      "How does MLflow enable production monitoring for agents and LLM applications?",
+      "How does MLflow enable AI monitoring for agents and LLM applications?",
     answer: (
       <>
-        MLflow provides an integrated production monitoring stack: (1) Automatic
-        tracing with one-line instrumentation across 20+ frameworks (OpenAI,
+        MLflow provides an integrated AI monitoring stack: (1) Automatic
+        tracing with one-line instrumentation across 50+ frameworks (OpenAI,
         LangChain, Anthropic, LlamaIndex, etc.), (2) Asynchronous trace logging
         that doesn't impact application performance, (3) Automatic online
         evaluation where registered LLM judges (Guidelines, Safety, Correctness,
@@ -107,13 +109,13 @@ const faqs: {
       </>
     ),
     answerText:
-      "MLflow provides an integrated production monitoring stack: (1) Automatic tracing with one-line instrumentation across 20+ frameworks (OpenAI, LangChain, Anthropic, LlamaIndex, etc.), (2) Asynchronous trace logging that doesn't impact application performance, (3) Automatic online evaluation where registered LLM judges score production traces in the background, (4) Configurable trace sampling for cost control, (5) Automatic token and cost tracking, (6) Human feedback collection via log_feedback() linked to traces, (7) User/session/request context tracking via update_current_trace(), and (8) OpenTelemetry compatibility for data portability.",
+      "MLflow provides an integrated AI monitoring stack: (1) Automatic tracing with one-line instrumentation across 50+ frameworks (OpenAI, LangChain, Anthropic, LlamaIndex, etc.), (2) Asynchronous trace logging that doesn't impact application performance, (3) Automatic online evaluation where registered LLM judges score production traces in the background, (4) Configurable trace sampling for cost control, (5) Automatic token and cost tracking, (6) Human feedback collection via log_feedback() linked to traces, (7) User/session/request context tracking via update_current_trace(), and (8) OpenTelemetry compatibility for data portability.",
   },
   {
-    question: "What is the MLflow lightweight tracing SDK?",
+    question: "What is the MLflow lightweight production tracing SDK?",
     answer: (
       <>
-        The <code>mlflow-tracing</code> package is a production-optimized
+        The <code>mlflow-tracing</code> package is a lightweight production
         tracing SDK that is 95% smaller than full MLflow (approximately 5MB vs
         1000MB). It includes only essential tracing functionality, making it
         ideal for Docker containers, serverless functions, and
@@ -128,7 +130,7 @@ const faqs: {
       </>
     ),
     answerText:
-      "The mlflow-tracing package is a production-optimized tracing SDK that is 95% smaller than full MLflow (approximately 5MB vs 1000MB). It includes only essential tracing functionality, making it ideal for Docker containers, serverless functions, and resource-constrained environments. It supports the same one-line auto-instrumentation and manual tracing APIs as the full SDK. It works with self-hosted MLflow, Databricks, and any OpenTelemetry-compatible backend.",
+      "The mlflow-tracing package is a lightweight production tracing SDK that is 95% smaller than full MLflow (approximately 5MB vs 1000MB). It includes only essential tracing functionality, making it ideal for Docker containers, serverless functions, and resource-constrained environments. It supports the same one-line auto-instrumentation and manual tracing APIs as the full SDK. It works with self-hosted MLflow, Databricks, and any OpenTelemetry-compatible backend.",
   },
   {
     question: "How does MLflow handle trace sampling in production?",
@@ -153,17 +155,54 @@ const faqs: {
   },
   {
     question:
-      "What built-in scorers does MLflow provide for production monitoring?",
+      "What built-in scorers does MLflow provide for AI monitoring?",
     answer: (
       <>
-        MLflow provides built-in LLM judges across multiple quality dimensions:
-        Safety (harmful content), Correctness (factual accuracy),
-        RelevanceToQuery (response addresses the question), Groundedness
-        (supported by context), ToolCallEfficiency (optimal tool usage),
-        RoleAdherence (stays in role across turns), ConversationalSafety
+        MLflow provides built-in LLM judges across multiple quality dimensions:{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/response-quality/safety/"}>
+          Safety
+        </Link>{" "}
+        (harmful content),{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/response-quality/correctness/"}>
+          Correctness
+        </Link>{" "}
+        (factual accuracy),{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/rag/relevance/"}>
+          RelevanceToQuery
+        </Link>{" "}
+        (response addresses the question),{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/rag/groundedness/"}>
+          Groundedness
+        </Link>{" "}
+        (supported by context),{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/tool-call/efficiency/"}>
+          ToolCallEfficiency
+        </Link>{" "}
+        (optimal tool usage),{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/"}>
+          RoleAdherence
+        </Link>{" "}
+        (stays in role across turns),{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/"}>
+          ConversationalSafety
+        </Link>{" "}
         (multi-turn safety), and more. Additionally, MLflow integrates with
-        third-party scorer libraries including DeepEval (50+ metrics), RAGAS
-        (RAG-specific metrics), TruLens (agent trajectory scoring), and Phoenix
+        third-party scorer libraries including{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/third-party/deepeval/"}>
+          DeepEval
+        </Link>{" "}
+        (50+ metrics),{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/third-party/ragas/"}>
+          RAGAS
+        </Link>{" "}
+        (RAG-specific metrics),{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/third-party/trulens/"}>
+          TruLens
+        </Link>{" "}
+        (agent trajectory scoring), and{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/third-party/phoenix/"}>
+          Phoenix
+        </Link>{" "}
         (hallucination, toxicity).{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/"}>
           Explore all available scorers
@@ -179,12 +218,12 @@ const faqs: {
     answer: (
       <>
         MLflow automatically extracts token counts (input, output, total) from
-        every LLM span. Starting with MLflow 3.10, it calculates USD costs using
-        model-aware pricing. You can view cost breakdowns per trace, per model,
-        and across time in the UI. The AI Gateway adds per-endpoint usage
-        analytics. For unsupported models, you can set custom costs via the span
-        API. This gives teams visibility into exactly where money is being spent
-        and helps identify optimization opportunities.{" "}
+        every LLM span and calculates costs using model-aware pricing. You can
+        view cost breakdowns per trace, per model, and across time in the UI.
+        The AI Gateway adds per-endpoint usage analytics. For unsupported
+        models, you can set custom costs via the span API. This gives teams
+        visibility into exactly where money is being spent and helps identify
+        optimization opportunities.{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/token-usage-cost/"}>
           Learn about cost tracking
         </Link>
@@ -192,7 +231,7 @@ const faqs: {
       </>
     ),
     answerText:
-      "MLflow automatically extracts token counts (input, output, total) from every LLM span. Starting with MLflow 3.10, it calculates USD costs using model-aware pricing. You can view cost breakdowns per trace, per model, and across time in the UI. The AI Gateway adds per-endpoint usage analytics. For unsupported models, you can set custom costs via the span API. This gives teams visibility into exactly where money is being spent and helps identify optimization opportunities.",
+      "MLflow automatically extracts token counts (input, output, total) from every LLM span and calculates costs using model-aware pricing. You can view cost breakdowns per trace, per model, and across time in the UI. The AI Gateway adds per-endpoint usage analytics. For unsupported models, you can set custom costs via the span API. This gives teams visibility into exactly where money is being spent and helps identify optimization opportunities.",
   },
   {
     question: "How does MLflow detect quality drift in production?",
@@ -204,8 +243,11 @@ const faqs: {
         compared to baselines, teams can investigate using the trace UI. MLflow
         also supports metric backfill, letting you retroactively apply new
         scorers to historical traces to establish baselines and detect when
-        drift began. Combined with human feedback via MemAlign, judges can be
-        calibrated to catch domain-specific quality regressions.{" "}
+        drift began. Combined with human feedback, judges can be{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "assessments/feedback/"}>
+          calibrated
+        </Link>{" "}
+        to catch domain-specific quality regressions.{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
           See the evaluation and monitoring docs
         </Link>
@@ -213,7 +255,7 @@ const faqs: {
       </>
     ),
     answerText:
-      "MLflow detects quality drift by continuously running LLM judges on production traces and tracking scores over time. When quality metrics (correctness pass rate, safety scores, relevance) trend downward compared to baselines, teams can investigate using the trace UI. MLflow also supports metric backfill, letting you retroactively apply new scorers to historical traces to establish baselines and detect when drift began. Combined with human feedback via MemAlign, judges can be calibrated to catch domain-specific quality regressions.",
+      "MLflow detects quality drift by continuously running LLM judges on production traces and tracking scores over time. When quality metrics (correctness pass rate, safety scores, relevance) trend downward compared to baselines, teams can investigate using the trace UI. MLflow also supports metric backfill, letting you retroactively apply new scorers to historical traces to establish baselines and detect when drift began. Combined with human feedback, judges can be calibrated to catch domain-specific quality regressions.",
   },
   {
     question: "Does MLflow support alerting for production quality issues?",
@@ -222,7 +264,10 @@ const faqs: {
         MLflow provides the assessment and scoring infrastructure that feeds
         alerting systems. Production scorers generate quality metrics on every
         evaluated trace. These metrics can be queried programmatically via{" "}
-        <code>mlflow.search_traces()</code> and aggregated into time-series
+        <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/search-traces/"}>
+          <code>mlflow.search_traces()</code>
+        </Link>{" "}
+        and aggregated into time-series
         dashboards. Teams integrate these metrics with their existing alerting
         tools (PagerDuty, Slack, etc.) to trigger alerts on quality score drops,
         cost anomalies, latency spikes, or safety incidents. The AI Gateway also
@@ -235,22 +280,29 @@ const faqs: {
   },
   {
     question:
-      "Can I use MLflow production monitoring with any LLM provider or agent framework?",
+      "Can I use MLflow AI monitoring with any LLM provider or agent framework?",
     answer:
-      "Yes. MLflow supports any LLM provider (OpenAI, Anthropic, AWS Bedrock, Google Gemini, Azure OpenAI, Mistral, Cohere, Ollama, and more) and any agent framework (LangChain, LangGraph, LlamaIndex, CrewAI, AutoGen, DSPy, Pydantic AI, and more). One-line auto-instrumentation is available for 20+ libraries. MLflow is fully OpenTelemetry-compatible, so you can export traces to any OTel-compatible backend. SDKs are available for Python, JavaScript, and TypeScript.",
+      "Yes. MLflow supports any LLM provider (OpenAI, Anthropic, AWS Bedrock, Google Gemini, Azure OpenAI, Mistral, Cohere, Ollama, and more) and any agent framework (LangChain, LangGraph, LlamaIndex, CrewAI, AutoGen, DSPy, Pydantic AI, and more). One-line auto-instrumentation is available for 50+ libraries. MLflow is fully OpenTelemetry-compatible, so you can export traces to any OTel-compatible backend. SDKs are available for Python, JavaScript, and TypeScript.",
   },
   {
-    question: "How does MLflow handle human feedback in production monitoring?",
+    question: "How does MLflow handle human feedback in AI monitoring?",
     answer: (
       <>
         MLflow integrates human feedback directly into the monitoring pipeline.
         Users can provide ratings (thumbs up/down, star ratings) linked to
-        specific traces via <code>log_feedback()</code>. This feedback serves
-        multiple purposes: ground-truthing LLM judges, identifying silent
-        failures that automated scoring misses, and improving judges over time.
-        MLflow 3.9 introduced MemAlign, which learns evaluation guidelines from
-        just a handful of natural-language feedback examples, enabling judges to
-        align with domain experts without expensive retraining.{" "}
+        specific traces via{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "assessments/feedback/"}>
+          <code>log_feedback()</code>
+        </Link>
+        . This feedback serves multiple purposes: ground-truthing LLM judges,
+        identifying silent failures that automated scoring misses, and improving
+        judges over time.{" "}
+        <Link href={MLFLOW_GENAI_DOCS_URL + "assessments/feedback/"}>
+          MemAlign
+        </Link>{" "}
+        learns evaluation guidelines from just a handful of natural-language
+        feedback examples, enabling judges to align with domain experts without
+        expensive retraining.{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
           Learn about feedback collection
         </Link>
@@ -258,14 +310,14 @@ const faqs: {
       </>
     ),
     answerText:
-      "MLflow integrates human feedback directly into the monitoring pipeline. Users can provide ratings (thumbs up/down, star ratings) linked to specific traces via log_feedback(). This feedback serves multiple purposes: ground-truthing LLM judges, identifying silent failures that automated scoring misses, and improving judges over time. MLflow 3.9 introduced MemAlign, which learns evaluation guidelines from just a handful of natural-language feedback examples, enabling judges to align with domain experts without expensive retraining.",
+      "MLflow integrates human feedback directly into the monitoring pipeline. Users can provide ratings (thumbs up/down, star ratings) linked to specific traces via log_feedback(). This feedback serves multiple purposes: ground-truthing LLM judges, identifying silent failures that automated scoring misses, and improving judges over time. MemAlign learns evaluation guidelines from just a handful of natural-language feedback examples, enabling judges to align with domain experts without expensive retraining.",
   },
   {
     question:
-      "How does MLflow production monitoring handle security threats like prompt injection and PII leakage?",
+      "How does MLflow handle security threats like prompt injection and PII leakage?",
     answer: (
       <>
-        MLflow's production monitoring captures complete audit trails of all
+        MLflow's AI monitoring captures complete audit trails of all
         inputs, outputs, and model interactions for compliance and incident
         investigation. Built-in safety scorers detect harmful content, PII
         exposure, and policy violations in outputs. The AI Gateway adds
@@ -280,40 +332,36 @@ const faqs: {
       </>
     ),
     answerText:
-      "MLflow's production monitoring captures complete audit trails of all inputs, outputs, and model interactions for compliance and incident investigation. Built-in safety scorers detect harmful content, PII exposure, and policy violations in outputs. The AI Gateway adds real-time guardrails that filter inputs for prompt injection attempts and scan outputs for PII, toxicity, or policy violations before they reach users. Combined with tracing, you can investigate security incidents with full execution context.",
+      "MLflow's AI monitoring captures complete audit trails of all inputs, outputs, and model interactions for compliance and incident investigation. Built-in safety scorers detect harmful content, PII exposure, and policy violations in outputs. The AI Gateway adds real-time guardrails that filter inputs for prompt injection attempts and scan outputs for PII, toxicity, or policy violations before they reach users. Combined with tracing, you can investigate security incidents with full execution context.",
   },
   {
-    question: "Is MLflow production monitoring free and open source?",
+    question: "Is MLflow AI monitoring free and open source?",
     answer:
-      "Yes. MLflow is 100% open source under the Apache 2.0 license, backed by the Linux Foundation. All production monitoring features (tracing, evaluation, scorers, cost tracking, feedback collection) are free, including for commercial use. There are no per-trace fees, no usage limits, and no vendor lock-in. You can self-host MLflow or use managed versions on Databricks, AWS, and other platforms. Your production data stays under your control.",
+      "Yes. MLflow is 100% open source under the Apache 2.0 license, backed by the Linux Foundation. All AI monitoring features (tracing, evaluation, scorers, cost tracking, feedback collection) are free, including for commercial use. There are no per-trace fees, no usage limits, and no vendor lock-in. You can self-host MLflow or use managed versions on Databricks, AWS, and other platforms. Your production data stays under your control.",
   },
   {
-    question: "How do I get started with MLflow production monitoring?",
+    question: "How do I get started with MLflow AI monitoring?",
     answer: (
       <>
-        Getting started requires four steps: (1) Install the lightweight SDK (
-        <code>pip install mlflow-tracing</code>) and add tracing to your
-        endpoints with <code>@mlflow.trace</code>, (2) Configure your tracking
-        server, sampling ratio, and async logging via environment variables, (3)
-        Add production context with <code>mlflow.update_current_trace()</code>{" "}
-        to attach user IDs, session IDs, and deployment metadata to traces, (4)
-        Register production judges with <code>.register()</code> and{" "}
-        <code>.start()</code> to automatically evaluate traces. You can view
-        traces, quality scores, and cost metrics in the MLflow UI immediately.{" "}
+        MLflow AI monitoring combines tracing, automatic LLM judge evaluation,
+        human feedback collection, and cost tracking into a unified stack. See
+        the <a href="#how-to-implement">How to Implement AI Monitoring</a>{" "}
+        section above for a step-by-step walkthrough with code examples, or
+        jump straight to the{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/prod-tracing/"}>
-          See the production tracing documentation
+          production tracing documentation
         </Link>{" "}
         for detailed setup guides and framework-specific examples.
       </>
     ),
     answerText:
-      "Getting started requires four steps: (1) Install the lightweight SDK (pip install mlflow-tracing) and add tracing to your endpoints with @mlflow.trace, (2) Configure your tracking server, sampling ratio, and async logging via environment variables, (3) Add production context with mlflow.update_current_trace() to attach user IDs, session IDs, and deployment metadata to traces, (4) Register production judges with .register() and .start() to automatically evaluate traces. You can view traces, quality scores, and cost metrics in the MLflow UI immediately. See the production tracing documentation for detailed setup guides and framework-specific examples.",
+      "MLflow AI monitoring combines tracing, automatic LLM judge evaluation, human feedback collection, and cost tracking into a unified stack. See the How to Implement AI Monitoring section above for a step-by-step walkthrough with code examples, or jump straight to the production tracing documentation for detailed setup guides and framework-specific examples.",
   },
   {
     question:
-      "What is the difference between MLflow's development evaluation and production monitoring?",
+      "What is the difference between MLflow's development evaluation and AI monitoring?",
     answer:
-      "Development evaluation runs scorers against curated benchmark datasets to validate quality before deployment. Production monitoring runs the same scorers on live traffic to detect issues that emerge from real-world usage. MLflow unifies both: use the same scorers, judges, and evaluation APIs in development and production to ensure consistent quality standards. Development evaluation gives you confidence to deploy; production monitoring gives you confidence it's still working well.",
+      "Development evaluation runs scorers and LLM judges against curated benchmark datasets to validate quality before deployment. AI monitoring runs the same scorers and LLM judges on live production traffic to detect issues that emerge from real-world usage. MLflow unifies both: use the same scorers, LLM judges, and evaluation APIs in development and production to ensure consistent quality standards. Development evaluation gives you confidence to deploy; AI monitoring gives you confidence it's still working well.",
   },
 ];
 
@@ -400,48 +448,22 @@ registered_judge.start(
 )`;
 
 const CODE_FEEDBACK = `import mlflow
-from mlflow.client import MlflowClient
 from mlflow.entities import AssessmentSource
-from fastapi import FastAPI, Query, Request
-from pydantic import BaseModel
-from typing import Optional
+from fastapi import FastAPI
 
 app = FastAPI()
 
-class FeedbackRequest(BaseModel):
-    is_correct: bool
-    comment: Optional[str] = None
-
-@app.post("/chat_feedback")
-def handle_feedback(
-    request: Request,
-    client_request_id: str = Query(...),
-    feedback: FeedbackRequest = ...,
-):
-    client = MlflowClient()
-    experiment = client.get_experiment_by_name("production-genai-app")
-    traces = client.search_traces(
-        locations=[experiment.experiment_id]
-    )
-    trace = next(
-        (t for t in traces
-         if t.info.client_request_id == client_request_id),
-        None,
-    )
-    if not trace:
-        return {"status": "error", "message": "Trace not found"}, 404
-
+@app.post("/feedback")
+def submit_feedback(trace_id: str, is_correct: bool, user_id: str):
     mlflow.log_feedback(
-        trace_id=trace.info.trace_id,
+        trace_id=trace_id,
         name="response_is_correct",
-        value=feedback.is_correct,
+        value=is_correct,
         source=AssessmentSource(
             source_type="HUMAN",
-            source_id=request.headers.get("X-User-ID"),
+            source_id=user_id,
         ),
-        rationale=feedback.comment,
-    )
-    return {"status": "success", "trace_id": trace.info.trace_id}`;
+    )`;
 
 export default function AiMonitoring() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
@@ -656,6 +678,56 @@ export default function AiMonitoring() {
             line-height: 1.6;
             color: #1e293b;
           }
+          .article-sidebar {
+            position: fixed;
+            top: 100px;
+            left: calc(50% + 900px / 2 + 48px);
+            width: 280px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+          }
+          .article-sidebar .toc-title {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #9ca3af;
+            margin: 0 0 12px 0;
+          }
+          .article-sidebar ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            border-left: 1px solid #e5e7eb;
+          }
+          .article-sidebar li {
+            margin: 0;
+            padding: 0;
+          }
+          .article-sidebar a {
+            font-family: 'DM Sans', sans-serif;
+            display: block;
+            padding: 8px 0 8px 16px;
+            font-size: 16px;
+            color: #0194e2 !important;
+            text-decoration: none !important;
+            transition: all 0.15s ease;
+            line-height: 1.4;
+          }
+          .article-sidebar a:hover {
+            color: #0072b0 !important;
+          }
+          .article-sidebar .toc-divider {
+            border: none;
+            border-top: 1px solid #e5e7eb;
+            margin: 12px 0 12px 0;
+          }
+          @media (max-width: 1400px) {
+            .article-sidebar {
+              display: none;
+            }
+          }
           @media (max-width: 768px) {
             .article-container {
               padding: 40px 20px 80px;
@@ -694,10 +766,13 @@ export default function AiMonitoring() {
           <h1>AI Monitoring for LLMs and Agents</h1>
 
           <p>
-            Production monitoring for agents and LLM applications goes beyond
-            uptime and error rates. It continuously assesses the{" "}
-            <em>quality</em> of non-deterministic AI outputs, tracks costs and
-            latency, and detects when behavior drifts from expected standards.{" "}
+            AI monitoring is the practice of continuously evaluating the
+            quality, performance, cost, and safety of AI applications running
+            in production, including LLM and agent-based systems. It goes
+            beyond uptime and error rates to assess the{" "}
+            <em>quality</em> of non-deterministic AI outputs, track token
+            costs and latency, and detect when behavior drifts from expected
+            standards.{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/prod-tracing/"}>
               Production tracing
             </Link>{" "}
@@ -706,15 +781,15 @@ export default function AiMonitoring() {
 
           <p>
             Unlike classical ML monitoring (which tracks feature distributions
-            and prediction accuracy on structured data), GenAI monitoring must
+            and prediction accuracy on structured data), AI monitoring must
             evaluate free-form language outputs, multi-step agent reasoning,
             tool call chains, retrieval accuracy, and token costs. Traditional
-            monitoring can tell you the system is running; production monitoring
+            monitoring can tell you the system is running; AI monitoring
             tells you whether it's <em>working well</em>.
           </p>
 
           <p>
-            <Link href="/genai">MLflow</Link> provides a complete production
+            <Link href="/genai">MLflow</Link> provides a complete AI
             monitoring stack: automatic online evaluation with LLM judges that
             score traces asynchronously, configurable trace sampling for cost
             control, user and session context tracking for debugging, human
@@ -743,60 +818,8 @@ export default function AiMonitoring() {
             </video>
           </div>
 
-          <div
-            style={{
-              background: "#f9fafb",
-              border: "1px solid #e5e7eb",
-              borderRadius: "8px",
-              padding: "20px 24px",
-              margin: "40px 0",
-            }}
-          >
-            <p style={{ marginBottom: "12px" }}>
-              <strong>Quick Navigation:</strong>
-            </p>
-            <ul style={{ margin: 0, paddingLeft: "24px" }}>
-              <li style={{ marginBottom: "8px" }}>
-                <a href="#why-monitoring">Why Production Monitoring Matters</a>
-              </li>
-              <li style={{ marginBottom: "8px" }}>
-                <a href="#production-tracing">
-                  Production Tracing and Observability
-                </a>
-              </li>
-              <li style={{ marginBottom: "8px" }}>
-                <a href="#online-evaluation">Automatic Online Evaluation</a>
-              </li>
-              <li style={{ marginBottom: "8px" }}>
-                <a href="#feedback">Feedback Collection</a>
-              </li>
-              <li style={{ marginBottom: "8px" }}>
-                <a href="#quality-drift">
-                  Quality Drift and Regression Detection
-                </a>
-              </li>
-              <li style={{ marginBottom: "8px" }}>
-                <a href="#cost-tracking">Cost, Latency, and Token Tracking</a>
-              </li>
-              <li style={{ marginBottom: "8px" }}>
-                <a href="#security-monitoring">
-                  Security and Safety Monitoring
-                </a>
-              </li>
-              <li style={{ marginBottom: "8px" }}>
-                <a href="#setup">Setting Up for Production</a>
-              </li>
-              <li style={{ marginBottom: "8px" }}>
-                <a href="#how-to-implement">How to Implement</a>
-              </li>
-              <li style={{ marginBottom: "0" }}>
-                <a href="#faq">FAQ</a>
-              </li>
-            </ul>
-          </div>
-
           <h2 id="why-monitoring">
-            Why Production Monitoring Matters for GenAI
+            Why AI Monitoring Matters
           </h2>
 
           <p>
@@ -812,8 +835,8 @@ export default function AiMonitoring() {
                 model updates, prompt changes, or shifting user inputs.
               </p>
               <p>
-                <strong>Solution:</strong> Continuous LLM judges detect quality
-                regressions before users notice.
+                <strong>Solution:</strong> Continuous LLM judges and human
+                feedback detect quality regressions before users lose trust.
               </p>
             </div>
 
@@ -855,493 +878,268 @@ export default function AiMonitoring() {
               </p>
             </div>
 
-            <div className="card">
-              <h3>Real-World Edge Cases</h3>
-              <p>
-                <strong>Problem:</strong> Real users expose edge cases,
-                adversarial inputs, and query patterns that curated test
-                datasets never cover.
-              </p>
-              <p>
-                <strong>Solution:</strong> Production traces with user context
-                and feedback collection reveal failure modes invisible during
-                development.
-              </p>
-            </div>
-
-            <div className="card">
-              <h3>Feedback and Ground Truth</h3>
-              <p>
-                <strong>Problem:</strong> Automated judges can miss subtle
-                quality issues that only domain experts or end users notice.
-              </p>
-              <p>
-                <strong>Solution:</strong> Human feedback linked to traces
-                provides ground truth to calibrate judges and discover blind
-                spots.
-              </p>
-            </div>
           </div>
 
-          <h2 id="production-tracing">Production Tracing and Observability</h2>
-
-          <p>
-            Traces are the foundation of production monitoring. They capture
-            complete execution graphs including LLM calls, tool invocations,
-            retrievals, and errors, giving you full visibility into every
-            request.
-          </p>
+          <h2 id="use-cases">AI Monitoring Use Cases</h2>
 
           <ul>
             <li>
-              <strong>Async logging:</strong>{" "}
-              <code>MLFLOW_ENABLE_ASYNC_TRACE_LOGGING</code> (enabled by
-              default) uploads traces in background threads, preventing tracing
-              from blocking your application's request path.
+              <strong>Hallucination detection in RAG systems:</strong> Run
+              groundedness scorers on production traces to catch when retrieval
+              quality degrades or the model starts generating claims unsupported
+              by the retrieved context.
             </li>
             <li>
-              <strong>User, session, and request context:</strong> Use{" "}
-              <code>mlflow.update_current_trace()</code> to attach user IDs,
-              session IDs, request IDs, environment, and deployment version to
-              every trace. This metadata enables filtering traces by user,
-              debugging specific sessions, and correlating feedback to requests.
+              <strong>Agent tool selection monitoring:</strong> Track whether
+              agents pick the right tools and complete tasks efficiently. Detect
+              loops, unnecessary retries, and incorrect tool selections that waste
+              tokens and degrade user experience.
             </li>
             <li>
-              <strong>Per-endpoint sampling:</strong> Use{" "}
-              <code>@mlflow.trace(sampling_ratio_override=...)</code> to sample
-              100% on critical endpoints and lower rates on high-volume ones.
+              <strong>Cost optimization:</strong> Identify expensive queries,
+              track per-model spend trends, and find opportunities to switch to
+              cheaper models for low-complexity requests without sacrificing
+              quality.
             </li>
             <li>
-              <strong>OpenTelemetry-compatible:</strong> Export traces to any
-              OTel-compatible backend for vendor-neutral data portability.
+              <strong>Safety regression detection:</strong> After model or
+              prompt updates, compare safety scores against pre-deployment
+              baselines to catch regressions before they affect users at scale.
             </li>
             <li>
-              <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/prod-tracing/"}>
-                Production tracing documentation
-              </Link>
+              <strong>A/B testing prompt changes:</strong> Compare quality
+              scores, latency, and cost across prompt variants using production
+              trace data to make data-driven decisions about which version to
+              keep.
+            </li>
+            <li>
+              <strong>Compliance and audit in regulated industries:</strong>{" "}
+              Healthcare, finance, and legal teams need to prove their AI
+              systems behave correctly and safely. AI monitoring provides full
+              audit trails of every input, output, and model interaction for
+              regulatory review.
+            </li>
+            <li>
+              <strong>Latency SLA monitoring:</strong> For user-facing
+              chatbots, coding assistants, and real-time agents where response
+              time directly impacts user experience. Track p50/p95/p99 latency
+              and time-to-first-token to catch performance regressions before
+              they affect retention.
             </li>
           </ul>
 
-          <h2 id="online-evaluation">Automatic Online Evaluation</h2>
+          <h2 id="how-to-implement">How to Implement AI Monitoring</h2>
 
           <p>
-            Online evaluation automatically runs LLM judges on production traces
-            in the background. You register scorers with evaluation criteria,
-            and MLflow continuously evaluates incoming traces without blocking
-            the request path.
-          </p>
-
-          <ul>
-            <li>
-              <strong>Production judges:</strong> Create a scorer (e.g.,{" "}
-              <code>Guidelines</code>) with evaluation criteria, register it
-              with <code>.register()</code>, and start it with{" "}
-              <code>.start()</code>. MLflow automatically evaluates matching
-              traces.
-            </li>
-            <li>
-              <strong>Sampling control:</strong> Use{" "}
-              <code>ScorerSamplingConfig</code> to control what percentage of
-              traces are evaluated and filter by metadata (e.g., only production
-              traces).
-            </li>
-            <li>
-              <strong>Built-in scorers:</strong> Safety, Correctness,
-              RelevanceToQuery, Groundedness, ToolCallEfficiency,
-              ConversationalSafety, UserFrustration, and more.
-            </li>
-            <li>
-              <strong>Third-party integrations:</strong> DeepEval (50+ metrics),
-              RAGAS, TruLens, and Phoenix for specialized scoring.
-            </li>
-            <li>
-              <strong>MemAlign:</strong> Learns evaluation guidelines from human
-              feedback (MLflow 3.9+) to align judges with domain experts.
-            </li>
-            <li>
-              <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/"}>
-                Explore available scorers
-              </Link>
-            </li>
-          </ul>
-
-          <h2 id="feedback">Feedback Collection and Human-in-the-Loop</h2>
-
-          <p>
-            Automated judges can miss subtle quality issues that only end users
-            and domain experts notice. MLflow integrates human feedback directly
-            into the monitoring pipeline, linking ratings to specific traces for
-            ground-truth collection.
-          </p>
-
-          <ul>
-            <li>
-              <strong>Trace-linked feedback:</strong> Use{" "}
-              <code>mlflow.log_feedback()</code> to record user ratings (thumbs
-              up/down, star ratings, corrections) with the trace ID, source
-              type, and rationale.
-            </li>
-            <li>
-              <strong>Ground-truth for judges:</strong> Feedback identifies
-              silent failures where outputs look acceptable to automated judges
-              but fail real users. Use this data to calibrate and improve LLM
-              judges over time.
-            </li>
-            <li>
-              <strong>Regression datasets:</strong> Convert production failures
-              identified through feedback into evaluation datasets that catch
-              known failure modes before they reach production again.
-            </li>
-            <li>
-              <strong>MemAlign:</strong> MLflow 3.9 introduced MemAlign, which
-              learns evaluation guidelines from just a handful of
-              natural-language feedback examples, enabling judges to align with
-              domain experts without expensive retraining.
-            </li>
-            <li>
-              <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
-                Evaluation and monitoring documentation
-              </Link>
-            </li>
-          </ul>
-
-          <h2 id="quality-drift">Quality Drift and Regression Detection</h2>
-
-          <p>
-            Quality drift in GenAI manifests as output degradation,
-            hallucination increases, safety regressions, coherence decline, or
-            cost creep. Root causes differ from classical ML: prompt changes,
-            model version updates, upstream data changes, and user input
-            distribution shifts.
-          </p>
-
-          <ul>
-            <li>
-              Trend-based detection beats hard thresholds for non-deterministic
-              systems where outputs naturally vary.
-            </li>
-            <li>
-              Compare production quality scores against baselines over time to
-              identify gradual degradation.
-            </li>
-            <li>
-              <strong>Metric backfill:</strong> Retroactively apply new scorers
-              to historical traces to establish baselines and detect when drift
-              began.
-            </li>
-          </ul>
-
-          <h2 id="cost-tracking">Cost, Latency, and Token Tracking</h2>
-
-          <p>
-            Visibility into spending and performance is critical for production
-            operations. MLflow tracks costs and latency automatically across the
-            full request lifecycle.
-          </p>
-
-          <ul>
-            <li>
-              <strong>Automatic token tracking:</strong> Input, output, and
-              total tokens per LLM call (MLflow 3.2+).
-            </li>
-            <li>
-              <strong>Cost calculation:</strong> Model-aware USD pricing (MLflow
-              3.10+) with per-trace and per-model breakdowns.
-            </li>
-            <li>
-              <strong>AI Gateway analytics:</strong> Per-endpoint usage tracking
-              via the{" "}
-              <Link href={MLFLOW_GENAI_DOCS_URL + "governance/ai-gateway/"}>
-                AI Gateway
-              </Link>
-              .
-            </li>
-            <li>
-              <strong>Key metrics:</strong> p50/p95/p99 latency,
-              time-to-first-token, cost per request, cost per task completion,
-              tokens per request.
-            </li>
-            <li>
-              <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/token-usage-cost/"}>
-                Token usage and cost tracking documentation
-              </Link>
-            </li>
-          </ul>
-
-          <h2>Sampling Strategies for Production</h2>
-
-          <p>
-            Trace sampling controls what percentage of requests are fully traced
-            and evaluated, balancing coverage against cost.
-          </p>
-
-          <ul>
-            <li>
-              <strong>Global control:</strong>{" "}
-              <code>MLFLOW_TRACE_SAMPLING_RATIO</code> (0.0-1.0) for system-wide
-              sampling.
-            </li>
-            <li>
-              <strong>Per-endpoint overrides:</strong> Use{" "}
-              <code>@mlflow.trace(sampling_ratio_override=1.0)</code> on
-              critical endpoints like payment processing, and{" "}
-              <code>sampling_ratio_override=0.1</code> on high-volume chat
-              endpoints.
-            </li>
-            <li>
-              <strong>Online evaluation sampling:</strong> Use{" "}
-              <code>ScorerSamplingConfig(sample_rate=...)</code> to
-              independently control what percentage of traces are evaluated by
-              each registered judge.
-            </li>
-            <li>
-              <strong>Best practices:</strong> 100% for deterministic safety
-              checks, 1-10% for LLM-judge evaluation, always capture errors.
-            </li>
-          </ul>
-
-          <h2 id="security-monitoring">Security and Safety Monitoring</h2>
-
-          <p>
-            Production agents and LLM applications face unique security threats
-            that require dedicated monitoring:
-          </p>
-
-          <ul>
-            <li>
-              <strong>Prompt injection detection:</strong> Pattern matching,
-              semantic analysis, and LLM classifiers to identify manipulation
-              attempts.
-            </li>
-            <li>
-              <strong>PII leakage scanning:</strong> Automated output scanning
-              to prevent exposure of sensitive data.
-            </li>
-            <li>
-              <strong>Jailbreak detection:</strong> Behavioral analysis and
-              guideline violation scoring to catch safety bypasses.
-            </li>
-            <li>
-              <strong>Content policy enforcement:</strong> Guardrails via the{" "}
-              <Link href={MLFLOW_GENAI_DOCS_URL + "governance/ai-gateway/"}>
-                AI Gateway
-              </Link>{" "}
-              for real-time input/output filtering.
-            </li>
-            <li>
-              <strong>Audit trails:</strong> Every input, output, and model
-              interaction logged for compliance and incident investigation.
-            </li>
-          </ul>
-
-          <h2>Common Use Cases</h2>
-
-          <ul>
-            <li>Detecting hallucination increases in production RAG systems</li>
-            <li>
-              Monitoring agent tool selection accuracy and task completion rates
-            </li>
-            <li>
-              Tracking cost trends and identifying expensive queries for
-              optimization
-            </li>
-            <li>Catching safety regressions after model or prompt updates</li>
-            <li>Collecting user feedback to ground-truth LLM judges</li>
-            <li>Building regression datasets from production failures</li>
-            <li>A/B testing prompt changes with production trace comparison</li>
-            <li>
-              Debugging specific user sessions by querying traces with{" "}
-              <code>
-                mlflow.search_traces(filter_string=&quot;tags.`mlflow.trace.user`
-                = ...&quot;)
-              </code>
-            </li>
-            <li>
-              Investigating incidents using trace context (request IDs,
-              deployment versions, regions)
-            </li>
-          </ul>
-
-          <h2 id="setup">Setting Up for Production</h2>
-
-          <p>
-            Moving from development to production monitoring requires a few
-            infrastructure and configuration steps:
-          </p>
-
-          <ul>
-            <li>
-              <strong>Production-grade database:</strong> Use PostgreSQL or
-              MySQL for the MLflow tracking server (not SQLite, which is the
-              development default).
-            </li>
-            <li>
-              <strong>
-                <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/lightweight-sdk"}>
-                  Lightweight SDK
-                </Link>
-                :
-              </strong>{" "}
-              Install <code>mlflow-tracing</code> instead of full{" "}
-              <code>mlflow</code> in production containers. It is 95% smaller
-              (~5MB vs ~1000MB), ideal for Docker containers, serverless
-              functions, and resource-constrained environments. It supports the
-              same auto-instrumentation and tracing APIs.
-            </li>
-            <li>
-              <strong>Environment variables:</strong> Configure production
-              settings via environment variables:
-              <ul>
-                <li>
-                  <code>MLFLOW_TRACKING_URI</code>: Your production MLflow
-                  server
-                </li>
-                <li>
-                  <code>MLFLOW_EXPERIMENT_NAME</code>: Experiment for production
-                  traces
-                </li>
-                <li>
-                  <code>MLFLOW_ENABLE_ASYNC_TRACE_LOGGING=true</code>:
-                  Background trace upload (default)
-                </li>
-                <li>
-                  <code>MLFLOW_ASYNC_TRACE_LOGGING_MAX_WORKERS=10</code>: Worker
-                  threads
-                </li>
-                <li>
-                  <code>MLFLOW_ASYNC_TRACE_LOGGING_MAX_QUEUE_SIZE=1000</code>:
-                  Max queued traces
-                </li>
-                <li>
-                  <code>MLFLOW_TRACE_SAMPLING_RATIO=0.1</code>: Global sampling
-                  ratio
-                </li>
-              </ul>
-            </li>
-          </ul>
-
-          <h2>Key Components of Production Monitoring</h2>
-
-          <p>
-            A comprehensive production monitoring stack combines these
-            capabilities:
-          </p>
-
-          <ul>
-            <li>
-              <Link
-                href={MLFLOW_GENAI_DOCS_URL + "tracing/"}
-                style={{ color: "#007bff", fontWeight: "600" }}
-              >
-                Tracing
-              </Link>
-              : Capture complete execution graphs of every request for debugging
-              and analysis.
-            </li>
-            <li>
-              <Link
-                href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/"}
-                style={{ color: "#007bff", fontWeight: "600" }}
-              >
-                Online Evaluation
-              </Link>
-              : Automatic quality assessment using registered judges that score
-              production traces asynchronously.
-            </li>
-            <li>
-              <Link
-                href={MLFLOW_GENAI_DOCS_URL + "tracing/token-usage-cost/"}
-                style={{ color: "#007bff", fontWeight: "600" }}
-              >
-                Cost and Token Tracking
-              </Link>
-              : Visibility into per-request, per-model, and aggregate spend.
-            </li>
-            <li>
-              <Link
-                href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}
-                style={{ color: "#007bff", fontWeight: "600" }}
-              >
-                Human Feedback
-              </Link>
-              : Ground-truth collection via <code>log_feedback()</code> linked
-              to specific traces.
-            </li>
-            <li>
-              <Link
-                href={MLFLOW_GENAI_DOCS_URL + "tracing/prod-tracing/"}
-                style={{ color: "#007bff", fontWeight: "600" }}
-              >
-                Context Tracking
-              </Link>
-              : User IDs, session IDs, request IDs, and deployment metadata for
-              filtering and debugging.
-            </li>
-            <li>
-              <Link
-                href={MLFLOW_GENAI_DOCS_URL + "governance/ai-gateway/"}
-                style={{ color: "#007bff", fontWeight: "600" }}
-              >
-                AI Gateway
-              </Link>
-              : Rate limiting, policy enforcement, usage analytics, and
-              real-time guardrails.
-            </li>
-          </ul>
-
-          <h2 id="how-to-implement">How to Implement Production Monitoring</h2>
-
-          <p>
-            <Link href="/genai">MLflow</Link> makes it straightforward to add
-            production monitoring to your agents and LLM applications. Below are
-            examples based on the{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/prod-tracing/"}>
-              production tracing documentation
-            </Link>
-            .
-          </p>
-
-          <p style={{ marginTop: "32px", marginBottom: "0px" }}>
-            <strong>Automatic Online Evaluation with Production Judges</strong>
+            <Link href="/genai">MLflow</Link> provides an open-source AI
+            monitoring stack that covers tracing, automatic quality evaluation
+            with LLM judges, cost and token tracking, human feedback collection,
+            and real-time safety guardrails, compatible with any LLM provider
+            and any agent framework. Here's how to set it up.
           </p>
 
           <div
-            className="rounded-lg border border-white/10 overflow-hidden"
-            style={{ backgroundColor: CODE_BG, margin: "8px 0" }}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4, 1fr)",
+              gap: "20px",
+              margin: "32px -60px",
+            }}
           >
-            <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
-              <span className="text-xs text-white/50 font-mono">python</span>
-              <CopyButton code={CODE_ONLINE_EVAL} />
-            </div>
-            <div className="p-3 overflow-x-auto">
-              <Highlight
-                theme={customNightOwl}
-                code={CODE_ONLINE_EVAL}
-                language="python"
+            <div
+              style={{
+                background: "#ffffff",
+                border: "1px solid #e5e7eb",
+                borderRadius: "4px",
+                padding: "24px",
+                boxShadow:
+                  "0 0 0 1px rgba(50, 50, 93, 0.05), 0 0 14px 5px rgba(50, 50, 93, 0.08), 0 0 10px 3px rgba(0, 0, 0, 0.05)",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "28px",
+                  fontWeight: "700",
+                  marginBottom: "8px",
+                  color: "#0194e2",
+                }}
               >
-                {({ style, tokens, getLineProps, getTokenProps }) => (
-                  <pre
-                    className="text-xs font-mono !m-0 !p-0 text-left"
-                    style={{
-                      ...style,
-                      backgroundColor: "transparent",
-                    }}
-                  >
-                    {tokens.map((line, i) => (
-                      <div key={i} {...getLineProps({ line })}>
-                        {line.map((token, key) => (
-                          <span key={key} {...getTokenProps({ token })} />
-                        ))}
-                      </div>
-                    ))}
-                  </pre>
-                )}
-              </Highlight>
+                1
+              </div>
+              <div
+                style={{
+                  fontWeight: "600",
+                  marginBottom: "8px",
+                  color: "#1a1a1a",
+                  fontSize: "16px",
+                }}
+              >
+                Trace Every Request
+              </div>
+              <div
+                style={{
+                  fontSize: "14px",
+                  color: "#505050",
+                  lineHeight: "1.5",
+                }}
+              >
+                Add production tracing with{" "}
+                <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
+                  <code>@mlflow.trace</code>
+                </Link>{" "}
+                to capture execution graphs. Attach user, session, and
+                deployment context.
+              </div>
+            </div>
+
+            <div
+              style={{
+                background: "#ffffff",
+                border: "1px solid #e5e7eb",
+                borderRadius: "4px",
+                padding: "24px",
+                boxShadow:
+                  "0 0 0 1px rgba(50, 50, 93, 0.05), 0 0 14px 5px rgba(50, 50, 93, 0.08), 0 0 10px 3px rgba(0, 0, 0, 0.05)",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "28px",
+                  fontWeight: "700",
+                  marginBottom: "8px",
+                  color: "#0194e2",
+                }}
+              >
+                2
+              </div>
+              <div
+                style={{
+                  fontWeight: "600",
+                  marginBottom: "8px",
+                  color: "#1a1a1a",
+                  fontSize: "16px",
+                }}
+              >
+                Score Traces Automatically
+              </div>
+              <div
+                style={{
+                  fontSize: "14px",
+                  color: "#505050",
+                  lineHeight: "1.5",
+                }}
+              >
+                Set up{" "}
+                <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/"}>
+                  automatic LLM judge evaluation
+                </Link>{" "}
+                to score production traces for safety, correctness, and
+                quality drift in the background.
+              </div>
+            </div>
+
+            <div
+              style={{
+                background: "#ffffff",
+                border: "1px solid #e5e7eb",
+                borderRadius: "4px",
+                padding: "24px",
+                boxShadow:
+                  "0 0 0 1px rgba(50, 50, 93, 0.05), 0 0 14px 5px rgba(50, 50, 93, 0.08), 0 0 10px 3px rgba(0, 0, 0, 0.05)",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "28px",
+                  fontWeight: "700",
+                  marginBottom: "8px",
+                  color: "#0194e2",
+                }}
+              >
+                3
+              </div>
+              <div
+                style={{
+                  fontWeight: "600",
+                  marginBottom: "8px",
+                  color: "#1a1a1a",
+                  fontSize: "16px",
+                }}
+              >
+                Collect Human Feedback
+              </div>
+              <div
+                style={{
+                  fontSize: "14px",
+                  color: "#505050",
+                  lineHeight: "1.5",
+                }}
+              >
+                Use{" "}
+                <Link href={MLFLOW_GENAI_DOCS_URL + "assessments/feedback/"}>
+                  <code>mlflow.log_feedback()</code>
+                </Link>{" "}
+                to record user ratings linked to traces. Catch quality issues
+                that automated judges miss and calibrate scoring over time.
+              </div>
+            </div>
+
+            <div
+              style={{
+                background: "#ffffff",
+                border: "1px solid #e5e7eb",
+                borderRadius: "4px",
+                padding: "24px",
+                boxShadow:
+                  "0 0 0 1px rgba(50, 50, 93, 0.05), 0 0 14px 5px rgba(50, 50, 93, 0.08), 0 0 10px 3px rgba(0, 0, 0, 0.05)",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "28px",
+                  fontWeight: "700",
+                  marginBottom: "8px",
+                  color: "#0194e2",
+                }}
+              >
+                4
+              </div>
+              <div
+                style={{
+                  fontWeight: "600",
+                  marginBottom: "8px",
+                  color: "#1a1a1a",
+                  fontSize: "16px",
+                }}
+              >
+                Track Costs &<br />Enforce Guardrails
+              </div>
+              <div
+                style={{
+                  fontSize: "14px",
+                  color: "#505050",
+                  lineHeight: "1.5",
+                }}
+              >
+                Integrate automatic{" "}
+                <Link
+                  href={MLFLOW_GENAI_DOCS_URL + "tracing/token-usage-cost/"}
+                >
+                  token and cost tracking
+                </Link>
+                {" "}per request. The{" "}
+                <Link
+                  href={MLFLOW_GENAI_DOCS_URL + "governance/ai-gateway/"}
+                >
+                  AI Gateway
+                </Link>{" "}
+                adds real-time safety guardrails.
+              </div>
             </div>
           </div>
 
           <p style={{ marginTop: "32px", marginBottom: "0px" }}>
-            <strong>Production Tracing with User and Session Context</strong>
+            <strong>Trace production requests with context</strong>
           </p>
 
           <div
@@ -1380,7 +1178,28 @@ export default function AiMonitoring() {
           </div>
 
           <p style={{ marginTop: "32px", marginBottom: "0px" }}>
-            <strong>Collecting User Feedback on Production Traces</strong>
+            <strong>Register judges for automatic online evaluation</strong>
+          </p>
+
+          <div
+            style={{
+              margin: "8px 0",
+              borderRadius: "8px",
+              overflow: "hidden",
+              border: "1px solid #e5e7eb",
+            }}
+          >
+            <video width="100%" controls autoPlay loop muted playsInline>
+              <source
+                src="https://mlflow.org/docs/latest/images/llms/tracing/automatic-evaluation-ui-setup.mp4"
+                type="video/mp4"
+              />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+
+          <p style={{ marginTop: "32px", marginBottom: "0px" }}>
+            <strong>Collect user feedback on traces</strong>
           </p>
 
           <div
@@ -1429,16 +1248,16 @@ export default function AiMonitoring() {
               evaluate, monitor, and optimize production-quality AI agents and
               LLM applications while controlling costs and managing access to
               models and data. Backed by the Linux Foundation and licensed under
-              Apache 2.0, MLflow provides a complete production monitoring
+              Apache 2.0, MLflow provides a complete AI monitoring
               solution with no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>
 
-          <h2>Open Source vs. Proprietary Production Monitoring Tools</h2>
+          <h2>Open Source vs. Proprietary AI Monitoring Tools</h2>
 
           <p>
-            When choosing a production monitoring platform for agents and LLM
+            When choosing an AI monitoring platform for agents and LLM
             applications, the decision between open source and proprietary SaaS
             tools has significant long-term implications for your team,
             infrastructure, and data ownership.
@@ -1537,6 +1356,9 @@ export default function AiMonitoring() {
             </li>
           </ul>
         </div>
+
+        <ArticleSidebar />
+        <SocialLinksFooter />
       </div>
     </>
   );
