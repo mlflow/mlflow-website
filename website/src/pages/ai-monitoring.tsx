@@ -9,8 +9,7 @@ import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
-const SEO_TITLE =
-  "AI Monitoring for LLMs & Agents | MLflow AI Platform";
+const SEO_TITLE = "AI Monitoring for LLMs & Agents | MLflow AI Platform";
 const SEO_DESCRIPTION =
   "AI monitoring evaluates agent and LLM quality in production, detects drift, and controls costs. Explore AI monitoring on MLflow's open source AI platform.";
 
@@ -26,8 +25,7 @@ const faqs: {
       "AI monitoring is the practice of continuously assessing the quality, performance, cost, and safety of AI applications running in production, including LLM and agent-based systems. Unlike traditional software monitoring (uptime, error rates), AI monitoring must evaluate the quality of non-deterministic text outputs, track token costs, detect hallucinations, and identify when model behavior drifts from expected standards.",
   },
   {
-    question:
-      "How is AI monitoring different from classical ML monitoring?",
+    question: "How is AI monitoring different from classical ML monitoring?",
     answer:
       "Classical ML monitoring tracks feature distributions, prediction accuracy on structured outputs, and data drift using statistical tests. AI monitoring must handle free-form language outputs, multi-step agent reasoning, tool call chains, retrieval accuracy, subjective quality dimensions, and token-based costs. You can't use distribution histograms to detect when an LLM starts hallucinating or when an agent picks the wrong tool.",
   },
@@ -90,16 +88,16 @@ const faqs: {
       "How does MLflow enable AI monitoring for agents and LLM applications?",
     answer: (
       <>
-        MLflow provides an integrated AI monitoring stack: (1) Automatic
-        tracing with one-line instrumentation across 50+ frameworks (OpenAI,
-        LangChain, Anthropic, LlamaIndex, etc.), (2) Asynchronous trace logging
-        that doesn't impact application performance, (3) Automatic online
-        evaluation where registered LLM judges (Guidelines, Safety, Correctness,
-        and more) score production traces in the background via{" "}
-        <code>.register()</code> and <code>.start()</code>, (4) Configurable
-        trace sampling for cost control, (5) Automatic token and cost tracking,
-        (6) Human feedback collection via <code>log_feedback()</code> linked to
-        traces, (7) User/session/request context tracking via{" "}
+        MLflow provides an integrated AI monitoring stack: (1) Automatic tracing
+        with one-line instrumentation across 50+ frameworks (OpenAI, LangChain,
+        Anthropic, LlamaIndex, etc.), (2) Asynchronous trace logging that
+        doesn't impact application performance, (3) Automatic online evaluation
+        where registered LLM judges (Guidelines, Safety, Correctness, and more)
+        score production traces in the background via <code>.register()</code>{" "}
+        and <code>.start()</code>, (4) Configurable trace sampling for cost
+        control, (5) Automatic token and cost tracking, (6) Human feedback
+        collection via <code>log_feedback()</code> linked to traces, (7)
+        User/session/request context tracking via{" "}
         <code>update_current_trace()</code>, and (8) OpenTelemetry compatibility
         for data portability.{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/prod-tracing/"}>
@@ -154,28 +152,52 @@ const faqs: {
       "MLflow supports configurable trace sampling at two levels. Globally, the MLFLOW_TRACE_SAMPLING_RATIO environment variable (0.0 to 1.0, default 1.0) controls the default sampling rate. Per-endpoint, use @mlflow.trace(sampling_ratio_override=...) to override the global rate for specific functions (e.g., 100% for payment processing, 10% for high-volume chat). Sampling decisions happen before trace submission to minimize overhead. This lets teams balance monitoring coverage against computational and storage costs.",
   },
   {
-    question:
-      "What built-in scorers does MLflow provide for AI monitoring?",
+    question: "What built-in scorers does MLflow provide for AI monitoring?",
     answer: (
       <>
         MLflow provides built-in LLM judges across multiple quality dimensions:{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/response-quality/safety/"}>
+        <Link
+          href={
+            MLFLOW_GENAI_DOCS_URL +
+            "eval-monitor/scorers/llm-judge/response-quality/safety/"
+          }
+        >
           Safety
         </Link>{" "}
         (harmful content),{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/response-quality/correctness/"}>
+        <Link
+          href={
+            MLFLOW_GENAI_DOCS_URL +
+            "eval-monitor/scorers/llm-judge/response-quality/correctness/"
+          }
+        >
           Correctness
         </Link>{" "}
         (factual accuracy),{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/rag/relevance/"}>
+        <Link
+          href={
+            MLFLOW_GENAI_DOCS_URL +
+            "eval-monitor/scorers/llm-judge/rag/relevance/"
+          }
+        >
           RelevanceToQuery
         </Link>{" "}
         (response addresses the question),{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/rag/groundedness/"}>
+        <Link
+          href={
+            MLFLOW_GENAI_DOCS_URL +
+            "eval-monitor/scorers/llm-judge/rag/groundedness/"
+          }
+        >
           Groundedness
         </Link>{" "}
         (supported by context),{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/llm-judge/tool-call/efficiency/"}>
+        <Link
+          href={
+            MLFLOW_GENAI_DOCS_URL +
+            "eval-monitor/scorers/llm-judge/tool-call/efficiency/"
+          }
+        >
           ToolCallEfficiency
         </Link>{" "}
         (optimal tool usage),{" "}
@@ -188,19 +210,35 @@ const faqs: {
         </Link>{" "}
         (multi-turn safety), and more. Additionally, MLflow integrates with
         third-party scorer libraries including{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/third-party/deepeval/"}>
+        <Link
+          href={
+            MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/third-party/deepeval/"
+          }
+        >
           DeepEval
         </Link>{" "}
         (50+ metrics),{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/third-party/ragas/"}>
+        <Link
+          href={
+            MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/third-party/ragas/"
+          }
+        >
           RAGAS
         </Link>{" "}
         (RAG-specific metrics),{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/third-party/trulens/"}>
+        <Link
+          href={
+            MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/third-party/trulens/"
+          }
+        >
           TruLens
         </Link>{" "}
         (agent trajectory scoring), and{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/third-party/phoenix/"}>
+        <Link
+          href={
+            MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/third-party/phoenix/"
+          }
+        >
           Phoenix
         </Link>{" "}
         (hallucination, toxicity).{" "}
@@ -267,11 +305,11 @@ const faqs: {
         <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/search-traces/"}>
           <code>mlflow.search_traces()</code>
         </Link>{" "}
-        and aggregated into time-series
-        dashboards. Teams integrate these metrics with their existing alerting
-        tools (PagerDuty, Slack, etc.) to trigger alerts on quality score drops,
-        cost anomalies, latency spikes, or safety incidents. The AI Gateway also
-        supports rate limiting and cost budgets as proactive guardrails.{" "}
+        and aggregated into time-series dashboards. Teams integrate these
+        metrics with their existing alerting tools (PagerDuty, Slack, etc.) to
+        trigger alerts on quality score drops, cost anomalies, latency spikes,
+        or safety incidents. The AI Gateway also supports rate limiting and cost
+        budgets as proactive guardrails.{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>Learn more</Link>.
       </>
     ),
@@ -317,8 +355,8 @@ const faqs: {
       "How does MLflow handle security threats like prompt injection and PII leakage?",
     answer: (
       <>
-        MLflow's AI monitoring captures complete audit trails of all
-        inputs, outputs, and model interactions for compliance and incident
+        MLflow's AI monitoring captures complete audit trails of all inputs,
+        outputs, and model interactions for compliance and incident
         investigation. Built-in safety scorers detect harmful content, PII
         exposure, and policy violations in outputs. The AI Gateway adds
         real-time guardrails that filter inputs for prompt injection attempts
@@ -346,8 +384,8 @@ const faqs: {
         MLflow AI monitoring combines tracing, automatic LLM judge evaluation,
         human feedback collection, and cost tracking into a unified stack. See
         the <a href="#how-to-implement">How to Implement AI Monitoring</a>{" "}
-        section above for a step-by-step walkthrough with code examples, or
-        jump straight to the{" "}
+        section above for a step-by-step walkthrough with code examples, or jump
+        straight to the{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/prod-tracing/"}>
           production tracing documentation
         </Link>{" "}
@@ -767,12 +805,11 @@ export default function AiMonitoring() {
 
           <p>
             AI monitoring is the practice of continuously evaluating the
-            quality, performance, cost, and safety of AI applications running
-            in production, including LLM and agent-based systems. It goes
-            beyond uptime and error rates to assess the{" "}
-            <em>quality</em> of non-deterministic AI outputs, track token
-            costs and latency, and detect when behavior drifts from expected
-            standards.{" "}
+            quality, performance, cost, and safety of AI applications running in
+            production, including LLM and agent-based systems. It goes beyond
+            uptime and error rates to assess the <em>quality</em> of
+            non-deterministic AI outputs, track token costs and latency, and
+            detect when behavior drifts from expected standards.{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/prod-tracing/"}>
               Production tracing
             </Link>{" "}
@@ -784,17 +821,17 @@ export default function AiMonitoring() {
             and prediction accuracy on structured data), AI monitoring must
             evaluate free-form language outputs, multi-step agent reasoning,
             tool call chains, retrieval accuracy, and token costs. Traditional
-            monitoring can tell you the system is running; AI monitoring
-            tells you whether it's <em>working well</em>.
+            monitoring can tell you the system is running; AI monitoring tells
+            you whether it's <em>working well</em>.
           </p>
 
           <p>
-            <Link href="/genai">MLflow</Link> provides a complete AI
-            monitoring stack: automatic online evaluation with LLM judges that
-            score traces asynchronously, configurable trace sampling for cost
-            control, user and session context tracking for debugging, human
-            feedback collection, and built-in scorers for hallucination
-            detection, safety, and more.{" "}
+            <Link href="/genai">MLflow</Link> provides a complete AI monitoring
+            stack: automatic online evaluation with LLM judges that score traces
+            asynchronously, configurable trace sampling for cost control, user
+            and session context tracking for debugging, human feedback
+            collection, and built-in scorers for hallucination detection,
+            safety, and more.{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
               Explore the evaluation and monitoring docs
             </Link>
@@ -818,9 +855,7 @@ export default function AiMonitoring() {
             </video>
           </div>
 
-          <h2 id="why-monitoring">
-            Why AI Monitoring Matters
-          </h2>
+          <h2 id="why-monitoring">Why AI Monitoring Matters</h2>
 
           <p>
             Agents and LLM applications in production face challenges that don't
@@ -877,7 +912,6 @@ export default function AiMonitoring() {
                 scores enable rapid root-cause analysis.
               </p>
             </div>
-
           </div>
 
           <h2 id="use-cases">AI Monitoring Use Cases</h2>
@@ -892,8 +926,8 @@ export default function AiMonitoring() {
             <li>
               <strong>Agent tool selection monitoring:</strong> Track whether
               agents pick the right tools and complete tasks efficiently. Detect
-              loops, unnecessary retries, and incorrect tool selections that waste
-              tokens and degrade user experience.
+              loops, unnecessary retries, and incorrect tool selections that
+              waste tokens and degrade user experience.
             </li>
             <li>
               <strong>Cost optimization:</strong> Identify expensive queries,
@@ -920,11 +954,11 @@ export default function AiMonitoring() {
               regulatory review.
             </li>
             <li>
-              <strong>Latency SLA monitoring:</strong> For user-facing
-              chatbots, coding assistants, and real-time agents where response
-              time directly impacts user experience. Track p50/p95/p99 latency
-              and time-to-first-token to catch performance regressions before
-              they affect retention.
+              <strong>Latency SLA monitoring:</strong> For user-facing chatbots,
+              coding assistants, and real-time agents where response time
+              directly impacts user experience. Track p50/p95/p99 latency and
+              time-to-first-token to catch performance regressions before they
+              affect retention.
             </li>
           </ul>
 
@@ -1033,8 +1067,8 @@ export default function AiMonitoring() {
                 <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/"}>
                   automatic LLM judge evaluation
                 </Link>{" "}
-                to score production traces for safety, correctness, and
-                quality drift in the background.
+                to score production traces for safety, correctness, and quality
+                drift in the background.
               </div>
             </div>
 
@@ -1112,7 +1146,8 @@ export default function AiMonitoring() {
                   fontSize: "16px",
                 }}
               >
-                Track Costs &<br />Enforce Guardrails
+                Track Costs &<br />
+                Enforce Guardrails
               </div>
               <div
                 style={{
@@ -1126,11 +1161,9 @@ export default function AiMonitoring() {
                   href={MLFLOW_GENAI_DOCS_URL + "tracing/token-usage-cost/"}
                 >
                   token and cost tracking
-                </Link>
-                {" "}per request. The{" "}
-                <Link
-                  href={MLFLOW_GENAI_DOCS_URL + "governance/ai-gateway/"}
-                >
+                </Link>{" "}
+                per request. The{" "}
+                <Link href={MLFLOW_GENAI_DOCS_URL + "governance/ai-gateway/"}>
                   AI Gateway
                 </Link>{" "}
                 adds real-time safety guardrails.
@@ -1248,8 +1281,8 @@ export default function AiMonitoring() {
               evaluate, monitor, and optimize production-quality AI agents and
               LLM applications while controlling costs and managing access to
               models and data. Backed by the Linux Foundation and licensed under
-              Apache 2.0, MLflow provides a complete AI monitoring
-              solution with no vendor lock-in.{" "}
+              Apache 2.0, MLflow provides a complete AI monitoring solution with
+              no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>
