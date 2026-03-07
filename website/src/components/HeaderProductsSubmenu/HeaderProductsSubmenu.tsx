@@ -57,6 +57,17 @@ export const HeaderProductsSubmenu = () => {
             </div>
           </div>
         </div>
+        <div className={feature()}>
+          <span className={featureTitle()}>Learn</span>
+          <div className={columns()}>
+            <div className={column()}>
+              <HeaderMenuItem
+                href="/ai-agent-platform"
+                label="AI Agent Platform"
+              />
+            </div>
+          </div>
+        </div>
       </div>
       <div className={component()}>
         <div className={titleContainer()}>
