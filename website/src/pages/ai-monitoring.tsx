@@ -809,9 +809,9 @@ export default function AiMonitoring() {
             production. LLM monitoring focuses on individual model calls,
             tracking output quality, hallucinations, token costs, and latency,
             while agent monitoring extends this to multi-step reasoning, tool
-            selection, and task completion. Both go beyond uptime and error rates
-            to assess the <em>quality</em> of non-deterministic outputs and
-            detect when behavior drifts from expected standards.{" "}
+            selection, and task completion. Both go beyond uptime and error
+            rates to assess the <em>quality</em> of non-deterministic outputs
+            and detect when behavior drifts from expected standards.{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/prod-tracing/"}>
               Production tracing
             </Link>{" "}
