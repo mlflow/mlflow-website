@@ -121,6 +121,9 @@ result = mlflow.genai.optimize_prompts(
         reflection_model="openai:/gpt-5.2",
         max_metric_calls=500,
     ),
+    # LLM judge that scores each candidate prompt's responses;
+    # the optimizer uses these scores as a reward signal
+    # to guide its search and identify prompt improvements
     scorers=[Correctness()],
     enable_tracking=True,
 )
