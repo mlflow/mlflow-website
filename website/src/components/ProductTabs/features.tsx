@@ -49,7 +49,14 @@ const llmAgentFeatures: Feature[] = [
           insights
         </Link>{" "}
         into their behavior. Built on OpenTelemetry and supports any LLM
-        provider and agent framework.
+        provider and agent framework.{" "}
+        <Link
+          href="/ai-monitoring"
+          className="text-white/90 hover:text-white underline"
+        >
+          Monitor
+        </Link>{" "}
+        production quality, costs, and safety.
       </>
     ),
     imageSrc: TracingTabImg,

@@ -1123,6 +1123,13 @@ export default function FAQ() {
                 improve prompts using training data and LLM-driven analysis.
               </p>
             </Link>
+            <Link href="/ai-monitoring" className="learn-more-card">
+              <h3>AI Monitoring</h3>
+              <p>
+                Continuously evaluate quality, detect drift, and track costs for
+                AI agents and LLM applications in production.
+              </p>
+            </Link>
             <Link href="/llm-optimization" className="learn-more-card">
               <h3>LLM Optimization</h3>
               <p>

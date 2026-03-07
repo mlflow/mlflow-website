@@ -1797,6 +1797,9 @@ results = mlflow.genai.evaluate(
               <Link href="/ai-observability">AI Observability FAQ</Link>
             </li>
             <li>
+              <Link href="/ai-monitoring">AI Monitoring FAQ</Link>
+            </li>
+            <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>
             </li>
           </ul>
