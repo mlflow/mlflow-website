@@ -20,12 +20,6 @@ const faqs: {
   answerText?: string;
 }[] = [
   {
-    question:
-      "Why use MLflow for prompt optimization instead of using GEPA or DSPy directly?",
-    answer:
-      "MLflow wraps optimizers like GEPA and DSPy behind a single API, so you can try different algorithms without rewriting your code. More importantly, MLflow tracks every optimization run: each prompt version is saved in the Prompt Registry with full diff history, evaluation scores are logged for comparison across runs, and traces let you inspect individual predictions. This means you can see exactly what changed, measure whether it helped, and roll back to any previous version at any time.",
-  },
-  {
     question: "What is prompt optimization?",
     answer:
       "Prompt optimization is the automated process of improving prompts for LLM applications using data-driven algorithms instead of manual trial-and-error. Optimizers analyze prompt performance on training data, identify failure patterns, and generate improved prompt variants iteratively until quality converges.",
@@ -48,7 +42,13 @@ const faqs: {
   {
     question: "How much training data do I need for prompt optimization?",
     answer:
-      "GEPA works well with 50-100 labeled examples. Each example should include inputs and an expected output so the optimizer can measure prompt quality and identify failure patterns.",
+      "Most optimization algorithms work well with 20+ labeled examples. Each example should include some way for the optimizer to measure prompt quality and identify failure patterns. For instance, you may include an expected output (label) for each example, which the optimizer should aim to match.",
+  },
+  {
+    question:
+      "Why use MLflow for prompt optimization instead of using GEPA or DSPy directly?",
+    answer:
+      "MLflow wraps optimizers like GEPA and DSPy behind a single API, so you can try different algorithms without rewriting your code. More importantly, MLflow tracks every optimization run: each prompt version is saved in the Prompt Registry with full diff history, evaluation scores are logged for comparison across runs, and traces let you inspect individual predictions. This means you can see exactly what changed, measure whether it helped, and roll back to any previous version at any time.",
   },
   {
     question: "Is prompt optimization free with MLflow?",
