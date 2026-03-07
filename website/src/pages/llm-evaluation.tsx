@@ -1307,7 +1307,9 @@ export default function AgentEvaluation() {
                 side-by-side evaluations
               </Link>{" "}
               with LLM judges. Compare quality metrics to ensure changes improve
-              output quality.
+              output quality, or use{" "}
+              <Link href="/prompt-optimization">prompt optimization</Link> to
+              automate the improvement process entirely.
             </li>
             <li>
               <strong>Building Regression Datasets:</strong> Convert production
@@ -1784,6 +1786,9 @@ results = mlflow.genai.evaluate(
               <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/"}>
                 Custom Scorers Documentation
               </Link>
+            </li>
+            <li>
+              <Link href="/prompt-optimization">Prompt Optimization Guide</Link>
             </li>
             <li>
               <Link href="/llm-tracing">LLM Tracing FAQ</Link>

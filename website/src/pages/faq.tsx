@@ -346,7 +346,11 @@ const faqCategories: FAQCategory[] = [
             application code, reuse them across multiple versions of your agent,
             and view rich lineage showing which deployments use each prompt
             version. This makes it easy to optimize prompts without redeploying
-            your application. See the{" "}
+            your application. You can also use{" "}
+            <Link href="/prompt-optimization">
+              automated prompt optimization
+            </Link>{" "}
+            to improve prompts algorithmically. See the{" "}
             <Link
               href={
                 MLFLOW_GENAI_DOCS_URL +
@@ -1110,6 +1114,13 @@ export default function FAQ() {
               <p>
                 Operationalize LLM applications with end-to-end lifecycle
                 management from development to production.
+              </p>
+            </Link>
+            <Link href="/prompt-optimization" className="learn-more-card">
+              <h3>Prompt Optimization</h3>
+              <p>
+                Automate prompt engineering with algorithms that systematically
+                improve prompts using training data and LLM-driven analysis.
               </p>
             </Link>
             <Link href="/genai" className="learn-more-card">
