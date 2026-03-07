@@ -8,6 +8,14 @@ import { ArticleSidebar } from "../components/ArticleSidebar/ArticleSidebar";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
+import DAGLoop from "../components/DAGLoop";
+import {
+  ClipboardCheck,
+  SearchX,
+  Sparkles,
+  Trophy,
+  RefreshCw,
+} from "lucide-react";
 
 const SEO_TITLE =
   "Prompt Optimization: Automate Prompt Engineering | MLflow AI Platform";
@@ -252,37 +260,7 @@ export default function PromptOptimization() {
             gap: 24px;
             margin: 40px 0 56px 0;
           }
-          .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin: 32px 0;
-          }
-          .step-card {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 4px;
-            padding: 24px;
-            box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.05), 0 0 14px 5px rgba(50, 50, 93, 0.08), 0 0 10px 3px rgba(0, 0, 0, 0.05);
-          }
-          .step-number {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #0194e2;
-          }
-          .step-title {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #1a1a1a;
-            font-size: 16px;
-          }
-          .step-desc {
-            font-size: 14px;
-            color: #505050;
-            line-height: 1.5;
-          }
-          .card {
+.card {
             background: #ffffff;
             border: 1px solid #e5e7eb;
             border-radius: 4px;
@@ -442,11 +420,7 @@ export default function PromptOptimization() {
               grid-template-columns: 1fr;
               gap: 20px;
             }
-            .steps-grid {
-              grid-template-columns: 1fr 1fr;
-              gap: 16px;
-            }
-            .card {
+.card {
               padding: 24px;
             }
             .faq-question {
@@ -554,47 +528,43 @@ export default function PromptOptimization() {
             four-step cycle:
           </p>
 
-          <div className="steps-grid">
-            <div className="step-card">
-              <div className="step-number">1</div>
-              <div className="step-title">Evaluate</div>
-              <div className="step-desc">
-                Run the current prompt against training examples and score each
-                output. This produces a performance baseline and a set of
-                failure cases where the prompt fell short.
-              </div>
-            </div>
-
-            <div className="step-card">
-              <div className="step-number">2</div>
-              <div className="step-title">Analyze Failures</div>
-              <div className="step-desc">
-                An LLM reads each failure, including the full execution trace,
-                and diagnoses why the prompt failed: missing instructions,
-                ambiguous wording, or unhandled edge cases.
-              </div>
-            </div>
-
-            <div className="step-card">
-              <div className="step-number">3</div>
-              <div className="step-title">Generate Candidates</div>
-              <div className="step-desc">
-                The optimizer generates new prompt variants that target the
-                specific weaknesses found in step 2, while maintaining diversity
-                to avoid local optima.
-              </div>
-            </div>
-
-            <div className="step-card">
-              <div className="step-number">4</div>
-              <div className="step-title">Select & Repeat</div>
-              <div className="step-desc">
-                Evaluate all candidates, select the best as the new baseline,
-                and repeat the loop until quality converges or a budget limit is
-                reached.
-              </div>
-            </div>
-          </div>
+          <DAGLoop
+            steps={[
+              {
+                icon: ClipboardCheck,
+                title: "Evaluate",
+                description: "Score current prompt",
+                detailedDescription:
+                  "Run the current prompt against training examples and score each output. This produces a performance baseline and a set of failure cases where the prompt fell short.",
+              },
+              {
+                icon: SearchX,
+                title: "Analyze Failures",
+                description: "Diagnose weaknesses",
+                detailedDescription:
+                  "An LLM reads each failure, including the full execution trace, and diagnoses why the prompt failed: missing instructions, ambiguous wording, or unhandled edge cases.",
+              },
+              {
+                icon: Sparkles,
+                title: "Generate Candidates",
+                description: "Create improved variants",
+                detailedDescription:
+                  "The optimizer generates new prompt variants that target the specific weaknesses found in step 2, while maintaining diversity to avoid local optima.",
+                isFocus: true,
+              },
+              {
+                icon: Trophy,
+                title: "Select & Repeat",
+                description: "Pick best, iterate",
+                detailedDescription:
+                  "Evaluate all candidates, select the best as the new baseline, and repeat the loop until quality converges or a budget limit is reached.",
+              },
+            ]}
+            loopBackIcon={RefreshCw}
+            loopBackText="Optimization Loop"
+            loopBackDescription="The optimizer repeats this cycle, improving the prompt with each iteration until quality converges."
+            circleSize={500}
+          />
 
           <h2 id="how-to-implement">How to Implement Prompt Optimization</h2>
 
