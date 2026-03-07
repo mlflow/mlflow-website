@@ -571,8 +571,9 @@ export default function LLMOptimization() {
             quality with LLM judges, providing a baseline to track whether
             changes actually improve performance.{" "}
             <Link href="/prompt-optimization">Prompt optimization</Link>{" "}
-            automates the process of improving prompts algorithmically, replacing
-            manual trial-and-error with systematic, data-driven iteration.
+            automates the process of improving prompts algorithmically,
+            replacing manual trial-and-error with systematic, data-driven
+            iteration.
           </p>
 
           <p>
@@ -955,8 +956,9 @@ export default function LLMOptimization() {
               automated prompt optimization
             </Link>{" "}
             to improve quality, route through the{" "}
-            <Link href="/ai-gateway">AI Gateway</Link> for cost management, compliance, and governance, and
-            monitor production quality with continuous evaluation.
+            <Link href="/ai-gateway">AI Gateway</Link> for cost management,
+            compliance, and governance, and monitor production quality with
+            continuous evaluation.
           </p>
 
           <div style={{ margin: "32px 0", textAlign: "center" }}>
@@ -1033,10 +1035,10 @@ export default function LLMOptimization() {
             <strong>Why Teams Choose Open Source:</strong> Organizations
             optimizing LLM applications at scale choose MLflow because it
             provides production-grade tracing, evaluation, prompt optimization,
-            and cost management, compliance, and governance without giving up control of their data, cost
-            predictability, or flexibility. The Apache 2.0 license and Linux
-            Foundation backing ensure MLflow remains truly open and
-            community-driven.
+            and cost management, compliance, and governance without giving up
+            control of their data, cost predictability, or flexibility. The
+            Apache 2.0 license and Linux Foundation backing ensure MLflow
+            remains truly open and community-driven.
           </p>
 
           <h2 id="faq">Frequently Asked Questions</h2>
