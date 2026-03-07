@@ -53,6 +53,13 @@ const faqs: { question: string; answer: ReactNode }[] = [
         >
           prompt management
         </Link>
+        ,{" "}
+        <Link
+          to="/prompt-optimization"
+          className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
+        >
+          prompt optimization
+        </Link>
         , an{" "}
         <Link
           to="/genai/ai-gateway"
