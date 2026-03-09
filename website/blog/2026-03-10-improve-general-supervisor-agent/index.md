@@ -223,14 +223,14 @@ Aggregate scores tell part of the story. The judge's per-trace rationales show e
 
 ### Baseline agent (scored 3.5/5):
 
-```text
+```
 The .500 BA / .240 SLG inconsistency is a significant data accuracy problem - SLG can never be lower than BA since every hit produces at least one total base. This undermines trust in the analysis. Despite the data accuracy concern and missing pitch count totals/usage percentages, the overall structure, strategic depth, and actionability of the response are strong. The count-by-count breakdown with zone tendencies provides genuine strategic advantage.
 
 Rating: 3.5. The strategic framework is excellent and highly actionable, but the data accuracy issue (impossible SLG < BA) and missing pitch count totals/usage percentages are notable flaws that prevent a 5.
 ```
 ### Optimized agent (scored 5/5):
 
-```text
+```
 This is a very strong response. It provides count-by-count strategic advice, identifies specific pitches to hunt, zones to focus on, and pitches to avoid. The data is well-presented with proper units and sample sizes. The recommendations are clearly tied to the data. The only minor issues are: 
 
 (1) not explicitly discussing the historical matchup results despite mentioning them in data collected, and (2) the exit velocity on sweepers seems low relative to the wOBA, which could have been noted. But overall this is an excellent, actionable scouting report.
