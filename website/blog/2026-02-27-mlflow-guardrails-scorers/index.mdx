@@ -10,7 +10,7 @@ image: /img/blog/mlflow-guardrails-scorers-thumbnail.png
 
 MLflow's [evaluation framework](https://mlflow.org/docs/latest/genai/eval-monitor/) (32M+ monthly PyPI downloads) now includes [Guardrails AI](https://guardrailsai.com/) as a third-party scorer integration. This extends the scorer framework established by Samraj Moorjani's [DeepEval](https://deepeval.com/docs/getting-started) and [RAGAS](https://docs.ragas.io/) integrations (MLflow 3.8) to deterministic safety validation, connecting MLflow's evaluation pipeline to Guardrails AI's library of NLP-based validators.
 
-LLM judges work well for subjective quality assessment like grounding and relevance, but for safety checks (toxic content, PII leakage, jailbreak attempts), the tradeoff is different. Speed and consistency matter more, and the precision/recall characteristics of rule-based detectors are often better suited to the task than a general-purpose language model. Previously, teams wanting deterministic safety checks in MLflow had to write custom scorer classes with 40-60 lines of Python per validator to handle setup, validation, result conversion, and error isolation.
+LLM judges work well for subjective quality assessment like grounding and relevance, but for safety checks (toxic content, PII leakage, jailbreak attempts), the tradeoff is different. Speed and consistency matter more, and the precision/recall characteristics of rule-based detectors are often better suited to the task than a general-purpose language model. Previously, teams wanting deterministic safety checks in MLflow had to write custom scorer classes with dozens of lines of Python per validator to handle setup, validation, result conversion, and error isolation.
 
 The integration brings six validators into MLflow's standard scorer interface, covering toxicity, PII detection (via [Microsoft Presidio](https://microsoft.github.io/presidio/)), jailbreak detection, secrets scanning, NSFW content, and gibberish detection. Each runs locally using NLP classifiers, regex patterns, or named entity recognition. Together with the [Phoenix](https://arize.com/docs/phoenix) and [TruLens](https://www.trulens.org/) integrations, teams can now combine deterministic safety checks with RAG quality metrics and content assessment in a single `mlflow.genai.evaluate()` call.
 
@@ -73,12 +73,14 @@ The "account manager" row flags PII (email and phone number), while the others p
 <img
   src={require("./evaluate-results.png").default}
   alt="MLflow evaluation UI showing results from three Guardrails AI scorers run against three LLM outputs, with pass/fail indicators for toxicity, PII, and jailbreak detection."
-  width="100%"
+  style={{ maxWidth: "80%", width: "100%", margin: "0 auto", display: "block" }}
 />
 
 Deterministic and LLM-based scorers compose naturally in the same `evaluate()` call. You can mix Guardrails validators with Phoenix, TruLens, or MLflow's built-in judges for a layered evaluation that covers both objective safety and subjective quality.
 
 ## How It Works
+
+The integration follows the same scorer pattern used by MLflow's other third-party integrations.
 
 <img
   src={require("./architecture-diagram.png").default}
@@ -86,7 +88,7 @@ Deterministic and LLM-based scorers compose naturally in the same `evaluate()` c
   style={{ width: "100%", margin: "0 auto", display: "block" }}
 />
 
-The integration follows the same scorer pattern used by MLflow's other third-party integrations. You pass inputs and outputs to the scorer, it maps them to text, runs the [Guardrails AI](https://guardrailsai.com/) validator, and returns a standard MLflow `Feedback` object with a yes/no value and a rationale. The key difference from LLM-based scorers is that the entire model adapter layer is unnecessary: validators run locally through NLP classifiers and pattern matching rather than LLM inference. All scorers accept keyword arguments that pass through to the underlying Guardrails AI validator. See the [Guardrails AI scorer docs](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/third-party/guardrails/) for configuration options.
+You pass inputs and outputs to the scorer, it maps them to text, runs the [Guardrails AI](https://guardrailsai.com/) validator, and returns a standard MLflow `Feedback` object with a yes/no value and a rationale. The key difference from LLM-based scorers is that the entire model adapter layer is unnecessary: validators run locally through NLP classifiers and pattern matching rather than LLM inference. All scorers accept keyword arguments that pass through to the underlying Guardrails AI validator. See the [Guardrails AI scorer docs](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/third-party/guardrails/) for configuration options.
 
 ## Getting Started
 
