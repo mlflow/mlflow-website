@@ -65,7 +65,7 @@ from openinference.instrumentation.dspy import (
 )
 
 DSPyInstrumentor().instrument()
-`
+`,
   },
 ];
 
@@ -175,7 +175,11 @@ const selfHostingTable: [string, string, string][] = [
     "Server + DB + storage",
     "ClickHouse + PostgreSQL + Redis + S3 + Web Server",
   ],
-  ["Database Choices", "PostgreSQL, MySQL, MSSQL, SQLite, and more", "ClickHouse required"],
+  [
+    "Database Choices",
+    "PostgreSQL, MySQL, MSSQL, SQLite, and more",
+    "ClickHouse required",
+  ],
   ["Storage", "S3, R2, GCS, Azure Blob, HDFS, local", "S3 or GCS"],
   [
     "Operational Complexity",
@@ -184,24 +188,27 @@ const selfHostingTable: [string, string, string][] = [
   ],
 ];
 
-const evalFeatures: { feature: string; mlflow: boolean | string; langfuse: boolean | string }[] =
-  [
-    { feature: "Built-in LLM Judges", mlflow: true, langfuse: true },
-    { feature: "Custom Metrics", mlflow: true, langfuse: true },
-    { feature: "Versioning Metrics", mlflow: true, langfuse: false },
-    {
-      feature: "Aligning Judges with Human Feedback",
-      mlflow: true,
-      langfuse: false,
-    },
-    { feature: "Multi-Turn Evaluation", mlflow: true, langfuse: false },
-    { feature: "Online Evaluation", mlflow: true, langfuse: false },
-    {
-      feature: "Integrated Libraries",
-      mlflow: "RAGAS, DeepEval, Phoenix, TruLens, Guardrails AI",
-      langfuse: "RAGAS",
-    },
-  ];
+const evalFeatures: {
+  feature: string;
+  mlflow: boolean | string;
+  langfuse: boolean | string;
+}[] = [
+  { feature: "Built-in LLM Judges", mlflow: true, langfuse: true },
+  { feature: "Custom Metrics", mlflow: true, langfuse: true },
+  { feature: "Versioning Metrics", mlflow: true, langfuse: false },
+  {
+    feature: "Aligning Judges with Human Feedback",
+    mlflow: true,
+    langfuse: false,
+  },
+  { feature: "Multi-Turn Evaluation", mlflow: true, langfuse: false },
+  { feature: "Online Evaluation", mlflow: true, langfuse: false },
+  {
+    feature: "Integrated Libraries",
+    mlflow: "RAGAS, DeepEval, Phoenix, TruLens, Guardrails AI",
+    langfuse: "RAGAS",
+  },
+];
 
 export default function LangfuseAlternative() {
   return (
@@ -613,13 +620,11 @@ export default function LangfuseAlternative() {
           <p className="subtitle">
             Langfuse is a popular open-source observability tool for LLM
             applications, but tracing alone isn't enough to ship
-            production-grade AI agents. Teams also need evaluation,
-            high-quality prompts, and governance.
-            In this article, we compare Langfuse's tracing-focused
-            approach with MLflow's complete AI engineering platform and
-            help you decide which is the right fit.
+            production-grade AI agents. Teams also need evaluation, high-quality
+            prompts, and governance. In this article, we compare Langfuse's
+            tracing-focused approach with MLflow's complete AI engineering
+            platform and help you decide which is the right fit.
           </p>
-
 
           {/* What is Langfuse? */}
           <h2>What is Langfuse?</h2>
@@ -630,14 +635,16 @@ export default function LangfuseAlternative() {
             />
           </div>
           <p>
-            <strong><Link to="https://langfuse.com/">Langfuse</Link></strong> is an open-source
-            observability and monitoring platform for LLM applications. Its core
-            strength is tracing — capturing every operation, timing, inputs,
-            outputs, and metadata to give visibility into LLM app behavior.
-            Langfuse also offers prompt management, basic evaluation, and
-            analytics. It integrates with popular frameworks like OpenAI SDK,
-            LangChain, and LlamaIndex, and offers both a cloud-hosted SaaS and
-            a self-hosted deployment option.
+            <strong>
+              <Link to="https://langfuse.com/">Langfuse</Link>
+            </strong>{" "}
+            is an open-source observability and monitoring platform for LLM
+            applications. Its core strength is tracing: capturing every
+            operation, timing, inputs, outputs, and metadata to give visibility
+            into LLM app behavior. Langfuse also offers prompt management, basic
+            evaluation, and analytics. It integrates with popular frameworks
+            like OpenAI SDK, LangChain, and LlamaIndex, and offers both a
+            cloud-hosted SaaS and a self-hosted deployment option.
           </p>
 
           {/* What is MLflow? */}
@@ -649,20 +656,25 @@ export default function LangfuseAlternative() {
             />
           </div>
           <p>
-            <strong><Link to="/">MLflow</Link></strong> is an open-source AI engineering
-            platform that enables teams of all sizes to debug, evaluate,
-            monitor, and optimize production-quality AI agents, LLM
-            applications, and ML models while controlling costs and managing
-            access to models and data. With over 30 million monthly downloads,
-            thousands of organizations rely on MLflow each day to ship AI to
-            production with confidence.
+            <strong>
+              <Link to="/">MLflow</Link>
+            </strong>{" "}
+            is an open-source AI engineering platform that enables teams of all
+            sizes to debug, evaluate, monitor, and optimize production-quality
+            AI agents, LLM applications, and ML models while controlling costs
+            and managing access to models and data. With over 30 million monthly
+            downloads, thousands of organizations rely on MLflow each day to
+            ship AI to production with confidence.
           </p>
 
           {/* TL;DR */}
           <h2 id="quick-comparison">Quick Comparison</h2>
           <div className="tldr-grid">
             <div className="tldr-card highlight">
-              <h3><img src={MlflowLogo} alt="MLflow" className="tldr-logo" />Choose MLflow if you...</h3>
+              <h3>
+                <img src={MlflowLogo} alt="MLflow" className="tldr-logo" />
+                Choose MLflow if you...
+              </h3>
               <ul>
                 <li>
                   Care about avoiding <strong>vendor lock-in</strong>
@@ -676,15 +688,25 @@ export default function LangfuseAlternative() {
                   <strong>prompt optimization</strong> for AI agents
                 </li>
                 <li>
-                  Want a unified solution for <strong>managing and governing access</strong> to LLMs for your organization
+                  Want a unified solution for{" "}
+                  <strong>managing and governing access</strong> to LLMs for
+                  your organization
                 </li>
               </ul>
             </div>
             <div className="tldr-card">
-              <h3><img src={LangfuseLogoImg} alt="Langfuse" className="tldr-logo" />Choose Langfuse if you...</h3>
+              <h3>
+                <img
+                  src={LangfuseLogoImg}
+                  alt="Langfuse"
+                  className="tldr-logo"
+                />
+                Choose Langfuse if you...
+              </h3>
               <ul>
                 <li>
-                  Only need <strong>tracing and observability</strong> without evaluation or governance
+                  Only need <strong>tracing and observability</strong> without
+                  evaluation or governance
                 </li>
                 <li>
                   Already run <strong>ClickHouse-based</strong> infrastructure
@@ -703,47 +725,61 @@ export default function LangfuseAlternative() {
           {/* Open Source & Governance */}
           <h2 id="open-source-governance">Open Source &amp; Governance</h2>
           <p>
-            <strong>Langfuse</strong> is an open source project under the MIT license and
-            was <strong>acquired by <Link href="https://clickhouse.com/">ClickHouse Inc.</Link></strong> in 2025. While the project remains
-            open source, its roadmap and development priorities are now shaped by
-            ClickHouse Inc.'s strategy. Langfuse also gates certain
-            features behind its paid cloud plans, creating a gap between the
-            open source and commercial versions. The vendor lock-in concern is sometimes a barrier
-            for Enterprises to adopt Langfuse.
+            <strong>Langfuse</strong> is an open source project under the MIT
+            license and was{" "}
+            <strong>
+              acquired by{" "}
+              <Link href="https://clickhouse.com/">ClickHouse Inc.</Link>
+            </strong>{" "}
+            in 2025. While the project remains open source, its roadmap and
+            development priorities are now shaped by ClickHouse Inc.'s strategy.
+            Langfuse also gates certain features behind its paid cloud plans,
+            creating a gap between the open source and commercial versions. The
+            vendor lock-in concern is sometimes a barrier for Enterprises to
+            adopt Langfuse.
           </p>
           <p>
-            <strong>MLflow</strong> is also an open source project but <strong>backed by the{" "}
-            <Link href="https://www.linuxfoundation.org/">
-              Linux Foundation
-            </Link></strong>
-            , a non-profit vendor-neutral organization, ensuring long-term community stewardship with no single company controlling its direction.
-            MLflow is licensed under{" "}
-            Apache 2.0 and maintains full feature parity between
-            its open-source release and managed offerings. With adoption by{" "}
-            60%+ of the Fortune 500, MLflow is one of the most widely deployed AI platform in the enterprise.
+            <strong>MLflow</strong> is also an open source project but{" "}
+            <strong>
+              backed by the{" "}
+              <Link href="https://www.linuxfoundation.org/">
+                Linux Foundation
+              </Link>
+            </strong>
+            , a non-profit vendor-neutral organization, ensuring long-term
+            community stewardship with no single company controlling its
+            direction. MLflow is licensed under Apache 2.0 and maintains full
+            feature parity between its open-source release and managed
+            offerings. With adoption by 60%+ of the Fortune 500, MLflow is one
+            of the most widely deployed AI platform in the enterprise.
           </p>
 
           {/* Self-Hosting & Architecture */}
-          <h2 id="self-hosting-architecture">Self-Hosting &amp; Architecture</h2>
+          <h2 id="self-hosting-architecture">
+            Self-Hosting &amp; Architecture
+          </h2>
           <p>
-            Both platform offer self-hosting options for teams who want to control their own data and infrastructure.
+            Both platform offer self-hosting options for teams who want to
+            control their own data and infrastructure.
           </p>
           <p>
             <strong>Langfuse</strong> architecture is built around{" "}
             <strong>ClickHouse</strong>, giving it strong analytical query
             performance for teams already invested in the ClickHouse ecosystem.
-            A full Langfuse deployment requires{" "}
-            <strong>5+ services</strong>, including ClickHouse, PostgreSQL, Redis, S3,
-            and the application server, which often requires a dedicated operation and
-             introduces challenges for teams without ClickHouse expertise.
+            A full Langfuse deployment requires <strong>5+ services</strong>,
+            including ClickHouse, PostgreSQL, Redis, S3, and the application
+            server, which often requires a dedicated operation and introduces
+            challenges for teams without ClickHouse expertise.
           </p>
           <p>
             <strong>MLflow</strong> is designed for{" "}
-              <strong>simplicity and flexibility</strong>. It adopts a simple server + DB + storage architecture,
-              and allowing teams to use their own choice of database and storage solution, such as PostgreSQL,
-              MySQL, AWS RDS, GCP Cloud SQL, Neon, Supabase, or even SQLite. The storage can be any object storage
-              solution, such as S3, GCS, Azure Blob, HDFS, or even local file system. Most teams can deploy MLflow
-              in minutes with familiar infrastructure.
+            <strong>simplicity and flexibility</strong>. It adopts a simple
+            server + DB + storage architecture, and allowing teams to use their
+            own choice of database and storage solution, such as PostgreSQL,
+            MySQL, AWS RDS, GCP Cloud SQL, Neon, Supabase, or even SQLite. The
+            storage can be any object storage solution, such as S3, GCS, Azure
+            Blob, HDFS, or even local file system. Most teams can deploy MLflow
+            in minutes with familiar infrastructure.
           </p>
           <ComparisonTable rows={selfHostingTable} />
 
@@ -755,12 +791,18 @@ export default function LangfuseAlternative() {
             Both offer operational dashboard and cost tracking.
           </p>
           <p>
-            <strong>Langfuse</strong>'s instrumentation <strong>varies by SDK and framework</strong>, some use a wrapper, some uses a callback handler, and others require a separate third-party package. The SDK is compatible with OpenTelemetry but exposes a different data model (Trace + Observation).
+            <strong>Langfuse</strong>'s instrumentation{" "}
+            <strong>varies by SDK and framework</strong>, some use a wrapper,
+            some uses a callback handler, and others require a separate
+            third-party package. The SDK is compatible with OpenTelemetry but
+            exposes a different data model (Trace + Observation).
           </p>
           <p>
-            <strong>MLflow</strong> auto-instruments 30+ frameworks with a <strong>one-line unified</strong> <code>autolog()</code> API, including OpenAI,
-            LangGraph, DSPy, Anthropic, LangChain, Pydantic AI, CrewAI, and many
-            more. MLflow uses the native OpenTelemetry data model (Trace + Span + Events).
+            <strong>MLflow</strong> auto-instruments 30+ frameworks with a{" "}
+            <strong>one-line unified</strong> <code>autolog()</code> API,
+            including OpenAI, LangGraph, DSPy, Anthropic, LangChain, Pydantic
+            AI, CrewAI, and many more. MLflow uses the native OpenTelemetry data
+            model (Trace + Span + Events).
           </p>
           <CodeTabs tabs={tracingExamples} />
 
@@ -768,13 +810,13 @@ export default function LangfuseAlternative() {
           <h2 id="evaluation">Evaluation</h2>
           <p>
             Evaluation is where the gap between MLflow and Langfuse is most
-            pronounced — and it reveals Langfuse's nature as a tracing tool,
-            not a complete AI engineering platform.{" "}
-            <strong>Langfuse</strong> offers only rudimentary evaluation: basic
-            LLM-as-a-judge scoring and manual annotation. It lacks multi-turn
-            evaluation, online evaluation, metric versioning, and judge
-            alignment with human feedback — capabilities that are essential for
-            teams shipping AI agents to production.
+            pronounced, and it reveals Langfuse's nature as a tracing tool, not
+            a complete AI engineering platform. <strong>Langfuse</strong> offers
+            only rudimentary evaluation: basic LLM-as-a-judge scoring and manual
+            annotation. It lacks multi-turn evaluation, online evaluation,
+            metric versioning, and judge alignment with human feedback, all
+            capabilities that are essential for teams shipping AI agents to
+            production.
           </p>
           <p>
             <strong>MLflow</strong> provides production-grade evaluation backed
@@ -798,8 +840,20 @@ export default function LangfuseAlternative() {
               {evalFeatures.map((row, i) => (
                 <tr key={i}>
                   <td>{row.feature}</td>
-                  <td>{typeof row.mlflow === "string" ? row.mlflow : row.mlflow ? "✅" : "❌"}</td>
-                  <td>{typeof row.langfuse === "string" ? row.langfuse : row.langfuse ? "✅" : "❌"}</td>
+                  <td>
+                    {typeof row.mlflow === "string"
+                      ? row.mlflow
+                      : row.mlflow
+                        ? "✅"
+                        : "❌"}
+                  </td>
+                  <td>
+                    {typeof row.langfuse === "string"
+                      ? row.langfuse
+                      : row.langfuse
+                        ? "✅"
+                        : "❌"}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -808,20 +862,35 @@ export default function LangfuseAlternative() {
           {/* Prompt Management */}
           <h2 id="prompt-management">Prompt Management</h2>
           <p>
-            Both platforms offer prompt management capabilities. While there are many common features such as versioning, tagging, lineage, caching, they
-            differ in their approach to developing prompt quality.
+            Both platforms offer prompt management capabilities. While there are
+            many common features such as versioning, tagging, lineage, caching,
+            they differ in their approach to developing prompt quality.
           </p>
           <p>
             <strong>Langfuse</strong> offers an{" "}
-            <strong><a href="https://langfuse.com/docs/prompt-management/features/playground">easy-to-use prompt playground</a></strong>, making it an excellent
-            choice for teams focused on manual prompt engineering - casually
-            iterating, testing variations, and refining prompts by hand.
+            <strong>
+              <a href="https://langfuse.com/docs/prompt-management/features/playground">
+                easy-to-use prompt playground
+              </a>
+            </strong>
+            , making it an excellent choice for teams focused on manual prompt
+            engineering - casually iterating, testing variations, and refining
+            prompts by hand.
           </p>
           <p>
-            <strong>MLflow</strong> targets <strong>systematic prompt improvement</strong> and offers {" "}
-            state-of-the-art <strong><a href="https://mlflow.org/docs/latest/genai/prompt-registry/optimize-prompts/">prompt optimization</a></strong> algorithms such as GEPA and MIPRO to automatically improve prompts based on evaluation results,
-            for both individual prompts and end-to-end agents. MLflow is suitable for
-            teams who want to go from manual prompt tweaking to a more systematic approach for developing production-grade prompts.
+            <strong>MLflow</strong> targets{" "}
+            <strong>systematic prompt improvement</strong> and offers{" "}
+            state-of-the-art{" "}
+            <strong>
+              <a href="https://mlflow.org/docs/latest/genai/prompt-registry/optimize-prompts/">
+                prompt optimization
+              </a>
+            </strong>{" "}
+            algorithms such as GEPA and MIPRO to automatically improve prompts
+            based on evaluation results, for both individual prompts and
+            end-to-end agents. MLflow is suitable for teams who want to go from
+            manual prompt tweaking to a more systematic approach for developing
+            production-grade prompts.
           </p>
 
           {/* AI Gateway */}
@@ -829,25 +898,31 @@ export default function LangfuseAlternative() {
           <p>
             As LLM applications move to production, teams face growing
             challenges around managing API keys, controlling costs, switching
-            between providers, and enforcing governance policies. This is where an{" "}
-            <Link to="/ai-gateway">AI Gateway</Link>, a centralized layer
-            between your applications and LLM providers, has become an
-            essential piece of production AI infrastructure.
+            between providers, and enforcing governance policies. This is where
+            an <Link to="/ai-gateway">AI Gateway</Link>, a centralized layer
+            between your applications and LLM providers, has become an essential
+            piece of production AI infrastructure.
           </p>
           <p>
-            <strong>Langfuse</strong> does not offer a gateway capability — another sign that it is a tracing tool, not a complete platform. To manage costs and model access, teams using Langfuse must bolt on a separate tool such as LiteLLM, PortKey, or build a custom gateway solution.
+            <strong>Langfuse</strong> does not offer a gateway capability,
+            another sign that it is a tracing tool, not a complete platform. To
+            manage costs and model access, teams using Langfuse must bolt on a
+            separate tool such as LiteLLM, PortKey, or build a custom gateway
+            solution.
           </p>
           <p>
             <strong>MLflow</strong> offers a built-in{" "}
-            <Link to={`${MLFLOW_GENAI_DOCS_URL}gateway/`}>
-              AI Gateway
-            </Link> for governing LLM access
-            across your organization. It provides a standard endpoint
-            that routes requests to any supported provider (OpenAI, Anthropic,
-            AWS Bedrock, Azure OpenAI, Google Gemini, and more), with built-in{" "}
-            <strong>rate limiting, fallbacks, usage tracking, and credential management</strong>.
-            Teams can switch providers, add guardrails, or enforce usage policies
-            without changing application code.
+            <Link to={`${MLFLOW_GENAI_DOCS_URL}gateway/`}>AI Gateway</Link> for
+            governing LLM access across your organization. It provides a
+            standard endpoint that routes requests to any supported provider
+            (OpenAI, Anthropic, AWS Bedrock, Azure OpenAI, Google Gemini, and
+            more), with built-in{" "}
+            <strong>
+              rate limiting, fallbacks, usage tracking, and credential
+              management
+            </strong>
+            . Teams can switch providers, add guardrails, or enforce usage
+            policies without changing application code.
           </p>
 
           {/* Reinforcement Learning */}
@@ -861,7 +936,7 @@ export default function LangfuseAlternative() {
           </p>
           <p>
             <strong>Langfuse</strong> is focused on LLM observability and does
-            not provide capabilities for fine-tuning or reinforcement learning —
+            not provide capabilities for fine-tuning or reinforcement learning,
             yet another area where teams must bring a separate tool to fill the
             gap.
           </p>
@@ -883,19 +958,18 @@ export default function LangfuseAlternative() {
             only one piece of the puzzle. Its incomplete evaluation support,
             lack of an AI Gateway, and absence of governance capabilities mean
             that teams inevitably need additional tools to build a complete AI
-            engineering stack. Langfuse is not a platform — it is a monitoring
+            engineering stack. Langfuse is not a platform. It is a monitoring
             layer.
           </p>
           <p>
             <strong>MLflow is a complete AI engineering platform.</strong> It
             covers tracing, production-grade evaluation, prompt optimization, an
-            AI Gateway, fine-tuning, and reinforcement learning — all governed by
-            the Linux Foundation with full open-source feature parity.{" "}
+            AI Gateway, fine-tuning, and reinforcement learning, all governed
+            by the Linux Foundation with full open-source feature parity.{" "}
             <strong>Choose MLflow</strong> if you need a vendor-neutral platform
             that goes beyond observability to help you actually improve and ship
-            AI agents with confidence.{" "}
-            <strong>Choose Langfuse</strong> if tracing and a prompt playground
-            are all you need.
+            AI agents with confidence. <strong>Choose Langfuse</strong> if
+            tracing and a prompt playground are all you need.
           </p>
 
           {/* Related Resources */}
@@ -913,9 +987,7 @@ export default function LangfuseAlternative() {
                 </Link>
               </li>
               <li>
-                <Link to={MLFLOW_GENAI_DOCS_URL}>
-                  MLflow Documentation
-                </Link>
+                <Link to={MLFLOW_GENAI_DOCS_URL}>MLflow Documentation</Link>
               </li>
               <li>
                 <Link to={`${MLFLOW_GENAI_DOCS_URL}tracing/quickstart/`}>
