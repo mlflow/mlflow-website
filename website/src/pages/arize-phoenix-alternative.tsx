@@ -3,17 +3,13 @@ import Head from "@docusaurus/Head";
 import Link from "@docusaurus/Link";
 import { Highlight } from "prism-react-renderer";
 import { Header } from "../components/Header/Header";
-import { ArticleSidebar } from "../components/ArticleSidebar/ArticleSidebar";
 import { MLFLOW_DOCS_URL, MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
-const MLFLOW_UI_SRC =
-  "/img/arize-phoenix-alternative/mlflow-ui.png";
-const PHOENIX_UI_SRC =
-  "/img/arize-phoenix-alternative/arize-phoenix-ui.png";
-const MLFLOW_LOGO_SRC =
-  "/img/arize-phoenix-alternative/mlflow-logo.png";
+const MLFLOW_UI_SRC = "/img/arize-phoenix-alternative/mlflow-ui.png";
+const PHOENIX_UI_SRC = "/img/arize-phoenix-alternative/arize-phoenix-ui.png";
+const MLFLOW_LOGO_SRC = "/img/arize-phoenix-alternative/mlflow-logo.png";
 const PHOENIX_LOGO_SRC =
   "/img/arize-phoenix-alternative/arize-phoenix-logo-placeholder.svg";
 const SEO_TITLE =
@@ -1205,8 +1201,47 @@ export default function ArizePhoenixAlternative() {
             </ul>
           </div>
         </div>
-
-        <ArticleSidebar />
+        <aside className="article-sidebar">
+          <p className="toc-title">ON THIS PAGE</p>
+          <ul>
+            <li>
+              <a href="#quick-comparison">Quick Comparison</a>
+            </li>
+            <li>
+              <a href="#open-source-licensing">Open Source &amp; Licensing</a>
+            </li>
+            <li>
+              <a href="#lifecycle-scope">Lifecycle Scope</a>
+            </li>
+            <li>
+              <a href="#tracing-observability">Tracing &amp; Observability</a>
+            </li>
+            <li>
+              <a href="#evaluation-experimentation">
+                Evaluation &amp; Experimentation
+              </a>
+            </li>
+            <li>
+              <a href="#faq">FAQ</a>
+            </li>
+          </ul>
+          <hr className="toc-divider" />
+          <p className="toc-title">RESOURCES</p>
+          <ul>
+            <li>
+              <a href="/llm-evaluation">MLflow FAQ</a>
+            </li>
+            <li>
+              <a href={MLFLOW_DOCS_URL}>Documentation</a>
+            </li>
+            <li>
+              <a href="/slack">Slack</a>
+            </li>
+            <li>
+              <a href="https://github.com/mlflow/mlflow">GitHub</a>
+            </li>
+          </ul>
+        </aside>
       </div>
     </>
   );
