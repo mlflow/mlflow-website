@@ -3,6 +3,7 @@ import Head from "@docusaurus/Head";
 import Link from "@docusaurus/Link";
 import { Highlight } from "prism-react-renderer";
 import { Header } from "../components/Header/Header";
+import { ArticleSidebar } from "../components/ArticleSidebar/ArticleSidebar";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
@@ -533,6 +534,58 @@ export default function LangfuseAlternative() {
             font-weight: 500;
           }
 
+          /* Sidebar TOC */
+          .article-sidebar {
+            position: fixed;
+            top: 100px;
+            left: calc(50% + 900px / 2 + 48px);
+            width: 280px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+          }
+          .article-sidebar .toc-title {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #9ca3af;
+            margin: 0 0 12px 0;
+          }
+          .article-sidebar ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            border-left: 1px solid #e5e7eb;
+          }
+          .article-sidebar li {
+            margin: 0;
+            padding: 0;
+          }
+          .article-sidebar a {
+            font-family: 'DM Sans', sans-serif;
+            display: block;
+            padding: 8px 0 8px 16px;
+            font-size: 16px;
+            color: #0194e2 !important;
+            text-decoration: none !important;
+            transition: all 0.15s ease;
+            line-height: 1.4;
+          }
+          .article-sidebar a:hover {
+            color: #0072b0 !important;
+          }
+          .article-sidebar .toc-divider {
+            border: none;
+            border-top: 1px solid #e5e7eb;
+            margin: 12px 0 12px 0;
+          }
+          @media (max-width: 1400px) {
+            .article-sidebar {
+              display: none;
+            }
+          }
+
           @media (max-width: 768px) {
             .article-container {
               padding: 40px 20px 80px;
@@ -606,7 +659,7 @@ export default function LangfuseAlternative() {
           </p>
 
           {/* TL;DR */}
-          <h2>TL;DR</h2>
+          <h2 id="quick-comparison">Quick Comparison</h2>
           <div className="tldr-grid">
             <div className="tldr-card highlight">
               <h3><img src={MlflowLogo} alt="MLflow" className="tldr-logo" />Choose MLflow if you...</h3>
@@ -648,7 +701,7 @@ export default function LangfuseAlternative() {
           </div>
 
           {/* Open Source & Governance */}
-          <h2>Open Source &amp; Governance</h2>
+          <h2 id="open-source-governance">Open Source &amp; Governance</h2>
           <p>
             <strong>Langfuse</strong> is an open source project under the MIT license and
             was <strong>acquired by <Link href="https://clickhouse.com/">ClickHouse Inc.</Link></strong> in 2025. While the project remains
@@ -671,7 +724,7 @@ export default function LangfuseAlternative() {
           </p>
 
           {/* Self-Hosting & Architecture */}
-          <h2>Self-Hosting &amp; Architecture</h2>
+          <h2 id="self-hosting-architecture">Self-Hosting &amp; Architecture</h2>
           <p>
             Both platform offer self-hosting options for teams who want to control their own data and infrastructure.
           </p>
@@ -695,7 +748,7 @@ export default function LangfuseAlternative() {
           <ComparisonTable rows={selfHostingTable} />
 
           {/* Tracing & Observability */}
-          <h2>Tracing &amp; Observability</h2>
+          <h2 id="tracing-observability">Tracing &amp; Observability</h2>
           <p>
             Both platforms provide core tracing for LLM applications with full
             OpenTelemetry compatibility and support for Python and JS/TS SDKs.
@@ -712,7 +765,7 @@ export default function LangfuseAlternative() {
           <CodeTabs tabs={tracingExamples} />
 
           {/* Evaluation */}
-          <h2>Evaluation</h2>
+          <h2 id="evaluation">Evaluation</h2>
           <p>
             Evaluation is where the gap between MLflow and Langfuse is most
             pronounced — and it reveals Langfuse's nature as a tracing tool,
@@ -753,7 +806,7 @@ export default function LangfuseAlternative() {
           </table>
 
           {/* Prompt Management */}
-          <h2>Prompt Management</h2>
+          <h2 id="prompt-management">Prompt Management</h2>
           <p>
             Both platforms offer prompt management capabilities. While there are many common features such as versioning, tagging, lineage, caching, they
             differ in their approach to developing prompt quality.
@@ -772,7 +825,7 @@ export default function LangfuseAlternative() {
           </p>
 
           {/* AI Gateway */}
-          <h2>AI Gateway</h2>
+          <h2 id="ai-gateway">AI Gateway</h2>
           <p>
             As LLM applications move to production, teams face growing
             challenges around managing API keys, controlling costs, switching
@@ -875,6 +928,8 @@ export default function LangfuseAlternative() {
             </ul>
           </div>
         </div>
+
+        <ArticleSidebar />
       </div>
     </>
   );
