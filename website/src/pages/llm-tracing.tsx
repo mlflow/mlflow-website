@@ -1121,6 +1121,11 @@ const result = await generateText({
 
           <ul>
             <li>
+              <Link href="/arize-phoenix-alternative">
+                Arize Phoenix Alternative Comparison
+              </Link>
+            </li>
+            <li>
               <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
                 MLflow Tracing Documentation
               </Link>
