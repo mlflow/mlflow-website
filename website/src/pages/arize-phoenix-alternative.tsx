@@ -7,9 +7,12 @@ import { MLFLOW_DOCS_URL, MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
-const MLFLOW_UI_SRC = "/img/arize-phoenix-alternative/mlflow-ui.png";
-const PHOENIX_UI_SRC = "/img/arize-phoenix-alternative/arize-phoenix-ui.png";
-const MLFLOW_LOGO_SRC = "/img/arize-phoenix-alternative/mlflow-logo.png";
+const MLFLOW_UI_SRC =
+  "/img/arize-phoenix-alternative/mlflow-ui.png";
+const PHOENIX_UI_SRC =
+  "/img/arize-phoenix-alternative/arize-phoenix-ui.png";
+const MLFLOW_LOGO_SRC =
+  "/img/arize-phoenix-alternative/mlflow-logo.png";
 const PHOENIX_LOGO_SRC =
   "/img/arize-phoenix-alternative/arize-phoenix-logo-placeholder.svg";
 const SEO_TITLE =
@@ -1201,6 +1204,7 @@ export default function ArizePhoenixAlternative() {
             </ul>
           </div>
         </div>
+
         <aside className="article-sidebar">
           <p className="toc-title">ON THIS PAGE</p>
           <ul>
