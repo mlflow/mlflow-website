@@ -15,7 +15,7 @@ const PHOENIX_LOGO_SRC =
 const SEO_TITLE =
   "Arize Phoenix Alternative for LLMs & Agents | MLflow Agent Platform";
 const SEO_DESCRIPTION =
-  "Compare MLflow vs Arize Phoenix for LLM observability, agent observability, tracing, and evaluation with a comprehensive, open-source agent engineering and ops platform.";
+  "Compare MLflow vs Arize Phoenix for LLM observability, agent observability, tracing, and evaluation with a comprehensive, open source agent engineering and ops platform.";
 const CANONICAL_URL = "https://mlflow.org/arize-phoenix-alternative";
 
 const tracingExamples: { label: string; mlflow: string; phoenix: string }[] = [
@@ -239,16 +239,16 @@ export default function ArizePhoenixAlternative() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const faqs: { question: string; answer: ReactNode; answerText: string }[] = [
     {
-      question: "What is the best open-source Arize Phoenix alternative?",
+      question: "What is the best open source Arize Phoenix alternative?",
       answer: (
         <>
-          MLflow is a strong open-source alternative when you need both{" "}
+          MLflow is a strong open source alternative when you need both{" "}
           <Link to="/llm-tracing">LLM tracing</Link> and lifecycle capabilities
           such as model registry, packaging, and deployment workflows.
         </>
       ),
       answerText:
-        "MLflow is a strong open-source alternative when you need both LLM tracing and lifecycle capabilities such as model registry, packaging, and deployment workflows.",
+        "MLflow is a strong open source alternative when you need both LLM tracing and lifecycle capabilities such as model registry, packaging, and deployment workflows.",
     },
     {
       question: "How does MLflow differ from Arize Phoenix?",
@@ -331,13 +331,13 @@ export default function ArizePhoenixAlternative() {
       question: "Is MLflow vendor-neutral for enterprise use?",
       answer: (
         <>
-          MLflow uses an open-source model with broad ecosystem adoption. Teams
+          MLflow uses an open source model with broad ecosystem adoption. Teams
           can self-host or use managed environments while preserving portability
           across infrastructure choices.
         </>
       ),
       answerText:
-        "MLflow uses an open-source model with broad ecosystem adoption. Teams can self-host or use managed environments while preserving portability across infrastructure choices.",
+        "MLflow uses an open source model with broad ecosystem adoption. Teams can self-host or use managed environments while preserving portability across infrastructure choices.",
     },
     {
       question: "Which teams should choose Arize Phoenix vs MLflow?",
@@ -889,7 +889,7 @@ export default function ArizePhoenixAlternative() {
             <strong>
               <Link to="https://arize.com/docs/phoenix">Arize Phoenix</Link>
             </strong>{" "}
-            is an open-source AI observability and evaluation tool designed for
+            is an open source AI observability and evaluation tool designed for
             LLM and agent applications. Phoenix focuses on trace inspection,
             span-level debugging, annotation workflows, and experiment loops for
             prompt and quality iteration. It is especially popular with teams
@@ -908,7 +908,7 @@ export default function ArizePhoenixAlternative() {
             <strong>
               <Link to="/">MLflow</Link>
             </strong>{" "}
-            is an open-source AI engineering platform that covers the full
+            is an open source AI engineering platform that covers the full
             lifecycle: experiment tracking, model packaging, model registry,
             deployment integration, and{" "}
             <Link to="/genai/observability">GenAI observability</Link>. Teams
@@ -1003,11 +1003,13 @@ export default function ArizePhoenixAlternative() {
 
           <h2 id="open-source-licensing">Open Source &amp; Licensing</h2>
           <p>
-            Both tools are open-source projects, but the licensing model is an
+            Both tools are open source projects, but the licensing model is an
             important strategic difference. <strong>MLflow</strong> is licensed
-            under Apache 2.0 and backed by broad open governance in the Linux
-            Foundation ecosystem, making it easier to adopt in environments that
-            prioritize permissive licensing and long-term portability.
+            under Apache 2.0 and backed by the Linux Foundation, the premier
+            open source AI software foundation. MLflow has powered production AI
+            applications for nearly 10 years, making it easier to adopt in
+            environments that prioritize permissive licensing and long-term
+            portability.
           </p>
           <p>
             <strong>Arize Phoenix</strong> is distributed under Elastic License
@@ -1129,7 +1131,7 @@ export default function ArizePhoenixAlternative() {
           <p>
             This managed path often strengthens MLflow's advantage for larger
             organizations that need unified governance and reliability while
-            preserving API portability with open-source MLflow.
+            preserving API portability with open source MLflow.
           </p>
 
           <h2>Summary</h2>
