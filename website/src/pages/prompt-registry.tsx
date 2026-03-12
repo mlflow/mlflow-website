@@ -8,7 +8,8 @@ import { ArticleSidebar } from "../components/ArticleSidebar/ArticleSidebar";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
-import PromptHero from "@site/static/img/GenAI_prompts/GenAI_prompts_hero.png";
+import PromptHero from "@site/static/img/GenAI_prompts&versions/GenAI_prompt&versioning_2.png";
+import PromptCreateUI from "@site/static/img/GenAI_prompts/GenAI_prompts_1.png";
 
 const SEO_TITLE = "Prompt Registry for LLMs & Agents | MLflow Agent Platform";
 const SEO_DESCRIPTION =
@@ -76,7 +77,8 @@ const faqs: {
       "Yes. MLflow includes automatic prompt optimization powered by the GEPA (Generalized Efficient Prompt Adaptation) algorithm. You define your evaluation criteria, provide a dataset, and MLflow automatically generates improved prompt variants and selects the best one. This has been shown to improve accuracy by 10-15% without manual prompt engineering.",
   },
   {
-    question: "How do I evaluate prompt changes before deploying them?",
+    question:
+      "How do I evaluate prompt changes in MLflow before deploying them?",
     answer: (
       <>
         MLflow integrates prompt versioning with{" "}
@@ -91,12 +93,12 @@ const faqs: {
       "MLflow integrates prompt versioning with evaluation. When you create a new prompt version, you can run it against a test dataset using LLM judges that score quality metrics like relevance, correctness, and safety. Compare scores across prompt versions side-by-side before promoting the new version to production.",
   },
   {
-    question: "Can non-technical team members edit prompts?",
+    question: "Can non-technical team members edit prompts in MLflow?",
     answer:
       "Yes. MLflow's Prompt Registry provides a UI-based editor where domain experts, product managers, and other non-technical team members can create and edit prompts directly. Changes are versioned with commit messages, so engineers maintain full visibility into what changed and why. This eliminates engineering bottlenecks and lets the people closest to the domain iterate on prompt quality.",
   },
   {
-    question: "How does the prompt registry work with agents?",
+    question: "How does MLflow's prompt registry work with agents?",
     answer: (
       <>
         Agents built with frameworks like LangGraph, CrewAI, or OpenAI Agents
@@ -115,7 +117,7 @@ const faqs: {
       'Agents built with frameworks like LangGraph, CrewAI, or OpenAI Agents SDK rely on system prompts and tool instructions that define agent behavior. The prompt registry stores and versions these prompts separately from agent code. When you load a prompt at runtime using mlflow.genai.load_prompt(), you can specify an alias (e.g., "production") to control which version your agent uses. This lets you update agent instructions without redeploying agent code.',
   },
   {
-    question: "How do I get started with prompt management?",
+    question: "How do I get started with prompt management in MLflow?",
     answer: (
       <>
         Getting started with MLflow's Prompt Registry takes just a few lines of
@@ -138,7 +140,7 @@ const faqs: {
   },
   {
     question:
-      "How does the prompt registry integrate with tracing and observability?",
+      "How does MLflow's prompt registry integrate with tracing and observability?",
     answer: (
       <>
         MLflow automatically links prompts to{" "}
@@ -492,21 +494,22 @@ export default function PromptRegistry() {
           <p>
             A prompt registry is a centralized repository for storing,
             versioning, and managing the prompt templates that power LLM and
-            agent applications. For teams practicing{" "}
-            <a href="#prompt-management">prompt management</a>, a prompt
-            registry is the foundational infrastructure. For engineers doing{" "}
-            <a href="#prompt-versioning">prompt versioning</a>, it provides
-            version control with diff views and commit messages. Prompt
-            registries decouple prompts from application code, enabling faster
-            iteration without redeployments. A prompt registry is a core
-            component of <Link href="/ai-observability">AI observability</Link>{" "}
-            and <Link href="/llmops">LLMOps</Link>.
+            agent applications. For teams managing{" "}
+            <a href="#prompt-management">prompt engineering</a> at scale, a
+            prompt registry is the foundational infrastructure — it provides{" "}
+            <a href="#prompt-versioning">prompt versioning</a> with diff views
+            and commit messages, evaluation integration for quality testing, and
+            environment aliases for safe deployments. Prompt registries decouple
+            prompts from application code, enabling faster iteration without
+            redeployments. A prompt registry is a core component of{" "}
+            <Link href="/ai-observability">AI observability</Link> and{" "}
+            <Link href="/llmops">LLMOps</Link>.
           </p>
 
           <div style={{ margin: "40px 0", textAlign: "center" }}>
             <img
               src={PromptHero}
-              alt="MLflow Prompt Registry UI showing versioned prompt templates with variables and metadata"
+              alt="MLflow Prompt Registry UI showing versioned prompt templates with version history sidebar and prompt details"
               style={{
                 width: "100%",
                 borderRadius: "8px",
@@ -531,15 +534,18 @@ export default function PromptRegistry() {
           <p>
             Prompt management is the discipline of organizing, versioning,
             testing, and deploying prompts across an organization&apos;s AI
-            applications. As LLM-powered applications scale from prototypes to
-            production systems used by thousands, managing prompts becomes as
-            critical as managing code. Prompts determine the quality, safety,
-            and reliability of every AI interaction.
+            applications. It encompasses all the operational work around prompt
+            engineering: storing prompt templates in a central registry,{" "}
+            <a href="#prompt-versioning">versioning every change</a> with commit
+            messages and diffs, evaluating prompt quality against benchmarks,
+            and promoting tested prompts through environments. As LLM-powered
+            applications scale from prototypes to production, managing prompt
+            engineering workflows becomes as critical as managing code.
           </p>
 
           <p>
             Effective prompt management solves three problems. First, it
-            eliminates the engineering bottleneck: domain experts can iterate on
+            eliminates engineering bottlenecks: domain experts can iterate on
             prompts through a UI without waiting for code deployments. Second,
             it ensures consistency: every team member works from the same
             versioned prompts rather than local copies scattered across
@@ -564,12 +570,13 @@ export default function PromptRegistry() {
           <h2 id="prompt-versioning">Prompt Versioning</h2>
 
           <p>
-            Prompt versioning tracks every change to a prompt template with
-            commit messages, timestamps, and metadata. Unlike code versioning,
-            prompt versioning must account for the non-deterministic nature of
-            LLM outputs: a small wording change in a prompt can dramatically
-            alter model behavior. This makes robust versioning and evaluation
-            essential.
+            Prompt versioning is one of the most important parts of{" "}
+            <a href="#prompt-management">prompt management</a>. It tracks every
+            change to a prompt template with commit messages, timestamps, and
+            metadata. Unlike code versioning, prompt versioning must account for
+            the non-deterministic nature of LLM outputs: a small wording change
+            in a prompt can dramatically alter model behavior. This makes robust
+            versioning essential for any prompt engineering workflow.
           </p>
 
           <p>
@@ -594,9 +601,9 @@ export default function PromptRegistry() {
           </h2>
 
           <p>
-            AI applications, such as agents, LLM applications, and RAG systems,
-            rely on prompts as core configuration. Without a prompt registry,
-            teams face compounding problems:
+            AI applications — agents, LLM applications, and RAG systems — rely
+            on prompts as core configuration. As prompt engineering efforts
+            scale, teams without a prompt registry face compounding problems:
           </p>
 
           <div className="grid-2">
@@ -656,8 +663,8 @@ export default function PromptRegistry() {
           <h2>Common Use Cases for Prompt Registries</h2>
 
           <p>
-            Prompt registries solve real-world problems across the AI
-            development lifecycle:
+            Prompt registries solve real-world prompt engineering challenges
+            across the AI development lifecycle:
           </p>
 
           <ul>
@@ -717,14 +724,41 @@ export default function PromptRegistry() {
           <h2 id="how-to-implement">How to Implement a Prompt Registry</h2>
 
           <p>
-            Here are quick examples showing how to register, load, and use
-            prompts with MLflow. Check out the{" "}
+            MLflow offers both a UI and an API for prompt engineering workflows.
+            Non-technical team members can create and edit prompts directly
+            through the UI, while engineers can use the Python API for
+            programmatic workflows. Here are quick examples showing both
+            approaches. Check out the{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>
               MLflow prompt registry documentation
             </Link>{" "}
             for complete guides including prompt evaluation and optimization
             workflows.
           </p>
+
+          <div style={{ margin: "40px 0", textAlign: "center" }}>
+            <img
+              src={PromptCreateUI}
+              alt="MLflow Prompt Registry create prompt dialog showing name, template, and commit message fields"
+              style={{
+                maxWidth: "560px",
+                width: "100%",
+                borderRadius: "8px",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+              }}
+            />
+            <p
+              style={{
+                marginTop: "12px",
+                fontSize: "14px",
+                color: "#6b7280",
+                fontStyle: "italic",
+              }}
+            >
+              Non-technical users can create prompts directly through the MLflow
+              UI — no code required
+            </p>
+          </div>
 
           <p style={{ marginTop: "32px", marginBottom: "0px" }}>
             <strong>Register a prompt</strong>
