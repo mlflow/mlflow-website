@@ -174,16 +174,6 @@ const config: Config = {
 
   themeConfig: {
     metadata: [
-      {
-        name: "description",
-        content:
-          "Traces, evals to debug LLM application with integrations for OpenAI, Claude Code, OTel, LangChain, LangGraph, Gemini, Bedrock, Vercel, LiteLLM, DeepSeek etc.",
-      },
-      {
-        property: "og:description",
-        content:
-          "Traces, evals to debug LLM application with integrations for OpenAI, Claude Code, OTel, LangChain, LangGraph, Gemini, Bedrock, Vercel, LiteLLM, DeepSeek etc.",
-      },
       { property: "og:site_name", content: "MLflow AI Platform" },
       {
         property: "og:image",
