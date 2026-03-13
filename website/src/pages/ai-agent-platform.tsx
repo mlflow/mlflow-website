@@ -96,13 +96,13 @@ const faqs: {
           evaluation framework
         </Link>{" "}
         provides LLM-as-a-judge scorers for metrics like correctness,
-        hallucination, and relevance. You can run evaluations on datasets, apply
+        groundedness, and relevance. You can run evaluations on datasets, apply
         scorers to production traces, and compare results across agent versions
         in the MLflow UI.
       </>
     ),
     answerText:
-      "Evaluating agents requires measuring quality across multi-step workflows, not just individual LLM calls. MLflow's evaluation framework provides LLM-as-a-judge scorers for metrics like correctness, hallucination, and relevance. You can run evaluations on datasets, apply scorers to production traces, and compare results across agent versions in the MLflow UI.",
+      "Evaluating agents requires measuring quality across multi-step workflows, not just individual LLM calls. MLflow's evaluation framework provides LLM-as-a-judge scorers for metrics like correctness, groundedness, and relevance. You can run evaluations on datasets, apply scorers to production traces, and compare results across agent versions in the MLflow UI.",
   },
   {
     question: "Can I use MLflow with any LLM provider or agent framework?",
@@ -622,7 +622,7 @@ export default function AIAgentPlatform() {
               <h3>Evaluation &amp; Quality</h3>
               <p>
                 <strong>What it does:</strong> Measures agent quality using
-                automated scorers — correctness, hallucination, relevance, and
+                automated scorers — correctness, groundedness, relevance, and
                 custom metrics — across datasets and production traces.
               </p>
               <p>
@@ -683,7 +683,7 @@ export default function AIAgentPlatform() {
               <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
                 LLM-as-a-judge evaluation
               </Link>{" "}
-              to assess correctness, hallucination, and relevance at scale.
+              to assess correctness, groundedness, and relevance at scale.
             </li>
             <li>
               <strong>Prompts drift silently:</strong> A small change to a
@@ -739,7 +739,7 @@ export default function AIAgentPlatform() {
               >
                 LLM-as-a-judge scorers
               </Link>{" "}
-              for correctness, hallucination, relevance, toxicity, and custom
+              for correctness, groundedness, relevance, safety, and custom
               metrics. Run evaluations on datasets or apply them continuously to
               production traces.
             </li>
@@ -825,7 +825,7 @@ client = OpenAI()
 
 # Every call is now traced automatically
 response = client.chat.completions.create(
-    model="gpt-4o-mini",
+    model="gpt-5-mini",
     messages=[{"role": "user", "content": "Summarize this document."}],
 )`}
               />
@@ -843,7 +843,7 @@ client = OpenAI()
 
 # Every call is now traced automatically
 response = client.chat.completions.create(
-    model="gpt-4o-mini",
+    model="gpt-5-mini",
     messages=[{"role": "user", "content": "Summarize this document."}],
 )`}
                 language="python"
@@ -950,13 +950,13 @@ result = app.invoke({"task": "Research competitor pricing"})`}
               <span className="text-xs text-white/50 font-mono">python</span>
               <CopyButton
                 code={`import mlflow
-from mlflow.genai.scorers import Correctness, Hallucination
+from mlflow.genai.scorers import Correctness, RelevanceToQuery
 
 # Evaluate your agent across a dataset
 results = mlflow.genai.evaluate(
     data=eval_dataset,
     predict_fn=my_agent,
-    scorers=[Correctness(), Hallucination()],
+    scorers=[Correctness(), RelevanceToQuery()],
 )
 
 # View results in the MLflow UI
@@ -967,13 +967,13 @@ print(results.tables["eval_results"])`}
               <Highlight
                 theme={customNightOwl}
                 code={`import mlflow
-from mlflow.genai.scorers import Correctness, Hallucination
+from mlflow.genai.scorers import Correctness, RelevanceToQuery
 
 # Evaluate your agent across a dataset
 results = mlflow.genai.evaluate(
     data=eval_dataset,
     predict_fn=my_agent,
-    scorers=[Correctness(), Hallucination()],
+    scorers=[Correctness(), RelevanceToQuery()],
 )
 
 # View results in the MLflow UI
