@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 560" font-family="'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#495057"/>
+    </marker>
+    <linearGradient id="logBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(24,100,171,0.06)"/>
+      <stop offset="100%" stop-color="rgba(24,100,171,0.02)"/>
+    </linearGradient>
+    <linearGradient id="restoreBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(8,127,91,0.06)"/>
+      <stop offset="100%" stop-color="rgba(8,127,91,0.02)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Title -->
+  <text x="510" y="32" font-size="22" fill="#1971c2" text-anchor="middle" font-weight="600">uv Dependency Flow in MLflow</text>
+
+  <!-- LOG TIME column -->
+  <rect x="16" y="52" width="480" height="460" rx="12" fill="url(#logBg)" stroke="#4dabf7" stroke-width="1.2" opacity="0.7"/>
+  <text x="256" y="76" font-size="13" fill="#4dabf7" text-anchor="middle" font-weight="700" letter-spacing="2">LOG TIME</text>
+
+  <!-- RESTORE TIME column -->
+  <rect x="524" y="52" width="480" height="460" rx="12" fill="url(#restoreBg)" stroke="#12b886" stroke-width="1.2" opacity="0.7"/>
+  <text x="764" y="76" font-size="13" fill="#12b886" text-anchor="middle" font-weight="700" letter-spacing="2">RESTORE TIME</text>
+
+  <!-- ===== LOG TIME ===== -->
+
+  <!-- L1: log_model() -->
+  <rect x="96" y="96" width="320" height="44" rx="10" fill="#1971c2"/>
+  <text x="256" y="123" font-size="14" fill="#f8f9fa" text-anchor="middle" font-weight="600">log_model() / save_model()</text>
+
+  <!-- Arrow L1 -> L2 -->
+  <line x1="256" y1="140" x2="256" y2="172" stroke="#495057" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- L2: detect_uv_project() -->
+  <rect x="112" y="172" width="288" height="44" rx="10" fill="#3b5bdb"/>
+  <text x="256" y="199" font-size="13" fill="#f8f9fa" text-anchor="middle">detect_uv_project()</text>
+
+  <!-- Arrow L2 -> L3 -->
+  <line x1="256" y1="216" x2="256" y2="252" stroke="#495057" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- L3: export_uv_requirements() (taller box with CLI annotation) -->
+  <rect x="80" y="252" width="352" height="60" rx="10" fill="#3b5bdb"/>
+  <text x="256" y="276" font-size="13" fill="#f8f9fa" text-anchor="middle">export_uv_requirements()</text>
+  <text x="256" y="296" font-size="11" fill="#c3cfe2" text-anchor="middle">uv export --frozen --no-dev</text>
+
+  <!-- Arrow L3 -> L4 -->
+  <line x1="256" y1="312" x2="256" y2="348" stroke="#495057" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- L4: Write requirements.txt -->
+  <rect x="112" y="348" width="288" height="44" rx="10" fill="#087f5b"/>
+  <text x="256" y="375" font-size="13" fill="#f8f9fa" text-anchor="middle" font-weight="600">Write requirements.txt</text>
+
+  <!-- Arrow L4 -> L5 -->
+  <line x1="256" y1="392" x2="256" y2="428" stroke="#495057" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- L5: Save artifact files -->
+  <rect x="80" y="428" width="352" height="44" rx="10" fill="#087f5b"/>
+  <text x="256" y="455" font-size="13" fill="#f8f9fa" text-anchor="middle" font-weight="600">Save uv.lock + pyproject.toml</text>
+
+  <!-- L5 annotation -->
+  <text x="256" y="488" font-size="11" fill="#868e96" text-anchor="middle">as model artifacts</text>
+
+  <!-- ===== RESTORE TIME ===== -->
+
+  <!-- R1: prepare_env() -->
+  <rect x="666" y="96" width="196" height="44" rx="10" fill="#1971c2"/>
+  <text x="764" y="123" font-size="14" fill="#f8f9fa" text-anchor="middle" font-weight="600">prepare_env()</text>
+
+  <!-- Arrow R1 -> Diamond1 -->
+  <line x1="764" y1="140" x2="764" y2="172" stroke="#495057" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Diamond1: uv.lock artifact? -->
+  <polygon points="764,172 856,204 764,236 672,204" fill="#fab005" stroke="#fab005"/>
+  <text x="764" y="208" font-size="13" fill="#212529" text-anchor="middle" font-weight="600">uv.lock artifact?</text>
+
+  <!-- No branch: L-shaped orthogonal arrow left then down -->
+  <polyline points="672,204 590,204 590,244" fill="none" stroke="#495057" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="628" y="196" font-size="13" fill="#e8590c" font-weight="600">No</text>
+
+  <!-- pip install box (No path) -->
+  <rect x="530" y="244" width="120" height="36" rx="10" fill="#495057"/>
+  <text x="590" y="267" font-size="12" fill="#f8f9fa" text-anchor="middle">pip install</text>
+
+  <!-- Yes branch: straight down -->
+  <line x1="764" y1="236" x2="764" y2="280" stroke="#495057" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="780" y="262" font-size="13" fill="#0ca678" font-weight="600">Yes</text>
+
+  <!-- R3: run_uv_sync() -->
+  <rect x="666" y="280" width="196" height="44" rx="10" fill="#3b5bdb"/>
+  <text x="764" y="307" font-size="13" fill="#f8f9fa" text-anchor="middle">run_uv_sync()</text>
+
+  <!-- R3 annotation to right -->
+  <text x="870" y="307" font-size="11" fill="#868e96" text-anchor="start">uv sync --frozen</text>
+
+  <!-- Arrow R3 -> Diamond2 -->
+  <line x1="764" y1="324" x2="764" y2="356" stroke="#495057" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Diamond2: Sync OK? -->
+  <polygon points="764,356 856,388 764,420 672,388" fill="#fab005" stroke="#fab005"/>
+  <text x="764" y="392" font-size="13" fill="#212529" text-anchor="middle" font-weight="600">Sync OK?</text>
+
+  <!-- Fail branch: L-shaped orthogonal arrow left then down -->
+  <polyline points="672,388 590,388 590,428" fill="none" stroke="#495057" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="628" y="380" font-size="13" fill="#e8590c" font-weight="600">Fail</text>
+
+  <!-- Fallback pip box (Fail path) -->
+  <rect x="530" y="428" width="120" height="36" rx="10" fill="#495057"/>
+  <text x="590" y="451" font-size="12" fill="#f8f9fa" text-anchor="middle">pip fallback</text>
+
+  <!-- OK branch: straight down -->
+  <line x1="764" y1="420" x2="764" y2="456" stroke="#495057" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="780" y="442" font-size="13" fill="#0ca678" font-weight="600">OK</text>
+
+  <!-- R5: Environment Ready -->
+  <rect x="666" y="456" width="196" height="44" rx="10" fill="#087f5b"/>
+  <text x="764" y="483" font-size="14" fill="#f8f9fa" text-anchor="middle" font-weight="600">Environment Ready</text>
+
+  <!-- Legend (centered below both columns) -->
+  <g transform="translate(260, 532)">
+    <rect x="0" y="0" width="14" height="14" rx="4" fill="#1971c2"/>
+    <text x="20" y="11" font-size="11" fill="#868e96">Entry</text>
+    <rect x="72" y="0" width="14" height="14" rx="4" fill="#3b5bdb"/>
+    <text x="92" y="11" font-size="11" fill="#868e96">Internal</text>
+    <rect x="160" y="0" width="14" height="14" rx="4" fill="#087f5b"/>
+    <text x="180" y="11" font-size="11" fill="#868e96">Output</text>
+    <rect x="240" y="0" width="14" height="14" rx="4" fill="#fab005"/>
+    <text x="260" y="11" font-size="11" fill="#868e96">Decision</text>
+    <rect x="332" y="0" width="14" height="14" rx="4" fill="#495057"/>
+    <text x="352" y="11" font-size="11" fill="#868e96">Fallback</text>
+  </g>
+</svg>
