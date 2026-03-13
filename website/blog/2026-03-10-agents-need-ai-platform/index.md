@@ -217,7 +217,7 @@ client = OpenAI(
 
 You _could_ build your own AI platform by stitching together separate tools. Use Langfuse for tracing, DeepEval for evaluation, a git repo for prompts, and LiteLLM for gateway routing. But a DIY platform held together with glue code is fragile, expensive to maintain, and less powerful than an integrated one.
 
-The integration tax adds up fast. Your evaluation framework can't access your traces, so you build a pipeline to export data between them. Your gateway doesn't know about your prompt versions, so you manually track which prompt is deployed where. Your tracing tool doesn't feed into your evaluation dashboard, so quality problems go unnoticed until a customer complains.
+The integration tax adds up fast. Your evaluation framework can't access your traces, so you build a pipeline to export data between them. Your prompt changes aren't automatically tested against your evaluation suite, so quality regressions slip through. Your gateway logs don't connect to your traces, so you can't correlate a cost spike with the agent behavior that caused it.
 
 When all four capabilities live in one platform, they **work better together**:
 
