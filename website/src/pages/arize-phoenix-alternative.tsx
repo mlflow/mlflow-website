@@ -954,7 +954,7 @@ export default function ArizePhoenixAlternative() {
               </h3>
               <ul>
                 <li>
-                  Primarily need <strong>LLM tracing + eval workflows</strong>
+                  Primarily need <strong>LLM tracing and basic evaluation workflows</strong>
                 </li>
                 <li>
                   Want a <strong>trace-first UI</strong> for rapid debugging and
