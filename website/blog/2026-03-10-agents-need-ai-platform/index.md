@@ -3,7 +3,7 @@ title: Your Agents Need an AI Platform
 description: Getting an agent to work in a demo is easy. Getting it to work in production requires an AI engineering platform with observability, evaluation, version control, and an AI gateway.
 slug: agents-need-ai-platform
 authors: [mlflow-maintainers]
-tags: [mlflow, genai, agents, tracing, evaluation, ai-gateway, version-control]
+tags: [agents, llms, prompts, ai-platform, tracing, observability, evaluation, ai-gateway, prompt-registry]
 thumbnail: /img/blog/agents-need-ai-platform-thumbnail.png
 image: /img/blog/agents-need-ai-platform-thumbnail.png
 date: 2026-03-10
