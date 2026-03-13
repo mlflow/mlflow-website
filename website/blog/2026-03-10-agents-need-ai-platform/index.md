@@ -162,7 +162,7 @@ prompt = mlflow.genai.load_prompt("customer_support_system")
 
 [MLflow's prompt registry](https://mlflow.org/docs/latest/genai/prompt-registry/index.html) links every version of your prompt directly to the traces and performance data it produced, so you can trace a quality drop back to the exact change that caused it. Additionally, MLflow offers [**prompt optimization**](/prompt-optimization), which automates prompt engineering by using an LLM to generate, test, and select improved prompt versions.
 
-## Governance: Your Agent Has No Guardrails
+## Governance: Your Agent Has No Safety Net
 
 Your customer support agent has API keys for OpenAI, Anthropic (as a fallback), and your internal order management system. Those keys are scattered across environment variables, config files, and `.env` files on developer laptops. One engineer hardcoded a key in a Jupyter notebook that got committed to git. The agent has no rate limits, so when a retry bug causes a loop, it burns through your API budget before anyone notices. And there's no centralized way to enforce content policies: the agent can return whatever the LLM generates, including customer PII that shouldn't be in a chat response.
 
