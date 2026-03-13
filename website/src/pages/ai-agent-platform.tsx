@@ -87,7 +87,7 @@ const faqs: {
       "A complete agent platform needs five layers: (1) an authoring framework for defining agent logic, tools, and memory; (2) a runtime for executing agents reliably; (3) observability with end-to-end tracing across multi-step workflows; (4) evaluation with LLM-as-a-judge scorers and dataset-based testing; and (5) governance for safety guardrails, access control, and compliance. MLflow covers layers 3–4 and parts of layer 5, complementing whatever authoring framework you choose.",
   },
   {
-    question: "How do I evaluate AI agents?",
+    question: "How do I evaluate AI agents with MLflow?",
     answer: (
       <>
         Evaluating agents requires measuring quality across multi-step
@@ -137,7 +137,7 @@ const faqs: {
       "Yes. MLflow integrates with 20+ frameworks and providers. For agent frameworks, it supports LangGraph, CrewAI, AutoGen, and others. For LLM providers, its AI Gateway provides a unified interface for OpenAI, Anthropic, Google, Amazon Bedrock, and Azure OpenAI. You can switch providers without changing application code and manage API keys centrally.",
   },
   {
-    question: "How do I monitor AI agents in production?",
+    question: "How do I monitor AI agents in production with MLflow?",
     answer: (
       <>
         Production monitoring for AI agents requires continuous evaluation of
@@ -762,7 +762,7 @@ export default function AIAgentPlatform() {
             </li>
             <li>
               <Link
-                href={MLFLOW_GENAI_DOCS_URL + "tracing/production-tracing/"}
+                href={MLFLOW_GENAI_DOCS_URL + "tracing/prod-tracing/"}
                 style={{ color: "#007bff", fontWeight: "600" }}
               >
                 Production Monitoring
