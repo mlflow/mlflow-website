@@ -28,7 +28,7 @@ These operational needs map to four capabilities that every production agent req
 
 1. [**Observability**](/ai-observability): full visibility into what your agent is doing, step by step
 2. [**Evaluation**](/llm-evaluation): reproducible quality measurement across every dimension you care about
-3. [**Version control**](https://mlflow.org/docs/latest/genai/prompt-registry/index.html): versioned prompts and configs that can be compared, optimized, and rolled back
+3. [**Version control**](https://mlflow.org/docs/latest/genai/prompt-registry/index.html): versioned prompts and configurations that can be compared, optimized, and rolled back
 4. [**Governance**](/ai-gateway): centralized control over LLM calls, data access, and costs
 
 Let's walk through each one using our customer support agent to see how an AI platform transforms a demo into a production-grade agent.
@@ -41,7 +41,7 @@ Without observability, you're guessing. Maybe the tool call failed silently. May
 
 **AI platforms** provide observability through [**tracing**](/llm-tracing): a system that records every step your agent takes, so you can replay and inspect any request after the fact. As we'll see, tracing also makes the rest of the platform work: evaluation, version control, and governance all depend on having full visibility into what your agent is doing.
 
-<div style={{display: "flex", gap: "1.5rem", alignItems: "center"}}>
+<div style={{display: "flex", gap: "1.5rem", alignItems: "center", marginBottom: "0"}}>
 <div style={{flex: 1, minWidth: 0}}>
 
 ```python
@@ -67,8 +67,7 @@ def handle_ticket(ticket):
 
 </div>
 </div>
-
-<figure style={{ marginTop: "1.5rem", marginBottom: "2rem" }}>
+<figure style={{ marginTop: "1.5rem", marginBottom: "2.5rem" }}>
 <figcaption style={{ textAlign: "center" }}>
 <i>Every agent interaction produces a trace you can inspect in the MLflow UI. When that customer complains about a phantom refund, you find the trace, see that <code>lookup_order</code> returned an error the LLM ignored, and fix the problem in minutes.</i>
 </figcaption>
@@ -78,11 +77,11 @@ def handle_ticket(ticket):
 
 ## Evaluation: Prove Your Agent Works Before You Ship It
 
-Your customer support agent handles refunds, answers product questions, and looks up order status. Before you deploy it, how do you know it performs well enough? And after it's in production, how do you know it's still working well? You can't manually sift through thousands of traces looking for problems. Every change you push risks introducing a regression that goes undetected because most users don't provide detailed feedback, they just stop using your product.
+Your customer support agent handles refunds, answers product questions, and looks up order status. Before you deploy it, how do you know it performs well enough? And after it's in production, how do you know it's still working well? You can't manually sift through thousands of traces looking for problems. Every change you push risks breaking something that goes undetected because most users don't provide detailed feedback, they just stop using your product.
 
 **AI platforms** solve this with an [**evaluation framework**](/llm-evaluation): a system that automatically scores your agent's outputs using defined criteria, both before deployment and continuously in production. Evaluation frameworks combine two approaches: LLM judges — models that automatically score your agent's outputs across dimensions like correctness, safety, relevance, and tool call accuracy — and human feedback, where domain experts review and label agent outputs to catch issues that automated scoring misses. You define what "good" means for your use case, and the framework measures it at scale.
 
-<div style={{display: "flex", gap: "1.5rem", alignItems: "center"}}>
+<div style={{display: "flex", gap: "1.5rem", alignItems: "center", marginBottom: "0"}}>
 <div style={{flex: 1, minWidth: 0}}>
 
 ```python
@@ -108,28 +107,27 @@ results = mlflow.genai.evaluate(
 </div>
 <div style={{flex: 1, minWidth: 0}}>
 
-<img src="/img/GenAI_home/GenAI_evaluation_darkmode.png" alt="MLflow Evaluation UI showing pass/fail scores for conciseness and hallucination across agent responses" style={{borderRadius: "8px", width: "100%"}} />
+<div style={{overflow: "hidden", borderRadius: "8px"}}><img src="/img/GenAI_home/GenAI_evaluation_darkmode.png" alt="MLflow Evaluation UI showing pass/fail scores for conciseness and hallucination across agent responses" style={{width: "100%", marginBottom: "-30px"}} /></div>
 
 </div>
 </div>
-
-<figure style={{ marginTop: "1.5rem", marginBottom: "2rem" }}>
+<figure style={{ marginTop: "1.5rem", marginBottom: "2.5rem" }}>
 <figcaption style={{ textAlign: "center" }}>
-<i>Define judges for the dimensions you care about and run them against your agent's responses, tool calls, and steps. MLflow surfaces results in a comprehensive dashboard.</i>
+<i>With MLflow, you can define judges for the dimensions you care about, run them against your agent's responses, tool calls, and reasoning steps, analyze results in a comprehensive dashboard, and monitor quality continuously in production.</i>
 </figcaption>
 </figure>
 
 [MLflow's agent evaluation framework](https://mlflow.org/docs/latest/genai/eval-monitor/) ships with [70+ built-in judges](https://mlflow.org/docs/latest/genai/evaluation/judges.html) covering response quality, safety, tool call correctness, user frustration, and more. You can also [define custom judges](https://mlflow.org/docs/latest/genai/evaluation/judges.html) for your domain and [collect human feedback](https://mlflow.org/docs/latest/genai/concepts/feedback/) through a built-in labeling UI. Because MLflow evaluation is integrated with tracing, you can [run scorers against production traces continuously](https://mlflow.org/docs/latest/genai/evaluation/index.html), catching quality issues in minutes.
 
-## Version Control: You Can't Improve What You Don't Version
+## Version Control: Your Agents Need a Changelog
 
-Agents have a lot of moving parts: system prompts, tool definitions, retrieval configs, model parameters. When something changes and quality drops, you need to know what changed, compare it against the previous version, and roll back if necessary.
+Agents have a lot of moving parts, including system prompts, tool definitions, data retrieval configurations, and model parameters. When something changes and quality drops, you need to know what changed, compare it against the previous version, and roll back if necessary.
 
-Most teams struggle with this because of one principal problem: **nothing ties a change to its impact on quality**. Prompts live as hardcoded strings in application code, and changes are tracked (if at all) through git commits mixed in with unrelated logic. One engineer rewrites the refund instructions to handle edge cases, another updates the few-shot examples to improve tone, and when refund accuracy drops, nobody can pinpoint which change caused the regression because no change has lineage to performance data.
+Most teams struggle with this because of one principal problem: **nothing ties a change to its impact on quality**. Prompts and configurations often live as hardcoded values in application code, and changes frequently blend together. One engineer rewrites the refund instructions to handle edge cases, another updates the few-shot examples to improve tone, and when refund accuracy drops, nobody can pinpoint which change caused the quality drop because no change has lineage to performance data.
 
-**AI platforms** solve this with a **prompt registry**: a versioned store for prompts and configs where every version has lineage to traces and evaluation results. MLflow's prompt registry links every version of your prompt directly to the traces and performance data it produced, so you can trace a quality regression back to the exact change that caused it.
+**AI platforms** solve this with a [**prompt registry**](/prompt-registry): a versioned store for prompts and configurations where every version has lineage to traces and evaluation results.
 
-<div style={{display: "flex", gap: "1.5rem", alignItems: "center"}}>
+<div style={{display: "flex", gap: "1.5rem", alignItems: "center", marginBottom: "0"}}>
 <div style={{flex: 1, minWidth: 0}}>
 
 ```python
@@ -155,16 +153,21 @@ prompt = mlflow.genai.load_prompt("customer_support_system")
 
 </div>
 </div>
+<figure style={{ marginTop: "1.5rem", marginBottom: "2.5rem" }}>
+<figcaption style={{ textAlign: "center" }}>
+<i>MLflow's prompt registry versions every prompt and links it to the traces and evaluation results it produced, so you can pinpoint which change caused a quality drop.</i>
+</figcaption>
+</figure>
 
-Because prompts are versioned and evaluation is built in, you can also run **automated prompt optimization**. MLflow integrates with algorithms like [GEPA](https://github.com/gepa-ai/gepa) that generate improved prompt variants, evaluate them against your dataset, and select the best performer. Every optimization run is tracked, so comparing versions and rolling back is straightforward.
+[MLflow's prompt registry](https://mlflow.org/docs/latest/genai/prompt-registry/index.html) links every version of your prompt directly to the traces and performance data it produced, so you can trace a quality drop back to the exact change that caused it. Additionally, MLflow offers [**prompt optimization**](/prompt-optimization), which automates prompt engineering by using an LLM to generate, test, and select improved prompt versions.
 
 ## Governance: Your Agent Has No Guardrails
 
 Your customer support agent has API keys for OpenAI, Anthropic (as a fallback), and your internal order management system. Those keys are scattered across environment variables, config files, and `.env` files on developer laptops. One engineer hardcoded a key in a Jupyter notebook that got committed to git. The agent has no rate limits, so when a retry bug causes a loop, it burns through your API budget before anyone notices. And there's no centralized way to enforce content policies: the agent can return whatever the LLM generates, including customer PII that shouldn't be in a chat response.
 
-**AI platforms** solve this with an **AI gateway**: a centralized proxy between your agent and every LLM provider it calls. MLflow's AI gateway handles credential management, traffic routing, cost controls, and guardrails, all without changing your agent's code.
+**AI platforms** solve this with an [**AI gateway**](/ai-gateway): a centralized proxy between your agent and every LLM provider it calls. An AI gateway handles credential management, traffic routing, cost controls, and content guardrails in one place, so they're enforced consistently and never skipped.
 
-<div style={{display: "flex", gap: "1.5rem", alignItems: "center"}}>
+<div style={{display: "flex", gap: "1.5rem", alignItems: "center", marginBottom: "0"}}>
 <div style={{flex: 1, minWidth: 0}}>
 
 ```python
@@ -173,7 +176,6 @@ from openai import OpenAI
 # Point your agent at the gateway instead of OpenAI directly
 client = OpenAI(
     base_url="https://your-mlflow-server/gateway/v1",
-    api_key=""  # Gateway handles authentication
 )
 
 # Your agent code doesn't change. The gateway handles:
@@ -191,21 +193,25 @@ client = OpenAI(
 
 </div>
 </div>
+<figure style={{ marginTop: "1.5rem", marginBottom: "2.5rem" }}>
+<figcaption style={{ textAlign: "center" }}>
+<i>MLflow's AI Gateway provides a centralized proxy for managing credentials, routing traffic, controlling costs, and enforcing guardrails across all your LLM providers.</i>
+</figcaption>
+</figure>
 
-The gateway exposes an OpenAI-compatible API, so switching providers is a config change, not a code change. A/B test GPT-5 against Claude by splitting traffic 90/10. Set budget alerts so a retry loop can't burn $12,000 overnight. Enforce PII redaction at the gateway level so sensitive data never reaches the response, regardless of what the LLM generates.
+[MLflow's AI Gateway](https://mlflow.org/docs/latest/genai/ai-gateway/index.html) exposes an [OpenResponses](https://www.openresponses.org/)-compatible API, so you can switch model providers without changing your code. A/B test GPT-5 against Claude by splitting traffic 90/10. Set up usage alerts so a retry loop can't burn through your budget overnight. Enforce PII redaction with guardrails, so sensitive data never reaches users when LLMs misbehave. Because the gateway is integrated with [MLflow Tracing](https://mlflow.org/docs/latest/genai/tracing/index.html), every request automatically becomes a trace with full context: model used, tokens consumed, latency, and whether any guardrails were triggered.
 
-Because the gateway is integrated with MLflow Tracing, every request that passes through it automatically becomes a trace with full context: model used, tokens consumed, latency, and whether any guardrails were triggered.
+## Why a Unified Platform Wins
 
-## Why You Need All Four Together
-
-You could stitch together separate tools for each of these. Use LangSmith for tracing, DeepEval for evaluation, a git repo for prompts, and LiteLLM for gateway routing. Some teams do.
+You could build your own AI platform by stitching together separate tools. Use LangSmith for tracing, DeepEval for evaluation, a git repo for prompts, and LiteLLM for gateway routing. Some teams do.
 
 But the integration tax adds up fast. Your evaluation framework can't access your traces, so you build a pipeline to export data between them. Your gateway doesn't know about your prompt versions, so you manually track which prompt is deployed where. Your tracing tool doesn't feed into your evaluation dashboard, so quality problems go unnoticed until a customer complains.
 
 When all four capabilities live in one platform, they **work together**:
 
-- **Traces feed evaluations**: run scorers directly against production traces to catch quality issues in real time
+- **Traces feed evaluations**: run judges directly against production traces to catch quality issues in real time
 - **Evaluations validate prompts**: every prompt change is measured against your evaluation suite before deployment
+- **Judges act as guardrails**: the same LLM judges that evaluate quality can block unsafe or low-quality responses at the gateway before they reach users
 - **The gateway generates traces**: every model interaction is automatically traced with full context, no separate instrumentation needed
 - **Prompt versions link to evaluation results**: see exactly how each prompt version performed across every quality dimension
 
