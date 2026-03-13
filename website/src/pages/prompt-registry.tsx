@@ -8,7 +8,7 @@ import { ArticleSidebar } from "../components/ArticleSidebar/ArticleSidebar";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
-import PromptHero from "@site/static/img/GenAI_prompts&versions/GenAI_prompt&versioning_2.png";
+import PromptHero from "@site/static/img/GenAI_prompts/prompt-registry-hero.png";
 import PromptCreateUI from "@site/static/img/GenAI_prompts/GenAI_prompts_1.png";
 
 const SEO_TITLE = "Prompt Registry for LLMs & Agents | MLflow Agent Platform";
@@ -745,6 +745,8 @@ export default function PromptRegistry() {
                 width: "100%",
                 borderRadius: "8px",
                 boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                display: "block",
+                margin: "0 auto",
               }}
             />
             <p
