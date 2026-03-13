@@ -925,16 +925,19 @@ export default function LangfuseAlternative() {
                 <Highlight
                   theme={customNightOwl}
                   code={`import mlflow
+from mlflow.genai.optimize import GepaPromptOptimizer
+from mlflow.genai.scorers import Correctness
+
 
 # Optimize the prompt
 result = mlflow.genai.optimize_prompts(
-    predict_fn=predict_fn,
+    predict_fn=run_agent,
     train_data=dataset,
-    prompt_uris=[prompt.uri],
+    prompt_uris=["prompts:/my-prompt@latest"],
     optimizer=GepaPromptOptimizer(
         reflection_model="openai:/gpt-5", max_metric_calls=300
     ),
-    scorers=[Correctness(model="openai:/gpt-5-mini")],
+    scorers=[Correctness()],
 )`}
                   language="python"
                 >
