@@ -48,7 +48,7 @@ const faqs: { question: string; answer: ReactNode }[] = [
         </Link>
         ,{" "}
         <Link
-          to="/genai/prompt-registry"
+          to="/prompt-registry"
           className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
         >
           prompt management

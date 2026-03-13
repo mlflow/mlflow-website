@@ -47,7 +47,7 @@ const faqCategories: FAQCategory[] = [
             includes production-grade{" "}
             <Link href="/ai-observability">observability</Link>,{" "}
             <Link href="/llm-evaluation">evaluation</Link>,{" "}
-            <Link href="/genai/prompt-registry">prompt management</Link>, an{" "}
+            <Link href="/prompt-registry">prompt management</Link>, an{" "}
             <Link href="/ai-gateway">AI Gateway</Link> for managing costs and
             model access, and more. Learn more at{" "}
             <Link href="/genai">MLflow for LLMs and Agents</Link>.
@@ -337,11 +337,8 @@ const faqCategories: FAQCategory[] = [
         question: "What is MLflow's Prompt Registry?",
         answer: (
           <>
-            The{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>
-              MLflow Prompt Registry
-            </Link>{" "}
-            lets you version, compare, and iterate on prompt templates directly
+            The <Link href="/prompt-registry">MLflow Prompt Registry</Link> lets
+            you version, compare, and iterate on prompt templates directly
             through the MLflow UI or SDK. You can manage prompts separately from
             application code, reuse them across multiple versions of your agent,
             and view rich lineage showing which deployments use each prompt
@@ -525,7 +522,7 @@ const faqCategories: FAQCategory[] = [
             single open source platform:{" "}
             <Link href="/genai/observability">tracing</Link>,{" "}
             <Link href="/genai/evaluations">evaluation</Link>,{" "}
-            <Link href="/genai/prompt-registry">prompt management</Link>,{" "}
+            <Link href="/prompt-registry">prompt management</Link>,{" "}
             <Link href="/genai/ai-gateway">AI Gateway</Link>,{" "}
             <Link href="/genai/human-feedback">human feedback</Link>, and{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "serving/"}>agent serving</Link>
@@ -605,11 +602,10 @@ const faqCategories: FAQCategory[] = [
             <Link href="/llm-tracing">tracing</Link>,{" "}
             <Link href="/llm-evaluation">evaluation</Link>,{" "}
             <Link href="/ai-gateway">gateway routing</Link>, and{" "}
-            <Link href="/genai/prompt-registry">prompt management</Link>,
-            creating data silos, duplicated configuration, and fragile
-            integrations. MLflow is an{" "}
-            <strong>integrated end-to-end platform</strong> where every
-            capability works together out of the box: gateway requests
+            <Link href="/prompt-registry">prompt management</Link>, creating
+            data silos, duplicated configuration, and fragile integrations.
+            MLflow is an <strong>integrated end-to-end platform</strong> where
+            every capability works together out of the box: gateway requests
             automatically become traces, traces feed directly into evaluation,
             and evaluation results drive production monitoring. No glue code, no
             sync issues, no extra infrastructure. You get a unified UI, a

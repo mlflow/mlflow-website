@@ -1281,10 +1281,11 @@ export default function AgentEvaluation() {
 
           <ul>
             <li>
-              <strong>Pre-deployment Testing:</strong> Before releasing new
-              prompts, models, or agent logic, run comprehensive evaluations
-              against benchmark datasets. Compare quality metrics to previous
-              versions to ensure changes improve, not degrade, your application.
+              <strong>Pre-deployment Testing:</strong> Before releasing new{" "}
+              <Link href="/prompt-registry">prompts</Link>, models, or agent
+              logic, run comprehensive evaluations against benchmark datasets.
+              Compare quality metrics to previous versions to ensure changes
+              improve, not degrade, your application.
             </li>
             <li>
               <strong>Continuous Quality Monitoring:</strong> In production,
@@ -1301,8 +1302,9 @@ export default function AgentEvaluation() {
               wrong.
             </li>
             <li>
-              <strong>A/B Testing Prompt Changes:</strong> Before deploying
-              prompt modifications to production, run{" "}
+              <strong>A/B Testing Prompt Changes:</strong> Before deploying{" "}
+              <Link href="/prompt-registry">prompt</Link> modifications to
+              production, run{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
                 side-by-side evaluations
               </Link>{" "}
