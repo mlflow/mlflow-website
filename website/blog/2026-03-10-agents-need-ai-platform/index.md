@@ -1,9 +1,20 @@
 ---
 title: Your Agents Need an AI Platform
-description: Getting an agent to work in a demo is easy. Getting it to work in production requires an AI engineering platform with observability, evaluation, version control, and an AI gateway.
+description: Getting an agent to work in a demo is easy. Getting it to work in production requires an AI platform with observability, evaluation, version control, and an AI gateway.
 slug: agents-need-ai-platform
 authors: [mlflow-maintainers]
-tags: [agents, llms, prompts, ai-platform, tracing, observability, evaluation, ai-gateway, prompt-registry]
+tags:
+  [
+    agents,
+    llms,
+    prompts,
+    ai-platform,
+    tracing,
+    observability,
+    evaluation,
+    ai-gateway,
+    prompt-registry,
+  ]
 thumbnail: /img/blog/agents-need-ai-platform-thumbnail.png
 image: /img/blog/agents-need-ai-platform-thumbnail.png
 date: 2026-03-10
@@ -204,7 +215,7 @@ client = OpenAI(
 
 ## Why a Unified Platform Wins
 
-You *could* build your own AI platform by stitching together separate tools. Use Langfuse for tracing, DeepEval for evaluation, a git repo for prompts, and LiteLLM for gateway routing. But a DIY platform held together with glue code is fragile, expensive to maintain, and less powerful than an integrated one.
+You _could_ build your own AI platform by stitching together separate tools. Use Langfuse for tracing, DeepEval for evaluation, a git repo for prompts, and LiteLLM for gateway routing. But a DIY platform held together with glue code is fragile, expensive to maintain, and less powerful than an integrated one.
 
 The integration tax adds up fast. Your evaluation framework can't access your traces, so you build a pipeline to export data between them. Your gateway doesn't know about your prompt versions, so you manually track which prompt is deployed where. Your tracing tool doesn't feed into your evaluation dashboard, so quality problems go unnoticed until a customer complains.
 
