@@ -3,8 +3,7 @@ title: Your Agents Need an AI Platform
 description: Getting an agent to work in a demo is easy. Getting it to work in production requires an AI engineering platform with observability, evaluation, version control, and an AI gateway.
 slug: agents-need-ai-platform
 authors: [mlflow-maintainers]
-tags:
-  [mlflow, genai, agents, tracing, evaluation, ai-gateway, version-control]
+tags: [mlflow, genai, agents, tracing, evaluation, ai-gateway, version-control]
 thumbnail: /img/blog/agents-need-ai-platform-thumbnail.png
 image: /img/blog/agents-need-ai-platform-thumbnail.png
 date: 2026-03-10
@@ -48,16 +47,18 @@ Without observability, you're guessing. Maybe the tool call failed silently. May
 import mlflow
 
 # One line instruments your entire agent
-mlflow.langchain.autolog()
+mlflow.openai.autolog()
 
-# Or use the decorator for custom agents
-@mlflow.trace(name="customer_support")
 def handle_ticket(ticket):
-    intent = classify_intent(ticket)
-    if intent == "refund":
-        order = lookup_order(ticket.order_id)
-        return process_refund(order)
-    return search_knowledge_base(ticket.question)
+    return client.responses.create(
+        model="gpt-5",
+        input=ticket,
+        tools=[
+            lookup_order,
+            process_refund,
+            search_knowledge_base,
+        ],
+    )
 ```
 
 </div>
@@ -73,7 +74,7 @@ def handle_ticket(ticket):
 </figcaption>
 </figure>
 
-[MLflow Tracing](https://mlflow.org/docs/latest/genai/tracing/index.html) captures the full execution graph of every agent interaction: every LLM call, every tool invocation, every retrieval step, with inputs, outputs, token counts, and latency. MLflow Tracing is [OpenTelemetry-compatible](/blog/opentelemetry-tracing-support), so it works with any programming language, any agent framework, and any LLM provider. MLflow also offers [one-line autologging](https://mlflow.org/docs/latest/genai/tracing/#one-line-auto-tracing-integrations) for more than 30 popular frameworks and providers (LangGraph, OpenAI Agents SDK, CrewAI, AutoGen, Pydantic AI, Google ADK, and [many more](https://mlflow.org/docs/latest/genai/tracing/integrations/)) that instruments your entire application automatically with just a single line of code.
+[MLflow Tracing](https://mlflow.org/docs/latest/genai/tracing/index.html) captures the full execution graph of every agent interaction: every LLM call, every tool invocation, every retrieval step, with inputs, outputs, token counts, and latency. MLflow Tracing is [OpenTelemetry-compatible](/blog/opentelemetry-tracing-support), so it works with any programming language, any agent framework, and any LLM provider. MLflow also offers [autologging](https://mlflow.org/docs/latest/genai/tracing/#one-line-auto-tracing-integrations) for more than 30 popular frameworks and providers (LangGraph, OpenAI Agents SDK, CrewAI, AutoGen, Pydantic AI, Google ADK, and [many more](https://mlflow.org/docs/latest/genai/tracing/integrations/)) that instruments your entire application automatically with just a single line of code.
 
 ## Evaluation: Prove Your Agent Works Before You Ship It
 
@@ -89,7 +90,7 @@ import mlflow
 from mlflow.genai.scorers import (
     Safety,
     Correctness,
-    RelevanceToQuery,
+    ToolCallCorrectness,
 )
 
 # Evaluate your agent against a dataset
@@ -99,7 +100,7 @@ results = mlflow.genai.evaluate(
     scorers=[
         Safety(),
         Correctness(),
-        RelevanceToQuery(),
+        ToolCallCorrectness(),
     ],
 )
 ```
@@ -117,7 +118,7 @@ results = mlflow.genai.evaluate(
 </figcaption>
 </figure>
 
-[MLflow's agent evaluation framework](https://mlflow.org/docs/latest/genai/eval-monitor/) ships with [70+ built-in judges](https://mlflow.org/docs/latest/genai/evaluation/judges.html) covering response quality, safety, tool call correctness, user frustration, and more. You can also [define custom judges](https://mlflow.org/docs/latest/genai/evaluation/judges.html) for your domain and [collect human feedback](https://mlflow.org/docs/latest/genai/concepts/feedback/) through a built-in labeling UI. Because MLflow evaluation is integrated with tracing, you can [run scorers against production traces continuously](https://mlflow.org/docs/latest/genai/evaluation/index.html), catching quality issues in minutes.
+[MLflow's agent evaluation framework](https://mlflow.org/docs/latest/genai/eval-monitor/) ships with [70+ built-in judges](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/) covering response quality, safety, tool call correctness, user frustration, and more. You can also [define custom judges](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/) for your domain and [collect human feedback](https://mlflow.org/docs/latest/genai/concepts/feedback/) through a built-in labeling UI. Because MLflow evaluation is integrated with tracing, you can [run scorers against production traces continuously](https://mlflow.org/docs/latest/genai/eval-monitor/), catching quality issues in minutes.
 
 ## Version Control: Your Agents Need a Changelog
 
@@ -136,10 +137,10 @@ import mlflow
 # Register a prompt in the registry
 mlflow.genai.register_prompt(
     name="customer_support_system",
-    template="You are a customer support agent for {{company_name}}. "
-    "You can help customers with order status, refunds, and product "
-    "questions. Always verify the order ID before processing refunds. "
-    "Never share customer PII in your responses.",
+    template="You are a support agent for {{company_name}}. "
+    "You help with order status, refunds, and product "
+    "questions. Always verify the order ID before refunds. "
+    "Never share customer PII in responses."
 )
 
 # Load and use the latest version
@@ -175,7 +176,7 @@ from openai import OpenAI
 
 # Point your agent at the gateway instead of OpenAI directly
 client = OpenAI(
-    base_url="https://your-mlflow-server/gateway/v1",
+    base_url="https://your-mlflow-server/gateway/v1"
 )
 
 # Your agent code doesn't change. The gateway handles:
@@ -199,39 +200,37 @@ client = OpenAI(
 </figcaption>
 </figure>
 
-[MLflow's AI Gateway](https://mlflow.org/docs/latest/genai/ai-gateway/index.html) exposes an [OpenResponses](https://www.openresponses.org/)-compatible API, so you can switch model providers without changing your code. A/B test GPT-5 against Claude by splitting traffic 90/10. Set up usage alerts so a retry loop can't burn through your budget overnight. Enforce PII redaction with guardrails, so sensitive data never reaches users when LLMs misbehave. Because the gateway is integrated with [MLflow Tracing](https://mlflow.org/docs/latest/genai/tracing/index.html), every request automatically becomes a trace with full context: model used, tokens consumed, latency, and whether any guardrails were triggered.
+[MLflow's AI Gateway](https://mlflow.org/docs/latest/genai/governance/ai-gateway/) exposes an [OpenResponses](https://www.openresponses.org/)-compatible API, so you can switch model providers without changing your code. A/B test GPT-5 against Claude by splitting traffic 90/10. Set up usage alerts so a retry loop can't burn through your budget overnight. Enforce PII redaction with guardrails, so sensitive data never reaches users when LLMs misbehave. Because the gateway is integrated with [MLflow Tracing](https://mlflow.org/docs/latest/genai/tracing/index.html), every request automatically becomes a trace with full context: model used, tokens consumed, latency, and whether any guardrails were triggered.
 
 ## Why a Unified Platform Wins
 
-You could build your own AI platform by stitching together separate tools. Use LangSmith for tracing, DeepEval for evaluation, a git repo for prompts, and LiteLLM for gateway routing. Some teams do.
+You *could* build your own AI platform by stitching together separate tools. Use Langfuse for tracing, DeepEval for evaluation, a git repo for prompts, and LiteLLM for gateway routing. But a DIY platform held together with glue code is fragile, expensive to maintain, and less powerful than an integrated one.
 
-But the integration tax adds up fast. Your evaluation framework can't access your traces, so you build a pipeline to export data between them. Your gateway doesn't know about your prompt versions, so you manually track which prompt is deployed where. Your tracing tool doesn't feed into your evaluation dashboard, so quality problems go unnoticed until a customer complains.
+The integration tax adds up fast. Your evaluation framework can't access your traces, so you build a pipeline to export data between them. Your gateway doesn't know about your prompt versions, so you manually track which prompt is deployed where. Your tracing tool doesn't feed into your evaluation dashboard, so quality problems go unnoticed until a customer complains.
 
-When all four capabilities live in one platform, they **work together**:
+When all four capabilities live in one platform, they **work better together**:
 
-- **Traces feed evaluations**: run judges directly against production traces to catch quality issues in real time
+- **Traces feed evaluations**: judges run directly against production traces to catch quality issues in real time
 - **Evaluations validate prompts**: every prompt change is measured against your evaluation suite before deployment
 - **Judges act as guardrails**: the same LLM judges that evaluate quality can block unsafe or low-quality responses at the gateway before they reach users
-- **The gateway generates traces**: every model interaction is automatically traced with full context, no separate instrumentation needed
-- **Prompt versions link to evaluation results**: see exactly how each prompt version performed across every quality dimension
+- **The gateway generates traces**: every model interaction is automatically traced with cost, latency, and token usage, giving you full visibility without extra instrumentation
 
-That's the difference between operating your agent with a single dashboard and operating it with four disconnected tools and a Slack channel full of "is this working?" messages.
+Running production-grade agents efficiently and reliably requires a unified AI platform, rather than a collection of disconnected tools.
 
-## MLflow: The Open-Source AI Platform for Agents
+## MLflow: The Open Source AI Platform for Agents
 
-MLflow is the only open-source platform that provides all four of these capabilities ([tracing](/llm-tracing), [evaluation](/llm-evaluation), [version control](/prompt-optimization), and [AI gateway](/ai-gateway)) in a single, integrated platform.
+MLflow is the only [open source AI platform](https://mlflow.org/genai) that provides all four of these capabilities ([tracing](/llm-tracing), [evaluation](/llm-evaluation), [version control](/prompt-optimization), and [AI gateway](/ai-gateway)) in a unified offering. MLflow enables teams of all sizes to debug, evaluate, monitor, and optimize production-quality AI agents and LLM applications, while controlling costs and managing access to models and data. With over 30 million monthly downloads and backing from the Linux Foundation, thousands of organizations rely on MLflow each day to ship agents to production with confidence.
 
-Three things make this worth paying attention to:
+MLflow integrates with any agent framework, programming language, and LLM provider, including LangGraph, OpenAI Agents SDK, Vercel AI SDK, Claude Agent SDK, Google ADK, Pydantic AI, and [many more](https://mlflow.org/docs/latest/genai/tracing/integrations/).
 
-**It's open source and vendor-neutral.** Apache 2.0 licensed, backed by the Linux Foundation, with over 20,000 GitHub stars and 30 million monthly downloads. No per-trace fees, no per-evaluation charges, no lock-in. Your data stays yours. Traces are OpenTelemetry-compatible and can be exported to any backend.
+## Getting Started with MLflow
 
-**It works with whatever you're already using.** MLflow supports LangGraph, OpenAI Agents SDK, CrewAI, AutoGen, Pydantic AI, Google ADK, and 20+ other agent frameworks. It works with 50+ LLM providers. You pick your tools; MLflow handles the operational side.
+The two fastest ways to get started are adding tracing to an existing agent or setting up the AI Gateway:
 
-**It's already running in production everywhere.** Thousands of organizations use MLflow today. Millions of ML practitioners already rely on it, and it now has the capabilities that production agents need.
+<div style={{display: "flex", gap: "1.5rem", alignItems: "flex-start"}}>
+<div style={{flex: 1, minWidth: 0}}>
 
-## Getting Started
-
-The fastest way to try this is to instrument an existing agent:
+**Add tracing to your agent**
 
 ```bash
 pip install 'mlflow[genai]'
@@ -241,17 +240,44 @@ mlflow server
 ```python
 import mlflow
 
-# Start tracing your agent with one line
-mlflow.openai.autolog()  # or langchain, crewai, autogen, etc.
+# One line instruments your entire agent
+mlflow.openai.autolog()
+# or langgraph, Google ADK, etc.
 ```
 
-From there, layer on evaluation, register your prompts, and configure the gateway. Each one builds on the tracing foundation.
+</div>
+<div style={{flex: 1, minWidth: 0}}>
+
+**Connect your agent to the AI Gateway**
+
+```bash
+pip install 'mlflow[genai]'
+mlflow server
+```
+
+```python
+from openai import OpenAI
+
+# Direct your agent's LLM calls to the gateway, which
+# handles auth, routing, cost controls, and guardrails
+client = OpenAI(
+    base_url="https://your-mlflow-server/gateway/v1"
+)
+```
+
+</div>
+</div>
+
+From there, layer on [evaluation](https://mlflow.org/docs/latest/genai/eval-monitor/), [register your prompts](https://mlflow.org/docs/latest/genai/prompt-registry/index.html), and [start monitoring](https://mlflow.org/docs/latest/genai/eval-monitor/). Each capability builds on the others. Check out the [MLflow for Agents and LLMs documentation](https://mlflow.org/docs/latest/genai/index.html) to learn more.
 
 Your agents can do a lot. Give them the platform to do it reliably.
 
-- [MLflow Tracing docs](https://mlflow.org/docs/latest/genai/tracing/index.html)
-- [MLflow Evaluation docs](https://mlflow.org/docs/latest/genai/evaluation/index.html)
-- [MLflow Prompt Registry docs](https://mlflow.org/docs/latest/genai/prompt-registry/index.html)
-- [MLflow AI Gateway docs](https://mlflow.org/docs/latest/genai/ai-gateway/index.html)
+### Resources
+
+- [MLflow for Agents and LLMs documentation](https://mlflow.org/docs/latest/genai/index.html)
+- [MLflow Tracing documentation](https://mlflow.org/docs/latest/genai/tracing/index.html)
+- [MLflow Evaluation documentation](https://mlflow.org/docs/latest/genai/eval-monitor/)
+- [MLflow Prompt Registry documentation](https://mlflow.org/docs/latest/genai/prompt-registry/index.html)
+- [MLflow AI Gateway documentation](https://mlflow.org/docs/latest/genai/governance/ai-gateway/)
 
 If you find MLflow useful, [give us a star on GitHub](https://github.com/mlflow/mlflow).
