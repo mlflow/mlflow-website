@@ -643,8 +643,13 @@ export default function AIAgentPlatform() {
               </p>
               <p>
                 <strong>MLflow contributes:</strong>{" "}
-                <Link href={MLFLOW_GENAI_DOCS_URL + "guides/responsible-ai/"}>
-                  Responsible AI scorers
+                <Link
+                  href={
+                    MLFLOW_GENAI_DOCS_URL +
+                    "eval-monitor/scorers/llm-judge/predefined/"
+                  }
+                >
+                  Safety and quality scorers
                 </Link>
                 , the <Link href="/genai/ai-gateway">AI Gateway</Link> for
                 centralized key management and rate limiting, and full trace
@@ -729,7 +734,7 @@ export default function AIAgentPlatform() {
               </Link>
               : Measure agent quality at scale using{" "}
               <Link
-                href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/llm-as-judge/"}
+                href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/"}
                 style={{ color: "#007bff" }}
               >
                 LLM-as-a-judge scorers
