@@ -108,7 +108,7 @@ const faqs: {
     question: "Can I use MLflow with any LLM provider or agent framework?",
     answer: (
       <>
-        Yes. MLflow integrates with 20+ frameworks and providers. For agent
+        Yes. MLflow integrates with 30+ frameworks and providers. For agent
         frameworks, it supports{" "}
         <Link
           href={
@@ -126,15 +126,16 @@ const faqs: {
         >
           CrewAI
         </Link>
-        , AutoGen, and others. For LLM providers, its{" "}
-        <Link href="/genai/ai-gateway">AI Gateway</Link> provides a unified
-        interface for OpenAI, Anthropic, Google, Amazon Bedrock, and Azure
-        OpenAI. You can switch providers without changing application code and
-        manage API keys centrally.
+        , OpenAI Agents SDK, AutoGen, Google ADK, Pydantic AI, and others. For
+        LLM providers, its{" "}
+        <Link href="/genai/ai-gateway">AI Gateway</Link> provides an
+        OpenResponses-compatible interface for OpenAI, Anthropic, Google, Amazon
+        Bedrock, and Azure OpenAI. You can switch providers without changing
+        application code and manage API keys centrally.
       </>
     ),
     answerText:
-      "Yes. MLflow integrates with 20+ frameworks and providers. For agent frameworks, it supports LangGraph, CrewAI, AutoGen, and others. For LLM providers, its AI Gateway provides a unified interface for OpenAI, Anthropic, Google, Amazon Bedrock, and Azure OpenAI. You can switch providers without changing application code and manage API keys centrally.",
+      "Yes. MLflow integrates with 30+ frameworks and providers. For agent frameworks, it supports LangGraph, CrewAI, OpenAI Agents SDK, AutoGen, Google ADK, Pydantic AI, and others. For LLM providers, its AI Gateway provides an OpenResponses-compatible interface for OpenAI, Anthropic, Google, Amazon Bedrock, and Azure OpenAI. You can switch providers without changing application code and manage API keys centrally.",
   },
   {
     question: "How do I monitor AI agents in production with MLflow?",
@@ -179,7 +180,7 @@ const faqs: {
     answer: (
       <>
         Getting started takes three steps: install MLflow with{" "}
-        <code>pip install mlflow</code>, enable tracing for your agent framework
+        <code>pip install 'mlflow[genai]'</code>, enable tracing for your agent framework
         (e.g., <code>mlflow.langgraph.autolog()</code>), and open the MLflow UI
         to see your traces. See the{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/quickstart/"}>
@@ -189,7 +190,7 @@ const faqs: {
       </>
     ),
     answerText:
-      "Getting started takes three steps: install MLflow with pip install mlflow, enable tracing for your agent framework (e.g., mlflow.langgraph.autolog()), and open the MLflow UI to see your traces. See the quickstart guide for a complete walkthrough.",
+      "Getting started takes three steps: install MLflow with pip install 'mlflow[genai]', enable tracing for your agent framework (e.g., mlflow.langgraph.autolog()), and open the MLflow UI to see your traces. See the quickstart guide for a complete walkthrough.",
   },
 ];
 
@@ -550,8 +551,8 @@ export default function AIAgentPlatform() {
             >
               CrewAI
             </Link>
-            , or AutoGen), a <strong>runtime</strong> for executing agents
-            reliably, and an <strong>operational layer</strong> for
+            , or OpenAI Agents SDK), a <strong>runtime</strong> for executing
+            agents reliably, and an <strong>operational layer</strong> for
             observability, evaluation, and governance.
           </p>
 
@@ -596,8 +597,8 @@ export default function AIAgentPlatform() {
                 memory, state management, and multi-step workflow logic.
               </p>
               <p>
-                <strong>Examples:</strong> LangGraph, CrewAI, AutoGen, Amazon
-                Bedrock Agents, Microsoft Copilot Studio.
+                <strong>Examples:</strong> LangGraph, OpenAI Agents SDK, CrewAI,
+                AutoGen, Google ADK, Pydantic AI.
               </p>
             </div>
 
@@ -614,7 +615,7 @@ export default function AIAgentPlatform() {
                 <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
                   OpenTelemetry-compatible tracing
                 </Link>{" "}
-                with one-line integrations for 20+ frameworks.
+                with one-line integrations for 30+ frameworks and providers.
               </p>
             </div>
 
@@ -722,8 +723,8 @@ export default function AIAgentPlatform() {
               : Capture complete execution traces including LLM calls, tool
               invocations, retrievals, and agent decisions.
               OpenTelemetry-compatible with one-line auto-instrumentation for
-              LangGraph, CrewAI, LangChain, OpenAI, Anthropic, and 20+ other
-              frameworks.
+              LangGraph, OpenAI Agents SDK, CrewAI, Google ADK, Pydantic AI,
+              and 30+ other frameworks and providers.
             </li>
             <li>
               <Link
@@ -732,14 +733,15 @@ export default function AIAgentPlatform() {
               >
                 Evaluation
               </Link>
-              : Measure agent quality at scale using{" "}
+              : Measure agent quality at scale with{" "}
               <Link
                 href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/"}
                 style={{ color: "#007bff" }}
               >
-                LLM-as-a-judge scorers
+                70+ built-in LLM judges
               </Link>{" "}
-              for correctness, groundedness, relevance, safety, and custom
+              covering correctness, safety, groundedness, tool call accuracy,
+              and custom
               metrics. Run evaluations on datasets or apply them continuously to
               production traces.
             </li>
@@ -761,9 +763,10 @@ export default function AIAgentPlatform() {
               >
                 AI Gateway
               </Link>
-              : Route requests to any LLM provider through a unified interface.
-              Manage API keys centrally, enforce rate limits, set fallback
-              routes, and track usage across providers.
+              : Route requests to any LLM provider through an
+              OpenResponses-compatible unified interface. Manage API keys
+              centrally, enforce rate limits, set fallback routes, and track
+              usage across providers.
             </li>
             <li>
               <Link
@@ -800,8 +803,8 @@ export default function AIAgentPlatform() {
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/integrations/"}>
               integrations documentation
             </Link>{" "}
-            for LangChain, LangGraph, CrewAI, LlamaIndex, Anthropic, Vercel AI
-            SDK, and more.
+            for LangGraph, OpenAI Agents SDK, CrewAI, Google ADK, Pydantic AI,
+            Vercel AI SDK, and more.
           </p>
 
           <p style={{ marginTop: "32px", marginBottom: "0px" }}>
@@ -818,15 +821,15 @@ export default function AIAgentPlatform() {
                 code={`import mlflow
 from openai import OpenAI
 
-# Enable tracing with one line
+# One line instruments your entire agent
 mlflow.openai.autolog()
 
 client = OpenAI()
 
 # Every call is now traced automatically
-response = client.chat.completions.create(
-    model="gpt-5-mini",
-    messages=[{"role": "user", "content": "Summarize this document."}],
+response = client.responses.create(
+    model="gpt-5",
+    input="Summarize this document.",
 )`}
               />
             </div>
@@ -836,15 +839,15 @@ response = client.chat.completions.create(
                 code={`import mlflow
 from openai import OpenAI
 
-# Enable tracing with one line
+# One line instruments your entire agent
 mlflow.openai.autolog()
 
 client = OpenAI()
 
 # Every call is now traced automatically
-response = client.chat.completions.create(
-    model="gpt-5-mini",
-    messages=[{"role": "user", "content": "Summarize this document."}],
+response = client.responses.create(
+    model="gpt-5",
+    input="Summarize this document.",
 )`}
                 language="python"
               >
@@ -950,34 +953,44 @@ result = app.invoke({"task": "Research competitor pricing"})`}
               <span className="text-xs text-white/50 font-mono">python</span>
               <CopyButton
                 code={`import mlflow
-from mlflow.genai.scorers import Correctness, RelevanceToQuery
+from mlflow.genai.scorers import (
+    Safety,
+    Correctness,
+    ToolCallCorrectness,
+)
 
-# Evaluate your agent across a dataset
+# Evaluate your agent against a dataset
 results = mlflow.genai.evaluate(
     data=eval_dataset,
     predict_fn=my_agent,
-    scorers=[Correctness(), RelevanceToQuery()],
-)
-
-# View results in the MLflow UI
-print(results.tables["eval_results"])`}
+    scorers=[
+        Safety(),
+        Correctness(),
+        ToolCallCorrectness(),
+    ],
+)`}
               />
             </div>
             <div className="p-3 overflow-x-auto">
               <Highlight
                 theme={customNightOwl}
                 code={`import mlflow
-from mlflow.genai.scorers import Correctness, RelevanceToQuery
+from mlflow.genai.scorers import (
+    Safety,
+    Correctness,
+    ToolCallCorrectness,
+)
 
-# Evaluate your agent across a dataset
+# Evaluate your agent against a dataset
 results = mlflow.genai.evaluate(
     data=eval_dataset,
     predict_fn=my_agent,
-    scorers=[Correctness(), RelevanceToQuery()],
-)
-
-# View results in the MLflow UI
-print(results.tables["eval_results"])`}
+    scorers=[
+        Safety(),
+        Correctness(),
+        ToolCallCorrectness(),
+    ],
+)`}
                 language="python"
               >
                 {({ style, tokens, getLineProps, getTokenProps }) => (
@@ -1036,8 +1049,8 @@ print(results.tables["eval_results"])`}
             versions on Databricks or other clouds. No per-seat fees, no usage
             limits, no vendor lock-in. MLflow integrates with any agent
             framework and LLM provider through OpenTelemetry-compatible tracing,
-            supports 20+ integrations out of the box, and has an active
-            community with over 20 million monthly downloads.
+            supports 30+ integrations out of the box, and has an active
+            community with over 30 million monthly downloads.
           </p>
 
           <p>
