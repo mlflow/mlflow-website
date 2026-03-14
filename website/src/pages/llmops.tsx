@@ -38,10 +38,8 @@ const faqs: {
         (execution capture for debugging),{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>evaluation</Link>{" "}
         (automated quality assessment with LLM judges),{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>
-          prompt management
-        </Link>{" "}
-        (versioning and registry), deployment infrastructure, and{" "}
+        <Link href="/prompt-registry">prompt management</Link> (versioning and
+        registry), deployment infrastructure, and{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
           production monitoring
         </Link>
@@ -639,11 +637,9 @@ export default function LLMOps() {
               </p>
               <p>
                 <strong>Solution:</strong>{" "}
-                <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>
-                  Prompt registries
-                </Link>{" "}
-                provide version control, A/B testing, and rollback capabilities
-                for prompt templates, and{" "}
+                <Link href="/prompt-registry">Prompt registries</Link> provide
+                version control, A/B testing, and rollback capabilities for
+                prompt templates, and{" "}
                 <Link href="/prompt-optimization">prompt optimization</Link>{" "}
                 automates improvement using training data.
               </p>
@@ -767,7 +763,7 @@ export default function LLMOps() {
             </li>
             <li>
               <Link
-                href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}
+                href="/prompt-registry"
                 style={{ color: "#007bff", fontWeight: "600" }}
               >
                 Prompt Management

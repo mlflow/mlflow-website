@@ -24,7 +24,7 @@ Fun fact: The earliest form of OCR, the Optophone, was introduced in 1914 to hel
 
 We face several recurring challenges when building an LLM-based OCR application.
 
-**Prompt Iteration and Versioning:** Prompts need to be updated and tweaked to improve extraction quality. A new prompt can introduce performance regression, but we do not save the old version. Without rigorous versioning, it's hard to roll back or compare.
+**Prompt Iteration and Versioning:** Prompts need to be updated and tweaked to improve extraction quality. A new prompt can introduce performance regression, but we do not save the old version. Without rigorous versioning, it's hard to roll back or compare. A [prompt registry](/prompt-registry) solves this by treating prompts as versioned artifacts with full change history.
 
 **Debugging Unexpected Results:** Unexpected results may show up periodically in our OCR attempts. We need a way to understand why. Without detailed traceability, it is difficult to diagnose whether the issue is with the prompt, the model, or the data (e.g., a new document strucutre).
 
