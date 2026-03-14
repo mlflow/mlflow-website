@@ -975,7 +975,7 @@ results = mlflow.genai.evaluate(
                 <strong>MLflow</strong>
               </Link>{" "}
               is the largest open-source{" "}
-              <strong>AI engineering platform</strong>, with over 30 million
+              <strong>AI engineering platform for agents, LLMs, and models</strong>, with over 30 million
               monthly downloads. Thousands of organizations use MLflow to manage
               prompts, evaluate AI quality, trace agent behavior, and deploy
               production-grade AI applications. Backed by the Linux Foundation

@@ -952,7 +952,7 @@ export default function LLMOps() {
                 <strong>MLflow</strong>
               </Link>{" "}
               is the largest open-source{" "}
-              <strong>AI engineering platform</strong>, with over 30 million
+              <strong>AI engineering platform for agents, LLMs, and models</strong>, with over 30 million
               monthly downloads. Thousands of organizations use MLflow to debug,
               evaluate, monitor, and optimize production-quality AI agents and
               LLM applications while controlling costs and managing access to
