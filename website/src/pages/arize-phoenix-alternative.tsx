@@ -6,12 +6,11 @@ import { Header } from "../components/Header/Header";
 import { MLFLOW_DOCS_URL, MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
+import MlflowUIImg from "@site/static/img/arize-phoenix-alternative/mlflow-ui.png";
+import PhoenixUIImg from "@site/static/img/arize-phoenix-alternative/arize-phoenix-ui.png";
+import MlflowLogo from "@site/static/img/arize-phoenix-alternative/mlflow-logo.png";
+import PhoenixLogo from "@site/static/img/arize-phoenix-alternative/arize_phoenixe_logo.png";
 
-const MLFLOW_UI_SRC = "/img/arize-phoenix-alternative/mlflow-ui.png";
-const PHOENIX_UI_SRC = "/img/arize-phoenix-alternative/arize-phoenix-ui.png";
-const MLFLOW_LOGO_SRC = "/img/arize-phoenix-alternative/mlflow-logo.png";
-const PHOENIX_LOGO_SRC =
-  "/img/arize-phoenix-alternative/arize_phoenixe_logo.png";
 const SEO_TITLE =
   "Arize Phoenix Alternative for LLMs & Agents | MLflow Agent Platform";
 const SEO_DESCRIPTION =
@@ -45,17 +44,19 @@ LangChainInstrumentor().instrument(
 
 mlflow.openai.autolog()
 
-# That's it. Requests and responses
-# are traced automatically.`,
+# That's it. All OpenAI calls are
+# captured automatically.`,
     phoenix: `from phoenix.otel import register
 from openinference.instrumentation.openai import (
     OpenAIInstrumentor,
 )
 
-tracer_provider = register(project_name="chat-app")
+tracer_provider = register(project_name="my-app")
 OpenAIInstrumentor().instrument(
     tracer_provider=tracer_provider
-)`,
+)
+
+# Continue running your app as usual`,
   },
   {
     label: "DSPy",
@@ -63,17 +64,19 @@ OpenAIInstrumentor().instrument(
 
 mlflow.dspy.autolog()
 
-# That's it. DSPy module executions
-# are traced automatically.`,
+# That's it. Every DSPy module call
+# is captured automatically.`,
     phoenix: `from phoenix.otel import register
 from openinference.instrumentation.dspy import (
     DSPyInstrumentor,
 )
 
-tracer_provider = register(project_name="rag-evals")
+tracer_provider = register(project_name="my-app")
 DSPyInstrumentor().instrument(
     tracer_provider=tracer_provider
-)`,
+)
+
+# Continue running your app as usual`,
   },
 ];
 
@@ -108,7 +111,7 @@ function ComparisonTable({ rows }: { rows: [string, string, string][] }) {
 function MlflowCodeLabel() {
   return (
     <span className="code-logo-inline">
-      <img src={MLFLOW_LOGO_SRC} alt="MLflow" className="code-logo-icon" />
+      <img src={MlflowLogo} alt="MLflow" className="code-logo-icon" />
       MLflow
     </span>
   );
@@ -117,11 +120,7 @@ function MlflowCodeLabel() {
 function PhoenixCodeLabel() {
   return (
     <span className="code-logo-inline">
-      <img
-        src={PHOENIX_LOGO_SRC}
-        alt="Arize Phoenix"
-        className="code-logo-icon"
-      />
+      <img src={PhoenixLogo} alt="Arize Phoenix" className="code-logo-icon" />
       Arize Phoenix
     </span>
   );
@@ -134,7 +133,7 @@ function CodeBlock({ code, label }: { code: string; label: string }) {
         <span className="code-side-label">
           {label === "MLflow" ? <MlflowCodeLabel /> : <PhoenixCodeLabel />}
         </span>
-        <CopyButton text={code} />
+        <CopyButton code={code} />
       </div>
       <Highlight theme={customNightOwl} code={code} language="python">
         {({ tokens, getLineProps, getTokenProps }) => (
@@ -184,7 +183,7 @@ const architectureTable: [string, string, string][] = [
   ["Dimension", "MLflow", "Arize Phoenix"],
   [
     "Primary Scope",
-    "End-to-end AI/ML lifecycle platform",
+    "End-to-end AI engineering platform",
     "LLM observability and evaluation workbench",
   ],
   [
@@ -193,18 +192,19 @@ const architectureTable: [string, string, string][] = [
     "Collector + UI + SQLite or PostgreSQL",
   ],
   [
-    "Model Registry",
-    "Built-in registry with lineage and versioning",
-    "Not a core product surface",
+    "Tracing",
+    "Native tracing + OTLP ingest/export",
+    "OpenTelemetry-native trace collection",
   ],
   [
-    "Deployment Surface",
-    "Model packaging + serving patterns",
-    "Focuses on tracing/evals, not model serving",
+    "Evaluation",
+    "Built-in LLM judges, custom metrics, multi-turn evaluation",
+    "Basic evaluation (advanced features require paid SaaS)",
   ],
+  ["AI Gateway", "Built-in gateway for LLM access governance", "Not available"],
   [
     "Operational Focus",
-    "Unified platform for training, models, and GenAI",
+    "Unified platform for agents, LLMs, and ML models",
     "Trace-centric debugging and iteration loop",
   ],
 ];
@@ -214,19 +214,25 @@ const capabilityRows: {
   mlflow: boolean | string;
   phoenix: boolean | string;
 }[] = [
-  { feature: "Training Experiment Tracking", mlflow: true, phoenix: false },
-  { feature: "Model Registry & Version Aliases", mlflow: true, phoenix: false },
-  { feature: "Model Packaging Standard", mlflow: true, phoenix: false },
+  { feature: "Built-in LLM Judges", mlflow: true, phoenix: true },
+  { feature: "Custom Metrics", mlflow: true, phoenix: true },
+  { feature: "Versioning Metrics", mlflow: true, phoenix: false },
   {
-    feature: "OpenTelemetry Ingest for LLM Traces",
+    feature: "Aligning Judges with Human Feedback",
     mlflow: true,
-    phoenix: true,
+    phoenix: false,
   },
-  { feature: "Human Annotation Workflows", mlflow: true, phoenix: true },
+  { feature: "Multi-Turn Evaluation", mlflow: true, phoenix: false },
+  { feature: "Visualization & Comparison", mlflow: true, phoenix: false },
   {
-    feature: "Primary Strength",
-    mlflow: "Lifecycle breadth",
-    phoenix: "Trace-first LLM iteration",
+    feature: "Online Evaluation",
+    mlflow: true,
+    phoenix: "Paid SaaS only",
+  },
+  {
+    feature: "Integrated Libraries",
+    mlflow: "RAGAS, DeepEval, Phoenix, TruLens, Guardrails AI",
+    phoenix: "RAGAS",
   },
   {
     feature: "License",
@@ -237,6 +243,7 @@ const capabilityRows: {
 
 export default function ArizePhoenixAlternative() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+
   const faqs: { question: string; answer: ReactNode; answerText: string }[] = [
     {
       question: "What is the best open source Arize Phoenix alternative?",
@@ -244,11 +251,12 @@ export default function ArizePhoenixAlternative() {
         <>
           MLflow is a strong open source alternative when you need both{" "}
           <Link to="/llm-tracing">LLM tracing</Link> and lifecycle capabilities
-          such as model registry, packaging, and deployment workflows.
+          such as evaluation, prompt management, AI Gateway, and governance
+          workflows.
         </>
       ),
       answerText:
-        "MLflow is a strong open source alternative when you need both LLM tracing and lifecycle capabilities such as model registry, packaging, and deployment workflows.",
+        "MLflow is a strong open source alternative when you need both LLM tracing and lifecycle capabilities such as evaluation, prompt management, AI Gateway, and governance workflows.",
     },
     {
       question: "How does MLflow differ from Arize Phoenix?",
@@ -256,12 +264,13 @@ export default function ArizePhoenixAlternative() {
         <>
           Arize Phoenix is primarily a trace-first observability and evaluation
           workspace. MLflow covers observability plus broader workflows across{" "}
-          <Link to={MLFLOW_DOCS_URL}>tracking</Link>, registry, deployment, and
-          GenAI quality operations.
+          <Link to={MLFLOW_DOCS_URL}>tracking</Link>, evaluation, prompt
+          management, AI Gateway, and governance for AI agents and LLM
+          applications.
         </>
       ),
       answerText:
-        "Arize Phoenix is primarily a trace-first observability and evaluation workspace. MLflow covers observability plus broader workflows across tracking, registry, deployment, and GenAI quality operations.",
+        "Arize Phoenix is primarily a trace-first observability and evaluation workspace. MLflow covers observability plus broader workflows across tracking, evaluation, prompt management, AI Gateway, and governance for AI agents and LLM applications.",
     },
     {
       question: "Does MLflow support OpenTelemetry traces?",
@@ -279,16 +288,17 @@ export default function ArizePhoenixAlternative() {
         "Yes. MLflow supports OpenTelemetry-aligned tracing workflows and integrations for multiple frameworks. See MLflow tracing docs for setup details.",
     },
     {
-      question: "Can I use MLflow for both LLM and traditional ML workloads?",
+      question:
+        "Can I use MLflow for both LLM applications and traditional ML workloads?",
       answer: (
         <>
-          Yes. MLflow is designed for both classical ML and GenAI systems, so
-          teams can manage experiments, model versions, and GenAI evaluations in
-          one platform.
+          Yes. MLflow is designed for both classical ML and AI agent / LLM
+          systems, so teams can manage experiments, model versions, and
+          evaluations in one platform.
         </>
       ),
       answerText:
-        "Yes. MLflow is designed for both classical ML and GenAI systems, so teams can manage experiments, model versions, and GenAI evaluations in one platform.",
+        "Yes. MLflow is designed for both classical ML and AI agent / LLM systems, so teams can manage experiments, model versions, and evaluations in one platform.",
     },
     {
       question: "Is Arize Phoenix better for trace-centric debugging?",
@@ -296,24 +306,26 @@ export default function ArizePhoenixAlternative() {
         <>
           Many teams choose Phoenix specifically for trace-first UI workflows.
           MLflow also provides strong trace visibility, with additional
-          lifecycle and governance features for teams that need broader
-          coverage.
+          evaluation, AI Gateway, and governance features for teams that need
+          broader coverage.
         </>
       ),
       answerText:
-        "Many teams choose Phoenix specifically for trace-first UI workflows. MLflow also provides strong trace visibility, with additional lifecycle and governance features for teams that need broader coverage.",
+        "Many teams choose Phoenix specifically for trace-first UI workflows. MLflow also provides strong trace visibility, with additional evaluation, AI Gateway, and governance features for teams that need broader coverage.",
     },
     {
-      question: "Does MLflow include model registry and deployment workflows?",
+      question: "Does MLflow include an AI Gateway?",
       answer: (
         <>
-          Yes. MLflow includes model registry and packaging capabilities in
-          addition to observability. This is a key reason teams adopt MLflow as
-          a full AI engineering system.
+          Yes. MLflow includes a built-in{" "}
+          <Link to="/ai-gateway">AI Gateway</Link> for governing LLM access
+          across your organization, with rate limiting, fallbacks, usage
+          tracking, and credential management. Arize Phoenix does not offer a
+          gateway capability.
         </>
       ),
       answerText:
-        "Yes. MLflow includes model registry and packaging capabilities in addition to observability. This is a key reason teams adopt MLflow as a full AI engineering system.",
+        "Yes. MLflow includes a built-in AI Gateway for governing LLM access across your organization, with rate limiting, fallbacks, usage tracking, and credential management. Arize Phoenix does not offer a gateway capability.",
     },
     {
       question: "How do I evaluate LLM and agent quality in MLflow?",
@@ -331,25 +343,28 @@ export default function ArizePhoenixAlternative() {
       question: "Is MLflow vendor-neutral for enterprise use?",
       answer: (
         <>
-          MLflow uses an open source model with broad ecosystem adoption. Teams
-          can self-host or use managed environments while preserving portability
-          across infrastructure choices.
+          MLflow is backed by the{" "}
+          <Link to="https://www.linuxfoundation.org/">Linux Foundation</Link>, a
+          non-profit vendor-neutral organization. It is licensed under Apache
+          2.0 with full feature parity between its open source release and
+          managed offerings, ensuring long-term portability.
         </>
       ),
       answerText:
-        "MLflow uses an open source model with broad ecosystem adoption. Teams can self-host or use managed environments while preserving portability across infrastructure choices.",
+        "MLflow is backed by the Linux Foundation, a non-profit vendor-neutral organization. It is licensed under Apache 2.0 with full feature parity between its open source release and managed offerings, ensuring long-term portability.",
     },
     {
       question: "Which teams should choose Arize Phoenix vs MLflow?",
       answer: (
         <>
           Choose Phoenix if your immediate priority is dedicated trace-centric
-          observability and annotation loops. Choose MLflow if you also need
-          lifecycle governance, registry, and long-term platform consolidation.
+          observability and you prefer a SaaS-first experience. Choose MLflow if
+          you need a complete AI engineering platform with evaluation, AI
+          Gateway, and long-term platform consolidation.
         </>
       ),
       answerText:
-        "Choose Phoenix if your immediate priority is dedicated trace-centric observability and annotation loops. Choose MLflow if you also need lifecycle governance, registry, and long-term platform consolidation.",
+        "Choose Phoenix if your immediate priority is dedicated trace-centric observability and you prefer a SaaS-first experience. Choose MLflow if you need a complete AI engineering platform with evaluation, AI Gateway, and long-term platform consolidation.",
     },
     {
       question: "Where can I get started quickly with MLflow tracing?",
@@ -361,13 +376,13 @@ export default function ArizePhoenixAlternative() {
           </Link>{" "}
           and then expand to{" "}
           <Link to={`${MLFLOW_GENAI_DOCS_URL}evaluate/`}>
-            GenAI evaluation workflows
+            evaluation workflows
           </Link>
           .
         </>
       ),
       answerText:
-        "Start with the MLflow tracing quickstart and then expand to GenAI evaluation workflows.",
+        "Start with the MLflow tracing quickstart and then expand to evaluation workflows.",
     },
   ];
   const faqSchema = {
@@ -844,11 +859,11 @@ export default function ArizePhoenixAlternative() {
             Open Source Arize Phoenix Alternative? Arize Phoenix vs MLflow
           </h1>
           <p className="subtitle">
-            Whether you build LLM applications with OpenAI and Claude or
-            multi-step agents with LangGraph and CrewAI, observability is a core
-            production requirement. This guide compares Arize Phoenix and MLflow
-            across LLM observability, agent observability, evaluation, and
-            lifecycle operations so you can choose the right platform.
+            Arize Phoenix and MLflow are open source platforms that help teams
+            build production-grade AI agents and LLM applications. Teams also
+            need evaluation, prompt management, and governance. In this guide,
+            we compare Phoenix's tracing-focused approach with MLflow's complete
+            AI engineering platform and help you decide which is the right fit.
           </p>
           <div className="quick-nav">
             <p>
@@ -859,10 +874,7 @@ export default function ArizePhoenixAlternative() {
                 <a href="#quick-comparison">Quick Comparison</a>
               </li>
               <li>
-                <a href="#llm-observability">LLM Observability</a>
-              </li>
-              <li>
-                <a href="#agent-observability">Agent Observability</a>
+                <a href="#open-source-licensing">Open Source &amp; Licensing</a>
               </li>
               <li>
                 <a href="#tracing-observability">Tracing &amp; Observability</a>
@@ -873,6 +885,9 @@ export default function ArizePhoenixAlternative() {
                 </a>
               </li>
               <li>
+                <a href="#ai-gateway">AI Gateway</a>
+              </li>
+              <li>
                 <a href="#faq">FAQ</a>
               </li>
             </ul>
@@ -881,8 +896,8 @@ export default function ArizePhoenixAlternative() {
           <h2>What is Arize Phoenix?</h2>
           <div className="screenshot-wrap">
             <img
-              src={PHOENIX_UI_SRC}
-              alt="Arize Phoenix trace and evaluation workspace placeholder screenshot"
+              src={PhoenixUIImg}
+              alt="Arize Phoenix trace and evaluation workspace screenshot"
             />
           </div>
           <p>
@@ -894,48 +909,55 @@ export default function ArizePhoenixAlternative() {
             span-level debugging, annotation workflows, and experiment loops for
             prompt and quality iteration. It is especially popular with teams
             that want OpenTelemetry-native instrumentation and a dedicated
-            trace-centric UI for LLM development.
+            trace-centric UI for LLM development. Phoenix OSS is primarily
+            designed for local development and debugging, while Arize's
+            commercial SaaS offering (Arize AX) targets production-scale
+            deployments with online evaluations, the Alyx Copilot, and
+            enterprise integrations.
           </p>
 
           <h2>What is MLflow?</h2>
           <div className="screenshot-wrap">
             <img
-              src={MLFLOW_UI_SRC}
-              alt="MLflow tracing and evaluation workspace placeholder screenshot"
+              src={MlflowUIImg}
+              alt="MLflow tracing and evaluation workspace screenshot"
             />
           </div>
           <p>
             <strong>
               <Link to="/">MLflow</Link>
             </strong>{" "}
-            is an open source AI engineering platform that covers the full
-            lifecycle: experiment tracking, model packaging, model registry,
-            deployment integration, and{" "}
-            <Link to="/genai/observability">GenAI observability</Link>. Teams
-            use MLflow to build, monitor, and improve ML and LLM systems in one
-            unified platform while keeping infrastructure and governance choices
-            flexible.
+            is an open source AI engineering platform that enables teams of all
+            sizes to debug, evaluate, monitor, and optimize production-quality
+            AI agents, LLM applications, and ML models while controlling costs
+            and managing access to models and data. With over 30 million monthly
+            downloads, thousands of organizations rely on MLflow each day to
+            ship AI to production with confidence.
           </p>
 
           <h2 id="quick-comparison">Quick Comparison</h2>
           <div className="tldr-grid">
             <div className="tldr-card highlight">
               <h3>
-                <img src={MLFLOW_LOGO_SRC} alt="MLflow" className="tldr-logo" />
+                <img src={MlflowLogo} alt="MLflow" className="tldr-logo" />
                 Choose MLflow if you...
               </h3>
               <ul>
                 <li>
-                  Need a <strong>complete lifecycle platform</strong> across
-                  tracking, registry, deployment, and GenAI
+                  Care about avoiding <strong>vendor lock-in</strong>
                 </li>
                 <li>
-                  Want <strong>one system</strong> for both classical ML and LLM
-                  applications
+                  Want <strong>simple, flexible self-hosting</strong> with
+                  minimal operational overhead
                 </li>
                 <li>
-                  Require <strong>model governance</strong> and controlled
-                  promotion workflows
+                  Need <strong>production-grade evaluation</strong> and{" "}
+                  <strong>prompt optimization</strong> for AI agents
+                </li>
+                <li>
+                  Want a unified solution for{" "}
+                  <strong>managing and governing access</strong> to LLMs via an{" "}
+                  <strong>AI Gateway</strong>
                 </li>
                 <li>
                   Prefer a permissive <strong>Apache 2.0</strong> licensing
@@ -946,7 +968,7 @@ export default function ArizePhoenixAlternative() {
             <div className="tldr-card">
               <h3>
                 <img
-                  src={PHOENIX_LOGO_SRC}
+                  src={PhoenixLogo}
                   alt="Arize Phoenix"
                   className="tldr-logo"
                 />
@@ -954,14 +976,13 @@ export default function ArizePhoenixAlternative() {
               </h3>
               <ul>
                 <li>
-                  Primarily need <strong>LLM tracing and basic evaluation workflows</strong>
+                  Primarily need{" "}
+                  <strong>LLM tracing and basic evaluation workflows</strong>
                 </li>
+                <li>Prefer a SaaS-first experience</li>
                 <li>
-                  Prefer a SaaS-first experience
-                </li>
-                <li>
-                  Do not need built-in{" "}
-                  <strong>model registry/deployment</strong>
+                  Already have another solution for{" "}
+                  <strong>managing LLM access</strong>
                 </li>
                 <li>
                   Are comfortable with <strong>ELv2 licensing</strong> tradeoffs
@@ -970,90 +991,61 @@ export default function ArizePhoenixAlternative() {
             </div>
           </div>
 
-          <h2 id="llm-observability">LLM Observability</h2>
-          <p>
-            LLM observability focuses on prompt execution, model responses,
-            latency, token usage, and quality trends over time. Teams use it to
-            debug degraded responses, identify expensive paths, and detect
-            quality regressions before they impact production users.
-          </p>
-          <p>
-            Phoenix is strong for trace-first inspection and annotation loops.
-            MLflow supports this workflow while also connecting traces to model
-            lineage and evaluation history. For teams that need deeper quality
-            control, pair tracing with{" "}
-            <Link to="/genai/evaluations">LLM evaluation workflows</Link>.
-          </p>
-
-          <h2 id="agent-observability">Agent Observability</h2>
-          <p>
-            Agent observability extends LLM observability to multi-step systems
-            with tool calls, retrieval hops, and branching control flow. This is
-            essential for debugging failures that happen across several steps.
-          </p>
-          <p>
-            MLflow supports agent-oriented tracing and integrates with common
-            frameworks such as LangGraph, LangChain, and CrewAI while preserving
-            a lifecycle view across experiments and deployments. Teams building
-            production agents can combine observability with{" "}
-            <Link to="/llm-evaluation">agent evaluation</Link> to drive safer
-            releases.
-          </p>
-
           <h2 id="open-source-licensing">Open Source &amp; Licensing</h2>
           <p>
-            Both tools are open source projects, but the licensing model is an
-            important strategic difference. <strong>MLflow</strong> is licensed
-            under Apache 2.0 and backed by the Linux Foundation, the premier
-            open source AI software foundation. MLflow has powered production AI
-            applications for nearly 10 years, making it easier to adopt in
-            environments that prioritize permissive licensing and long-term
-            portability.
+            <strong>MLflow</strong> is an open source project backed by the{" "}
+            <strong>
+              <Link to="https://www.linuxfoundation.org/">
+                Linux Foundation
+              </Link>
+            </strong>
+            , a non-profit vendor-neutral organization, ensuring long-term
+            community stewardship with no single company controlling its
+            direction. MLflow is licensed under Apache 2.0 and maintains full
+            feature parity between its open source release and managed
+            offerings. With adoption by 60%+ of the Fortune 500, MLflow is one
+            of the most widely deployed AI platforms in the enterprise.
           </p>
           <p>
             <strong>Arize Phoenix</strong> is distributed under Elastic License
-            2.0. It is free to self-host, but ELv2 includes restrictions for
-            offering the software itself as a managed hosted service. For many
-            internal use cases this is fine, but teams building customer-facing
-            hosted products should evaluate the implications early.
+            2.0. While Phoenix is free to self-host, ELv2 includes restrictions
+            for offering the software as a managed hosted service. Arize is
+            largely focused on their commercial SaaS offering (Arize AX), and
+            some production capabilities such as online evaluations, the Alyx
+            Copilot, and enterprise integrations are{" "}
+            <Link to="https://arize.com/products-phoenix-versus-arize-ax">
+              only available in the paid SaaS tier
+            </Link>
+            . Phoenix OSS is primarily designed for local development and
+            debugging, while Arize AX targets production-scale deployments.
           </p>
-
-          <h2 id="lifecycle-scope">
-            Lifecycle Scope: Tracking, Registry &amp; Deployment
-          </h2>
-          <p>
-            The largest difference is platform scope. <strong>MLflow</strong> is
-            designed as a full lifecycle system: it tracks training and
-            evaluation runs, packages models in a standard format, manages
-            versions in a registry, and supports production deployment patterns.
-            See <Link to={MLFLOW_DOCS_URL}>MLflow docs</Link> for end-to-end
-            lifecycle capabilities.
-          </p>
-          <p>
-            <strong>Arize Phoenix</strong> focuses on observability and
-            evaluation for LLM/agent systems. That makes Phoenix highly
-            effective for quality iteration loops, but it is not intended to
-            replace a training experiment tracker or model registry.
-          </p>
-          <ComparisonTable rows={architectureTable} />
 
           <h2 id="tracing-observability">Tracing &amp; Observability</h2>
           <p>
-            Both platforms now align around OpenTelemetry-compatible tracing.
-            Phoenix is built around trace exploration, while MLflow has expanded
-            rapidly with native tracing plus OTLP ingest/export so teams can
-            integrate with broader observability infrastructure.
+            Both platforms align around OpenTelemetry-compatible tracing. MLflow
+            and Phoenix both support OpenTelemetry, but they differ in
+            instrumentation ergonomics and production monitoring capabilities.
           </p>
           <p>
-            Instrumentation ergonomics differ in day-to-day workflows.
-            <strong> MLflow</strong> emphasizes one-line <code>autolog()</code>
-            APIs across many frameworks, while <strong>Phoenix</strong> commonly
-            uses OpenInference/OpenTelemetry instrumentation with explicit
-            tracer registration. Teams also track{" "}
+            <strong>MLflow</strong> auto-instruments 30+ frameworks with a{" "}
+            <strong>one-line unified</strong> <code>autolog()</code> API,
+            including OpenAI, LangGraph, DSPy, Anthropic, LangChain, Pydantic
+            AI, CrewAI, and many more. MLflow uses the native OpenTelemetry data
+            model (Trace + Span + Events) and supports both OTLP ingest and
+            export so teams can integrate with broader observability
+            infrastructure. Teams also track{" "}
             <Link to={`${MLFLOW_GENAI_DOCS_URL}tracing/token-usage-cost/`}>
               token usage and cost
             </Link>{" "}
             to connect observability with spend.
+          </p>
+          <p>
+            <strong>Phoenix</strong> uses OpenInference/OpenTelemetry
+            instrumentation with explicit tracer registration. The open source
+            version of Phoenix does not offer online monitoring as part of its
+            observability stack — teams that need production monitoring must
+            upgrade to the{" "}
+            <Link to="https://arize.com/docs/phoenix">paid SaaS version</Link>.
           </p>
           <CodeTabs tabs={tracingExamples} />
 
@@ -1061,16 +1053,21 @@ export default function ArizePhoenixAlternative() {
             Evaluation &amp; Experimentation
           </h2>
           <p>
-            Phoenix is strong at trace-driven LLM evaluation loops: inspect
-            traces, annotate outputs, build datasets, run experiments, and
-            compare prompt or system changes. This workflow is a core Phoenix
-            strength and is one reason teams adopt it for agent iteration.
+            Evaluation is where the gap between MLflow and Arize Phoenix is most
+            pronounced. Phoenix offers trace-driven evaluation loops — inspect
+            traces, annotate outputs, build datasets, and run experiments — but
+            online evaluations require the paid Arize AX tier, and the open
+            source evaluation capabilities are less mature at scale.
           </p>
           <p>
-            MLflow combines LLM evaluation with broader ML evaluation and
-            lifecycle capabilities. This allows teams to connect online quality
-            signals, offline evaluations, model versions, and deployment context
-            inside one platform rather than stitching multiple systems together.
+            <strong>MLflow</strong> provides production-grade evaluation backed
+            by a dedicated research team. It supports a rich set of built-in
+            scorers, integration with leading evaluation libraries (RAGAS,
+            DeepEval, Phoenix, TruLens, Guardrails AI), and advanced
+            capabilities like multi-turn evaluation, online evaluation, and
+            aligning LLM judges with human feedback. If your team needs to move
+            beyond vibe checks to rigorous quality assurance, MLflow is
+            purpose-built for it.
           </p>
           <table className="eval-checklist">
             <thead>
@@ -1103,20 +1100,36 @@ export default function ArizePhoenixAlternative() {
             </tbody>
           </table>
 
-          <h2 id="governance-security">Governance &amp; Security</h2>
+          <ComparisonTable rows={architectureTable} />
+
+          <h2 id="ai-gateway">AI Gateway</h2>
           <p>
-            For self-hosted deployments, both platforms support authentication
-            and role-based control patterns, but they are optimized for
-            different outcomes. Phoenix emphasizes secure access and data
-            controls for observability projects. MLflow emphasizes governance
-            across experiments, models, and prompts, and can be extended with
-            plugins and enterprise infrastructure patterns.
+            As LLM applications move to production, teams face growing
+            challenges around managing API keys, controlling costs, switching
+            between providers, and enforcing governance policies. This is where
+            an <Link to="/ai-gateway">AI Gateway</Link>, a centralized layer
+            between your applications and LLM providers, has become an essential
+            piece of production AI infrastructure.
           </p>
           <p>
-            If your roadmap includes strict enterprise governance and auditable
-            lifecycle controls, MLflow is usually the stronger long-term center
-            of gravity. If your immediate goal is accelerating LLM debugging and
-            feedback loops, Phoenix can deliver value quickly.
+            <strong>Arize Phoenix</strong> does not offer a gateway capability.
+            To manage costs and model access, teams using Phoenix must bolt on a
+            separate tool such as LiteLLM, PortKey, or build a custom gateway
+            solution.
+          </p>
+          <p>
+            <strong>MLflow</strong> offers a built-in{" "}
+            <Link to={`${MLFLOW_GENAI_DOCS_URL}gateway/`}>AI Gateway</Link> for
+            governing LLM access across your organization. It provides a
+            standard endpoint that routes requests to any supported provider
+            (OpenAI, Anthropic, AWS Bedrock, Azure OpenAI, Google Gemini, and
+            more), with built-in{" "}
+            <strong>
+              rate limiting, fallbacks, usage tracking, and credential
+              management
+            </strong>
+            . Teams can switch providers, add guardrails, or enforce usage
+            policies without changing application code.
           </p>
 
           <h2 id="databricks-managed-mlflow">Databricks Managed MLflow</h2>
@@ -1135,18 +1148,21 @@ export default function ArizePhoenixAlternative() {
 
           <h2>Summary</h2>
           <p>
-            <strong>Arize Phoenix</strong> is a strong product for trace-first
-            LLM observability and evaluation workflows. If your main challenge
-            is debugging agent behavior and iterating on prompts with annotation
-            loops, Phoenix is a compelling option.
+            <strong>Arize Phoenix is a solid observability tool</strong>, but
+            tracing is only one piece of the puzzle. Its limited open source
+            feature set and absence of an AI Gateway mean that teams inevitably
+            need additional tools to build a complete AI engineering stack.{" "}
+            <strong>Choose Phoenix</strong> if tracing and basic evaluation are
+            all you need and you prefer a SaaS-first experience.
           </p>
           <p>
-            <strong>MLflow</strong> is a broader AI engineering platform. It
-            covers LLM tracing and evaluation while also delivering training
-            experiment tracking, model packaging, model registry, and deployment
-            integration. Choose MLflow when you need a single platform that can
-            support both current LLM workloads and long-term ML/AI lifecycle
-            needs.
+            <strong>MLflow is a complete AI engineering platform.</strong> It
+            covers tracing, production-grade evaluation, prompt optimization, an
+            AI Gateway, and governance, all backed by the Linux Foundation with
+            full open source feature parity. <strong>Choose MLflow</strong> if
+            you need a vendor-neutral platform that goes beyond observability to
+            help you actually improve and ship AI agents and LLM applications
+            with confidence.
           </p>
 
           <h2 id="faq">FAQ</h2>
@@ -1196,8 +1212,11 @@ export default function ArizePhoenixAlternative() {
               </li>
               <li>
                 <Link to={`${MLFLOW_GENAI_DOCS_URL}evaluate/`}>
-                  MLflow GenAI Evaluation
+                  MLflow Evaluation
                 </Link>
+              </li>
+              <li>
+                <Link to="/ai-gateway">MLflow AI Gateway</Link>
               </li>
             </ul>
           </div>
@@ -1213,15 +1232,15 @@ export default function ArizePhoenixAlternative() {
               <a href="#open-source-licensing">Open Source &amp; Licensing</a>
             </li>
             <li>
-              <a href="#lifecycle-scope">Lifecycle Scope</a>
-            </li>
-            <li>
               <a href="#tracing-observability">Tracing &amp; Observability</a>
             </li>
             <li>
               <a href="#evaluation-experimentation">
                 Evaluation &amp; Experimentation
               </a>
+            </li>
+            <li>
+              <a href="#ai-gateway">AI Gateway</a>
             </li>
             <li>
               <a href="#faq">FAQ</a>
@@ -1231,10 +1250,10 @@ export default function ArizePhoenixAlternative() {
           <p className="toc-title">RESOURCES</p>
           <ul>
             <li>
-              <a href="/llm-evaluation">MLflow FAQ</a>
+              <a href={MLFLOW_DOCS_URL}>Documentation</a>
             </li>
             <li>
-              <a href={MLFLOW_DOCS_URL}>Documentation</a>
+              <a href="/ai-gateway">AI Gateway</a>
             </li>
             <li>
               <a href="/slack">Slack</a>
