@@ -975,12 +975,15 @@ results = mlflow.genai.evaluate(
                 <strong>MLflow</strong>
               </Link>{" "}
               is the largest open-source{" "}
-              <strong>AI engineering platform for agents, LLMs, and models</strong>, with over 30 million
-              monthly downloads. Thousands of organizations use MLflow to manage
-              prompts, evaluate AI quality, trace agent behavior, and deploy
-              production-grade AI applications. Backed by the Linux Foundation
-              and licensed under Apache 2.0, MLflow provides a complete prompt
-              management solution with no vendor lock-in.{" "}
+              <strong>
+                AI engineering platform for agents, LLMs, and models
+              </strong>
+              , with over 30 million monthly downloads. Thousands of
+              organizations use MLflow to manage prompts, evaluate AI quality,
+              trace agent behavior, and deploy production-grade AI applications.
+              Backed by the Linux Foundation and licensed under Apache 2.0,
+              MLflow provides a complete prompt management solution with no
+              vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>
                 Get started →
               </Link>
