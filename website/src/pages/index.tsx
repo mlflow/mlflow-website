@@ -48,7 +48,7 @@ export default function Home(): JSX.Element {
             url: "https://mlflow.org",
             license: "https://www.apache.org/licenses/LICENSE-2.0",
             keywords:
-              "MLflow, AI agents, LLM observability, LLM tracing, AI evaluation, GenAI, LLMOps, prompt management, AI gateway, open source",
+              "MLflow, AI agents, LLM observability, LLM tracing, AI evaluation, LLMOps, GenAI, prompt engineering, AI gateway, open source",
             featureList: [
               "LLM and AI agent tracing and observability",
               "Automated LLM evaluation with LLM judges",
@@ -56,10 +56,10 @@ export default function Home(): JSX.Element {
               "AI Gateway for cost control and model access",
               "Human feedback collection",
               "Agent serving as REST APIs",
-              "Support for OpenAI, Anthropic, LangChain, LangGraph, Google ADK, DSPy, CrewAI, and more",
+              "Support for OpenAI, Claude, Gemini, LangChain, LangGraph, Google ADK, CrewAI, Vercel AI SDK, and more",
               "ML experiment tracking",
-              "Hyperparameter optimization",
-              "Model registry and deployment",
+              "ML hyperparameter optimization",
+              "ML model registry and deployment",
             ],
           })}
         </script>
