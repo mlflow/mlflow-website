@@ -25,10 +25,10 @@ const faqs: { question: string; answer: ReactNode }[] = [
           ML models
         </Link>
         . MLflow enables teams of all sizes to debug, evaluate, monitor, and
-        optimize their AI applications while controlling costs and managing
-        access to models and data. With over 30 million monthly downloads,
-        thousands of organizations rely on MLflow each day to ship AI to
-        production with confidence.
+        optimize production-quality AI applications while controlling costs and
+        managing access to models and data. With over 30 million monthly
+        downloads, thousands of organizations rely on MLflow each day to ship AI
+        to production with confidence.
         <br />
         <br />
         MLflow's comprehensive feature set for agents and LLM applications

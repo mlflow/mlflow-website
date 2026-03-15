@@ -663,10 +663,10 @@ export default function LangfuseAlternative() {
             </strong>{" "}
             is an open source AI engineering platform for agents, LLMs, and
             models that enables teams of all sizes to debug, evaluate, monitor,
-            and optimize their AI applications while controlling costs and
-            managing access to models and data. With over 30 million monthly
-            downloads, thousands of organizations rely on MLflow each day to
-            ship AI to production with confidence.
+            and optimize production-quality AI applications while controlling
+            costs and managing access to models and data. With over 30 million
+            monthly downloads, thousands of organizations rely on MLflow each
+            day to ship AI to production with confidence.
           </p>
 
           {/* TL;DR */}
