@@ -112,7 +112,7 @@ agent_ran_instrumented_code = make_judge(
 )
 ```
 
-This [agentic judge](https://mlflow.org/docs/latest/genai/eval-monitor/llm-judges) reads the actual span tree and reasons about whether the *sequence* of actions was correct. No rule can do that.
+This [agentic judge](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/#trace-based-judges) reads the actual span tree and reasons about whether the *sequence* of actions was correct. No rule can do that.
 
 **Rule-based judge:** check a side effect in the final testing environment which was modified by the execution of the skill:
 
