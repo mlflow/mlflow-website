@@ -19,7 +19,7 @@ import Head from "@docusaurus/Head";
 
 const SEO_TITLE = "MLflow - Open Source AI Platform for Agents, LLMs & Models";
 const SEO_DESCRIPTION =
-  "The largest open source AI engineering platform for agents, LLMs, and models. Debug, evaluate, monitor, and optimize your AI applications. Built for teams of all sizes.";
+  "The largest open source AI engineering platform for agents, LLMs, and ML models. Debug, evaluate, monitor, and optimize your AI applications. Built for teams of all sizes.";
 
 export default function Home(): JSX.Element {
   return (

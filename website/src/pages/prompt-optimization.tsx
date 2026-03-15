@@ -733,7 +733,7 @@ export default function PromptOptimization() {
               </Link>{" "}
               is the largest open-source{" "}
               <strong>
-                AI engineering platform for agents, LLMs, and models
+                AI engineering platform for agents, LLMs, and ML models
               </strong>
               , with over 30 million monthly downloads. Thousands of
               organizations use MLflow to debug, evaluate, monitor, and optimize
