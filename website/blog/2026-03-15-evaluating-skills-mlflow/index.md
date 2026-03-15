@@ -61,6 +61,8 @@ This is why skills are hard to test: the contract is semantic. "Did Claude disco
 
 Before diving into the details, here's how the pieces fit together.
 
+![Test harness diagram](./test-harness-diagram.svg)
+
 A test harness runs Claude Code headlessly against a target project with the skill installed. MLflow traces every action Claude takes during the session: file reads, shell commands, API calls. After Claude finishes, a set of judges runs against those traces to check whether Claude executed the skill correctly.
 
 Each judge evaluates one specific aspect of the trace: whether a particular artifact was created, whether Claude followed the right sequence of steps, whether it invoked the right tools. If all judges pass, the skill worked as intended. If any judge fails, the rationale points directly at what went wrong.
