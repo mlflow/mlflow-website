@@ -61,7 +61,46 @@ This is why skills are hard to test: the contract is semantic. "Did Claude disco
 
 Before diving into the details, here's how the pieces fit together.
 
-![Test harness diagram](./test-harness-diagram.svg)
+```
+┌─────────────────────────────────────────────────┐
+│              test config (YAML)                  │
+│     my-skill · prompt · setup · judges           │
+└───────────────────────┬─────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────┐
+│                 test harness                     │
+│                                                  │
+│  ① start MLflow                                  │
+│  ② run setup script to initialize testing        │
+│     environment and install my-skill             │
+│     for Claude to have access                    │
+│  ③ enable Claude Code tracing                    │
+│                                                  │
+└───────────────────────┬─────────────────────────┘
+                        │
+              claude -p "prompt"
+                        │
+                        ▼
+┌─────────────────────────────────────────────────┐
+│                  Claude Code                     │
+│              (headless session)                  │
+└──────────┬──────────────────────────┬────────────┘
+           │                          │
+     execution traces          final testing environment
+     (tool calls, spans)       as modified by Claude
+           │                          │
+           └──────────────┬───────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────┐
+│                    judges                        │
+│         LLM judges · rule-based judges           │
+└───────────────────────┬─────────────────────────┘
+                        │
+                        ▼
+              [PASS] / [FAIL] + rationale
+```
 
 A test harness runs Claude Code headlessly against a target project with the skill installed. MLflow traces every action Claude takes during the session: file reads, shell commands, API calls. After Claude finishes, a set of judges runs against those traces to check whether Claude executed the skill correctly.
 
