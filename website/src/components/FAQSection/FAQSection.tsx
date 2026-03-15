@@ -15,7 +15,7 @@ const faqs: { question: string; answer: ReactNode }[] = [
           to="/genai"
           className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
         >
-          AI agents and LLM applications
+          AI agents, LLMs
         </Link>
         , and{" "}
         <Link
