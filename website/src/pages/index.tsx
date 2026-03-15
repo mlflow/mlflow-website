@@ -19,7 +19,7 @@ import Head from "@docusaurus/Head";
 
 const SEO_TITLE = "MLflow - Open Source AI Platform for Agents, LLMs & Models";
 const SEO_DESCRIPTION =
-  "The largest open source AI engineering platform. Debug, evaluate, monitor, and optimize AI agents, LLMs, and ML models. Built for teams of all sizes.";
+  "The largest open source AI engineering platform for agents, LLMs, and ML models. Debug, evaluate, monitor, and optimize your AI applications. Built for teams of all sizes.";
 
 export default function Home(): JSX.Element {
   return (
@@ -47,6 +47,23 @@ export default function Home(): JSX.Element {
             description: SEO_DESCRIPTION,
             url: "https://mlflow.org",
             license: "https://www.apache.org/licenses/LICENSE-2.0",
+            keywords:
+              "MLflow, AI agents, LLM observability, LLM tracing, AI evaluation, LLMOps, GenAI, prompt engineering, AI gateway, open source",
+            featureList: [
+              "LLM and AI agent tracing and observability",
+              "Automated LLM evaluation with LLM judges",
+              "Prompt registry and version management",
+              "AI Gateway for cost control and model access",
+              "Human feedback collection",
+              "Agent serving as REST APIs",
+              "Token usage and cost tracking across LLM providers",
+              "Production agent monitoring and alerting",
+              "Guardrails and safety policies for AI applications",
+              "Support for OpenAI, Claude, Gemini, LangChain, LangGraph, Google ADK, CrewAI, Vercel AI SDK, and more",
+              "ML experiment tracking",
+              "ML hyperparameter optimization",
+              "ML model registry and deployment",
+            ],
           })}
         </script>
         <script type="application/ld+json">
@@ -56,7 +73,12 @@ export default function Home(): JSX.Element {
             name: "MLflow",
             url: "https://mlflow.org",
             logo: "https://mlflow.org/img/mlflow-logo.svg",
-            sameAs: ["https://github.com/mlflow/mlflow"],
+            sameAs: [
+              "https://github.com/mlflow/mlflow",
+              "https://www.linkedin.com/company/mlflow-org",
+              "https://x.com/mlflow",
+              "https://www.youtube.com/@mlflowoss",
+            ],
           })}
         </script>
       </Head>
