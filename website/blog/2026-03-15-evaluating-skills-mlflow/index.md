@@ -1,6 +1,6 @@
 ---
-title: "Evaluating and Refining Claude Code Skills with MLflow"
-description: How to test Claude Code skills using MLflow tracing and LLM judges, and close a self-improvement loop where Claude Code refines its own guidance documents.
+title: "Testing and Refining Claude Code Skills with MLflow"
+description: How to test Claude Code skills using MLflow tracing and LLM judges, and close a self-improvement loop where Claude Code refines its own skills.
 slug: evaluating-skills-mlflow
 authors: [mlflow-maintainers]
 tags:
