@@ -61,6 +61,8 @@ This is why skills are hard to test: the contract is semantic. "Did Claude disco
 
 Before diving into the details, here's how the pieces fit together.
 
+![Test harness diagram](./test-harness-diagram.svg)
+
 ```
 ┌─────────────────────────────────────────────────┐
 │              test config (YAML)                  │
