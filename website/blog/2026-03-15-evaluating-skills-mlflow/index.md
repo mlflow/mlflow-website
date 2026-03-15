@@ -268,7 +268,7 @@ Both fixes share the same shape: Claude reads the trace, identifies the gap betw
 
 MLflow is what makes the loop *grounded*. Claude isn't guessing what went wrong from a vague description in the prompt. It's reading the full span tree: the exact tool calls it made, in order, with timestamps. The diagnosis is direct.
 
-Because multiple test configs can cover the same skill, Claude can run the full suite against its revisions of `SKILL.md`. This prevents overfitting the skill to any single prompt or test case: a fix that addresses one failing judge must not cause another to regress.
+Because multiple test configs can cover the same skill, Claude can run the full suite against its revisions of `SKILL.md`. This prevents overfitting the skill to any single prompt or test case: a fix that addresses one failing test config must not cause another to regress.
 
 ---
 
