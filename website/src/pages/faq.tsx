@@ -33,21 +33,21 @@ const faqCategories: FAQCategory[] = [
         answer: (
           <>
             MLflow is the largest{" "}
-            <strong>open source AI engineering platform</strong>. MLflow enables
-            teams of all sizes to debug, evaluate, monitor, and optimize
-            production-quality{" "}
-            <Link href="/genai">AI agents, LLM applications</Link>, and{" "}
-            <Link href="/classical-ml">ML models</Link> while controlling costs
-            and managing access to models and data. With over 30 million monthly
-            downloads, thousands of organizations rely on MLflow each day to
-            ship AI to production with confidence.
+            <strong>open source AI engineering platform</strong> for{" "}
+            <Link href="/genai">agents, LLMs</Link>, and{" "}
+            <Link href="/classical-ml">ML models</Link>. MLflow enables teams of
+            all sizes to debug, evaluate, monitor, and optimize their AI
+            applications while controlling costs and managing access to models
+            and data. With over 30 million monthly downloads, thousands of
+            organizations rely on MLflow each day to ship AI to production with
+            confidence.
             <br />
             <br />
             MLflow's comprehensive feature set for agents and LLM applications
             includes production-grade{" "}
             <Link href="/ai-observability">observability</Link>,{" "}
             <Link href="/llm-evaluation">evaluation</Link>,{" "}
-            <Link href="/genai/prompt-registry">prompt management</Link>, an{" "}
+            <Link href="/prompt-registry">prompt management</Link>, an{" "}
             <Link href="/ai-gateway">AI Gateway</Link> for managing costs and
             model access, and more. Learn more at{" "}
             <Link href="/genai">MLflow for LLMs and Agents</Link>.
@@ -65,7 +65,7 @@ const faqCategories: FAQCategory[] = [
           </>
         ),
         answerText:
-          "MLflow is the largest open source AI engineering platform. MLflow enables teams of all sizes to debug, evaluate, monitor, and optimize production-quality AI agents, LLM applications, and ML models while controlling costs and managing access to models and data. With over 30 million monthly downloads, thousands of organizations rely on MLflow each day to ship AI to production with confidence. MLflow's comprehensive feature set for agents and LLM applications includes production-grade observability, evaluation, prompt management, an AI Gateway for managing costs and model access, and more. For machine learning (ML) model development, MLflow provides experiment tracking, model evaluation capabilities, a production model registry, and model deployment tools.",
+          "MLflow is the largest open source AI engineering platform for agents, LLMs, and ML models. MLflow enables teams of all sizes to debug, evaluate, monitor, and optimize production-quality AI applications while controlling costs and managing access to models and data. With over 30 million monthly downloads, thousands of organizations rely on MLflow each day to ship AI to production with confidence. MLflow's comprehensive feature set for agents and LLM applications includes production-grade observability, evaluation, prompt management, an AI Gateway for managing costs and model access, and more. For machine learning (ML) model development, MLflow provides experiment tracking, model evaluation capabilities, a production model registry, and model deployment tools.",
       },
       {
         question: "Why do I need an AI engineering platform like MLflow?",
@@ -337,11 +337,8 @@ const faqCategories: FAQCategory[] = [
         question: "What is MLflow's Prompt Registry?",
         answer: (
           <>
-            The{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>
-              MLflow Prompt Registry
-            </Link>{" "}
-            lets you version, compare, and iterate on prompt templates directly
+            The <Link href="/prompt-registry">MLflow Prompt Registry</Link> lets
+            you version, compare, and iterate on prompt templates directly
             through the MLflow UI or SDK. You can manage prompts separately from
             application code, reuse them across multiple versions of your agent,
             and view rich lineage showing which deployments use each prompt
@@ -525,7 +522,7 @@ const faqCategories: FAQCategory[] = [
             single open source platform:{" "}
             <Link href="/genai/observability">tracing</Link>,{" "}
             <Link href="/genai/evaluations">evaluation</Link>,{" "}
-            <Link href="/genai/prompt-registry">prompt management</Link>,{" "}
+            <Link href="/prompt-registry">prompt management</Link>,{" "}
             <Link href="/genai/ai-gateway">AI Gateway</Link>,{" "}
             <Link href="/genai/human-feedback">human feedback</Link>, and{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "serving/"}>agent serving</Link>
@@ -605,11 +602,10 @@ const faqCategories: FAQCategory[] = [
             <Link href="/llm-tracing">tracing</Link>,{" "}
             <Link href="/llm-evaluation">evaluation</Link>,{" "}
             <Link href="/ai-gateway">gateway routing</Link>, and{" "}
-            <Link href="/genai/prompt-registry">prompt management</Link>,
-            creating data silos, duplicated configuration, and fragile
-            integrations. MLflow is an{" "}
-            <strong>integrated end-to-end platform</strong> where every
-            capability works together out of the box: gateway requests
+            <Link href="/prompt-registry">prompt management</Link>, creating
+            data silos, duplicated configuration, and fragile integrations.
+            MLflow is an <strong>integrated end-to-end platform</strong> where
+            every capability works together out of the box: gateway requests
             automatically become traces, traces feed directly into evaluation,
             and evaluation results drive production monitoring. No glue code, no
             sync issues, no extra infrastructure. You get a unified UI, a

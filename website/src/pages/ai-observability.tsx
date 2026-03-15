@@ -536,8 +536,7 @@ export default function AIObservability() {
             different outputs depending on model state, retrieved context, and
             multi-step agent reasoning. This makes traditional logging and
             monitoring insufficient. AI observability captures the full
-            execution context (
-            <Link href={MLFLOW_GENAI_DOCS_URL + "prompts/"}>prompts</Link>,
+            execution context (<Link href="/prompt-registry">prompts</Link>,
             model responses,{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>tool calls</Link>,
             retrieval results, and{" "}
@@ -674,8 +673,9 @@ export default function AIObservability() {
             best results, identify expensive or slow queries, and detect quality
             regressions when models are updated. By tracing every LLM call with
             full context (system prompts, user messages, temperature settings,
-            token counts), you can debug hallucinations, optimize prompt
-            templates, and track costs across different models and use cases.
+            token counts), you can debug hallucinations, optimize{" "}
+            <Link href="/prompt-registry">prompt templates</Link>, and track
+            costs across different models and use cases.
           </p>
 
           <p>
@@ -1098,13 +1098,15 @@ const result = await generateText({
                 <strong>MLflow</strong>
               </Link>{" "}
               is the largest open-source{" "}
-              <strong>AI engineering platform</strong>, with over 30 million
-              monthly downloads. Thousands of organizations use MLflow to debug,
-              evaluate, monitor, and optimize production-quality AI agents and
-              LLM applications while controlling costs and managing access to
-              models and data. Backed by the Linux Foundation and licensed under
-              Apache 2.0, MLflow provides a complete observability stack with no
-              vendor lock-in.{" "}
+              <strong>
+                AI engineering platform for agents, LLMs, and ML models
+              </strong>
+              , with over 30 million monthly downloads. Thousands of
+              organizations use MLflow to debug, evaluate, monitor, and optimize
+              production-quality AI agents and LLM applications while
+              controlling costs and managing access to models and data. Backed
+              by the Linux Foundation and licensed under Apache 2.0, MLflow
+              provides a complete observability stack with no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>

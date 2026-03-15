@@ -38,10 +38,8 @@ const faqs: {
         (execution capture for debugging),{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>evaluation</Link>{" "}
         (automated quality assessment with LLM judges),{" "}
-        <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>
-          prompt management
-        </Link>{" "}
-        (versioning and registry), deployment infrastructure, and{" "}
+        <Link href="/prompt-registry">prompt management</Link> (versioning and
+        registry), deployment infrastructure, and{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
           production monitoring
         </Link>
@@ -639,11 +637,9 @@ export default function LLMOps() {
               </p>
               <p>
                 <strong>Solution:</strong>{" "}
-                <Link href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}>
-                  Prompt registries
-                </Link>{" "}
-                provide version control, A/B testing, and rollback capabilities
-                for prompt templates, and{" "}
+                <Link href="/prompt-registry">Prompt registries</Link> provide
+                version control, A/B testing, and rollback capabilities for
+                prompt templates, and{" "}
                 <Link href="/prompt-optimization">prompt optimization</Link>{" "}
                 automates improvement using training data.
               </p>
@@ -767,7 +763,7 @@ export default function LLMOps() {
             </li>
             <li>
               <Link
-                href={MLFLOW_GENAI_DOCS_URL + "prompt-registry/"}
+                href="/prompt-registry"
                 style={{ color: "#007bff", fontWeight: "600" }}
               >
                 Prompt Management
@@ -956,13 +952,16 @@ export default function LLMOps() {
                 <strong>MLflow</strong>
               </Link>{" "}
               is the largest open-source{" "}
-              <strong>AI engineering platform</strong>, with over 30 million
-              monthly downloads. Thousands of organizations use MLflow to debug,
-              evaluate, monitor, and optimize production-quality AI agents and
-              LLM applications while controlling costs and managing access to
-              models and data. Backed by the Linux Foundation and licensed under
-              Apache 2.0, MLflow provides a complete LLMOps stack with no vendor
-              lock-in. <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
+              <strong>
+                AI engineering platform for agents, LLMs, and ML models
+              </strong>
+              , with over 30 million monthly downloads. Thousands of
+              organizations use MLflow to debug, evaluate, monitor, and optimize
+              production-quality AI agents and LLM applications while
+              controlling costs and managing access to models and data. Backed
+              by the Linux Foundation and licensed under Apache 2.0, MLflow
+              provides a complete LLMOps stack with no vendor lock-in.{" "}
+              <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>
 

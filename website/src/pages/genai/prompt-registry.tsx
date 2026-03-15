@@ -48,6 +48,10 @@ export default function PromptRegistryVersioning() {
             {
               title: "Create and edit prompts",
               body: "Define prompt templates with variables, manage versions with commit messages and metadata, and compare changes.",
+              cta: {
+                href: "/prompt-registry",
+                text: "Learn about prompt management",
+              },
               image: (
                 <img src={Card1} alt="MLflow prompt registry screenshot" />
               ),
@@ -55,6 +59,10 @@ export default function PromptRegistryVersioning() {
             {
               title: "Compare prompts",
               body: "Track changes across prompt versions with a built-in diff view for easier prompt iteration and change management.",
+              cta: {
+                href: "/prompt-registry",
+                text: "Learn about prompt versioning",
+              },
               image: (
                 <img src={Card2} alt="MLflow prompt registry screenshot" />
               ),
@@ -73,6 +81,10 @@ export default function PromptRegistryVersioning() {
             {
               title: "Manage prompt lifecycle with aliases",
               body: "Use aliases (e.g., development, staging, production) to manage prompt versions across environments and implement governance.",
+              cta: {
+                href: "/prompt-registry",
+                text: "Learn about prompt lifecycle",
+              },
               image: (
                 <img src={Card4} alt="MLflow prompt registry screenshot" />
               ),
