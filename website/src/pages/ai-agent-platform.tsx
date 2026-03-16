@@ -526,8 +526,8 @@ export default function AIAgentPlatform() {
           <h1>AI Platform</h1>
 
           <p>
-            An AI platform is the integrated stack for building,
-            deploying, and operating AI agents and LLM applications in production. Agents
+            An AI platform is the integrated stack for building, deploying, and
+            operating AI agents and LLM applications in production. Agents
             reason across multiple steps, call tools and APIs, maintain state,
             and make decisions autonomously. A complete AI platform provides{" "}
             <strong>observability</strong> to see what your agent is doing,{" "}
@@ -608,10 +608,7 @@ export default function AIAgentPlatform() {
                 <strong>MLflow provides this:</strong>{" "}
                 <Link href="/genai/prompt-registry">Prompt registry</Link> with
                 lineage to traces and evaluation results, plus{" "}
-                <Link href="/prompt-optimization">
-                  prompt optimization
-                </Link>
-                .
+                <Link href="/prompt-optimization">prompt optimization</Link>.
               </p>
             </div>
 
@@ -772,9 +769,7 @@ export default function AIAgentPlatform() {
             </li>
           </ul>
 
-          <h2 id="how-to-add-mlflow">
-            How to Add MLflow to Your AI Platform
-          </h2>
+          <h2 id="how-to-add-mlflow">How to Add MLflow to Your AI Platform</h2>
 
           <p>
             MLflow integrates with your existing agent framework in minutes. You
