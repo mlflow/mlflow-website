@@ -116,7 +116,7 @@ const faqs: { question: string; answer: ReactNode }[] = [
         Getting an AI agent or LLM application to work in a demo is easy.
         Getting it to work reliably in production requires a comprehensive{" "}
         <Link
-          to="/ai-agent-platform"
+          to="/ai-platform"
           className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
         >
           AI agent platform

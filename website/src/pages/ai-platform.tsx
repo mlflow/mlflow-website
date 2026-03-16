@@ -233,11 +233,8 @@ export default function AIAgentPlatform() {
         <meta property="og:title" content={SEO_TITLE} />
         <meta property="og:description" content={SEO_DESCRIPTION} />
         <meta property="og:type" content="website" />
-        <meta
-          property="og:url"
-          content="https://mlflow.org/ai-agent-platform"
-        />
-        <link rel="canonical" href="https://mlflow.org/ai-agent-platform" />
+        <meta property="og:url" content="https://mlflow.org/ai-platform" />
+        <link rel="canonical" href="https://mlflow.org/ai-platform" />
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
         <script type="application/ld+json">
           {JSON.stringify(softwareJsonLd)}
