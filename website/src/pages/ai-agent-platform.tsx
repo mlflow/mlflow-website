@@ -11,7 +11,7 @@ import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE = "AI Agent Platform: What It Is & What You Need | MLflow";
 const SEO_DESCRIPTION =
-  "Learn what an AI agent platform is, what components it requires—authoring, orchestration, observability, evaluation, and governance—and how MLflow provides the open-source operational layer every agent platform needs.";
+  "Learn what an AI agent platform is, what components it requires, and how MLflow provides observability, evaluation, version control, and governance as the largest open-source AI platform.";
 
 const faqs: {
   question: string;
@@ -21,7 +21,7 @@ const faqs: {
   {
     question: "What is an AI agent platform?",
     answer:
-      "An AI agent platform is an integrated environment for building, deploying, and operating autonomous AI agents in production. It typically spans agent authoring and orchestration (defining how agents reason, plan, and use tools), a runtime for executing long-running stateful agents, observability for tracing multi-step execution, evaluation for measuring agent quality, and governance for enforcing safety and compliance policies. No single tool covers every layer—most teams combine an agent framework for authoring with an operational platform for observability and evaluation.",
+      "An AI agent platform is an integrated environment for building, deploying, and operating autonomous AI agents in production. It provides four core capabilities: observability for tracing multi-step execution, evaluation for measuring agent quality, version control for prompts and configurations, and governance for enforcing safety, compliance, and cost controls.",
   },
   {
     question:
@@ -45,26 +45,25 @@ const faqs: {
         >
           CrewAI
         </Link>
-        , or AutoGen) provides the building blocks for constructing
-        agents—tools, memory, planning loops, and orchestration patterns. An
-        agent platform is broader: it includes the framework layer plus the
-        operational layer for tracing, evaluation, monitoring, and governance.
-        MLflow provides that operational layer, integrating with any agent
-        framework so you can see what your agent did, measure whether it did
-        well, and catch issues in production.
+        , or AutoGen) provides the building blocks for constructing agents:
+        tools, memory, planning loops, and orchestration patterns. An agent
+        platform is broader: it provides the tracing, evaluation, version
+        control, and governance that production agents need. MLflow is the
+        largest open-source AI platform, integrating with any framework so you
+        can see what your agent did, measure whether it did well, and catch
+        issues in production.
       </>
     ),
     answerText:
-      "An agent framework (like LangGraph, CrewAI, or AutoGen) provides the building blocks for constructing agents—tools, memory, planning loops, and orchestration patterns. An agent platform is broader: it includes the framework layer plus the operational layer for tracing, evaluation, monitoring, and governance. MLflow provides that operational layer, integrating with any agent framework so you can see what your agent did, measure whether it did well, and catch issues in production.",
+      "An agent framework (like LangGraph, CrewAI, or AutoGen) provides the building blocks for constructing agents: tools, memory, planning loops, and orchestration patterns. An agent platform is broader: it provides the tracing, evaluation, version control, and governance that production agents need. MLflow is the largest open-source AI platform, integrating with any framework so you can see what your agent did, measure whether it did well, and catch issues in production.",
   },
   {
     question: "Where does MLflow fit in an AI agent platform?",
     answer: (
       <>
-        MLflow is the open-source operational layer for your agent platform. It
-        does not author or orchestrate agents—that's the job of frameworks like
-        LangGraph or CrewAI. Instead, MLflow provides the capabilities you need
-        once agents are running:{" "}
+        MLflow is the largest open-source AI platform. It provides the
+        capabilities you need to build, deploy, and operate agents in
+        production:{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
           end-to-end tracing
         </Link>{" "}
@@ -79,12 +78,12 @@ const faqs: {
       </>
     ),
     answerText:
-      "MLflow is the open-source operational layer for your agent platform. It does not author or orchestrate agents—that's the job of frameworks like LangGraph or CrewAI. Instead, MLflow provides the capabilities you need once agents are running: end-to-end tracing to debug multi-step execution, automated evaluation to measure quality, a prompt registry for managing instructions, and an AI gateway for unified access to LLM providers.",
+      "MLflow is the largest open-source AI platform. It provides the capabilities you need to build, deploy, and operate agents in production: end-to-end tracing to debug multi-step execution, automated evaluation to measure quality, a prompt registry for managing instructions, and an AI gateway for unified access to LLM providers.",
   },
   {
     question: "What features should I look for in an AI agent platform?",
     answer:
-      "A complete agent platform needs five layers: (1) an authoring framework for defining agent logic, tools, and memory; (2) a runtime for executing agents reliably; (3) observability with end-to-end tracing across multi-step workflows; (4) evaluation with LLM-as-a-judge scorers and dataset-based testing; and (5) governance for safety guardrails, access control, and compliance. MLflow covers layers 3–4 and parts of layer 5, complementing whatever authoring framework you choose.",
+      "A complete agent platform needs four core capabilities: (1) observability with end-to-end tracing across multi-step workflows; (2) evaluation with LLM-as-a-judge scorers and dataset-based testing; (3) version control for prompts, configurations, and model versions; and (4) governance for safety guardrails, cost controls, and compliance. MLflow provides all four, integrating with whatever agent framework you choose.",
   },
   {
     question: "How do I evaluate AI agents with MLflow?",
@@ -127,11 +126,10 @@ const faqs: {
           CrewAI
         </Link>
         , OpenAI Agents SDK, AutoGen, Google ADK, Pydantic AI, and others. For
-        LLM providers, its{" "}
-        <Link href="/genai/ai-gateway">AI Gateway</Link> provides an
-        OpenResponses-compatible interface for OpenAI, Anthropic, Google, Amazon
-        Bedrock, and Azure OpenAI. You can switch providers without changing
-        application code and manage API keys centrally.
+        LLM providers, its <Link href="/genai/ai-gateway">AI Gateway</Link>{" "}
+        provides an OpenResponses-compatible interface for OpenAI, Anthropic,
+        Google, Amazon Bedrock, and Azure OpenAI. You can switch providers
+        without changing application code and manage API keys centrally.
       </>
     ),
     answerText:
@@ -167,22 +165,22 @@ const faqs: {
         <Link href="https://databricks.com/product/managed-mlflow">
           managed MLflow on Databricks
         </Link>{" "}
-        for a hosted experience. The open-source version includes all
-        operational capabilities: tracing, evaluation, prompt registry, AI
-        gateway, and experiment tracking.
+        for a hosted experience. The open-source version includes all core
+        capabilities: tracing, evaluation, prompt registry, AI gateway, and
+        experiment tracking.
       </>
     ),
     answerText:
-      "MLflow is completely free and open-source under the Apache 2.0 license. You can self-host it or use managed MLflow on Databricks for a hosted experience. The open-source version includes all operational capabilities: tracing, evaluation, prompt registry, AI gateway, and experiment tracking.",
+      "MLflow is completely free and open-source under the Apache 2.0 license. You can self-host it or use managed MLflow on Databricks for a hosted experience. The open-source version includes all core capabilities: tracing, evaluation, prompt registry, AI gateway, and experiment tracking.",
   },
   {
     question: "How do I get started with MLflow for my agent platform?",
     answer: (
       <>
         Getting started takes three steps: install MLflow with{" "}
-        <code>pip install 'mlflow[genai]'</code>, enable tracing for your agent framework
-        (e.g., <code>mlflow.langgraph.autolog()</code>), and open the MLflow UI
-        to see your traces. See the{" "}
+        <code>pip install 'mlflow[genai]'</code>, enable tracing for your agent
+        framework (e.g., <code>mlflow.langgraph.autolog()</code>), and open the
+        MLflow UI to see your traces. See the{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/quickstart/"}>
           quickstart guide
         </Link>{" "}
@@ -219,7 +217,7 @@ const softwareJsonLd = {
     priceCurrency: "USD",
   },
   description:
-    "Open-source operational platform for tracing, evaluating, and monitoring AI agents and LLM applications.",
+    "Open-source AI platform for tracing, evaluating, and monitoring AI agents and LLM applications.",
   url: "https://mlflow.org",
   license: "https://www.apache.org/licenses/LICENSE-2.0",
 };
@@ -530,38 +528,17 @@ export default function AIAgentPlatform() {
           <p>
             An AI agent platform is the integrated stack for building,
             deploying, and operating autonomous AI agents in production. Agents
-            go beyond single LLM calls — they reason across multiple steps, call
-            tools and APIs, maintain state, and make decisions autonomously. A
-            complete agent platform spans several layers: an{" "}
-            <strong>authoring framework</strong> for defining agent logic (like{" "}
-            <Link
-              href={
-                MLFLOW_GENAI_DOCS_URL +
-                "tracing/integrations/listing/langgraph.html"
-              }
-            >
-              LangGraph
-            </Link>
-            ,{" "}
-            <Link
-              href={
-                MLFLOW_GENAI_DOCS_URL +
-                "tracing/integrations/listing/crewai.html"
-              }
-            >
-              CrewAI
-            </Link>
-            , or OpenAI Agents SDK), a <strong>runtime</strong> for executing
-            agents reliably, and an <strong>operational layer</strong> for
-            observability, evaluation, and governance.
+            reason across multiple steps, call tools and APIs, maintain state,
+            and make decisions autonomously. A complete agent platform provides{" "}
+            <strong>observability</strong> to see what your agent is doing,{" "}
+            <strong>evaluation</strong> to measure whether it's working well,{" "}
+            <strong>version control</strong> for prompts and configurations, and{" "}
+            <strong>governance</strong> to control costs, access, and safety.
           </p>
 
           <p>
-            No single tool covers every layer. Most production teams combine an
-            agent framework for authoring with a separate operational platform
-            for tracing, evaluation, and monitoring.{" "}
-            <Link href="/genai">MLflow</Link> is the leading open-source
-            operational layer for agent platforms — it provides{" "}
+            <Link href="/genai">MLflow</Link> is the largest open-source AI
+            platform. It provides{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
               end-to-end tracing
             </Link>{" "}
@@ -573,9 +550,9 @@ export default function AIAgentPlatform() {
             <Link href="/genai/prompt-registry">prompt registry</Link> for
             managing instructions, and an{" "}
             <Link href="/genai/ai-gateway">AI gateway</Link> for unified access
-            to LLM providers. MLflow integrates with whatever agent framework
-            you choose, giving you full visibility without locking you into a
-            specific authoring tool.
+            to LLM providers. MLflow is framework-agnostic: it integrates with
+            whatever agent framework you choose, giving you full visibility
+            without locking you into a specific tool.
           </p>
 
           <h2 id="what-makes-up-agent-platform">
@@ -583,32 +560,17 @@ export default function AIAgentPlatform() {
           </h2>
 
           <p>
-            An AI agent platform is not a single product — it is a stack of
-            complementary capabilities. Understanding each layer helps you
-            choose the right tools for your team:
+            An AI agent platform is not a single product. It is a stack of
+            complementary capabilities that every production agent needs:
           </p>
 
           <div className="grid-2">
             <div className="card">
-              <h3>Agent Authoring &amp; Orchestration</h3>
-              <p>
-                <strong>What it does:</strong> Defines how agents reason, plan,
-                use tools, and coordinate with other agents. This layer handles
-                memory, state management, and multi-step workflow logic.
-              </p>
-              <p>
-                <strong>Examples:</strong> LangGraph, OpenAI Agents SDK, CrewAI,
-                AutoGen, Google ADK, Pydantic AI.
-              </p>
-            </div>
-
-            <div className="card">
               <h3>Observability &amp; Tracing</h3>
               <p>
                 <strong>What it does:</strong> Captures the full execution graph
-                — every LLM call, tool invocation, retrieval step, and decision
-                branch — so you can debug failures and understand agent
-                behavior.
+                (every LLM call, tool invocation, retrieval step, and decision
+                branch) so you can debug failures and understand agent behavior.
               </p>
               <p>
                 <strong>MLflow provides this:</strong>{" "}
@@ -623,8 +585,8 @@ export default function AIAgentPlatform() {
               <h3>Evaluation &amp; Quality</h3>
               <p>
                 <strong>What it does:</strong> Measures agent quality using
-                automated scorers — correctness, groundedness, relevance, and
-                custom metrics — across datasets and production traces.
+                automated scorers (correctness, groundedness, relevance, and
+                custom metrics) across datasets and production traces.
               </p>
               <p>
                 <strong>MLflow provides this:</strong>{" "}
@@ -636,45 +598,65 @@ export default function AIAgentPlatform() {
             </div>
 
             <div className="card">
+              <h3>Version Control</h3>
+              <p>
+                <strong>What it does:</strong> Versions prompts and
+                configurations so you can compare changes, measure their impact
+                on quality, and roll back when something breaks.
+              </p>
+              <p>
+                <strong>MLflow provides this:</strong>{" "}
+                <Link href="/genai/prompt-registry">Prompt registry</Link> with
+                lineage to traces and evaluation results, plus{" "}
+                <Link href="/genai/prompt-optimization">
+                  prompt optimization
+                </Link>
+                .
+              </p>
+            </div>
+
+            <div className="card">
               <h3>Governance &amp; Safety</h3>
               <p>
                 <strong>What it does:</strong> Enforces guardrails, access
-                policies, and compliance rules. Ensures agents operate within
-                organizational boundaries and don't produce harmful outputs.
+                policies, and compliance rules. Controls costs and ensures
+                agents operate within organizational boundaries.
               </p>
               <p>
-                <strong>MLflow contributes:</strong>{" "}
+                <strong>MLflow provides this:</strong>{" "}
+                <Link href="/genai/ai-gateway">AI Gateway</Link> for centralized
+                key management, rate limiting, and traffic routing, plus{" "}
                 <Link
                   href={
                     MLFLOW_GENAI_DOCS_URL +
                     "eval-monitor/scorers/llm-judge/predefined/"
                   }
                 >
-                  Safety and quality scorers
-                </Link>
-                , the <Link href="/genai/ai-gateway">AI Gateway</Link> for
-                centralized key management and rate limiting, and full trace
-                auditability.
+                  safety scorers
+                </Link>{" "}
+                and full trace auditability.
               </p>
             </div>
           </div>
 
-          <h2 id="why-operational-layer">Why You Need an Operational Layer</h2>
+          <h2 id="why-agents-need-platform">
+            Why Your Agents Need an AI Platform
+          </h2>
 
           <p>
-            Authoring an agent is straightforward. Operating it in production is
+            Building an agent is straightforward. Operating it in production is
             not. Unlike traditional software, agents are{" "}
-            <strong>non-deterministic</strong> — the same input can produce
+            <strong>non-deterministic</strong>: the same input can produce
             different outputs depending on model state, retrieved context, and
-            multi-step reasoning. This creates challenges that agent authoring
-            frameworks alone don't solve:
+            multi-step reasoning. This creates challenges that require dedicated
+            platform tooling:
           </p>
 
           <ul>
             <li>
               <strong>Debugging is opaque:</strong> Agent failures can happen at
-              any step — retrieval, reasoning, tool execution, prompt
-              construction. Without{" "}
+              any step (retrieval, reasoning, tool execution, or prompt
+              construction). Without{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>tracing</Link>,
               you can't see what went wrong or why.
             </li>
@@ -706,10 +688,9 @@ export default function AIAgentPlatform() {
           <h2 id="what-mlflow-provides">What MLflow Provides</h2>
 
           <p>
-            MLflow is not an agent authoring tool — it does not define how your
-            agent reasons, plans, or calls tools. Instead, it provides the
-            operational infrastructure that every agent platform needs,
-            regardless of which framework you use to build your agents:
+            MLflow is the only open-source AI platform that provides all four
+            capabilities in a unified offering. It integrates with any agent
+            framework, programming language, and LLM provider:
           </p>
 
           <ul>
@@ -723,8 +704,8 @@ export default function AIAgentPlatform() {
               : Capture complete execution traces including LLM calls, tool
               invocations, retrievals, and agent decisions.
               OpenTelemetry-compatible with one-line auto-instrumentation for
-              LangGraph, OpenAI Agents SDK, CrewAI, Google ADK, Pydantic AI,
-              and 30+ other frameworks and providers.
+              LangGraph, OpenAI Agents SDK, CrewAI, Google ADK, Pydantic AI, and
+              30+ other frameworks and providers.
             </li>
             <li>
               <Link
@@ -741,9 +722,8 @@ export default function AIAgentPlatform() {
                 70+ built-in LLM judges
               </Link>{" "}
               covering correctness, safety, groundedness, tool call accuracy,
-              and custom
-              metrics. Run evaluations on datasets or apply them continuously to
-              production traces.
+              and custom metrics. Run evaluations on datasets or apply them
+              continuously to production traces.
             </li>
             <li>
               <Link
@@ -797,9 +777,9 @@ export default function AIAgentPlatform() {
           </h2>
 
           <p>
-            MLflow integrates with your existing agent framework in minutes —
-            you don't need to change how you build agents. Here are examples
-            showing how to add tracing and evaluation to common setups. See the{" "}
+            MLflow integrates with your existing agent framework in minutes. You
+            don't need to change how you build agents. Here are examples showing
+            how to add tracing and evaluation to common setups. See the{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/integrations/"}>
               integrations documentation
             </Link>{" "}
@@ -1019,25 +999,23 @@ results = mlflow.genai.evaluate(
               <Link href="/genai" style={{ color: "#007bff" }}>
                 <strong>MLflow</strong>
               </Link>{" "}
-              is the largest open-source operational platform for AI, with over
-              30 million monthly downloads. Thousands of organizations use
-              MLflow to trace, evaluate, and monitor their AI agents and LLM
-              applications — regardless of which authoring framework or LLM
-              provider they use. Backed by the Linux Foundation and licensed
-              under Apache 2.0, MLflow complements your agent platform with no
-              vendor lock-in.{" "}
+              is the largest open-source AI platform, with over 30 million
+              monthly downloads. Thousands of organizations use MLflow to trace,
+              evaluate, and monitor their AI agents and LLM applications. Backed
+              by the Linux Foundation and licensed under Apache 2.0, MLflow
+              provides everything you need with no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started &#8594;</Link>
             </p>
           </div>
 
           <h2 id="open-source-vs-proprietary">
-            Open Source vs. Proprietary Operational Platforms
+            Open Source vs. Proprietary AI Platforms
           </h2>
 
           <p>
-            When choosing the operational layer for your agent platform, the
-            decision between open source and proprietary SaaS tools has
-            long-term implications for data ownership, cost, and flexibility.
+            When choosing an AI platform for your agents, the decision between
+            open source and proprietary SaaS tools has long-term implications
+            for data ownership, cost, and flexibility.
           </p>
 
           <p>
