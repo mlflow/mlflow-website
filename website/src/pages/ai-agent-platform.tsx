@@ -608,7 +608,7 @@ export default function AIAgentPlatform() {
                 <strong>MLflow provides this:</strong>{" "}
                 <Link href="/genai/prompt-registry">Prompt registry</Link> with
                 lineage to traces and evaluation results, plus{" "}
-                <Link href="/genai/prompt-optimization">
+                <Link href="/prompt-optimization">
                   prompt optimization
                 </Link>
                 .
