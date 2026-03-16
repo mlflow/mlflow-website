@@ -9,9 +9,9 @@ import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
-const SEO_TITLE = "AI Agent Platform: What It Is & What You Need | MLflow";
+const SEO_TITLE = "AI Platform: What It Is & What You Need | MLflow";
 const SEO_DESCRIPTION =
-  "Learn what an AI agent platform is, what components it requires, and how MLflow provides observability, evaluation, version control, and governance as the largest open-source AI platform.";
+  "Learn what an AI platform is, what components it requires, and how MLflow provides observability, evaluation, version control, and governance as the largest open-source AI platform.";
 
 const faqs: {
   question: string;
@@ -19,13 +19,13 @@ const faqs: {
   answerText?: string;
 }[] = [
   {
-    question: "What is an AI agent platform?",
+    question: "What is an AI platform?",
     answer:
-      "An AI agent platform is an integrated environment for building, deploying, and operating autonomous AI agents in production. It provides four core capabilities: observability for tracing multi-step execution, evaluation for measuring agent quality, version control for prompts and configurations, and governance for enforcing safety, compliance, and cost controls.",
+      "An AI platform is an integrated environment for building, deploying, and operating AI agents and LLM applications in production. It provides four core capabilities: observability for tracing multi-step execution, evaluation for measuring quality, version control for prompts and configurations, and governance for enforcing safety, compliance, and cost controls.",
   },
   {
     question:
-      "What is the difference between an agent framework and an agent platform?",
+      "What is the difference between an agent framework and an AI platform?",
     answer: (
       <>
         An agent framework (like{" "}
@@ -46,7 +46,7 @@ const faqs: {
           CrewAI
         </Link>
         , or AutoGen) provides the building blocks for constructing agents:
-        tools, memory, planning loops, and orchestration patterns. An agent
+        tools, memory, planning loops, and orchestration patterns. An AI
         platform is broader: it provides the tracing, evaluation, version
         control, and governance that production agents need. MLflow is the
         largest open-source AI platform, integrating with any framework so you
@@ -55,10 +55,10 @@ const faqs: {
       </>
     ),
     answerText:
-      "An agent framework (like LangGraph, CrewAI, or AutoGen) provides the building blocks for constructing agents: tools, memory, planning loops, and orchestration patterns. An agent platform is broader: it provides the tracing, evaluation, version control, and governance that production agents need. MLflow is the largest open-source AI platform, integrating with any framework so you can see what your agent did, measure whether it did well, and catch issues in production.",
+      "An agent framework (like LangGraph, CrewAI, or AutoGen) provides the building blocks for constructing agents: tools, memory, planning loops, and orchestration patterns. An AI platform is broader: it provides the tracing, evaluation, version control, and governance that production agents need. MLflow is the largest open-source AI platform, integrating with any framework so you can see what your agent did, measure whether it did well, and catch issues in production.",
   },
   {
-    question: "Where does MLflow fit in an AI agent platform?",
+    question: "Where does MLflow fit in an AI platform?",
     answer: (
       <>
         MLflow is the largest open-source AI platform. It provides the
@@ -81,9 +81,9 @@ const faqs: {
       "MLflow is the largest open-source AI platform. It provides the capabilities you need to build, deploy, and operate agents in production: end-to-end tracing to debug multi-step execution, automated evaluation to measure quality, a prompt registry for managing instructions, and an AI gateway for unified access to LLM providers.",
   },
   {
-    question: "What features should I look for in an AI agent platform?",
+    question: "What features should I look for in an AI platform?",
     answer:
-      "A complete agent platform needs four core capabilities: (1) observability with end-to-end tracing across multi-step workflows; (2) evaluation with LLM-as-a-judge scorers and dataset-based testing; (3) version control for prompts, configurations, and model versions; and (4) governance for safety guardrails, cost controls, and compliance. MLflow provides all four, integrating with whatever agent framework you choose.",
+      "A complete AI platform needs four core capabilities: (1) observability with end-to-end tracing across multi-step workflows; (2) evaluation with LLM-as-a-judge scorers and dataset-based testing; (3) version control for prompts, configurations, and model versions; and (4) governance for safety guardrails, cost controls, and compliance. MLflow provides all four, integrating with whatever agent framework you choose.",
   },
   {
     question: "How do I evaluate AI agents with MLflow?",
@@ -174,7 +174,7 @@ const faqs: {
       "MLflow is completely free and open-source under the Apache 2.0 license. You can self-host it or use managed MLflow on Databricks for a hosted experience. The open-source version includes all core capabilities: tracing, evaluation, prompt registry, AI gateway, and experiment tracking.",
   },
   {
-    question: "How do I get started with MLflow for my agent platform?",
+    question: "How do I get started with MLflow for my AI platform?",
     answer: (
       <>
         Getting started takes three steps: install MLflow with{" "}
@@ -523,13 +523,13 @@ export default function AIAgentPlatform() {
         <Header />
 
         <div className="article-container">
-          <h1>AI Agent Platform</h1>
+          <h1>AI Platform</h1>
 
           <p>
-            An AI agent platform is the integrated stack for building,
-            deploying, and operating autonomous AI agents in production. Agents
+            An AI platform is the integrated stack for building,
+            deploying, and operating AI agents and LLM applications in production. Agents
             reason across multiple steps, call tools and APIs, maintain state,
-            and make decisions autonomously. A complete agent platform provides{" "}
+            and make decisions autonomously. A complete AI platform provides{" "}
             <strong>observability</strong> to see what your agent is doing,{" "}
             <strong>evaluation</strong> to measure whether it's working well,{" "}
             <strong>version control</strong> for prompts and configurations, and{" "}
@@ -556,11 +556,11 @@ export default function AIAgentPlatform() {
           </p>
 
           <h2 id="what-makes-up-agent-platform">
-            What Makes Up an AI Agent Platform
+            What Makes Up an AI Platform
           </h2>
 
           <p>
-            An AI agent platform is not a single product. It is a stack of
+            An AI platform is not a single product. It is a stack of
             complementary capabilities that every production agent needs:
           </p>
 
@@ -773,7 +773,7 @@ export default function AIAgentPlatform() {
           </ul>
 
           <h2 id="how-to-add-mlflow">
-            How to Add MLflow to Your Agent Platform
+            How to Add MLflow to Your AI Platform
           </h2>
 
           <p>
