@@ -1,6 +1,6 @@
 ---
 title: "Testing and Refining Claude Code Skills with MLflow"
-description: How to test Claude Code skills using MLflow tracing and LLM judges, and close a self-improvement loop where Claude Code refines its own skills.
+description: How to test Claude Code skills using MLflow tracing and LLM judges, and create a self-improvement loop where Claude Code refines its own skills.
 slug: evaluating-skills-mlflow
 authors: [mlflow-maintainers]
 tags:
@@ -22,23 +22,21 @@ date: 2026-03-15
 
 You wrote a Claude Code skill: a `SKILL.md` file that extends Claude with a new capability. You tested it manually and it looks right. But how do you *know* it reliably works?
 
-The problem is fundamental: a skill guides LLM behavior, which is semantic and non-deterministic rather than syntactic and deterministic. You can't assert `output == expected_output`. You need to observe *what Claude did*: which tools it called, what steps it took, whether it made the right judgment calls. Doing this manually is both time-consuming and brittle: it requires replaying the session, interpreting ambiguous output, and re-checking from scratch every time the skill changes.
+The problem is fundamental: a skill guides LLM behavior, and LLM behavior is inherently unpredictable. You can't assert `output == expected_output`. You need to observe *what Claude did*: which tools it called, what steps it took, whether it made the right judgment calls. Doing this manually means keeping a record of every Claude interaction and verifying outcomes case by case — time-consuming, and you have to repeat it every time the skill changes.
 
 Here's the loop we built to solve this:
 
 1. **Trace** Claude Code's own execution with MLflow while it runs the skill
-2. **Judge** those traces with LLM scorers that check for correct behavior
+2. **Judge** those traces with checks that verify correct behavior
 3. **Refine** the skill based on failing judges, automatically, with Claude Code itself
 
 If this sounds familiar, it should. It mirrors what software engineers do when fixing bugs with Claude Code: write unit tests that express the expected behavior, then ask Claude to refine the code until all tests pass. We apply the same pattern here, but the "code" being refined is a skill.
 
-This is also the methodology we use to develop and refine the MLflow skills published in this repository.
-
----
+This is also the methodology we use to develop and refine the [MLflow skills published in this repository](https://github.com/mlflow/skills).
 
 ## What Is a Claude Code Skill?
 
-A skill is a markdown file with YAML frontmatter that Claude Code reads before acting. The `description` field tells Claude when to load it, whereas the body progressively provides instructions on how to execute the skill, including examples and tool guidance.
+A skill is a markdown file with YAML frontmatter that Claude Code reads before acting. The `description` field tells Claude when to load it, and the body progressively provides instructions on how to execute the skill, including examples and tool guidance.
 
 Here's the frontmatter from the `agent-evaluation` skill in the [MLflow Skills repo](https://github.com/mlflow/skills), which we will use as our running example:
 
@@ -53,11 +51,11 @@ allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---
 ```
 
-The body is a complete walkthrough: discover the agent structure, set up tracing, register scorers, create an evaluation dataset, and run `mlflow.genai.evaluate()`. It's authoritative guidance, and whatever Claude reads here shapes every decision it makes.
+This skill guides Claude through the full evaluation workflow: run the agent to understand its behavior, select appropriate quality scorers, prepare an evaluation dataset, and execute `mlflow.genai.evaluate()` to get a systematic quality assessment.
 
-This is why skills are hard to test: the contract is semantic. Going back to the `agent-evaluation` skill, the question "Did Claude discover the agent's entry point before trying to evaluate it?" cannot be checked with `assertEqual`.
+The body is a complete walkthrough: discover the agent structure, set up [tracing](https://mlflow.org/docs/latest/genai/tracing/index.html), select [LLM scorers](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/index.html), create an [evaluation dataset](https://mlflow.org/docs/latest/genai/eval-monitor/dataset.html), and run [`mlflow.genai.evaluate()`](https://mlflow.org/docs/latest/genai/eval-monitor/index.html). It's authoritative guidance, and whatever Claude reads here shapes every decision it makes.
 
----
+This is what makes skills hard to test: there is no output to compare against. Going back to the `agent-evaluation` skill, the question "Did Claude discover the agent's entry point before trying to evaluate it?" cannot be checked with `assertEqual`.
 
 ## The Testing Methodology
 
@@ -71,13 +69,11 @@ A test harness runs Claude Code headlessly against a target project with the ski
 
 Each judge evaluates one specific aspect of the trace: whether a particular artifact was created, whether Claude followed the right sequence of steps, whether it invoked the right tools. If all judges pass, the skill worked as intended. If any judge fails, the rationale points directly at what went wrong.
 
-This gives us a reproducible, observable check of skill behavior that requires no human in the loop.
+This gives us a reproducible, observable check of skill behavior that requires no human in the loop. The following sections walk through each component in detail.
 
----
+### Tracing Claude Code with MLflow
 
-## Tracing Claude Code with MLflow
-
-MLflow ships with built-in support for tracing Claude Code itself. A single command instruments every session in a project directory:
+MLflow ships with [built-in support for tracing Claude Code](https://mlflow.org/docs/latest/genai/tracing/index.html) itself. A single command instruments every session in a project directory:
 
 ```bash
 mlflow autolog claude /path/to/project \
@@ -87,13 +83,11 @@ mlflow autolog claude /path/to/project \
 
 From that point on, every tool call Claude makes (reading a file, running a shell command, calling the Claude API) becomes a span in a trace. The trace is a ground-truth record: not what Claude said it did, but what it *actually* did, in order, with full inputs and outputs.
 
----
+### Writing Judges
 
-## Writing Judges
+A *judge* is a check that verifies a specific aspect of how Claude executed the skill. Judges are implemented as MLflow [scorers](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/index.html): each receives a Claude Code trace and returns `Feedback` with a value and rationale. Two patterns cover almost every test:
 
-A judge receives a Claude Code trace and returns feedback that assesses a specific aspect of it. Two patterns cover almost every test:
-
-**LLM judge:** use `make_judge()` to semantically analyze the trace:
+**LLM judge:** use [`make_judge()`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/#trace-based-judges) to semantically analyze the trace:
 
 ```python
 from mlflow.genai.judges import make_judge
@@ -112,7 +106,7 @@ agent_ran_instrumented_code = make_judge(
 )
 ```
 
-This [agentic judge](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/#trace-based-judges) reads the actual span tree and reasons about whether the *sequence* of actions was correct. No rule can do that.
+This [judge](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/#trace-based-judges) reads the actual span tree and reasons about whether the *sequence* of actions was correct. No rule can do that.
 
 **Rule-based judge:** check a side effect in the final testing environment which was modified by the execution of the skill:
 
@@ -136,7 +130,7 @@ def dataset_created(trace) -> Feedback:
     )
 ```
 
-This judge does not evaluate Claude's internal behavior, but rather it checks whether Claude created the artifact we expected.
+This judge does not evaluate Claude's internal behavior, but rather it checks whether Claude created the artifact we expected. You can browse all the judges for the `agent-evaluation` test in the [tests/judges/](https://github.com/mlflow/skills/tree/main/tests/judges) directory.
 
 Both types are needed: LLM judges handle behavioral and sequential questions, while rule-based judges provide deterministic checks on observable side effects.
 
@@ -149,13 +143,11 @@ Going back to our running example, the full test for `agent-evaluation` uses six
 - `tracing-skill-invoked`: did Claude load the tracing skill as instructed?
 - `agent-eval-skill-invoked`: did Claude actually read and follow the skill?
 
-Together they define the acceptance criteria for the skill. If all six pass, the skill works.
+Each judge is asking whether Claude followed the skill's workflow — calling the right APIs, in the right order, as the skill instructs. Together they define the acceptance criteria for the skill. If all six pass, the skill works.
 
----
+### The Test Harness
 
-## The Test Harness
-
-A YAML config ties the methodology together:
+A YAML config ties the methodology together. You can see the full config for this example at [`tests/configs/agent_evaluation.yaml`](https://github.com/mlflow/skills/blob/main/tests/configs/agent_evaluation.yaml):
 
 ```yaml
 name: "agent-evaluation-test"
@@ -179,7 +171,7 @@ judges:
   - tests/judges/agent_eval_skill_invoked.py
 ```
 
-`test_skill.py` orchestrates the full sequence:
+[`test_skill.py`](https://github.com/mlflow/skills/blob/main/tests/test_skill.py) orchestrates the full sequence:
 
 1. Start a local MLflow server and create two experiments: one for the evaluation work the skill is guiding, and one for Claude's own execution traces
 2. Run the setup script (clone the target agent repo, seed test data)
@@ -206,8 +198,6 @@ Sample output:
 That last line is actionable. Claude didn't run the agent after instrumenting it, so the skill didn't make this step explicit enough.
 
 A few things worth noting about this setup. The setup script is flexible: it can clone any repository, install dependencies, and seed whatever data the skill needs. And a single skill can be covered by multiple configs with different prompts, letting you verify that the skill triggers (or doesn't trigger) correctly under a range of conditions.
-
----
 
 ## The Automated Refinement Loop
 
@@ -270,8 +260,6 @@ MLflow is what makes the loop *grounded*. Claude isn't guessing what went wrong 
 
 Because multiple test configs can cover the same skill, Claude can run the full suite against its revisions of `SKILL.md`. This prevents overfitting the skill to any single prompt or test case: a fix that addresses one failing test config must not cause another to regress.
 
----
-
 ## What We Learned
 
 A few patterns emerged from running this system on the `agent-evaluation` skill:
@@ -283,8 +271,6 @@ A few patterns emerged from running this system on the `agent-evaluation` skill:
 **Both judge types are needed.** LLM judges and rule-based judges serve different purposes. LLM judges handle behavioral and sequential questions that no rule can express. Rule-based judges provide deterministic checks on side effects: a dataset was created, a run was logged. Use both.
 
 **The rationale is the real value.** `Feedback.rationale` is what makes automated refinement possible. A bare yes/no from an LLM judge gives Claude Code nothing to work with. A rationale like "Claude added tracing decorators but never executed the agent afterward" gives it exactly what it needs to make a targeted, surgical fix.
-
----
 
 ## Get Started
 
