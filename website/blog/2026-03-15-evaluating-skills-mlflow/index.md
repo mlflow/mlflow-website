@@ -4,15 +4,7 @@ description: How to test Claude Code skills using MLflow tracing and LLM judges,
 slug: evaluating-skills-mlflow
 authors: [mlflow-maintainers]
 tags:
-  [
-    genai,
-    evaluation,
-    tracing,
-    coding-agents,
-    claude-code,
-    skills,
-    llm-judges,
-  ]
+  [genai, evaluation, tracing, coding-agents, claude-code, skills, llm-judges]
 thumbnail: /img/blog/evaluating-skills-mlflow-thumbnail.svg
 image: /img/blog/evaluating-skills-mlflow-thumbnail.svg
 date: 2026-03-15
@@ -20,9 +12,9 @@ date: 2026-03-15
 
 ## The Skill Testing Problem
 
-You wrote a Claude Code skill: a `SKILL.md` file that extends Claude with a new capability. You tested it manually and it looks right. But how do you *know* it reliably works?
+You wrote a Claude Code skill: a `SKILL.md` file that extends Claude with a new capability. You tested it manually and it looks right. But how do you _know_ it reliably works?
 
-The problem is fundamental: a skill guides LLM behavior, and LLM behavior is inherently unpredictable. You can't assert `output == expected_output`. You need to observe *what Claude did*: which tools it called, what steps it took, whether it made the right judgment calls. Doing this manually means keeping a record of every Claude interaction and verifying outcomes case by case — time-consuming, and you have to repeat it every time the skill changes.
+The problem is fundamental: a skill guides LLM behavior, and LLM behavior is inherently unpredictable. You can't assert `output == expected_output`. You need to observe _what Claude did_: which tools it called, what steps it took, whether it made the right judgment calls. Doing this manually means keeping a record of every Claude interaction and verifying outcomes case by case — time-consuming, and you have to repeat it every time the skill changes.
 
 Here's the loop we built to solve this:
 
@@ -43,7 +35,8 @@ Here's the frontmatter from the `agent-evaluation` skill in the [MLflow Skills r
 ```yaml
 ---
 name: agent-evaluation
-description: Use this when you need to EVALUATE OR IMPROVE or OPTIMIZE an existing
+description:
+  Use this when you need to EVALUATE OR IMPROVE or OPTIMIZE an existing
   LLM agent's output quality ... Evaluates agents systematically using MLflow
   evaluation with datasets, scorers, and tracing. IMPORTANT - Always also load
   the instrumenting-with-mlflow-tracing skill before starting any work.
@@ -63,7 +56,7 @@ Before diving into the details, here's how the pieces of our methodology fit tog
 
 ![Test harness diagram](./test-harness-diagram.svg)
 
-*The test harness orchestrates environment setup, headless Claude Code execution, and judge evaluation in a single reproducible run.*
+_The test harness orchestrates environment setup, headless Claude Code execution, and judge evaluation in a single reproducible run._
 
 A test harness runs Claude Code headlessly against a target project with the skill installed. MLflow traces every action Claude takes during the session, e.g., file reads, shell commands, API calls, tool calls, to name a few. After Claude finishes, a set of judges runs against those traces to check whether Claude executed the skill correctly.
 
@@ -81,11 +74,11 @@ mlflow autolog claude /path/to/project \
   --experiment-id 42
 ```
 
-From that point on, every tool call Claude makes (reading a file, running a shell command, calling the Claude API) becomes a span in a trace. The trace is a ground-truth record: not what Claude said it did, but what it *actually* did, in order, with full inputs and outputs.
+From that point on, every tool call Claude makes (reading a file, running a shell command, calling the Claude API) becomes a span in a trace. The trace is a ground-truth record: not what Claude said it did, but what it _actually_ did, in order, with full inputs and outputs.
 
 ### Writing Judges
 
-A *judge* is a check that verifies a specific aspect of how Claude executed the skill. Judges are implemented as MLflow [scorers](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/index.html): each receives a Claude Code trace and returns `Feedback` with a value and rationale. Two patterns cover almost every test:
+A _judge_ is a check that verifies a specific aspect of how Claude executed the skill. Judges are implemented as MLflow [scorers](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/index.html): each receives a Claude Code trace and returns `Feedback` with a value and rationale. Two patterns cover almost every test:
 
 **LLM judge:** use [`make_judge()`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/#trace-based-judges) to semantically analyze the trace:
 
@@ -106,7 +99,7 @@ agent_ran_instrumented_code = make_judge(
 )
 ```
 
-This [judge](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/#trace-based-judges) reads the actual span tree and reasons about whether the *sequence* of actions was correct. No rule can do that.
+This [judge](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/#trace-based-judges) reads the actual span tree and reasons about whether the _sequence_ of actions was correct. No rule can do that.
 
 **Rule-based judge:** check a side effect in the final testing environment which was modified by the execution of the skill (see [`dataset_created.py`](https://github.com/mlflow/skills/blob/main/tests/judges/dataset_created.py)):
 
@@ -240,7 +233,7 @@ Next run: `dataset-created` and `evaluation-run-created` both pass.
 
 **Example 2: A missing skill dependency**
 
-The `tracing-skill-invoked` judge kept failing: Claude was attempting evaluation without first loading the tracing skill, even though `SKILL.md` listed it as a prerequisite. The problem was in the skill's `description` field, the trigger text Claude reads *before* loading the skill body. It said nothing about the tracing skill dependency.
+The `tracing-skill-invoked` judge kept failing: Claude was attempting evaluation without first loading the tracing skill, even though `SKILL.md` listed it as a prerequisite. The problem was in the skill's `description` field, the trigger text Claude reads _before_ loading the skill body. It said nothing about the tracing skill dependency.
 
 One line added to the description:
 
@@ -256,7 +249,7 @@ The `tracing-skill-invoked` judge has passed on every run since.
 
 Both fixes share the same shape: Claude reads the trace, identifies the gap between what it did and what the judge expected, and makes a targeted edit. The skill author never had to debug by hand.
 
-MLflow is what makes the loop *grounded*. Claude isn't guessing what went wrong from a vague description in the prompt. It's reading the full span tree: the exact tool calls it made, in order, with timestamps. The diagnosis is direct.
+MLflow is what makes the loop _grounded_. Claude isn't guessing what went wrong from a vague description in the prompt. It's reading the full span tree: the exact tool calls it made, in order, with timestamps. The diagnosis is direct.
 
 Because multiple test configs can cover the same skill, Claude can run the full suite against its revisions of `SKILL.md`. This prevents overfitting the skill to any single prompt or test case: a fix that addresses one failing test config must not cause another to regress.
 
