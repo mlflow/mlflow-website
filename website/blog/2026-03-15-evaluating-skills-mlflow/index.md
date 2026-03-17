@@ -5,8 +5,8 @@ slug: evaluating-skills-mlflow
 authors: [mlflow-maintainers]
 tags:
   [genai, evaluation, tracing, coding-agents, claude-code, skills, llm-judges]
-thumbnail: /img/blog/evaluating-skills-mlflow-thumbnail.svg
-image: /img/blog/evaluating-skills-mlflow-thumbnail.svg
+thumbnail: /img/blog/evaluating-skills-mlflow-thumbnail.png
+image: /img/blog/evaluating-skills-mlflow-thumbnail.png
 date: 2026-03-15
 ---
 
@@ -24,7 +24,7 @@ Here's the loop we built to solve this:
 
 If this sounds familiar, it should. It mirrors what software engineers do when fixing bugs with Claude Code: write unit tests that express the expected behavior, then ask Claude to refine the code until all tests pass. We apply the same pattern here, but the "code" being refined is a skill.
 
-This is also the methodology we use to develop and refine the [MLflow skills published in this repository](https://github.com/mlflow/skills).
+This is also the methodology we use to develop and refine our [Claude Code Skills for MLflow](https://github.com/mlflow/skills).
 
 ## What Is a Claude Code Skill?
 
@@ -44,13 +44,15 @@ allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---
 ```
 
-This skill guides Claude through the full evaluation workflow: run the agent to understand its behavior, select appropriate quality scorers, prepare an evaluation dataset, and execute `mlflow.genai.evaluate()` to get a systematic quality assessment.
+This skill guides Claude through the full evaluation workflow: run the agent to understand its behavior, [select appropriate quality scorers](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/index.html), [prepare an evaluation dataset](https://mlflow.org/docs/latest/genai/eval-monitor/dataset.html), and [execute `mlflow.genai.evaluate()`](https://mlflow.org/docs/latest/genai/eval-monitor/index.html) to get a systematic quality assessment.
 
 The body is a complete walkthrough: discover the agent structure, set up [tracing](https://mlflow.org/docs/latest/genai/tracing/index.html), select [LLM scorers](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/index.html), create an [evaluation dataset](https://mlflow.org/docs/latest/genai/eval-monitor/dataset.html), and run [`mlflow.genai.evaluate()`](https://mlflow.org/docs/latest/genai/eval-monitor/index.html). It's authoritative guidance, and whatever Claude reads here shapes every decision it makes.
 
 This is what makes skills hard to test: there is no output to compare against. Going back to the `agent-evaluation` skill, the question "Did Claude discover the agent's entry point before trying to evaluate it?" cannot be checked with `assertEqual`.
 
-## The Testing Methodology
+## Example: Testing and Improving a Claude Code Skill with MLflow
+
+We'll use the `agent-evaluation` skill as a concrete example — all the test code lives in the [`tests/` directory](https://github.com/mlflow/skills/tree/main/tests) of the skills repository.
 
 Before diving into the details, here's how the pieces of our methodology fit together.
 
@@ -80,7 +82,9 @@ From that point on, every tool call Claude makes (reading a file, running a shel
 
 A _judge_ is a check that verifies a specific aspect of how Claude executed the skill. Judges are implemented as MLflow [scorers](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/index.html): each receives a Claude Code trace and returns `Feedback` with a value and rationale. Two patterns cover almost every test:
 
-**LLM judge:** use [`make_judge()`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/#trace-based-judges) to semantically analyze the trace:
+**LLM judge**
+
+use [`make_judge()`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/#trace-based-judges) to semantically analyze the trace:
 
 ```python
 from mlflow.genai.judges import make_judge
@@ -101,7 +105,9 @@ agent_ran_instrumented_code = make_judge(
 
 This [judge](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/#trace-based-judges) reads the actual span tree and reasons about whether the _sequence_ of actions was correct. No rule can do that.
 
-**Rule-based judge:** check a side effect in the final testing environment which was modified by the execution of the skill (see [`dataset_created.py`](https://github.com/mlflow/skills/blob/main/tests/judges/dataset_created.py)):
+**Rule-based judge**
+
+check a side effect in the final testing environment which was modified by the execution of the skill (see [`dataset_created.py`](https://github.com/mlflow/skills/blob/main/tests/judges/dataset_created.py)):
 
 ```python
 from mlflow import MlflowClient
@@ -136,9 +142,9 @@ Going back to our running example, the full test for `agent-evaluation` uses six
 - [`tracing-skill-invoked`](https://github.com/mlflow/skills/blob/main/tests/judges/tracing_skill_invoked.py): did Claude load the tracing skill as instructed?
 - [`agent-eval-skill-invoked`](https://github.com/mlflow/skills/blob/main/tests/judges/agent_eval_skill_invoked.py): did Claude actually read and follow the skill?
 
-Each judge is asking whether Claude followed the skill's workflow — calling the right APIs, in the right order, as the skill instructs. Together they define the acceptance criteria for the skill. If all six pass, the skill works.
+Each judge is asking whether Claude followed the skill's workflow — did it create the expected artifacts, follow the right sequence of steps, and invoke the right tools? Together they define the acceptance criteria for the skill. If all six pass, the skill works.
 
-### The Test Harness
+### Running the Tests
 
 A YAML config ties the methodology together. You can see the full config for this example at [`tests/configs/agent_evaluation.yaml`](https://github.com/mlflow/skills/blob/main/tests/configs/agent_evaluation.yaml):
 
@@ -209,7 +215,7 @@ Two real examples from the `agent-evaluation` skill's history illustrate exactly
 
 **Example 1: Claude bypassing MLflow entirely**
 
-Early runs saw `dataset-created` and `evaluation-run-created` both fail. Inspecting the trace revealed why: Claude had created an `evaluation/eval_dataset.py` file with a hand-rolled evaluation loop, completely bypassing MLflow's APIs. No dataset in MLflow, no run logged. The judges had nowhere to find success.
+Early runs saw [`dataset-created`](https://github.com/mlflow/skills/blob/main/tests/judges/dataset_created.py) and [`evaluation-run-created`](https://github.com/mlflow/skills/blob/main/tests/judges/evaluation_run_created.py) both fail. Inspecting the trace revealed why: Claude had created an `evaluation/eval_dataset.py` file with a hand-rolled evaluation loop, completely bypassing MLflow's APIs. No dataset in MLflow, no run logged. The judges had nowhere to find success.
 
 Claude Code read the trace, saw the custom file creation, and made this addition to `SKILL.md`:
 
@@ -233,7 +239,7 @@ Next run: `dataset-created` and `evaluation-run-created` both pass.
 
 **Example 2: A missing skill dependency**
 
-The `tracing-skill-invoked` judge kept failing: Claude was attempting evaluation without first loading the tracing skill, even though `SKILL.md` listed it as a prerequisite. The problem was in the skill's `description` field, the trigger text Claude reads _before_ loading the skill body. It said nothing about the tracing skill dependency.
+The [`tracing-skill-invoked`](https://github.com/mlflow/skills/blob/main/tests/judges/tracing_skill_invoked.py) judge kept failing: Claude was attempting evaluation without first loading the tracing skill, even though `SKILL.md` listed it as a prerequisite. The problem was in the skill's `description` field, the trigger text Claude reads _before_ loading the skill body. It said nothing about the tracing skill dependency.
 
 One line added to the description:
 
@@ -259,7 +265,7 @@ A few patterns emerged from running this system on the `agent-evaluation` skill:
 
 **Write judges before you polish the skill.** The judges are the specification. Writing them first forces you to articulate what success actually means, and often reveals that your initial skill draft was underspecified. A skill that passes all its judges on the first try probably has judges that are too weak.
 
-**Traces reveal surprising gaps.** The `tracing-skill-invoked` judge caught cases where Claude attempted evaluation without loading the tracing skill, despite SKILL.md listing it as a prerequisite. The fix was a single sentence in the `description` field, the text Claude reads before loading the skill body. Without the trace, this failure mode would have been invisible: there's nothing in the output that signals a missing skill dependency.
+**Traces reveal surprising gaps.** The [`tracing-skill-invoked`](https://github.com/mlflow/skills/blob/main/tests/judges/tracing_skill_invoked.py) judge caught cases where Claude attempted evaluation without loading the tracing skill, despite SKILL.md listing it as a prerequisite. The fix was a single sentence in the `description` field, the text Claude reads before loading the skill body. Without the trace, this failure mode would have been invisible: there's nothing in the output that signals a missing skill dependency.
 
 **Both judge types are needed.** LLM judges and rule-based judges serve different purposes. LLM judges handle behavioral and sequential questions that no rule can express. Rule-based judges provide deterministic checks on side effects: a dataset was created, a run was logged. Use both.
 
@@ -276,3 +282,5 @@ python tests/test_skill.py tests/configs/agent_evaluation.yaml
 The test spins up a local MLflow server, clones a sample agent repo, runs Claude Code headlessly, and prints judge results. Add your own judges to `tests/judges/` and reference them in a new YAML config.
 
 The pattern works for any Claude Code skill: write the judges first, run the test, let Claude fix what's broken.
+
+Adopting this methodology for your own skill takes minutes: write a YAML config, define your judges, and run the test. From there, you never have to debug a skill by hand — Claude reads the failing trace and fixes the skill itself. The approach scales to any Claude Code skill, whether you're testing a two-step guide or a complex multi-step workflow.
