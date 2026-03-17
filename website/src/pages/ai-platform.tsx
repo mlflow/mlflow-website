@@ -11,7 +11,7 @@ import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 const SEO_TITLE = "AI Platform: What It Is & What You Need | MLflow";
 const SEO_DESCRIPTION =
-  "Learn what an AI platform is, what components it requires, and how MLflow provides observability, evaluation, version control, and governance as the largest open-source AI platform.";
+  "Learn what an AI platform is, what components it requires, and how MLflow provides observability, evaluation, version control, and governance as the largest open source AI platform.";
 
 const faqs: {
   question: string;
@@ -49,19 +49,19 @@ const faqs: {
         tools, memory, planning loops, and orchestration patterns. An AI
         platform is broader: it provides the tracing, evaluation, version
         control, and governance that production agents need. MLflow is the
-        largest open-source AI platform, integrating with any framework so you
+        largest open source AI platform, integrating with any framework so you
         can see what your agent did, measure whether it did well, and catch
         issues in production.
       </>
     ),
     answerText:
-      "An agent framework (like LangGraph, CrewAI, or AutoGen) provides the building blocks for constructing agents: tools, memory, planning loops, and orchestration patterns. An AI platform is broader: it provides the tracing, evaluation, version control, and governance that production agents need. MLflow is the largest open-source AI platform, integrating with any framework so you can see what your agent did, measure whether it did well, and catch issues in production.",
+      "An agent framework (like LangGraph, CrewAI, or AutoGen) provides the building blocks for constructing agents: tools, memory, planning loops, and orchestration patterns. An AI platform is broader: it provides the tracing, evaluation, version control, and governance that production agents need. MLflow is the largest open source AI platform, integrating with any framework so you can see what your agent did, measure whether it did well, and catch issues in production.",
   },
   {
     question: "Where does MLflow fit in an AI platform?",
     answer: (
       <>
-        MLflow is the largest open-source AI platform. It provides the
+        MLflow is the largest open source AI platform. It provides the
         capabilities you need to build, deploy, and operate agents in
         production:{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
@@ -78,7 +78,7 @@ const faqs: {
       </>
     ),
     answerText:
-      "MLflow is the largest open-source AI platform. It provides the capabilities you need to build, deploy, and operate agents in production: end-to-end tracing to debug multi-step execution, automated evaluation to measure quality, a prompt registry for managing instructions, and an AI gateway for unified access to LLM providers.",
+      "MLflow is the largest open source AI platform. It provides the capabilities you need to build, deploy, and operate agents in production: end-to-end tracing to debug multi-step execution, automated evaluation to measure quality, a prompt registry for managing instructions, and an AI gateway for unified access to LLM providers.",
   },
   {
     question: "What features should I look for in an AI platform?",
@@ -160,18 +160,18 @@ const faqs: {
     question: "Is MLflow free to use?",
     answer: (
       <>
-        MLflow is completely free and open-source under the Apache 2.0 license.
+        MLflow is completely free and open source under the Apache 2.0 license.
         You can self-host it or use{" "}
         <Link href="https://databricks.com/product/managed-mlflow">
           managed MLflow on Databricks
         </Link>{" "}
-        for a hosted experience. The open-source version includes all core
+        for a hosted experience. The open source version includes all core
         capabilities: tracing, evaluation, prompt registry, AI gateway, and
         experiment tracking.
       </>
     ),
     answerText:
-      "MLflow is completely free and open-source under the Apache 2.0 license. You can self-host it or use managed MLflow on Databricks for a hosted experience. The open-source version includes all core capabilities: tracing, evaluation, prompt registry, AI gateway, and experiment tracking.",
+      "MLflow is completely free and open source under the Apache 2.0 license. You can self-host it or use managed MLflow on Databricks for a hosted experience. The open source version includes all core capabilities: tracing, evaluation, prompt registry, AI gateway, and experiment tracking.",
   },
   {
     question: "How do I get started with MLflow for my AI platform?",
@@ -534,7 +534,7 @@ export default function AIAgentPlatform() {
           </p>
 
           <p>
-            <Link href="/genai">MLflow</Link> is the largest open-source AI
+            <Link href="/genai">MLflow</Link> is the largest open source AI
             platform. It provides{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
               end-to-end tracing
@@ -552,6 +552,26 @@ export default function AIAgentPlatform() {
             without locking you into a specific tool.
           </p>
 
+          <div
+            style={{
+              borderRadius: "8px",
+              overflow: "hidden",
+              border: "1px solid #e5e7eb",
+              margin: "40px 0",
+            }}
+          >
+            <video width="100%" controls autoPlay loop muted playsInline>
+              <source
+                src={
+                  require("@site/static/img/releases/3.10.0/demo-experiment.mp4")
+                    .default
+                }
+                type="video/mp4"
+              />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+
           <h2 id="what-makes-up-agent-platform">
             What Makes Up an AI Platform
           </h2>
@@ -565,46 +585,49 @@ export default function AIAgentPlatform() {
             <div className="card">
               <h3>Observability &amp; Tracing</h3>
               <p>
-                <strong>What it does:</strong> Captures the full execution graph
-                (every LLM call, tool invocation, retrieval step, and decision
-                branch) so you can debug failures and understand agent behavior.
+                <strong>Problem:</strong> Multi-step agents, tool calls, and
+                retrieval chains create complex execution paths that are
+                difficult to debug.
               </p>
               <p>
-                <strong>MLflow provides this:</strong>{" "}
+                <strong>Solution:</strong>{" "}
                 <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
                   OpenTelemetry-compatible tracing
                 </Link>{" "}
-                with one-line integrations for 30+ frameworks and providers.
+                captures the full execution graph so you can see every LLM call,
+                tool invocation, and decision branch.
               </p>
             </div>
 
             <div className="card">
               <h3>Evaluation &amp; Quality</h3>
               <p>
-                <strong>What it does:</strong> Measures agent quality using
-                automated scorers (correctness, groundedness, relevance, and
-                custom metrics) across datasets and production traces.
+                <strong>Problem:</strong> Free-form language output can't be
+                validated with unit tests, and quality regressions are hard to
+                catch before they reach users.
               </p>
               <p>
-                <strong>MLflow provides this:</strong>{" "}
+                <strong>Solution:</strong>{" "}
                 <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
                   LLM-as-a-judge evaluation
                 </Link>{" "}
-                that runs on datasets or continuously on live traffic.
+                with 70+ built-in scorers runs on datasets or continuously on
+                live production traffic.
               </p>
             </div>
 
             <div className="card">
               <h3>Version Control</h3>
               <p>
-                <strong>What it does:</strong> Versions prompts and
-                configurations so you can compare changes, measure their impact
-                on quality, and roll back when something breaks.
+                <strong>Problem:</strong> A small change to a system prompt can
+                alter agent behavior across thousands of interactions, and
+                there's no way to track what changed.
               </p>
               <p>
-                <strong>MLflow provides this:</strong>{" "}
-                <Link href="/genai/prompt-registry">Prompt registry</Link> with
-                lineage to traces and evaluation results, plus{" "}
+                <strong>Solution:</strong>{" "}
+                <Link href="/genai/prompt-registry">Prompt registry</Link>{" "}
+                versions prompts with lineage to traces and evaluation results,
+                plus{" "}
                 <Link href="/prompt-optimization">prompt optimization</Link>.
               </p>
             </div>
@@ -612,14 +635,15 @@ export default function AIAgentPlatform() {
             <div className="card">
               <h3>Governance &amp; Safety</h3>
               <p>
-                <strong>What it does:</strong> Enforces guardrails, access
-                policies, and compliance rules. Controls costs and ensures
-                agents operate within organizational boundaries.
+                <strong>Problem:</strong> AI systems make decisions that need
+                auditing, and can inadvertently expose PII or violate content
+                policies.
               </p>
               <p>
-                <strong>MLflow provides this:</strong>{" "}
-                <Link href="/genai/ai-gateway">AI Gateway</Link> for centralized
-                key management, rate limiting, and traffic routing, plus{" "}
+                <strong>Solution:</strong>{" "}
+                <Link href="/genai/ai-gateway">AI Gateway</Link> provides a
+                production-grade proxy for centralized key management, rate
+                limiting, and traffic routing, plus{" "}
                 <Link
                   href={
                     MLFLOW_GENAI_DOCS_URL +
@@ -670,19 +694,19 @@ export default function AIAgentPlatform() {
               versions and tracks the impact of changes on quality.
             </li>
             <li>
-              <strong>Provider management grows complex:</strong> Routing
+              <strong>LLM and MCP management grows complex:</strong> Routing
               requests across OpenAI, Anthropic, Google, and Bedrock while
               managing API keys, rate limits, and fallback logic creates
               compounding overhead. An{" "}
               <Link href="/genai/ai-gateway">AI gateway</Link> provides a
-              unified interface.
+              low-overhead, production-grade proxy for all of this.
             </li>
           </ul>
 
           <h2 id="what-mlflow-provides">What MLflow Provides</h2>
 
           <p>
-            MLflow is the only open-source AI platform that provides all four
+            MLflow is the only open source AI platform that provides all four
             capabilities in a unified offering. It integrates with any agent
             framework, programming language, and LLM provider:
           </p>
@@ -737,10 +761,10 @@ export default function AIAgentPlatform() {
               >
                 AI Gateway
               </Link>
-              : Route requests to any LLM provider through an
-              OpenResponses-compatible unified interface. Manage API keys
-              centrally, enforce rate limits, set fallback routes, and track
-              usage across providers.
+              : A low-overhead, production-grade proxy that routes requests to
+              any LLM provider through an OpenResponses-compatible interface.
+              Manage API keys centrally, enforce rate limits, set fallback
+              routes, and track usage across providers.
             </li>
             <li>
               <Link
@@ -766,12 +790,13 @@ export default function AIAgentPlatform() {
             </li>
           </ul>
 
-          <h2 id="how-to-add-mlflow">How to Add MLflow to Your AI Platform</h2>
+          <h2 id="how-to-add-mlflow">Get Started with MLflow</h2>
 
           <p>
             MLflow integrates with your existing agent framework in minutes. You
             don't need to change how you build agents. Here are examples showing
-            how to add tracing and evaluation to common setups. See the{" "}
+            how to add tracing, evaluation, and gateway routing to common
+            setups. See the{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/integrations/"}>
               integrations documentation
             </Link>{" "}
@@ -867,7 +892,7 @@ graph.add_node("planner", planner_node)
 graph.add_node("executor", executor_node)
 graph.add_node("reviewer", reviewer_node)
 
-# Run the agent — every step is captured
+# Run the agent - every step is captured
 app = graph.compile()
 result = app.invoke({"task": "Research competitor pricing"})`}
               />
@@ -887,7 +912,7 @@ graph.add_node("planner", planner_node)
 graph.add_node("executor", executor_node)
 graph.add_node("reviewer", reviewer_node)
 
-# Run the agent — every step is captured
+# Run the agent - every step is captured
 app = graph.compile()
 result = app.invoke({"task": "Research competitor pricing"})`}
                 language="python"
@@ -914,7 +939,7 @@ result = app.invoke({"task": "Research competitor pricing"})`}
           </div>
 
           <p style={{ marginTop: "32px", marginBottom: "0px" }}>
-            <strong>Evaluate agent quality</strong>
+            <strong>Route LLM requests through AI Gateway</strong>
           </p>
 
           <div
@@ -924,44 +949,36 @@ result = app.invoke({"task": "Research competitor pricing"})`}
             <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
               <span className="text-xs text-white/50 font-mono">python</span>
               <CopyButton
-                code={`import mlflow
-from mlflow.genai.scorers import (
-    Safety,
-    Correctness,
-    ToolCallCorrectness,
-)
+                code={`from mlflow.gateway import set_gateway_uri
+from openai import OpenAI
 
-# Evaluate your agent against a dataset
-results = mlflow.genai.evaluate(
-    data=eval_dataset,
-    predict_fn=my_agent,
-    scorers=[
-        Safety(),
-        Correctness(),
-        ToolCallCorrectness(),
-    ],
+# Point your client at the MLflow AI Gateway
+set_gateway_uri("http://localhost:9000")
+client = OpenAI(base_url="http://localhost:9000/v1")
+
+# Route requests through the gateway
+# Keys, rate limits, and fallbacks are managed centrally
+response = client.chat.completions.create(
+    model="gpt-5",
+    messages=[{"role": "user", "content": "Summarize this document."}],
 )`}
               />
             </div>
             <div className="p-3 overflow-x-auto">
               <Highlight
                 theme={customNightOwl}
-                code={`import mlflow
-from mlflow.genai.scorers import (
-    Safety,
-    Correctness,
-    ToolCallCorrectness,
-)
+                code={`from mlflow.gateway import set_gateway_uri
+from openai import OpenAI
 
-# Evaluate your agent against a dataset
-results = mlflow.genai.evaluate(
-    data=eval_dataset,
-    predict_fn=my_agent,
-    scorers=[
-        Safety(),
-        Correctness(),
-        ToolCallCorrectness(),
-    ],
+# Point your client at the MLflow AI Gateway
+set_gateway_uri("http://localhost:9000")
+client = OpenAI(base_url="http://localhost:9000/v1")
+
+# Route requests through the gateway
+# Keys, rate limits, and fallbacks are managed centrally
+response = client.chat.completions.create(
+    model="gpt-5",
+    messages=[{"role": "user", "content": "Summarize this document."}],
 )`}
                 language="python"
               >
@@ -991,7 +1008,7 @@ results = mlflow.genai.evaluate(
               <Link href="/genai" style={{ color: "#007bff" }}>
                 <strong>MLflow</strong>
               </Link>{" "}
-              is the largest open-source AI platform, with over 30 million
+              is the largest open source AI platform, with over 30 million
               monthly downloads. Thousands of organizations use MLflow to trace,
               evaluate, and monitor their AI agents and LLM applications. Backed
               by the Linux Foundation and licensed under Apache 2.0, MLflow
@@ -1000,7 +1017,7 @@ results = mlflow.genai.evaluate(
             </p>
           </div>
 
-          <h2 id="open-source-vs-proprietary">
+          <h2 id="open source-vs-proprietary">
             Open Source vs. Proprietary AI Platforms
           </h2>
 
