@@ -8,6 +8,9 @@ import { ArticleSidebar } from "../components/ArticleSidebar/ArticleSidebar";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
+import TracingImage from "@site/static/img/GenAI_home/GenAI_trace_darkmode.png";
+import EvaluationImage from "@site/static/img/GenAI_home/GenAI_evaluation_darkmode.png";
+import GatewayImage from "@site/static/img/GenAI_home/GenAI_gateway_darkmode.png";
 
 const SEO_TITLE = "AI Platform: What It Is & What You Need | MLflow";
 const SEO_DESCRIPTION =
@@ -795,7 +798,7 @@ export default function AIAgentPlatform() {
           <p>
             MLflow integrates with your existing agent framework in minutes. You
             don't need to change how you build agents. Here are examples showing
-            how to add tracing, evaluation, and gateway routing to common
+            how to add evaluation, tracing, and gateway routing to common
             setups. See the{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/integrations/"}>
               integrations documentation
@@ -805,7 +808,7 @@ export default function AIAgentPlatform() {
           </p>
 
           <p style={{ marginTop: "32px", marginBottom: "0px" }}>
-            <strong>Trace an LLM application (OpenAI)</strong>
+            <strong>Evaluate agent quality</strong>
           </p>
 
           <div
@@ -816,17 +819,21 @@ export default function AIAgentPlatform() {
               <span className="text-xs text-white/50 font-mono">python</span>
               <CopyButton
                 code={`import mlflow
-from openai import OpenAI
+from mlflow.genai.scorers import (
+    Safety,
+    Correctness,
+    ToolCallCorrectness,
+)
 
-# One line instruments your entire agent
-mlflow.openai.autolog()
-
-client = OpenAI()
-
-# Every call is now traced automatically
-response = client.responses.create(
-    model="gpt-5",
-    input="Summarize this document.",
+# Evaluate your agent against a dataset
+results = mlflow.genai.evaluate(
+    data=eval_dataset,
+    predict_fn=my_agent,
+    scorers=[
+        Safety(),
+        Correctness(),
+        ToolCallCorrectness(),
+    ],
 )`}
               />
             </div>
@@ -834,17 +841,21 @@ response = client.responses.create(
               <Highlight
                 theme={customNightOwl}
                 code={`import mlflow
-from openai import OpenAI
+from mlflow.genai.scorers import (
+    Safety,
+    Correctness,
+    ToolCallCorrectness,
+)
 
-# One line instruments your entire agent
-mlflow.openai.autolog()
-
-client = OpenAI()
-
-# Every call is now traced automatically
-response = client.responses.create(
-    model="gpt-5",
-    input="Summarize this document.",
+# Evaluate your agent against a dataset
+results = mlflow.genai.evaluate(
+    data=eval_dataset,
+    predict_fn=my_agent,
+    scorers=[
+        Safety(),
+        Correctness(),
+        ToolCallCorrectness(),
+    ],
 )`}
                 language="python"
               >
@@ -868,6 +879,17 @@ response = client.responses.create(
               </Highlight>
             </div>
           </div>
+
+          <img
+            src={EvaluationImage}
+            alt="MLflow Evaluation UI showing quality scores across multiple agents"
+            style={{
+              width: "100%",
+              borderRadius: "8px",
+              border: "1px solid #e5e7eb",
+              marginTop: "16px",
+            }}
+          />
 
           <p style={{ marginTop: "32px", marginBottom: "0px" }}>
             <strong>Trace a multi-step agent (LangGraph)</strong>
@@ -938,6 +960,17 @@ result = app.invoke({"task": "Research competitor pricing"})`}
             </div>
           </div>
 
+          <img
+            src={TracingImage}
+            alt="MLflow Tracing UI showing multi-step agent execution graph"
+            style={{
+              width: "100%",
+              borderRadius: "8px",
+              border: "1px solid #e5e7eb",
+              marginTop: "16px",
+            }}
+          />
+
           <p style={{ marginTop: "32px", marginBottom: "0px" }}>
             <strong>Route LLM requests through AI Gateway</strong>
           </p>
@@ -1002,6 +1035,17 @@ response = client.chat.completions.create(
               </Highlight>
             </div>
           </div>
+
+          <img
+            src={GatewayImage}
+            alt="MLflow AI Gateway routing requests across multiple LLM providers"
+            style={{
+              width: "100%",
+              borderRadius: "8px",
+              border: "1px solid #e5e7eb",
+              marginTop: "16px",
+            }}
+          />
 
           <div className="info-box">
             <p>
