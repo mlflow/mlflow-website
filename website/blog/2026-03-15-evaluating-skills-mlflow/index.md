@@ -136,12 +136,12 @@ Both types are needed: LLM judges handle behavioral and sequential questions, wh
 
 Going back to our running example, the full test for `agent-evaluation` uses six judges, each checking one requirement:
 
-- `dataset-created`: did Claude call `mlflow.genai.datasets.create_dataset()`?
-- `scorer-registered`: did Claude register a scorer before evaluation?
-- `evaluation-run-created`: did `mlflow.genai.evaluate()` produce a run?
-- `agent-trace-logged`: did the agent under evaluation produce traces?
-- `tracing-skill-invoked`: did Claude load the tracing skill as instructed?
-- `agent-eval-skill-invoked`: did Claude actually read and follow the skill?
+- [`dataset-created`](https://github.com/mlflow/skills/blob/main/tests/judges/dataset_created.py): did Claude call `mlflow.genai.datasets.create_dataset()`?
+- [`scorer-registered`](https://github.com/mlflow/skills/blob/main/tests/judges/scorer_registered.py): did Claude register a scorer before evaluation?
+- [`evaluation-run-created`](https://github.com/mlflow/skills/blob/main/tests/judges/evaluation_run_created.py): did `mlflow.genai.evaluate()` produce a run?
+- [`agent-trace-logged`](https://github.com/mlflow/skills/blob/main/tests/judges/agent_trace_logged.py): did the agent under evaluation produce traces?
+- [`tracing-skill-invoked`](https://github.com/mlflow/skills/blob/main/tests/judges/tracing_skill_invoked.py): did Claude load the tracing skill as instructed?
+- [`agent-eval-skill-invoked`](https://github.com/mlflow/skills/blob/main/tests/judges/agent_eval_skill_invoked.py): did Claude actually read and follow the skill?
 
 Each judge is asking whether Claude followed the skill's workflow — calling the right APIs, in the right order, as the skill instructs. Together they define the acceptance criteria for the skill. If all six pass, the skill works.
 
