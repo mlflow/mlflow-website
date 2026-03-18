@@ -225,6 +225,9 @@ export const Header = () => {
             <li className="w-full md:w-auto">
               <HeaderMenuItem href="/blog" label="Blog" />
             </li>
+            <li className="w-full md:w-auto">
+              <HeaderMenuItem href="/cookbook" label="Cookbook" />
+            </li>
             <li className="w-full md:w-auto md:hidden">
               <button
                 type="button"
