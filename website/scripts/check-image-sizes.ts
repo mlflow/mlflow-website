@@ -38,7 +38,8 @@ if (oversized.length > 0) {
   }
   console.error(
     `\nPlease compress these images before committing. You can run:\n` +
-      `  npm run compress-images\n`,
+      `  npm run compress-images\n` +
+      `\nNote: this will modify the image files in-place.\n`,
   );
   process.exit(1);
 }

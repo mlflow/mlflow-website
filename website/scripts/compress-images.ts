@@ -64,6 +64,7 @@ async function main() {
   console.log(
     `Found ${files.length} image files, compressing those > 500KB...`,
   );
+  console.log(`WARNING: This script modifies image files in-place.\n`);
 
   let compressed = 0;
   for (const file of files) {
