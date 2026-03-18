@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import readline from "readline";
 import sharp from "sharp";
 
 const MAX_WIDTH = 1400;
@@ -61,18 +62,33 @@ async function main() {
     fs.existsSync(dir) ? getImageFiles(dir) : [],
   );
 
+  const toCompress = files.filter((f) => fs.statSync(f).size >= MIN_SIZE_BYTES);
+
   console.log(
-    `Found ${files.length} image files, compressing those > 500KB...`,
+    `Found ${toCompress.length} image files over 500KB (out of ${files.length} total).`,
   );
-  console.log(`WARNING: This script modifies image files in-place.\n`);
+  console.log(
+    "This script modifies files in-place. Please make a backup if you want to retain the original copies.",
+  );
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  const answer = await new Promise<string>((resolve) =>
+    rl.question("Proceed? (y/n) ", resolve),
+  );
+  rl.close();
+
+  if (answer.toLowerCase() !== "y") {
+    console.log("Aborted.");
+    return;
+  }
 
   let compressed = 0;
-  for (const file of files) {
-    const stat = fs.statSync(file);
-    if (stat.size >= MIN_SIZE_BYTES) {
-      compressed++;
-      await compressImage(file);
-    }
+  for (const file of toCompress) {
+    compressed++;
+    await compressImage(file);
   }
 
   console.log(`\nDone. Processed ${compressed} files.`);
