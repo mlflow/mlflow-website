@@ -282,11 +282,11 @@ A few patterns emerged from running this system on the `agent-evaluation` skill:
 ```bash
 git clone https://github.com/mlflow/skills.git
 cd skills
+pip install "mlflow[genai]" pyyaml
+export OPENAI_API_KEY=...  # needed for LLM judges
 python tests/test_skill.py tests/configs/agent_evaluation.yaml
 ```
 
 The test spins up a local MLflow server, clones a sample agent repo, runs Claude Code headlessly, and prints judge results. Add your own judges to `tests/judges/` and reference them in a new YAML config.
-
-The pattern works for any Claude Code skill: write the judges first, run the test, let Claude fix what's broken.
 
 Adopting this methodology for your own skill takes minutes: write a YAML config, define your judges, and run the test. From there, you never have to debug a skill by hand — Claude reads the failing trace and fixes the skill itself. The approach scales to any Claude Code skill, whether you're testing a two-step guide or a complex multi-step workflow.
