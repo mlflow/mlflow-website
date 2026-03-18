@@ -144,6 +144,12 @@ Going back to our running example, the full test for `agent-evaluation` uses six
 
 Each judge is asking whether Claude followed the skill's workflow — did it create the expected artifacts, follow the right sequence of steps, and invoke the right tools? Together they define the acceptance criteria for the skill. If all six pass, the skill works.
 
+The screenshot below shows an MLflow trace from a real `agent-evaluation` skill run. The left panel shows Claude's span tree — the sequence of tool calls it made, starting with loading the skill. The right panel shows all six judges passing, with the rationale for each LLM judge visible inline.
+
+![MLflow trace of the agent-evaluation skill run with all six judges passing](./screenshot.png)
+
+_The MLflow trace viewer showing Claude's tool call sequence (left) and the six judge assessments (right). The `agent-eval-skill-invoked` judge's rationale explains exactly why the trace passes: Claude loaded the skill and followed its instructions._
+
 ### Running the Tests
 
 A YAML config ties the methodology together. You can see the full config for this example at [`tests/configs/agent_evaluation.yaml`](https://github.com/mlflow/skills/blob/main/tests/configs/agent_evaluation.yaml):
