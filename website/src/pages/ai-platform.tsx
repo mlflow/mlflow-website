@@ -807,8 +807,14 @@ export default function AIAgentPlatform() {
             Vercel AI SDK, and more.
           </p>
 
-          <p style={{ marginTop: "32px", marginBottom: "0px" }}>
-            <strong>Evaluate agent quality</strong>
+          <h3 style={{ marginTop: "48px", marginBottom: "16px" }}>
+            Evaluate Agent Quality
+          </h3>
+
+          <p>
+            Run automated evaluations against your agents using LLM-as-a-judge
+            scorers. MLflow provides 70+ built-in judges for metrics like
+            correctness, safety, and tool call accuracy.
           </p>
 
           <div
@@ -891,8 +897,27 @@ results = mlflow.genai.evaluate(
             }}
           />
 
-          <p style={{ marginTop: "32px", marginBottom: "0px" }}>
-            <strong>Trace a multi-step agent (LangGraph)</strong>
+          <p
+            style={{
+              fontSize: "14px",
+              color: "#6b7280",
+              marginTop: "8px",
+              marginBottom: "0",
+            }}
+          >
+            The MLflow UI displays evaluation results across multiple scorers,
+            making it easy to compare agent performance and identify quality
+            regressions.
+          </p>
+
+          <h3 style={{ marginTop: "48px", marginBottom: "16px" }}>
+            Trace Multi-Step Agent Workflows
+          </h3>
+
+          <p>
+            Capture every step of agent execution with automatic tracing. See
+            LLM calls, tool invocations, and decision branches in a visual
+            graph.
           </p>
 
           <div
@@ -971,8 +996,27 @@ result = app.invoke({"task": "Research competitor pricing"})`}
             }}
           />
 
-          <p style={{ marginTop: "32px", marginBottom: "0px" }}>
-            <strong>Route LLM requests through AI Gateway</strong>
+          <p
+            style={{
+              fontSize: "14px",
+              color: "#6b7280",
+              marginTop: "8px",
+              marginBottom: "0",
+            }}
+          >
+            The trace view shows the complete execution graph, including timing,
+            inputs, outputs, and metadata for each step in your agent's
+            workflow.
+          </p>
+
+          <h3 style={{ marginTop: "48px", marginBottom: "16px" }}>
+            Route Requests Through AI Gateway
+          </h3>
+
+          <p>
+            Use MLflow AI Gateway as a production-grade proxy for all LLM
+            requests. Centralize API key management, enforce rate limits, and
+            switch providers without changing your code.
           </p>
 
           <div
@@ -1046,6 +1090,19 @@ response = client.chat.completions.create(
               marginTop: "16px",
             }}
           />
+
+          <p
+            style={{
+              fontSize: "14px",
+              color: "#6b7280",
+              marginTop: "8px",
+              marginBottom: "0",
+            }}
+          >
+            The AI Gateway provides a unified interface across OpenAI,
+            Anthropic, Google, and other providers, with built-in support for
+            fallbacks and load balancing.
+          </p>
 
           <div className="info-box">
             <p>
