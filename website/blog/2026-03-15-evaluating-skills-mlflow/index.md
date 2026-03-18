@@ -284,7 +284,7 @@ git clone https://github.com/mlflow/skills.git
 cd skills
 pip install "mlflow[genai]" pyyaml
 export OPENAI_API_KEY=...   # needed for LLM judges
-export REPO_URL=https://github.com/mlflow/mlflow-agent  # agent repo to evaluate
+export REPO_URL=https://github.com/your-org/your-agent  # agent repo to evaluate
 python tests/test_skill.py tests/configs/agent_evaluation.yaml
 ```
 
