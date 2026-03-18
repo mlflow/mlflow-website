@@ -1,6 +1,6 @@
 ---
 title: Your Agents Need an AI Platform
-description: Making your agents work reliably in production requires an integrated platform with observability, evaluation, version control, and governance. Learn how MLflow brings all four together as the only complete open source AI platform.
+description: Making your agents work reliably in production requires observability, evaluation, version control, and governance. Learn how MLflow brings all four together as the only complete open source AI platform.
 slug: agents-need-ai-platform
 authors: [mlflow-maintainers]
 tags:
@@ -20,7 +20,7 @@ image: /img/blog/agents-need-ai-platform-thumbnail.png
 date: 2026-03-18
 ---
 
-Agent frameworks like LangGraph, OpenAI Agents SDK, and Vercel AI SDK make it easy to build an initial version of an agent. But getting an initial version working is the easy part. The hard part is making it work reliably in production: agents can break down in ways that are impossible to catch by vibe-checking a prototype.
+Agent frameworks like LangGraph, OpenAI Agents SDK, and Vercel AI SDK make it easy to build an initial version of an agent. The hard part is making it work reliably in production: agents can break down in ways that are impossible to catch by vibe-checking a prototype.
 
 Consider a customer support agent that looks up order status, processes refunds, and searches your knowledge base. You wire it up, test it on a handful of questions, and it works. Ship it. Then a customer asks for a refund on an order that doesn't exist, and the agent hallucinates a confirmation number. The wrong customer's home address shows up in a response due to a lack of data access controls. A model provider pushes an update, and refund success rate quietly drops from 94% to 71%. A retry loop goes haywire overnight and you wake up to a $12,000 invoice. The agent framework got you to version one. It won't get you to reliability.
 
@@ -102,7 +102,7 @@ def handle_ticket(ticket):
 </figcaption>
 </figure>
 
-MLflow offers a comprehensive [tracing framework](https://mlflow.org/docs/latest/genai/tracing/index.html) that captures the full execution graph of every agent interaction: every LLM call, every tool invocation, every retrieval step, even your custom functions, with inputs, outputs, token counts, and latency. [MLflow Tracing](https://mlflow.org/docs/latest/genai/tracing/index.html) is [OpenTelemetry-compatible](/blog/opentelemetry-tracing-support), so it works with any programming language, any agent framework, and any LLM provider. MLflow also offers [autologging](https://mlflow.org/docs/latest/genai/tracing/#one-line-auto-tracing-integrations) for more than 30 popular frameworks and providers (LangGraph, OpenAI Agents SDK, CrewAI, AutoGen, Pydantic AI, Google ADK, and [many more](https://mlflow.org/docs/latest/genai/tracing/integrations/)) that instruments your entire application automatically with just a single line of code.
+MLflow offers a comprehensive [tracing framework](https://mlflow.org/docs/latest/genai/tracing/index.html) that captures the full execution graph of every agent interaction: every LLM call, every tool invocation, every retrieval step, even your custom functions, with inputs, outputs, token counts, and latency. [MLflow Tracing](https://mlflow.org/docs/latest/genai/tracing/index.html) is [OpenTelemetry-compatible](/blog/opentelemetry-tracing-support), so it works with any programming language, any agent framework, and any LLM provider. MLflow also offers [one-line automatic tracing](https://mlflow.org/docs/latest/genai/tracing/#one-line-auto-tracing-integrations) for more than 30 popular frameworks and providers (LangGraph, OpenAI Agents SDK, CrewAI, AutoGen, Pydantic AI, Google ADK, and [many more](https://mlflow.org/docs/latest/genai/tracing/integrations/)) that instruments your entire application automatically with just a single line of code.
 
 ## Evaluation: Prove Your Agent Works Before You Ship It
 
@@ -222,7 +222,7 @@ from openai import OpenAI
 
 # Point your agent at the gateway instead of OpenAI directly
 client = OpenAI(
-    base_url="https://your-mlflow-server/gateway/v1"
+    base_url="https://your-mlflow-server/gateway/mlflow/v1"
 )
 
 # Your agent code doesn't change. The gateway handles:
@@ -238,7 +238,7 @@ client = OpenAI(
 
 <img
   src="/img/blog/GenAI_gateway_darkmode.png"
-  alt="MLflow AI Gateway usage dashboard showing requests, latency, errors, token usage, and cost breakdown"
+  alt="MLflow AI Gateway endpoint configuration showing traffic splitting and automatic fallback routing between model providers"
   style={{ borderRadius: "8px", width: "100%" }}
 />
 
@@ -309,7 +309,7 @@ from openai import OpenAI
 # Direct your agent's LLM calls to the gateway, which
 # handles auth, routing, cost controls, and guardrails
 client = OpenAI(
-    base_url="https://your-mlflow-server/gateway/v1"
+    base_url="https://your-mlflow-server/gateway/mlflow/v1"
 )
 ```
 
@@ -328,4 +328,4 @@ Your agents can do a lot. Give them the platform to do it reliably.
 - [MLflow Prompt Registry documentation](https://mlflow.org/docs/latest/genai/prompt-registry/index.html)
 - [MLflow AI Gateway documentation](https://mlflow.org/docs/latest/genai/governance/ai-gateway/)
 
-If you find MLflow useful, [give us a star on GitHub](https://github.com/mlflow/mlflow).
+If you find MLflow useful, [give us a star on GitHub](https://github.com/mlflow/mlflow)⭐️.
