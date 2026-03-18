@@ -84,7 +84,7 @@ A _judge_ is a check that verifies a specific aspect of how Claude executed the 
 
 **LLM judge**
 
-use [`make_judge()`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/#trace-based-judges) to semantically analyze the trace:
+Use [`make_judge()`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/#trace-based-judges) to semantically analyze the trace:
 
 ```python
 from mlflow.genai.judges import make_judge
@@ -107,7 +107,7 @@ This [judge](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge
 
 **Rule-based judge**
 
-check a side effect in the final testing environment which was modified by the execution of the skill (see [`dataset_created.py`](https://github.com/mlflow/skills/blob/main/tests/judges/dataset_created.py)):
+Check a side effect in the final testing environment which was modified by the execution of the skill (see [`dataset_created.py`](https://github.com/mlflow/skills/blob/main/tests/judges/dataset_created.py)):
 
 ```python
 from mlflow import MlflowClient
