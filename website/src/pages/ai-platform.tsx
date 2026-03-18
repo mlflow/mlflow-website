@@ -807,7 +807,31 @@ export default function AIAgentPlatform() {
             Vercel AI SDK, and more.
           </p>
 
-          <h3 style={{ marginTop: "48px", marginBottom: "16px" }}>
+          <img
+            src={EvaluationImage}
+            alt="MLflow Evaluation UI showing quality scores across multiple agents"
+            style={{
+              width: "100%",
+              borderRadius: "8px",
+              border: "1px solid #e5e7eb",
+              marginTop: "48px",
+            }}
+          />
+
+          <p
+            style={{
+              fontSize: "14px",
+              color: "#6b7280",
+              marginTop: "8px",
+              marginBottom: "16px",
+            }}
+          >
+            The MLflow UI displays evaluation results across multiple scorers,
+            making it easy to compare agent performance and identify quality
+            regressions.
+          </p>
+
+          <h3 style={{ marginTop: "0", marginBottom: "16px" }}>
             Evaluate Agent Quality
           </h3>
 
@@ -887,13 +911,13 @@ results = mlflow.genai.evaluate(
           </div>
 
           <img
-            src={EvaluationImage}
-            alt="MLflow Evaluation UI showing quality scores across multiple agents"
+            src={TracingImage}
+            alt="MLflow Tracing UI showing multi-step agent execution graph"
             style={{
               width: "100%",
               borderRadius: "8px",
               border: "1px solid #e5e7eb",
-              marginTop: "16px",
+              marginTop: "48px",
             }}
           />
 
@@ -902,15 +926,15 @@ results = mlflow.genai.evaluate(
               fontSize: "14px",
               color: "#6b7280",
               marginTop: "8px",
-              marginBottom: "0",
+              marginBottom: "16px",
             }}
           >
-            The MLflow UI displays evaluation results across multiple scorers,
-            making it easy to compare agent performance and identify quality
-            regressions.
+            The trace view shows the complete execution graph, including timing,
+            inputs, outputs, and metadata for each step in your agent's
+            workflow.
           </p>
 
-          <h3 style={{ marginTop: "48px", marginBottom: "16px" }}>
+          <h3 style={{ marginTop: "0", marginBottom: "16px" }}>
             Trace Multi-Step Agent Workflows
           </h3>
 
@@ -986,13 +1010,13 @@ result = app.invoke({"task": "Research competitor pricing"})`}
           </div>
 
           <img
-            src={TracingImage}
-            alt="MLflow Tracing UI showing multi-step agent execution graph"
+            src={GatewayImage}
+            alt="MLflow AI Gateway routing requests across multiple LLM providers"
             style={{
               width: "100%",
               borderRadius: "8px",
               border: "1px solid #e5e7eb",
-              marginTop: "16px",
+              marginTop: "48px",
             }}
           />
 
@@ -1001,15 +1025,15 @@ result = app.invoke({"task": "Research competitor pricing"})`}
               fontSize: "14px",
               color: "#6b7280",
               marginTop: "8px",
-              marginBottom: "0",
+              marginBottom: "16px",
             }}
           >
-            The trace view shows the complete execution graph, including timing,
-            inputs, outputs, and metadata for each step in your agent's
-            workflow.
+            The AI Gateway provides a unified interface across OpenAI,
+            Anthropic, Google, and other providers, with built-in support for
+            fallbacks and load balancing.
           </p>
 
-          <h3 style={{ marginTop: "48px", marginBottom: "16px" }}>
+          <h3 style={{ marginTop: "0", marginBottom: "16px" }}>
             Route Requests Through AI Gateway
           </h3>
 
@@ -1079,30 +1103,6 @@ response = client.chat.completions.create(
               </Highlight>
             </div>
           </div>
-
-          <img
-            src={GatewayImage}
-            alt="MLflow AI Gateway routing requests across multiple LLM providers"
-            style={{
-              width: "100%",
-              borderRadius: "8px",
-              border: "1px solid #e5e7eb",
-              marginTop: "16px",
-            }}
-          />
-
-          <p
-            style={{
-              fontSize: "14px",
-              color: "#6b7280",
-              marginTop: "8px",
-              marginBottom: "0",
-            }}
-          >
-            The AI Gateway provides a unified interface across OpenAI,
-            Anthropic, Google, and other providers, with built-in support for
-            fallbacks and load balancing.
-          </p>
 
           <div className="info-box">
             <p>
