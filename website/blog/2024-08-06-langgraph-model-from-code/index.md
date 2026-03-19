@@ -7,7 +7,7 @@ thumbnail: /img/blog/release-candidates.png
 image: /img/blog/release-candidates.png
 ---
 
-In this blog, we'll guide you through creating a LangGraph chatbot using MLflow. By combining MLflow with LangGraph's ability to create and manage cyclical graphs, you can create powerful stateful, multi-actor applications in a scalable fashion.
+In this blog, we'll guide you through creating a LangGraph chatbot using MLflow. By combining MLflow's [AI agent platform](/ai-platform) with LangGraph's ability to create and manage cyclical graphs, you can create powerful stateful, multi-actor applications in a scalable fashion.
 
 Throughout this post we will demonstrate how to leverage MLflow's capabilities to create a serializable and servable MLflow model which can easily be tracked, versioned, and deployed on a variety of servers. We'll be using the [langchain flavor](https://mlflow.org/docs/latest/llms/langchain/index.html) combined with MLflow's [model from code](https://mlflow.org/docs/latest/models.html#models-from-code) feature.
 
