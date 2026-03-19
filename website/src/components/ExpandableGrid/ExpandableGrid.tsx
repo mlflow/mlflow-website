@@ -2,7 +2,13 @@ import React, { useState } from "react";
 import { flushSync } from "react-dom";
 import styles from "./styles.module.css";
 
-const ExpandableGrid = ({ items, defaultVisibleCount, renderItem }) => {
+const ExpandableGrid = ({
+  items,
+  defaultVisibleCount,
+  renderItem,
+  seeMoreLabel = "See More ∨",
+  seeLessLabel = "See Less ∧",
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const visibleItems = isExpanded ? items : items.slice(0, defaultVisibleCount);
@@ -35,7 +41,7 @@ const ExpandableGrid = ({ items, defaultVisibleCount, renderItem }) => {
             }}
             className={styles.toggleButton}
           >
-            {isExpanded ? "See Less ∧" : "See More ∨"}
+            {isExpanded ? seeLessLabel : seeMoreLabel}
           </button>
         </div>
       )}
