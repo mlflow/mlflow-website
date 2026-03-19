@@ -7,7 +7,7 @@ tags:
   [genai, evaluation, tracing, coding-agents, claude-code, skills, llm-judges]
 thumbnail: /img/blog/evaluating-skills-mlflow-thumbnail.png
 image: /img/blog/evaluating-skills-mlflow-thumbnail.png
-date: 2026-03-15
+date: 2026-03-23
 ---
 
 ## The Skill Testing Problem
