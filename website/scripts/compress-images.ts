@@ -25,7 +25,7 @@ function formatSize(bytes: number): string {
   return `${(bytes / 1024).toFixed(0)}KB`;
 }
 
-async function compressImage(filePath: string): Promise<void> {
+async function compressImage(filePath: string): Promise<boolean> {
   const stat = fs.statSync(filePath);
   if (stat.size < MIN_SIZE_BYTES) return;
 
