@@ -51,8 +51,10 @@ async function compressImage(filePath: string): Promise<void> {
     console.log(
       `  ${path.relative(".", filePath)}: ${formatSize(stat.size)} → ${formatSize(output.length)} (${pct}% reduction)`,
     );
+    return true;
   } else {
     console.log(`  ${path.relative(".", filePath)}: already optimal, skipped`);
+    return false;
   }
 }
 
@@ -86,12 +88,17 @@ async function main() {
   }
 
   let compressed = 0;
+  let skipped = 0;
   for (const file of toCompress) {
-    compressed++;
-    await compressImage(file);
+    const didCompress = await compressImage(file);
+    if (didCompress) {
+      compressed++;
+    } else {
+      skipped++;
+    }
   }
 
-  console.log(`\nDone. Processed ${compressed} files.`);
+  console.log(`\nDone. Compressed ${compressed} files, skipped ${skipped} files.`);
 }
 
 main().catch((err) => {
