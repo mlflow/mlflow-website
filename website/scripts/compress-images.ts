@@ -98,7 +98,9 @@ async function main() {
     }
   }
 
-  console.log(`\nDone. Compressed ${compressed} files, skipped ${skipped} files.`);
+  console.log(
+    `\nDone. Compressed ${compressed} files, skipped ${skipped} files.`,
+  );
 }
 
 main().catch((err) => {
