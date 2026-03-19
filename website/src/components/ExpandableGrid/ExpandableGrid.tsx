@@ -1,21 +1,31 @@
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
 import { flushSync } from "react-dom";
 import styles from "./styles.module.css";
 
-const ExpandableGrid = ({
+interface ExpandableGridProps<T> {
+  items: T[];
+  defaultVisibleCount: number;
+  renderItem: (item: T, index: number) => ReactNode;
+  seeMoreLabel?: string;
+  seeLessLabel?: string;
+}
+
+const ExpandableGrid = <T,>({
   items,
   defaultVisibleCount,
   renderItem,
   seeMoreLabel = "See More ∨",
   seeLessLabel = "See Less ∧",
-}) => {
+}: ExpandableGridProps<T>) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const visibleItems = isExpanded ? items : items.slice(0, defaultVisibleCount);
+  const gridId = "expandable-grid";
 
   return (
     <>
       <div
+        id={gridId}
         className={`${styles.grid} ${!isExpanded ? styles.fadeOverlay : ""}`}
       >
         {visibleItems.map((item, index) => (
@@ -40,6 +50,8 @@ const ExpandableGrid = ({
               }
             }}
             className={styles.toggleButton}
+            aria-expanded={isExpanded}
+            aria-controls={gridId}
           >
             {isExpanded ? seeLessLabel : seeMoreLabel}
           </button>
