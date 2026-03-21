@@ -8,7 +8,13 @@ type Props = {
   style?: CSSProperties;
 };
 
-export function BlogImage({ src, alt, width = "100%", center = false, style }: Props) {
+export function BlogImage({
+  src,
+  alt,
+  width = "100%",
+  center = false,
+  style,
+}: Props) {
   return (
     <img
       src={src}

@@ -1,6 +1,6 @@
 ---
-title: "Harness Your Coding Agent with Observability and Governance"
-description: AI coding agents edit files, run commands, and browse the web autonomously - but what are they actually doing? Learn how to trace every step, evaluate output quality, and control LLM spending for OpenHands agents using MLflow. 
+title: "Harness Your Coding Agent with AI Observability and Governance"
+description: AI coding agents edit files, run commands, and browse the web autonomously - but what are they actually doing? Learn how to trace every step, evaluate output quality, and control LLM spending for OpenHands agents using MLflow.
 slug: mlflow-openhands
 authors: [yuki-watanabe]
 tags: [genai, evaluation, tracing, openhands, agents]
@@ -27,13 +27,13 @@ Key capabilities include:
 - **MCP integration** - agents connect to external tools via the Model Context Protocol
 - **Model-agnostic** - works with Claude, OpenAI, and open-source models
 
-Because OpenHands agents run autonomously, no human is watching every step in real time. That makes observability critical. You need to know what happened, what tools fired, how many tokens were spent, and whether the output actually meets your bar. This is where MLflow comes in.
+Because OpenHands agents run autonomously, no human is watching every step in real time. That makes observability and governance critical. You need to know what happened, what tools fired, how many tokens were spent, and whether the output actually meets your bar. This is where MLflow comes in.
 
 ## Trace OpenHands Agents via OpenTelemetry 🔍
 
 When an agent runs autonomously, having visibility over what it did is important. Which tools fired? How many LLM calls were made? Where did the tokens go? Without this information, debugging failures and optimizing performance is guesswork.
 
-[MLflow Tracing](https://mlflow.org/genai/observability) is a powerful tool for adding observability to any agents with minimal setup. OpenHands emits [OpenTelemetry](https://opentelemetry.io/) traces natively and MLflow accepts them out of the box. To connect OpenHands and MLflow, first start your MLflow server if you haven't already.
+[MLflow Tracing](https://mlflow.org/genai/observability) is a powerful tool for adding observability to any agents with minimal setup. OpenHands emits [OpenTelemetry](https://opentelemetry.io/) traces natively, and MLflow accepts them out of the box. To connect OpenHands and MLflow, first start your MLflow server if you haven't already.
 
 ```bash
 uvx mlflow server
@@ -83,7 +83,7 @@ print("All done!")
 ```
 
 Once the agent finishes, every LLM call, tool invocation, and agent step appears as structured spans in MLflow. Navigate to the MLflow UI (e.g. `http://localhost:5000`), select the experiment set in the environment variables, and open on the "Traces" tab to view the recorded traces.
-C
+
 Clicking on the ID of the trace will open a new pane with more details as shown below.
 
 <BlogImage
@@ -112,7 +112,7 @@ The quickest way to evaluate OpenHands agent runs is to directly run the built-i
 1. Select traces you want to evaluate from the "Traces" tab.
 2. Click "Run Judges" button in the actions menu.
 3. Select the judges you want to run and submit.
-4. MLflow show the results once the judges are finished on the same page with new columns added to the table.
+4. MLflow shows the results once the judges are finished on the same page with new columns added to the table.
 
 <BlogImage
   src={require("./mlflow-openhands-eval-ui-judges.png").default}
@@ -137,7 +137,6 @@ Each trace is assessed against the scoring criteria, producing clear pass/fail i
   alt="MLflow evaluation results table showing OpenHands evaluation results"
 />
 
-
 Alternatively, you can run evaluation programmatically with the `mlflow.genai.evaluate()` API as shown below.
 
 ```python
@@ -145,7 +144,7 @@ import mlflow
 from mlflow.genai.scorers import RelevanceToQuery, Correctness, ToolCallEfficiency
 
 # Load OpenHands traces from MLflow
-traces = mlflow.search_traces(locations=["123"], max_results=10)
+traces = mlflow.search_traces(locations=["123"], max_results=10) # substitute "123" with your experiment ID
 
 # Evaluate output quality
 results = mlflow.genai.evaluate(
@@ -162,7 +161,7 @@ The link to the evaluation results will be displayed in the console.
 
 ## Governance for LLM Traffic with AI Gateway 🛡️
 
-One pitfall in highly autonomous agents like OpenHands is that they come with their own set of risks. They might burn excessive tokens for long-running tasks, leak sensitive data to LLM providers, or got compromised by prompt injection attacks.
+One pitfall in highly autonomous agents like OpenHands is that they come with their own set of risks. They might burn excessive tokens for long-running tasks, leak sensitive data to LLM providers, or get compromised by prompt injection attacks.
 
 [AI Gateway](https://mlflow.org/ai-gateway) is a centralized proxy layer that sits between your application and LLM providers. It routes requests through a single, unified API while managing credentials, tracking usage, enforcing governance policies, and providing complete observability across all LLM calls. Instead of scattering API keys across scripts and environments, you configure credentials once in the gateway and let it handle authentication, cost tracking, and policy enforcement for every request.
 
