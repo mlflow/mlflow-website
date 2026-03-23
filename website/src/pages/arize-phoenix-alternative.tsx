@@ -9,7 +9,7 @@ import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 import MlflowUIImg from "@site/static/img/arize-phoenix-alternative/mlflow-ui.png";
 import PhoenixUIImg from "@site/static/img/arize-phoenix-alternative/arize-phoenix-ui.png";
 import MlflowLogo from "@site/static/img/arize-phoenix-alternative/mlflow-logo.png";
-import PhoenixLogo from "@site/static/img/arize-phoenix-alternative/arize_phoenixe_logo.png";
+import PhoenixLogo from "@site/static/img/arize-phoenix-alternative/arize_phoenix_logo.png";
 
 const SEO_TITLE =
   "Arize Phoenix Alternative for LLMs & Agents | MLflow Agent Platform";
@@ -31,7 +31,7 @@ from openinference.instrumentation.langchain import (
     LangChainInstrumentor,
 )
 
-tracer_provider = register(project_name="support-bot")
+tracer_provider = register(project_name="my-app")
 LangChainInstrumentor().instrument(
     tracer_provider=tracer_provider
 )
@@ -192,17 +192,6 @@ const architectureTable: [string, string, string][] = [
     "Collector + UI + SQLite or PostgreSQL",
   ],
   [
-    "Tracing",
-    "Native tracing + OTLP ingest/export",
-    "OpenTelemetry-native trace collection",
-  ],
-  [
-    "Evaluation",
-    "Built-in LLM judges, custom metrics, multi-turn evaluation",
-    "Basic evaluation (advanced features require paid SaaS)",
-  ],
-  ["AI Gateway", "Built-in gateway for LLM access governance", "Not available"],
-  [
     "Operational Focus",
     "Unified platform for agents, LLMs, and ML models",
     "Trace-centric debugging and iteration loop",
@@ -227,12 +216,12 @@ const capabilityRows: {
   {
     feature: "Online Evaluation",
     mlflow: true,
-    phoenix: "Paid SaaS only",
+    phoenix: "Arize AX (paid SaaS) only",
   },
   {
-    feature: "Integrated Libraries",
-    mlflow: "RAGAS, DeepEval, Phoenix, TruLens, Guardrails AI",
-    phoenix: "RAGAS",
+    feature: "Evaluation Library Integration",
+    mlflow: "RAGAS, DeepEval, TruLens, Guardrails AI",
+    phoenix: "Custom integrations only",
   },
   {
     feature: "License",
@@ -547,24 +536,6 @@ export default function ArizePhoenixAlternative() {
             font-size: 14px;
             margin-bottom: 6px;
           }
-          .quick-nav {
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 12px 0 32px;
-            background: #f9fafb;
-          }
-          .quick-nav p {
-            margin-bottom: 12px !important;
-          }
-          .quick-nav ul {
-            margin: 0 !important;
-            padding-left: 20px !important;
-          }
-          .quick-nav li {
-            margin-bottom: 4px;
-          }
-
           .comparison-table-wrap {
             width: 100%;
             overflow-x: auto;
@@ -727,6 +698,21 @@ export default function ArizePhoenixAlternative() {
             background: #f9fafb;
           }
 
+          .tip-note {
+            background: #f0f9ff;
+            border-left: 4px solid #0194e2;
+            border-radius: 4px;
+            padding: 16px 20px;
+            margin: 24px 0 40px 0;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            color: #1a1a1a;
+            line-height: 1.6;
+          }
+          .tip-note strong {
+            color: #0072b0;
+          }
+
           .related-resources ul {
             list-style-type: none;
             padding-left: 0;
@@ -864,35 +850,7 @@ export default function ArizePhoenixAlternative() {
             we compare Phoenix's tracing-focused approach with MLflow's complete
             AI engineering platform and help you decide which is the right fit.
           </p>
-          <div className="quick-nav">
-            <p>
-              <strong>Quick Navigation</strong>
-            </p>
-            <ul>
-              <li>
-                <a href="#quick-comparison">Quick Comparison</a>
-              </li>
-              <li>
-                <a href="#open-source-licensing">Open Source &amp; Licensing</a>
-              </li>
-              <li>
-                <a href="#tracing-observability">Tracing &amp; Observability</a>
-              </li>
-              <li>
-                <a href="#evaluation-experimentation">
-                  Evaluation &amp; Experimentation
-                </a>
-              </li>
-              <li>
-                <a href="#ai-gateway">AI Gateway</a>
-              </li>
-              <li>
-                <a href="#faq">FAQ</a>
-              </li>
-            </ul>
-          </div>
-
-          <h2>What is Arize Phoenix?</h2>
+          <h2 id="what-is-arize-phoenix">What is Arize Phoenix?</h2>
           <div className="screenshot-wrap">
             <img
               src={PhoenixUIImg}
@@ -910,12 +868,12 @@ export default function ArizePhoenixAlternative() {
             that want OpenTelemetry-native instrumentation and a dedicated
             trace-centric UI for LLM development. Phoenix OSS is primarily
             designed for local development and debugging, while Arize's
-            commercial SaaS offering (Arize AX) targets production-scale
-            deployments with online evaluations, the Alyx Copilot, and
-            enterprise integrations.
+            commercial SaaS offering — Arize AX (the paid, hosted tier built on
+            top of Phoenix) — targets production-scale deployments with online
+            evaluations, the Alyx Copilot, and enterprise integrations.
           </p>
 
-          <h2>What is MLflow?</h2>
+          <h2 id="what-is-mlflow">What is MLflow?</h2>
           <div className="screenshot-wrap">
             <img
               src={MlflowUIImg}
@@ -1099,7 +1057,20 @@ export default function ArizePhoenixAlternative() {
             </tbody>
           </table>
 
+          <h2 id="architecture-operation">Architecture &amp; Operation</h2>
+          <p>
+            Beyond individual features, MLflow and Arize Phoenix differ
+            significantly in deployment model and operational scope.
+          </p>
           <ComparisonTable rows={architectureTable} />
+          <div className="tip-note">
+            <strong>Running at enterprise scale?</strong> Teams on Databricks
+            can use managed MLflow with platform integrations for governance,
+            operational scale, and production monitoring. Trace and model data
+            become queryable in governed data systems and are tied to enterprise
+            access controls — while remaining fully portable with open source
+            MLflow.
+          </div>
 
           <h2 id="ai-gateway">AI Gateway</h2>
           <p>
@@ -1131,21 +1102,7 @@ export default function ArizePhoenixAlternative() {
             policies without changing application code.
           </p>
 
-          <h2 id="databricks-managed-mlflow">Databricks Managed MLflow</h2>
-          <p>
-            Teams running on Databricks can use managed MLflow with platform
-            integrations for governance, operational scale, and production
-            monitoring workflows. This is especially relevant when you want
-            trace and model data to be queryable in governed data systems and
-            tied to enterprise access controls.
-          </p>
-          <p>
-            This managed path often strengthens MLflow's advantage for larger
-            organizations that need unified governance and reliability while
-            preserving API portability with open source MLflow.
-          </p>
-
-          <h2>Summary</h2>
+          <h2 id="summary">Summary</h2>
           <p>
             <strong>Arize Phoenix is a solid observability tool</strong>, but
             tracing is only one piece of the puzzle. Its limited open source
@@ -1192,13 +1149,8 @@ export default function ArizePhoenixAlternative() {
           <div className="related-resources">
             <ul>
               <li>
-                <Link to="https://arize.com/docs/phoenix">
-                  Arize Phoenix Overview
-                </Link>
-              </li>
-              <li>
                 <Link to="https://docs.arize.com/phoenix">
-                  Arize Phoenix Docs
+                  Arize Phoenix Documentation
                 </Link>
               </li>
               <li>
@@ -1236,6 +1188,11 @@ export default function ArizePhoenixAlternative() {
             <li>
               <a href="#evaluation-experimentation">
                 Evaluation &amp; Experimentation
+              </a>
+            </li>
+            <li>
+              <a href="#architecture-operation">
+                Architecture &amp; Operation
               </a>
             </li>
             <li>
