@@ -846,9 +846,10 @@ export default function ArizePhoenixAlternative() {
           </h1>
           <p className="subtitle">
             Arize Phoenix and MLflow are open source platforms that help teams
-            build production-grade AI agents and LLM applications. In this guide,
-            we compare Phoenix's tracing-focused approach with MLflow's complete
-            AI engineering platform and help you decide which is the right fit.
+            build production-grade AI agents and LLM applications. In this
+            guide, we compare Phoenix's tracing-focused approach with MLflow's
+            complete AI engineering platform and help you decide which is the
+            right fit.
           </p>
           <h2 id="what-is-arize-phoenix">What is Arize Phoenix?</h2>
           <div className="screenshot-wrap">
@@ -1013,18 +1014,18 @@ export default function ArizePhoenixAlternative() {
             Evaluation is where the gap between MLflow and Arize Phoenix is most
             pronounced. Phoenix offers trace-driven evaluation loops — inspect
             traces, annotate outputs, build datasets, and run experiments — but
-            high-value features such as online evaluations require the paid Arize AX tier, and the open
-            source evaluation capabilities are less mature at scale.
+            high-value features such as online evaluations require the paid
+            Arize AX tier, and the open source evaluation capabilities are less
+            mature at scale.
           </p>
           <p>
             <strong>MLflow</strong> provides production-grade evaluation backed
             by a dedicated research team. It supports a rich set of built-in
             scorers, integration with leading evaluation libraries (RAGAS,
-            DeepEval, TruLens, Guardrails AI), and advanced
-            capabilities like multi-turn evaluation, online evaluation, and
-            aligning LLM judges with human feedback. If your team needs to move
-            beyond vibe checks to rigorous quality assurance, MLflow is
-            purpose-built for it.
+            DeepEval, TruLens, Guardrails AI), and advanced capabilities like
+            multi-turn evaluation, online evaluation, and aligning LLM judges
+            with human feedback. If your team needs to move beyond vibe checks
+            to rigorous quality assurance, MLflow is purpose-built for it.
           </p>
           <table className="eval-checklist">
             <thead>
@@ -1065,19 +1066,18 @@ export default function ArizePhoenixAlternative() {
           </p>
           <ComparisonTable rows={architectureTable} />
           <p>
-            MLflow keeps tracing, evaluation, and model artifacts in one
-            system. Phoenix covers trace inspection well, but teams typically
-            need additional tools as their scope grows.
+            MLflow keeps tracing, evaluation, and model artifacts in one system.
+            Phoenix covers trace inspection well, but teams typically need
+            additional tools as their scope grows.
           </p>
           <div className="tip-note">
-            <strong>Running on Databricks?</strong> Managed MLflow on
-            Databricks extends the open source platform with Unity Catalog
-            governance for trace and model data, native Databricks Model
-            Serving integration, and always-on production monitoring. Trace
-            data becomes queryable alongside your governed data assets, and
-            enterprise access controls apply automatically. Teams start with
-            open source MLflow and move to managed infrastructure without
-            changing instrumentation code.
+            <strong>Running on Databricks?</strong> Managed MLflow on Databricks
+            extends the open source platform with Unity Catalog governance for
+            trace and model data, native Databricks Model Serving integration,
+            and always-on production monitoring. Trace data becomes queryable
+            alongside your governed data assets, and enterprise access controls
+            apply automatically. Teams start with open source MLflow and move to
+            managed infrastructure without changing instrumentation code.
           </div>
 
           <h2 id="ai-gateway">AI Gateway</h2>
@@ -1199,9 +1199,7 @@ export default function ArizePhoenixAlternative() {
               </a>
             </li>
             <li>
-              <a href="#architecture-operation">
-                Architecture &amp; Operation
-              </a>
+              <a href="#architecture-operation">Architecture &amp; Operation</a>
             </li>
             <li>
               <a href="#ai-gateway">AI Gateway</a>
