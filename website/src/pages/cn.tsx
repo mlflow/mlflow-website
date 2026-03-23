@@ -51,7 +51,7 @@ const llmAgentFeatures: Feature[] = [
     id: "observability",
     title: "可观测性",
     description:
-      "捕获 LLM 应用程序和 Agent 的完整追踪，深入了解其行为。基于 OpenTelemetry 构建，支持任何 LLM 提供商和 Agent 框架。监控生产环境的质量、成本和安全性。",
+      "记录 LLM 应用与 Agent 的端到端调用链，深入洞察其运行行为。基于 OpenTelemetry 构建，兼容任意 LLM 提供商与 Agent 框架，并支持对生产环境中的质量、成本与安全性进行持续监控。",
     imageSrc: TracingTabImg,
     imageZoom: 160,
     quickstartLink: "https://mlflow.org/docs/latest/genai/tracing/quickstart/",
@@ -74,7 +74,7 @@ response = client.chat.completions.create(
     id: "evaluation",
     title: "评估",
     description:
-      "运行系统化评估，跟踪质量指标的变化趋势，在问题到达生产环境之前检测回归。从 50 多个内置指标和 LLM 评判器中选择，或使用灵活的 API 定义自己的评估标准。",
+      "通过系统化评估持续跟踪质量指标变化，在问题进入生产环境前及时发现问题。可从 50+ 内置指标与 LLM 评判器中选择，或通过灵活 API 自定义评估标准。",
     imageSrc: EvaluationTabImg,
     quickstartLink:
       "https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/",
@@ -100,7 +100,7 @@ results = mlflow.genai.evaluate(
     id: "prompt",
     title: "提示词管理与优化",
     description:
-      "通过完整的血缘追踪进行提示词的版本管理、测试和部署。使用最先进的算法自动优化提示词，提升性能表现。",
+      "通过完整的谱系追踪技术，实现提示词的版本管理、测试与部署。利用先进算法自动优化提示词，持续提升性能表现。",
     imageSrc: PromptTabImg,
     imageZoom: 150,
     quickstartLink: "https://mlflow.org/docs/latest/genai/prompt-registry/",
@@ -259,7 +259,7 @@ const categoriesCN: CategoryCN[] = [
   },
 ];
 
-const SEO_TITLE = "MLflow - 开源 AI 平台 | Agent・LLM・模型";
+const SEO_TITLE = "MLflow - 开源 AI 平台 | Agent · LLM · 模型";
 const SEO_DESCRIPTION =
   "MLflow 是面向 AI Agent、LLM 和机器学习模型的最大开源 AI 工程平台。实现 AI 应用的调试、评估、监控和优化。";
 
@@ -367,7 +367,7 @@ const socialsCN = [
     key: "github",
     icon: <GithubIcon />,
     label: "GitHub",
-    description: "20k+ Stars",
+    description: "20K+ Stars",
     href: "https://github.com/mlflow/mlflow",
   },
   {
