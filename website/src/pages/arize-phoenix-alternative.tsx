@@ -1059,17 +1059,25 @@ export default function ArizePhoenixAlternative() {
 
           <h2 id="architecture-operation">Architecture &amp; Operation</h2>
           <p>
-            Beyond individual features, MLflow and Arize Phoenix differ
-            significantly in deployment model and operational scope.
+            MLflow's pluggable backend scales from a local SQLite file to a
+            production cluster without changing code. Phoenix is optimized for
+            local debugging — lightweight to start, but limited at scale.
           </p>
           <ComparisonTable rows={architectureTable} />
+          <p>
+            MLflow keeps tracing, evaluation, and model artifacts in one
+            system. Phoenix covers trace inspection well, but teams typically
+            need additional tools as their scope grows.
+          </p>
           <div className="tip-note">
-            <strong>Running at enterprise scale?</strong> Teams on Databricks
-            can use managed MLflow with platform integrations for governance,
-            operational scale, and production monitoring. Trace and model data
-            become queryable in governed data systems and are tied to enterprise
-            access controls — while remaining fully portable with open source
-            MLflow.
+            <strong>Running on Databricks?</strong> Managed MLflow on
+            Databricks extends the open source platform with Unity Catalog
+            governance for trace and model data, native Databricks Model
+            Serving integration, and always-on production monitoring. Trace
+            data becomes queryable alongside your governed data assets, and
+            enterprise access controls apply automatically. Teams start with
+            open source MLflow and move to managed infrastructure without
+            changing instrumentation code.
           </div>
 
           <h2 id="ai-gateway">AI Gateway</h2>
