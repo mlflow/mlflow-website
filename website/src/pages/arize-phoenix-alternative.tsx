@@ -869,8 +869,8 @@ export default function ArizePhoenixAlternative() {
             that want OpenTelemetry-native instrumentation and a dedicated
             trace-centric UI for LLM development. Phoenix OSS is primarily
             designed for local development and debugging, while Arize's
-            commercial SaaS offering — Arize AX (the paid, hosted tier built on
-            top of Phoenix) — targets production-scale deployments with online
+            commercial SaaS offering called Arize AX (the paid, hosted tier built on
+            top of Phoenix), which targets production-scale deployments with online
             evaluations, the Alyx Copilot, and enterprise integrations.
           </p>
 
@@ -1001,7 +1001,7 @@ export default function ArizePhoenixAlternative() {
             <strong>Phoenix</strong> uses OpenInference/OpenTelemetry
             instrumentation with explicit tracer registration. The open source
             version of Phoenix does not offer online monitoring as part of its
-            observability stack — teams that need production monitoring must
+            observability stack, so teams that need production monitoring must
             upgrade to the{" "}
             <Link to="https://arize.com/docs/phoenix">paid SaaS version</Link>.
           </p>
@@ -1012,8 +1012,8 @@ export default function ArizePhoenixAlternative() {
           </h2>
           <p>
             Evaluation is where the gap between MLflow and Arize Phoenix is most
-            pronounced. Phoenix offers trace-driven evaluation loops — inspect
-            traces, annotate outputs, build datasets, and run experiments — but
+            pronounced. Phoenix offers basic evaluation loops, such as inspecting
+            traces, annotating outputs, building datasets, and running experiments, but
             high-value features such as online evaluations require the paid
             Arize AX tier, and the open source evaluation capabilities are less
             mature at scale.
@@ -1061,8 +1061,9 @@ export default function ArizePhoenixAlternative() {
           <h2 id="architecture-operation">Architecture &amp; Operation</h2>
           <p>
             MLflow's pluggable backend scales from a local SQLite file to a
-            production cluster without changing code. Phoenix is optimized for
-            local debugging — lightweight to start, but limited at scale.
+            production cluster with various database options without changing
+            code. Phoenix is optimized for local debugging and limits you to use
+            PostgreSQL.
           </p>
           <ComparisonTable rows={architectureTable} />
           <p>
