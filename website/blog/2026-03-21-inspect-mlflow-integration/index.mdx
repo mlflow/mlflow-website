@@ -8,7 +8,7 @@ thumbnail: /img/blog/inspect-mlflow-thumbnail.png
 image: /img/blog/inspect-mlflow-thumbnail.png
 ---
 
-AI safety evaluation frameworks like [Inspect AI](https://inspect.aisi.org.uk/) run tasks against language models, score the results, and produce log files. When a sample fails or a model scores differently across versions, debugging means opening JSON and reading through message histories, tool calls, and scoring events by hand. There's no experiment tracking across runs, no visual span tree showing what the model did at each step, and no way to compare two evaluations side by side. Before this package, no MLflow integration existed for Inspect AI.
+AI safety evaluation frameworks like [Inspect AI](https://inspect.aisi.org.uk/) run tasks against language models, score the results, and produce log files. When a sample fails or a model scores differently across versions, debugging means opening JSON and reading through message histories, tool calls, and scoring events by hand. There's no experiment tracking across runs, no visual span tree showing what the model did at each step, and no way to compare two evaluations side by side.
 
 The [`inspect-mlflow`](https://pypi.org/project/inspect-mlflow/) package brings [MLflow tracking and tracing](https://mlflow.org/docs/latest/tracing.html) to Inspect AI, the UK AI Security Institute's open-source evaluation framework (16M+ monthly PyPI downloads). Install the package, set two environment variables, and every evaluation automatically logs hierarchical runs with metrics, execution traces with span-level visibility, and artifacts. No code changes needed. The package auto-registers through Inspect AI's [hooks system](https://inspect.aisi.org.uk/extensions.html#sec-hooks) via Python entry points.
 
@@ -18,7 +18,7 @@ The [`inspect-mlflow`](https://pypi.org/project/inspect-mlflow/) package brings 
 
 The tracking hook creates a parent MLflow run for each evaluation, with a nested child run for each task. Every task run captures the model name, dataset, solver configuration, and generation parameters as MLflow parameters. Per-sample scores log as step metrics so you can see accuracy trends across the dataset. Token usage rolls up per model, and event counts track total model calls and tool invocations.
 
-At the end of each task, the hook writes two artifacts: a per-sample results JSON with inputs, outputs, targets, and scores for every sample, and the full evaluation log (minus raw samples) for archival.
+At the end of each task, the hook writes two artifacts: a per-sample results JSON with inputs, outputs, targets, and scores for every sample, and the full evaluation log (minus raw samples) for archival. The screenshot below shows a task run with 17 logged metrics including accuracy, token usage, and event counts:
 
 <img
   src={require("./screenshot-tracking.png").default}
@@ -26,7 +26,7 @@ At the end of each task, the hook writes two artifacts: a per-sample results JSO
   style={{ width: "100%", margin: "0 auto", display: "block" }}
 />
 
-Eval scores also log as MLflow trace assessments, so they appear directly in the Traces table alongside execution time and status. The "match" column below shows the average score and per-trace count:
+Eval scores also log as MLflow trace assessments, so they appear directly in the Traces table alongside execution time and status. The "match" column below shows the average score (1.0) and per-trace assessment count (3 samples):
 
 <img
   src={require("./screenshot-assessments.png").default}
@@ -46,7 +46,7 @@ eval_run (CHAIN)
       scorers -> match -> score (EVALUATOR)
 ```
 
-Each span type captures different data. LLM spans record the model name, input and output token counts, temperature, cache status, and the response text. Tool spans show the function name, arguments, result, and execution time. Evaluator spans capture the score value and explanation.
+Each span type captures different data. LLM spans record the model name, input and output token counts, temperature, cache status, and the response text. Tool spans show the function name, arguments, result, and execution time. Evaluator spans capture the score value and explanation. The span tree below shows a full evaluation with three samples, each containing solver and scorer spans:
 
 <img
   src={require("./screenshot-tracing.png").default}
@@ -54,7 +54,7 @@ Each span type captures different data. LLM spans record the model name, input a
   style={{ width: "100%", margin: "0 auto", display: "block" }}
 />
 
-Click any span to see its inputs and outputs. Here's an LLM span from a math evaluation showing 23 tokens consumed and the model's response:
+Clicking any span opens its inputs and outputs. The LLM span below shows a model call that consumed 23 tokens and returned "2 + 2 equals 4.":
 
 <img
   src={require("./screenshot-llm-detail.png").default}
