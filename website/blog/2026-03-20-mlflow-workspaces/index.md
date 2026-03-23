@@ -37,8 +37,7 @@ and artifact paths grouped by workspace._
 
 ## What Workspaces Add
 
-- **Centralized organization** for experiments, registered models, prompts, AI Gateway resources,
-  evaluation datasets, and their child resources
+- **Centralized organization** for experiments, models, prompts, traces, datasets, AI Gateway resources, and their child resources
 - **Logical isolation** so teams can share one server without mixing day-to-day work
 - **Flexible access control** through workspace-level permissions that apply across all resources in
   a workspace
