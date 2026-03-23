@@ -12,9 +12,7 @@ function filterFuturePosts(content) {
   const publishedPosts = content.blogPosts.filter(
     (post) => new Date(post.metadata.date) <= now,
   );
-  const publishedPermalinks = new Set(
-    publishedPosts.map((post) => post.metadata.permalink),
-  );
+  const publishedIds = new Set(publishedPosts.map((post) => post.id));
 
   content.blogPosts = publishedPosts;
 
@@ -22,7 +20,7 @@ function filterFuturePosts(content) {
   content.blogListPaginated = content.blogListPaginated
     .map((page) => ({
       ...page,
-      items: page.items.filter((id) => publishedPermalinks.has(id)),
+      items: page.items.filter((id) => publishedIds.has(id)),
     }))
     .filter((page) => page.items.length > 0);
 
@@ -44,11 +42,11 @@ function filterFuturePosts(content) {
 
   // Filter tags
   for (const [key, tag] of Object.entries(content.blogTags)) {
-    tag.items = tag.items.filter((id) => publishedPermalinks.has(id));
+    tag.items = tag.items.filter((id) => publishedIds.has(id));
     tag.pages = tag.pages
       .map((page) => ({
         ...page,
-        items: page.items.filter((id) => publishedPermalinks.has(id)),
+        items: page.items.filter((id) => publishedIds.has(id)),
       }))
       .filter((page) => page.items.length > 0);
 
