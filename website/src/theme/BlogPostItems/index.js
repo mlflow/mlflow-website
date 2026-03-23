@@ -56,6 +56,7 @@ export default function BlogPostItems({
                     )}
                     alt={blogPost.content.metadata.title}
                     className="w-full h-full object-cover object-top"
+                    loading="lazy"
                   />
                 </div>
                 <div role="time" dateTime={blogPost.content.metadata.date}>

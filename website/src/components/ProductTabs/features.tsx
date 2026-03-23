@@ -49,7 +49,14 @@ const llmAgentFeatures: Feature[] = [
           insights
         </Link>{" "}
         into their behavior. Built on OpenTelemetry and supports any LLM
-        provider and agent framework.
+        provider and agent framework.{" "}
+        <Link
+          href="/ai-monitoring"
+          className="text-white/90 hover:text-white underline"
+        >
+          Monitor
+        </Link>{" "}
+        production quality, costs, and safety.
       </>
     ),
     imageSrc: TracingTabImg,
@@ -111,8 +118,25 @@ results = mlflow.genai.evaluate(
   {
     id: "prompt",
     title: "Prompts & Optimization",
-    description:
-      "Version, test, and deploy prompts with full lineage tracking. Automatically optimize prompts with state-of-the-art algorithms to improve performance.",
+    description: (
+      <>
+        Version, test, and deploy{" "}
+        <Link
+          href="/prompt-registry"
+          className="text-white/90 hover:text-white underline"
+        >
+          prompts
+        </Link>{" "}
+        with full lineage tracking. Automatically{" "}
+        <Link
+          href="/prompt-optimization"
+          className="text-white/90 hover:text-white underline"
+        >
+          optimize prompts
+        </Link>{" "}
+        with state-of-the-art algorithms to improve performance.
+      </>
+    ),
     imageSrc: PromptTabImg,
     imageZoom: 150,
     quickstartLink: "https://mlflow.org/docs/latest/genai/prompt-registry/",

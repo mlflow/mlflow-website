@@ -11,6 +11,7 @@ import { Grid } from "../Grid/Grid";
 import { Heading } from "../Typography/Heading";
 import { Body } from "../Typography/Body";
 import { MLFLOW_DOCS_URL } from "@site/src/constants";
+import { useGitHubStars } from "../../hooks/useGitHubStars";
 
 const socials = [
   {
@@ -62,6 +63,7 @@ const socials = [
 ];
 
 export const SocialWidget = () => {
+  const stars = useGitHubStars();
   return (
     <div className="flex flex-col w-full gap-16">
       <div className="flex flex-col w-full gap-6 items-center justify-center text-center">
@@ -76,7 +78,11 @@ export const SocialWidget = () => {
             href={social.href}
             icon={social.icon}
             label={social.label}
-            description={social.description}
+            description={
+              social.key === "github" && stars
+                ? `${stars}+ stars`
+                : social.description
+            }
           />
         ))}
       </Grid>

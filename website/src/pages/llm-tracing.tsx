@@ -3,6 +3,8 @@ import Head from "@docusaurus/Head";
 import Link from "@docusaurus/Link";
 import { Highlight } from "prism-react-renderer";
 import { Header } from "../components/Header/Header";
+import { SocialLinksFooter } from "../components/SocialLinksFooter/SocialLinksFooter";
+import { ArticleSidebar } from "../components/ArticleSidebar/ArticleSidebar";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import TracingHero from "@site/static/img/GenAI_observability/GenAI_observability_hero.png";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
@@ -337,6 +339,56 @@ export default function LLMTracing() {
             line-height: 1.6;
             color: #1e293b;
           }
+          .article-sidebar {
+            position: fixed;
+            top: 100px;
+            left: calc(50% + 900px / 2 + 48px);
+            width: 280px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+          }
+          .article-sidebar .toc-title {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #9ca3af;
+            margin: 0 0 12px 0;
+          }
+          .article-sidebar ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            border-left: 1px solid #e5e7eb;
+          }
+          .article-sidebar li {
+            margin: 0;
+            padding: 0;
+          }
+          .article-sidebar a {
+            font-family: 'DM Sans', sans-serif;
+            display: block;
+            padding: 8px 0 8px 16px;
+            font-size: 16px;
+            color: #0194e2 !important;
+            text-decoration: none !important;
+            transition: all 0.15s ease;
+            line-height: 1.4;
+          }
+          .article-sidebar a:hover {
+            color: #0072b0 !important;
+          }
+          .article-sidebar .toc-divider {
+            border: none;
+            border-top: 1px solid #e5e7eb;
+            margin: 12px 0 12px 0;
+          }
+          @media (max-width: 1400px) {
+            .article-sidebar {
+              display: none;
+            }
+          }
           @media (max-width: 768px) {
             .article-container {
               padding: 40px 20px 80px;
@@ -405,8 +457,7 @@ export default function LLMTracing() {
           <p>
             Unlike traditional logging, LLM tracing captures the full context of
             AI execution in a structured, queryable format. It records{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "prompts/"}>prompts</Link>,
-            model responses,{" "}
+            <Link href="/prompt-registry">prompts</Link>, model responses,{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>tool calls</Link>,
             retrieval results, token usage, and nested spans showing multi-step
             reasoning. This structured telemetry allows teams to search for
@@ -771,8 +822,9 @@ export default function LLMTracing() {
               drift, or data changes—before users notice.
             </li>
             <li>
-              <strong>A/B Testing Prompts:</strong> Before deploying prompt
-              changes to production, use traced data to run{" "}
+              <strong>A/B Testing Prompts:</strong> Before deploying{" "}
+              <Link href="/prompt-registry">prompt</Link> changes to production,
+              use traced data to run{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>
                 side-by-side evaluations
               </Link>
@@ -1040,12 +1092,16 @@ const result = await generateText({
               <Link href="/genai" style={{ color: "#007bff" }}>
                 <strong>MLflow</strong>
               </Link>{" "}
-              is the largest open source AI platform, with over 30 million
-              monthly downloads. Thousands of organizations, developers, and
-              research teams use MLflow each day to build and deploy
-              production-grade agents and LLM applications. Backed by the Linux
-              Foundation and licensed under Apache 2.0, MLflow provides complete
-              LLM tracing with no vendor lock-in.{" "}
+              is the largest open-source{" "}
+              <strong>
+                AI engineering platform for agents, LLMs, and ML models
+              </strong>
+              , with over 30 million monthly downloads. Thousands of
+              organizations use MLflow to debug, evaluate, monitor, and optimize
+              production-quality AI agents and LLM applications while
+              controlling costs and managing access to models and data. Backed
+              by the Linux Foundation and licensed under Apache 2.0, MLflow
+              provides a complete LLM tracing solution with no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>
@@ -1137,6 +1193,9 @@ const result = await generateText({
               <Link href="/llm-evaluation">Agent Evaluation FAQ</Link>
             </li>
             <li>
+              <Link href="/ai-monitoring">AI Monitoring FAQ</Link>
+            </li>
+            <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>
             </li>
             <li>
@@ -1146,6 +1205,9 @@ const result = await generateText({
             </li>
           </ul>
         </div>
+
+        <ArticleSidebar />
+        <SocialLinksFooter />
       </div>
     </>
   );

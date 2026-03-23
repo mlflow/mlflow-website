@@ -3,6 +3,8 @@ import Head from "@docusaurus/Head";
 import Link from "@docusaurus/Link";
 import { Highlight } from "prism-react-renderer";
 import { Header } from "../components/Header/Header";
+import { SocialLinksFooter } from "../components/SocialLinksFooter/SocialLinksFooter";
+import { ArticleSidebar } from "../components/ArticleSidebar/ArticleSidebar";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
@@ -347,6 +349,56 @@ export default function AIGateway() {
             font-size: 16px;
             line-height: 1.6;
             color: #1e293b;
+          }
+          .article-sidebar {
+            position: fixed;
+            top: 100px;
+            left: calc(50% + 900px / 2 + 48px);
+            width: 280px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+          }
+          .article-sidebar .toc-title {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #9ca3af;
+            margin: 0 0 12px 0;
+          }
+          .article-sidebar ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            border-left: 1px solid #e5e7eb;
+          }
+          .article-sidebar li {
+            margin: 0;
+            padding: 0;
+          }
+          .article-sidebar a {
+            font-family: 'DM Sans', sans-serif;
+            display: block;
+            padding: 8px 0 8px 16px;
+            font-size: 16px;
+            color: #0194e2 !important;
+            text-decoration: none !important;
+            transition: all 0.15s ease;
+            line-height: 1.4;
+          }
+          .article-sidebar a:hover {
+            color: #0072b0 !important;
+          }
+          .article-sidebar .toc-divider {
+            border: none;
+            border-top: 1px solid #e5e7eb;
+            margin: 12px 0 12px 0;
+          }
+          @media (max-width: 1400px) {
+            .article-sidebar {
+              display: none;
+            }
           }
           @media (max-width: 768px) {
             .article-container {
@@ -1007,13 +1059,15 @@ response = client.messages.create(
                 <strong>MLflow</strong>
               </Link>{" "}
               is the largest open-source{" "}
-              <strong>AI engineering platform</strong>, with over 30 million
-              monthly downloads. Thousands of organizations use MLflow to debug,
-              evaluate, monitor, and optimize production-quality AI agents and
-              LLM applications while controlling costs and managing access to
-              models and data. Backed by the Linux Foundation and licensed under
-              Apache 2.0, MLflow provides a complete AI Gateway solution with no
-              vendor lock-in.{" "}
+              <strong>
+                AI engineering platform for agents, LLMs, and ML models
+              </strong>
+              , with over 30 million monthly downloads. Thousands of
+              organizations use MLflow to debug, evaluate, monitor, and optimize
+              production-quality AI agents and LLM applications while
+              controlling costs and managing access to models and data. Backed
+              by the Linux Foundation and licensed under Apache 2.0, MLflow
+              provides a complete AI Gateway solution with no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>
@@ -1035,11 +1089,12 @@ response = client.messages.create(
             just the beginning. You still need to trace what happened inside
             your application after the LLM responded, evaluate whether the
             output was actually good, and tie cost and latency data back to
-            specific features, prompts, or model versions. With a standalone
-            gateway, that means integrating a separate observability tool, a
-            separate evaluation framework, and building the glue code to connect
-            them all to the same data. Every new tool in the stack is another
-            thing to deploy, monitor, and keep in sync.
+            specific features, <Link href="/prompt-registry">prompts</Link>, or
+            model versions. With a standalone gateway, that means integrating a
+            separate observability tool, a separate evaluation framework, and
+            building the glue code to connect them all to the same data. Every
+            new tool in the stack is another thing to deploy, monitor, and keep
+            in sync.
           </p>
 
           <p>
@@ -1188,6 +1243,9 @@ response = client.messages.create(
               <Link href="/llm-evaluation">Agent Evaluation FAQ</Link>
             </li>
             <li>
+              <Link href="/ai-monitoring">AI Monitoring FAQ</Link>
+            </li>
+            <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>
             </li>
             <li>
@@ -1197,6 +1255,9 @@ response = client.messages.create(
             </li>
           </ul>
         </div>
+
+        <ArticleSidebar />
+        <SocialLinksFooter />
       </div>
     </>
   );

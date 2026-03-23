@@ -3,13 +3,14 @@ import Head from "@docusaurus/Head";
 import Link from "@docusaurus/Link";
 import { Highlight } from "prism-react-renderer";
 import { Header } from "../components/Header/Header";
+import { SocialLinksFooter } from "../components/SocialLinksFooter/SocialLinksFooter";
+import { ArticleSidebar } from "../components/ArticleSidebar/ArticleSidebar";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import EvaluationHero from "@site/static/img/GenAI_evaluations/GenAI_evaluations_hero.png";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
-const SEO_TITLE =
-  "LLM Evaluation & Agent Evaluation for LLMs & Agents | MLflow AI Platform";
+const SEO_TITLE = "LLM Evaluation and Agent Evaluation | MLflow AI Platform";
 const SEO_DESCRIPTION =
   "Agent evaluation and LLM evaluation systematically assess how well agents and LLM applications perform. Explore evaluation on MLflow's open-source AI platform.";
 
@@ -536,6 +537,56 @@ export default function AgentEvaluation() {
             font-size: 16px;
             line-height: 1.6;
             color: #1e293b;
+          }
+          .article-sidebar {
+            position: fixed;
+            top: 100px;
+            left: calc(50% + 900px / 2 + 48px);
+            width: 280px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+          }
+          .article-sidebar .toc-title {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #9ca3af;
+            margin: 0 0 12px 0;
+          }
+          .article-sidebar ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            border-left: 1px solid #e5e7eb;
+          }
+          .article-sidebar li {
+            margin: 0;
+            padding: 0;
+          }
+          .article-sidebar a {
+            font-family: 'DM Sans', sans-serif;
+            display: block;
+            padding: 8px 0 8px 16px;
+            font-size: 16px;
+            color: #0194e2 !important;
+            text-decoration: none !important;
+            transition: all 0.15s ease;
+            line-height: 1.4;
+          }
+          .article-sidebar a:hover {
+            color: #0072b0 !important;
+          }
+          .article-sidebar .toc-divider {
+            border: none;
+            border-top: 1px solid #e5e7eb;
+            margin: 12px 0 12px 0;
+          }
+          @media (max-width: 1400px) {
+            .article-sidebar {
+              display: none;
+            }
           }
           @media (max-width: 768px) {
             .article-container {
@@ -1230,10 +1281,11 @@ export default function AgentEvaluation() {
 
           <ul>
             <li>
-              <strong>Pre-deployment Testing:</strong> Before releasing new
-              prompts, models, or agent logic, run comprehensive evaluations
-              against benchmark datasets. Compare quality metrics to previous
-              versions to ensure changes improve, not degrade, your application.
+              <strong>Pre-deployment Testing:</strong> Before releasing new{" "}
+              <Link href="/prompt-registry">prompts</Link>, models, or agent
+              logic, run comprehensive evaluations against benchmark datasets.
+              Compare quality metrics to previous versions to ensure changes
+              improve, not degrade, your application.
             </li>
             <li>
               <strong>Continuous Quality Monitoring:</strong> In production,
@@ -1250,13 +1302,16 @@ export default function AgentEvaluation() {
               wrong.
             </li>
             <li>
-              <strong>A/B Testing Prompt Changes:</strong> Before deploying
-              prompt modifications to production, run{" "}
+              <strong>A/B Testing Prompt Changes:</strong> Before deploying{" "}
+              <Link href="/prompt-registry">prompt</Link> modifications to
+              production, run{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
                 side-by-side evaluations
               </Link>{" "}
               with LLM judges. Compare quality metrics to ensure changes improve
-              output quality.
+              output quality, or use{" "}
+              <Link href="/prompt-optimization">prompt optimization</Link> to
+              automate the improvement process entirely.
             </li>
             <li>
               <strong>Building Regression Datasets:</strong> Convert production
@@ -1641,13 +1696,15 @@ results = mlflow.genai.evaluate(
                 <strong>MLflow</strong>
               </Link>{" "}
               is the largest open-source{" "}
-              <strong>AI engineering platform</strong>, with over 30 million
-              monthly downloads. Thousands of organizations use MLflow to debug,
-              evaluate, monitor, and optimize production-quality AI agents and
-              LLM applications while controlling costs and managing access to
-              models and data. Backed by the Linux Foundation and licensed under
-              Apache 2.0, MLflow provides a complete evaluation solution with no
-              vendor lock-in.{" "}
+              <strong>
+                AI engineering platform for agents, LLMs, and ML models
+              </strong>
+              , with over 30 million monthly downloads. Thousands of
+              organizations use MLflow to debug, evaluate, monitor, and optimize
+              production-quality AI agents and LLM applications while
+              controlling costs and managing access to models and data. Backed
+              by the Linux Foundation and licensed under Apache 2.0, MLflow
+              provides a complete evaluation solution with no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>
@@ -1735,16 +1792,25 @@ results = mlflow.genai.evaluate(
               </Link>
             </li>
             <li>
+              <Link href="/prompt-optimization">Prompt Optimization Guide</Link>
+            </li>
+            <li>
               <Link href="/llm-tracing">LLM Tracing FAQ</Link>
             </li>
             <li>
               <Link href="/ai-observability">AI Observability FAQ</Link>
             </li>
             <li>
+              <Link href="/ai-monitoring">AI Monitoring FAQ</Link>
+            </li>
+            <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>
             </li>
           </ul>
         </div>
+
+        <ArticleSidebar />
+        <SocialLinksFooter />
       </div>
     </>
   );

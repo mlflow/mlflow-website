@@ -54,6 +54,7 @@ export const LatestNews = () => {
                   )}
                   alt={post.metadata.title}
                   className="w-full h-full object-cover object-top"
+                  loading="lazy"
                 />
               </div>
             </Link>

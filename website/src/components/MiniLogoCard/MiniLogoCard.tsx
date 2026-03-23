@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import useBaseUrl from "@docusaurus/useBaseUrl";
 import styles from "./styles.module.css";
 import { ExternalLink } from "lucide-react";
 
@@ -11,6 +12,7 @@ const MiniLogoCard = ({
   src: string;
   href: string;
 }) => {
+  const resolvedSrc = useBaseUrl(src);
   return (
     <div className={clsx("card", styles.card)}>
       <a
@@ -25,7 +27,7 @@ const MiniLogoCard = ({
               <div className={styles.logoInner}>
                 <div className={styles.logoFront}>
                   <img
-                    src={src}
+                    src={resolvedSrc}
                     alt={title}
                     className={clsx(
                       styles.img,
