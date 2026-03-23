@@ -64,7 +64,9 @@ async function blogPluginEnhanced(...pluginArgs) {
     contentLoaded: async function (...contentLoadedArgs) {
       const { content } = contentLoadedArgs[0];
 
-      filterFuturePosts(content);
+      if (process.env.FILTER_FUTURE_POSTS) {
+        filterFuturePosts(content);
+      }
 
       fs.writeFileSync(
         ".docusaurus/blog-posts.json",
