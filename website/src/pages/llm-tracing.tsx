@@ -457,8 +457,7 @@ export default function LLMTracing() {
           <p>
             Unlike traditional logging, LLM tracing captures the full context of
             AI execution in a structured, queryable format. It records{" "}
-            <Link href={MLFLOW_GENAI_DOCS_URL + "prompts/"}>prompts</Link>,
-            model responses,{" "}
+            <Link href="/prompt-registry">prompts</Link>, model responses,{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>tool calls</Link>,
             retrieval results, token usage, and nested spans showing multi-step
             reasoning. This structured telemetry allows teams to search for
@@ -823,8 +822,9 @@ export default function LLMTracing() {
               drift, or data changes—before users notice.
             </li>
             <li>
-              <strong>A/B Testing Prompts:</strong> Before deploying prompt
-              changes to production, use traced data to run{" "}
+              <strong>A/B Testing Prompts:</strong> Before deploying{" "}
+              <Link href="/prompt-registry">prompt</Link> changes to production,
+              use traced data to run{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL + "llm-evaluate/"}>
                 side-by-side evaluations
               </Link>
@@ -1093,13 +1093,15 @@ const result = await generateText({
                 <strong>MLflow</strong>
               </Link>{" "}
               is the largest open-source{" "}
-              <strong>AI engineering platform</strong>, with over 30 million
-              monthly downloads. Thousands of organizations use MLflow to debug,
-              evaluate, monitor, and optimize production-quality AI agents and
-              LLM applications while controlling costs and managing access to
-              models and data. Backed by the Linux Foundation and licensed under
-              Apache 2.0, MLflow provides a complete LLM tracing solution with
-              no vendor lock-in.{" "}
+              <strong>
+                AI engineering platform for agents, LLMs, and ML models
+              </strong>
+              , with over 30 million monthly downloads. Thousands of
+              organizations use MLflow to debug, evaluate, monitor, and optimize
+              production-quality AI agents and LLM applications while
+              controlling costs and managing access to models and data. Backed
+              by the Linux Foundation and licensed under Apache 2.0, MLflow
+              provides a complete LLM tracing solution with no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>

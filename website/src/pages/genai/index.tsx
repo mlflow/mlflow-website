@@ -321,7 +321,7 @@ export default function GenAi(): JSX.Element {
                 evaluation
               </HighlightedKeyword>
               ,{" "}
-              <HighlightedKeyword href="/genai/prompt-registry">
+              <HighlightedKeyword href="/prompt-registry">
                 prompt management
               </HighlightedKeyword>
               ,{" "}

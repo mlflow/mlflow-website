@@ -1059,13 +1059,15 @@ response = client.messages.create(
                 <strong>MLflow</strong>
               </Link>{" "}
               is the largest open-source{" "}
-              <strong>AI engineering platform</strong>, with over 30 million
-              monthly downloads. Thousands of organizations use MLflow to debug,
-              evaluate, monitor, and optimize production-quality AI agents and
-              LLM applications while controlling costs and managing access to
-              models and data. Backed by the Linux Foundation and licensed under
-              Apache 2.0, MLflow provides a complete AI Gateway solution with no
-              vendor lock-in.{" "}
+              <strong>
+                AI engineering platform for agents, LLMs, and ML models
+              </strong>
+              , with over 30 million monthly downloads. Thousands of
+              organizations use MLflow to debug, evaluate, monitor, and optimize
+              production-quality AI agents and LLM applications while
+              controlling costs and managing access to models and data. Backed
+              by the Linux Foundation and licensed under Apache 2.0, MLflow
+              provides a complete AI Gateway solution with no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>
@@ -1087,11 +1089,12 @@ response = client.messages.create(
             just the beginning. You still need to trace what happened inside
             your application after the LLM responded, evaluate whether the
             output was actually good, and tie cost and latency data back to
-            specific features, prompts, or model versions. With a standalone
-            gateway, that means integrating a separate observability tool, a
-            separate evaluation framework, and building the glue code to connect
-            them all to the same data. Every new tool in the stack is another
-            thing to deploy, monitor, and keep in sync.
+            specific features, <Link href="/prompt-registry">prompts</Link>, or
+            model versions. With a standalone gateway, that means integrating a
+            separate observability tool, a separate evaluation framework, and
+            building the glue code to connect them all to the same data. Every
+            new tool in the stack is another thing to deploy, monitor, and keep
+            in sync.
           </p>
 
           <p>

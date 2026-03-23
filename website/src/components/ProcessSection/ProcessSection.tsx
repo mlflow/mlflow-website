@@ -65,12 +65,14 @@ export function ProcessSection({
   steps: customSteps,
   title: customTitle,
   getStartedLink,
+  getStartedLabel = "Get Started →",
 }: {
   subtitle?: string;
   colorTheme?: "default" | "red";
   steps?: Step[];
   title?: string;
   getStartedLink?: string;
+  getStartedLabel?: string;
 } = {}) {
   const steps = customSteps ?? defaultSteps;
   return (
@@ -91,7 +93,7 @@ export function ProcessSection({
             style={{ textDecoration: "underline" }}
             className="hover:opacity-80"
           >
-            Get Started →
+            {getStartedLabel}
           </Link>
         </div>
       }
