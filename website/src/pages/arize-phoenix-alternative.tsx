@@ -1056,7 +1056,7 @@ export default function ArizePhoenixAlternative() {
             Evaluation is where the gap between MLflow and Arize Phoenix is most
             pronounced. Phoenix offers trace-driven evaluation loops — inspect
             traces, annotate outputs, build datasets, and run experiments — but
-            online evaluations require the paid Arize AX tier, and the open
+            high-value features such as online evaluations require the paid Arize AX tier, and the open
             source evaluation capabilities are less mature at scale.
           </p>
           <p>
