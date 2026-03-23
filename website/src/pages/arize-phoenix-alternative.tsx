@@ -869,9 +869,10 @@ export default function ArizePhoenixAlternative() {
             that want OpenTelemetry-native instrumentation and a dedicated
             trace-centric UI for LLM development. Phoenix OSS is primarily
             designed for local development and debugging, while Arize's
-            commercial SaaS offering called Arize AX (the paid, hosted tier built on
-            top of Phoenix), which targets production-scale deployments with online
-            evaluations, the Alyx Copilot, and enterprise integrations.
+            commercial SaaS offering called Arize AX (the paid, hosted tier
+            built on top of Phoenix), which targets production-scale deployments
+            with online evaluations, the Alyx Copilot, and enterprise
+            integrations.
           </p>
 
           <h2 id="what-is-mlflow">What is MLflow?</h2>
@@ -1012,11 +1013,11 @@ export default function ArizePhoenixAlternative() {
           </h2>
           <p>
             Evaluation is where the gap between MLflow and Arize Phoenix is most
-            pronounced. Phoenix offers basic evaluation loops, such as inspecting
-            traces, annotating outputs, building datasets, and running experiments, but
-            high-value features such as online evaluations require the paid
-            Arize AX tier, and the open source evaluation capabilities are less
-            mature at scale.
+            pronounced. Phoenix offers basic evaluation loops, such as
+            inspecting traces, annotating outputs, building datasets, and
+            running experiments, but high-value features such as online
+            evaluations require the paid Arize AX tier, and the open source
+            evaluation capabilities are less mature at scale.
           </p>
           <p>
             <strong>MLflow</strong> provides production-grade evaluation backed
