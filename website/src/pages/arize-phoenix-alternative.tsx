@@ -1063,7 +1063,7 @@ export default function ArizePhoenixAlternative() {
             <strong>MLflow</strong> provides production-grade evaluation backed
             by a dedicated research team. It supports a rich set of built-in
             scorers, integration with leading evaluation libraries (RAGAS,
-            DeepEval, Phoenix, TruLens, Guardrails AI), and advanced
+            DeepEval, TruLens, Guardrails AI), and advanced
             capabilities like multi-turn evaluation, online evaluation, and
             aligning LLM judges with human feedback. If your team needs to move
             beyond vibe checks to rigorous quality assurance, MLflow is
