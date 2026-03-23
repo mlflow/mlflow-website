@@ -860,8 +860,7 @@ export default function ArizePhoenixAlternative() {
           </h1>
           <p className="subtitle">
             Arize Phoenix and MLflow are open source platforms that help teams
-            build production-grade AI agents and LLM applications. Teams also
-            need evaluation, prompt management, and governance. In this guide,
+            build production-grade AI agents and LLM applications. In this guide,
             we compare Phoenix's tracing-focused approach with MLflow's complete
             AI engineering platform and help you decide which is the right fit.
           </p>
