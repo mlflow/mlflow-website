@@ -1,6 +1,6 @@
 ---
 title: "MLflow Workspaces: Shared Deployment Without Separate Servers"
-description: MLflow workspaces add a logical organization and permission layer so multiple teams can share one deployment while keeping experiments, models, prompts, AI Gateway resources, and artifacts scoped by workspace.
+description: MLflow workspaces add a logical organization and permission layer so multiple teams can share one deployment while keeping experiments, models, traces, prompts, AI Gateway resources, and artifacts scoped by workspace.
 slug: mlflow-workspaces
 authors: [matt-prahl]
 tags: [mlflow, workspaces, self-hosting, mlops, governance]
