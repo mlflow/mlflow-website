@@ -5,13 +5,14 @@ slug: openclaw-tracing
 authors: [yuki-watanabe]
 tags: [genai, tracing, agents, openclaw, observability]
 thumbnail: img/blog/mlflow-openclaw-thumbnail.png
+image: img/blog/mlflow-openclaw-thumbnail.png
 ---
+
+import { BlogImage } from "@site/src/components/BlogImage/BlogImage";
 
 [OpenClaw](https://openclaw.ai/) is an open-source personal AI agent that runs on your own machine. You talk to it through WhatsApp, Telegram, Discord, Slack, or any of 20+ messaging channels, and it acts on your behalf: triaging emails, managing tasks across Notion and Things 3, searching the web, reading and writing local files, and orchestrating whatever custom skills you've built. With 68,000+ GitHub stars and over 5,400 community-built skills on ClawHub, it has quickly become one of the most popular ways to run a local-first AI assistant.
 
 The challenge is that OpenClaw's power comes from autonomy. It decides which tools to call, in what order, and whether to spawn sub-agents for sub-tasks. That makes it capable, but also opaque. When the agent handles a request well, you don't know why. When it handles one poorly, you don't know where it went wrong. You just see the final message in your chat.
-
-{/_ truncate _/}
 
 This post shows how to add [MLflow Tracing](https://mlflow.org/docs/latest/genai/tracing/) to OpenClaw so that every agent run becomes a fully inspectable execution timeline. We'll walk through setup, explain what traces capture, and use a concrete example to show how tracing turns vague suspicions into actionable debugging information.
 
@@ -21,7 +22,7 @@ You might think tracing is only for production systems with SLAs and uptime requ
 
 Consider a few scenarios that are hard to debug without traces. You ask your OpenClaw agent to summarize this week's AI news and draft a brief. The summary is shallow and misses the biggest story. Was the web search tool returning poor results? Did the model ignore relevant results during summarization? Did it hit the context window limit and silently drop content? You ask it to reschedule a meeting based on your calendar, and it picks the wrong time slot. Did the calendar tool return stale data? Did the model misinterpret the constraint you gave it? You won't know from the chat reply alone.
 
-Tracing captures the full execution path of every agent run: each LLM call with its prompt and response, each tool invocation with its parameters and result, each sub-agent spawn and its own nested steps, along with token counts and timing for everything. That record transforms debugging from guesswork into direct inspection. You open the trace, find the step where things diverged from what you expected, and now you know exactly what to fix, whether that's a skill definition, a tool configuration, or the way you phrased the request.
+[Tracing](/ai-observability) captures the full execution path of every agent run: each LLM call with its prompt and response, each tool invocation with its parameters and result, each sub-agent spawn and its own nested steps, along with token counts and timing for everything. That record transforms debugging from guesswork into direct inspection. You open the trace, find the step where things diverged from what you expected, and now you know exactly what to fix, whether that's a skill definition, a tool configuration, or the way you phrased the request.
 
 Beyond debugging individual runs, traces become the foundation for systematically improving your agent. When you can see how the agent handled a task, you can give it targeted feedback, refine the skills it uses, and verify that your changes actually worked. Tracing is what makes that feedback loop possible.
 
@@ -61,10 +62,9 @@ That's it. Start OpenClaw as usual and use it normally. Once the integration is 
 
 Open `http://localhost:5000` in your browser and you'll see traces appear as your OpenClaw agent runs.
 
-<img
-src={require("./openclaw-trace.png").default}
-alt="Screenshot of MLflow dashboard showing OpenClaw traces"
-width="100%"
+<BlogImage
+  src={require("./openclaw-trace.png").default}
+  alt="Screenshot of MLflow dashboard showing OpenClaw traces"
 />
 
 ## What a Trace Looks Like
@@ -83,10 +83,9 @@ Every span carries metadata including timestamps, duration, and usage statistics
 
 Once traces start flowing into MLflow, the operational dashboard gives you a bird's-eye view of how your agent is performing. You can see error rates across runs, which tools are being called most frequently, and how token consumption trends over time. If your agent starts failing more often after you update a skill, or if token usage spikes because a new tool is triggering longer reasoning chains, the dashboard surfaces it before you notice it in chat. Think of it as the health check for your personal agent: a single page that tells you whether things are running smoothly or whether something needs attention.
 
-<img
-src={require("./openclaw-dashboard.png").default}
-alt="Screenshot of MLflow dashboard showing OpenClaw traces"
-width="100%"
+<BlogImage
+  src={require("./openclaw-dashboard.png").default}
+  alt="Screenshot of MLflow operational dashboard showing error rates, tool usage, and token consumption"
 />
 
 ## From Observations to Improvements
