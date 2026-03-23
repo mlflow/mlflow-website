@@ -13,6 +13,7 @@ import { Button } from "../Button/Button";
 import { HeaderMenuItem } from "../HeaderMenuItem/HeaderMenuItem";
 import { HeaderProductsSubmenu } from "../HeaderProductsSubmenu/HeaderProductsSubmenu";
 import { HeaderDocsSubmenu } from "../HeaderDocsSubmenu/HeaderDocsSubmenu";
+import { HeaderResourcesSubmenu } from "../HeaderResourcesSubmenu/HeaderResourcesSubmenu";
 
 const GitHubStarsBadge = () => {
   const stars = useGitHubStars();
@@ -59,6 +60,8 @@ export const Header = () => {
   const [isProductSubmenuOpen, setIsProductSubmenuOpen] = useState(false);
   const [isDocsItemHovered, setIsDocsItemHovered] = useState(false);
   const [isDocsSubmenuOpen, setIsDocsSubmenuOpen] = useState(false);
+  const [isResourcesItemHovered, setIsResourcesItemHovered] = useState(false);
+  const [isResourcesSubmenuOpen, setIsResourcesSubmenuOpen] = useState(false);
   const location = useLocation();
   const classicalMLPath = useBaseUrl("/classical-ml");
   const genAIPath = useBaseUrl("/genai");
@@ -72,6 +75,7 @@ export const Header = () => {
   const handleProductItemHover = () => {
     setIsProductItemHovered(true);
     setIsDocsItemHovered(false);
+    setIsResourcesItemHovered(false);
   };
 
   const handleProductSubmenuLeave = () => {
@@ -85,15 +89,16 @@ export const Header = () => {
   const handleProductItemClick = () => {
     const newState = !isProductSubmenuOpen;
     setIsProductSubmenuOpen(newState);
-    // Accordion behavior: close Docs when Components opens
     if (newState) {
       setIsDocsSubmenuOpen(false);
+      setIsResourcesSubmenuOpen(false);
     }
   };
 
   const handleDocsItemHover = () => {
     setIsDocsItemHovered(true);
     setIsProductItemHovered(false);
+    setIsResourcesItemHovered(false);
   };
 
   const handleDocsSubmenuLeave = () => {
@@ -107,9 +112,32 @@ export const Header = () => {
   const handleDocsItemClick = () => {
     const newState = !isDocsSubmenuOpen;
     setIsDocsSubmenuOpen(newState);
-    // Accordion behavior: close Components when Docs opens
     if (newState) {
       setIsProductSubmenuOpen(false);
+      setIsResourcesSubmenuOpen(false);
+    }
+  };
+
+  const handleResourcesItemHover = () => {
+    setIsResourcesItemHovered(true);
+    setIsProductItemHovered(false);
+    setIsDocsItemHovered(false);
+  };
+
+  const handleResourcesSubmenuLeave = () => {
+    setIsResourcesItemHovered(false);
+  };
+
+  const toggleResourcesSubmenuHovered = () => {
+    setIsResourcesItemHovered(!isResourcesItemHovered);
+  };
+
+  const handleResourcesItemClick = () => {
+    const newState = !isResourcesSubmenuOpen;
+    setIsResourcesSubmenuOpen(newState);
+    if (newState) {
+      setIsProductSubmenuOpen(false);
+      setIsDocsSubmenuOpen(false);
     }
   };
 
@@ -128,9 +156,9 @@ export const Header = () => {
       document.body.classList.add("noScroll");
     } else {
       document.body.classList.remove("noScroll");
-      // Reset submenus when menu closes
       setIsProductSubmenuOpen(false);
       setIsDocsSubmenuOpen(false);
+      setIsResourcesSubmenuOpen(false);
     }
   }, [isOpen]);
 
@@ -225,9 +253,6 @@ export const Header = () => {
             <li className="w-full md:w-auto">
               <HeaderMenuItem href="/blog" label="Blog" />
             </li>
-            <li className="w-full md:w-auto">
-              <HeaderMenuItem href="/cookbook" label="Cookbook" />
-            </li>
             <li className="w-full md:w-auto md:hidden">
               <button
                 type="button"
@@ -263,8 +288,40 @@ export const Header = () => {
             >
               <HeaderMenuItem label="Docs" hasDropdown />
             </li>
-            <li className="w-full md:w-auto">
-              <HeaderMenuItem href="/ambassadors" label="Ambassador Program" />
+            <li className="w-full md:w-auto md:hidden">
+              <button
+                type="button"
+                onClick={handleResourcesItemClick}
+                aria-expanded={isResourcesSubmenuOpen}
+                aria-controls="mobile-resources-submenu"
+                className="flex items-center justify-between gap-2 py-2 text-white text-lg w-full cursor-pointer transition-colors duration-200 hover:text-white/60"
+              >
+                Resources
+                <DownIcon
+                  className={cn(
+                    "w-6 h-6 transition-transform duration-300",
+                    isResourcesSubmenuOpen && "rotate-180",
+                  )}
+                />
+              </button>
+              <div
+                id="mobile-resources-submenu"
+                className={cn(
+                  "transition-all duration-300 ease-in-out overflow-hidden",
+                  isResourcesSubmenuOpen
+                    ? "max-h-[300px] opacity-100"
+                    : "max-h-0 opacity-0",
+                )}
+              >
+                <HeaderResourcesSubmenu />
+              </div>
+            </li>
+            <li
+              className="w-full md:w-auto hidden md:block"
+              onMouseEnter={handleResourcesItemHover}
+              onClick={toggleResourcesSubmenuHovered}
+            >
+              <HeaderMenuItem label="Resources" hasDropdown />
             </li>
             <li className="w-full md:w-auto md:hidden">
               <Link href={getStartedHref}>
@@ -295,6 +352,16 @@ export const Header = () => {
         onMouseLeave={handleDocsSubmenuLeave}
       >
         <HeaderDocsSubmenu />
+      </div>
+
+      <div
+        className={cn(
+          "flex-col w-full py-6",
+          isResourcesItemHovered ? "flex" : "hidden",
+        )}
+        onMouseLeave={handleResourcesSubmenuLeave}
+      >
+        <HeaderResourcesSubmenu />
       </div>
     </nav>
   );
