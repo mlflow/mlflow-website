@@ -15,9 +15,12 @@ function CookbookSidebar({ sidebar }) {
   return (
     <aside className="cookbook-sidebar hidden md:block sticky top-20 self-start w-64 shrink-0 overflow-y-auto max-h-[calc(100vh-6rem)] hidden-scrollbar">
       <nav>
-        <div className="text-sm font-semibold text-white/50 uppercase tracking-wider mb-4 px-3">
+        <Link
+          href="/cookbook"
+          className="block text-sm font-semibold !text-white/50 uppercase tracking-wider mb-4 px-3 hover:!text-white transition-colors"
+        >
           {sidebar.title}
-        </div>
+        </Link>
         <ul className="flex flex-col gap-0.5">
           {sidebar.items.map((item) => {
             const isActive = location.pathname === item.permalink;

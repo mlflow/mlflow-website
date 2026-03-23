@@ -20,8 +20,8 @@ export const HeaderResourcesSubmenu = () => {
         <Link to="/cookbook">
           <h3 className={linkTitle()}>Cookbook</h3>
           <p className={linkSubtitle()}>
-            Hands-on guides and code examples for building GenAI applications
-            with MLflow.
+            Hands-on guides and code examples for building
+            Agents and LLM applications with MLflow.
           </p>
         </Link>
       </div>
