@@ -10,7 +10,7 @@ image: /img/blog/inspect-mlflow-thumbnail.png
 
 AI safety evaluation frameworks like [Inspect AI](https://inspect.aisi.org.uk/) run tasks against language models, score the results, and produce log files. When a sample fails or a model scores differently across versions, debugging means opening JSON and reading through message histories, tool calls, and scoring events by hand. There's no experiment tracking across runs, no visual span tree showing what the model did at each step, and no way to compare two evaluations side by side.
 
-The [`inspect-mlflow`](https://pypi.org/project/inspect-mlflow/) package brings [MLflow tracking and tracing](https://mlflow.org/docs/latest/tracing.html) to Inspect AI, the UK AI Security Institute's open-source evaluation framework (16M+ monthly PyPI downloads). Install the package, set two environment variables, and every evaluation automatically logs hierarchical runs with metrics, execution traces with span-level visibility, and artifacts. No code changes needed. The package auto-registers through Inspect AI's [hooks system](https://inspect.aisi.org.uk/extensions.html#sec-hooks) via Python entry points.
+The [`inspect-mlflow`](https://pypi.org/project/inspect-mlflow/) package brings [MLflow tracking and tracing](https://mlflow.org/docs/latest/tracing.html) to Inspect AI, the UK AI Security Institute's open-source evaluation framework (16M+ monthly PyPI downloads). Install the package, set two environment variables, and every evaluation automatically logs hierarchical runs with metrics, execution traces with span-level visibility, and artifacts. No code changes needed. Hooks auto-register via Python entry points.
 
 {/* truncate */}
 
@@ -18,7 +18,7 @@ The [`inspect-mlflow`](https://pypi.org/project/inspect-mlflow/) package brings 
 
 The tracking hook creates a parent MLflow run for each evaluation, with a nested child run for each task. Every task run captures the model name, dataset, solver configuration, and generation parameters as MLflow parameters. Per-sample scores log as step metrics so you can see accuracy trends across the dataset. Token usage rolls up per model, and event counts track total model calls and tool invocations.
 
-At the end of each task, the hook writes structured artifact tables under `inspect/` (tasks, samples, messages, sample scores, events, model usage) plus per-sample results and the full evaluation log. When LLM provider SDKs are installed, the package also enables MLflow autolog for providers like OpenAI, Anthropic, LangChain, and LiteLLM, capturing provider-level telemetry alongside Inspect AI's own tracing. The screenshot below shows a task run with 17 logged metrics including accuracy, token usage, and event counts:
+At the end of each task, the hook writes structured artifact tables under `inspect/` (tasks, samples, messages, sample scores, events, model usage) plus per-sample results and the full evaluation log. The package also supports MLflow autolog for OpenAI, Anthropic, LangChain, LiteLLM, and five other providers. The screenshot below shows a task run with 17 logged metrics including accuracy, token usage, and event counts:
 
 <img
   src={require("./screenshot-tracking.png").default}
@@ -26,7 +26,7 @@ At the end of each task, the hook writes structured artifact tables under `inspe
   style={{ width: "100%", margin: "0 auto", display: "block" }}
 />
 
-Eval scores also log as MLflow trace assessments, so they appear directly in the Traces table alongside execution time and status. The "match" column below shows the average score (1.0) and per-trace assessment count (3 samples):
+Eval scores also log as MLflow trace assessments via `mlflow.log_feedback()`, so they appear directly in the Traces table alongside execution time and status. This makes it possible to sort and filter traces by evaluation outcome. The "match" column below shows the average score (1.0) and per-trace assessment count (3 samples):
 
 <img
   src={require("./screenshot-assessments.png").default}
@@ -62,7 +62,7 @@ Clicking any span opens its inputs and outputs. The LLM span below shows a model
   style={{ width: "100%", margin: "0 auto", display: "block" }}
 />
 
-The tracing hook handles tool-using agents the same way. Define a tool, add it to your solver, and each tool invocation appears as a TOOL span with the function name, arguments, and returned result:
+The tracing hook handles tool-using agents the same way. Define a tool, add it to your solver, and each tool invocation appears as a TOOL span with the function name, arguments, and returned result. The code below is a standard Inspect AI evaluation. With `MLFLOW_TRACKING_URI` and `MLFLOW_INSPECT_TRACING` set, all runs and traces log to MLflow automatically:
 
 ```python
 from inspect_ai import Task, eval
@@ -126,11 +126,11 @@ for r in result.regressions:
     print(f"Sample {r.id}: {r.baseline_score} -> {r.candidate_score}")
 ```
 
-The comparison auto-selects McNemar's test for binary scores or bootstrap confidence intervals for continuous scores, and reports Cohen's d effect size. Sample filtering and regression thresholds let you focus on meaningful differences. All statistics are implemented with NumPy (no scipy dependency).
+The comparison auto-selects McNemar's test for binary scores or bootstrap confidence intervals for continuous scores, and reports Cohen's d effect size. Sample filtering and regression thresholds let you focus on meaningful differences.
 
 ## How It Works
 
-The diagram below shows the data flow. Inspect AI fires lifecycle hooks during evaluation. The tracking and tracing hooks capture those events and write them to MLflow. The Scout import is a separate manual step where users pull MLflow traces into Scout's transcript database for safety analysis.
+The diagram below shows the core data flow for tracking and tracing. Inspect AI fires lifecycle hooks during evaluation. The tracking and tracing hooks capture those events and write them to MLflow. The comparison module and Scout import operate on the resulting logs and traces after evaluation completes.
 
 <img
   src={require("./architecture-diagram.png").default}
@@ -158,9 +158,7 @@ See the [package documentation](https://inspect-mlflow.readthedocs.io) for confi
 - [inspect-mlflow on GitHub](https://github.com/debu-sinha/inspect-mlflow)
 - [inspect-mlflow on PyPI](https://pypi.org/project/inspect-mlflow/)
 - [inspect-mlflow documentation](https://inspect-mlflow.readthedocs.io)
-- [Inspect AI Extensions](https://inspect.aisi.org.uk/extensions.html)
-- [Inspect AI Hooks Documentation](https://inspect.aisi.org.uk/extensions.html#sec-hooks)
-- [Scout MLflow Import Guide](https://meridianlabs-ai.github.io/inspect_scout/db_importing.html#mlflow)
+- [Inspect AI Extensions page](https://inspect.aisi.org.uk/extensions.html)
 - [MLflow Tracing Documentation](https://mlflow.org/docs/latest/tracing.html)
 
 ## Provenance
@@ -169,7 +167,7 @@ I (Debu Sinha) built the `inspect-mlflow` package, which provides MLflow trackin
 
 After the initial hooks landed, Allaire [suggested standalone package distribution](https://github.com/UKGovernmentBEIS/inspect_ai/issues/3547) to simplify installation. The package is published on PyPI as [`inspect-mlflow`](https://pypi.org/project/inspect-mlflow/), and the underlying hooks are referenced as examples on the [Inspect AI Extensions page](https://inspect.aisi.org.uk/extensions.html). Allaire also added an [MLflow import section](https://meridianlabs-ai.github.io/inspect_scout/db_importing.html#mlflow) to the Inspect Scout documentation.
 
-Farnaz Kohankhaki from the [Vector Institute](https://vectorinstitute.ai/) and [National Research Council of Canada](https://nrc.canada.ca/) contributed LLM provider autolog support (9 providers with dependency gating) and structured artifact tables, consolidating features from the Vector Institute's related extension into this package. The package now has 100+ tests and 11 releases on PyPI.
+Farnaz Kohankhaki from the [Vector Institute](https://vectorinstitute.ai/) and [National Research Council of Canada](https://nrc.canada.ca/) contributed LLM provider autolog support and structured artifact tables on behalf of the [Canadian AI Safety Institute (CAISI)](https://www.aisafetyinstitute.ca/).
 
 This integration connects two ecosystems with a combined 47M+ monthly PyPI downloads (MLflow: 31M, Inspect AI: 16M). The package follows the entry-point auto-registration pattern used by [inspect-wandb](https://github.com/DanielPolatajko/inspect_wandb) and other Inspect AI extensions.
 
