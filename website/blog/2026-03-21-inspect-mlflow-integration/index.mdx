@@ -18,7 +18,7 @@ The [`inspect-mlflow`](https://pypi.org/project/inspect-mlflow/) package brings 
 
 The tracking hook creates a parent MLflow run for each evaluation, with a nested child run for each task. Every task run captures the model name, dataset, solver configuration, and generation parameters as MLflow parameters. Per-sample scores log as step metrics so you can see accuracy trends across the dataset. Token usage rolls up per model, and event counts track total model calls and tool invocations.
 
-At the end of each task, the hook writes structured artifact tables under `inspect/` (tasks, samples, messages, sample scores, events, model usage) plus per-sample results and the full evaluation log. The package also supports MLflow autolog for OpenAI, Anthropic, LangChain, LiteLLM, and five other providers. The screenshot below shows a task run with 17 logged metrics including accuracy, token usage, and event counts:
+At the end of each task, the hook writes structured artifact tables under `inspect/` plus per-sample results and the full evaluation log. The package also supports MLflow autolog for OpenAI, Anthropic, LangChain, LiteLLM, and five other providers. The screenshot below shows a task run with 17 logged metrics including accuracy, token usage, and event counts:
 
 <img
   src={require("./screenshot-tracking.png").default}
@@ -26,7 +26,7 @@ At the end of each task, the hook writes structured artifact tables under `inspe
   style={{ width: "100%", margin: "0 auto", display: "block" }}
 />
 
-Eval scores also log as MLflow trace assessments via `mlflow.log_feedback()`, so they appear directly in the Traces table alongside execution time and status. This makes it possible to sort and filter traces by evaluation outcome. The "match" column below shows the average score (1.0) and per-trace assessment count (3 samples):
+Eval scores also log as MLflow trace assessments, so they appear directly in the Traces table alongside execution time and status. This makes it possible to sort and filter traces by evaluation outcome. The "match" column below shows the average score (1.0) and per-trace assessment count (3 samples):
 
 <img
   src={require("./screenshot-assessments.png").default}
@@ -138,7 +138,7 @@ The diagram below shows the core data flow for tracking and tracing. Inspect AI 
   style={{ width: "100%", margin: "0 auto", display: "block" }}
 />
 
-The package registers both hooks via Python entry points. When Inspect AI starts, it discovers and activates them automatically. The tracking hook creates nested MLflow runs. The tracing hook creates a span tree with parent-child relationships that mirror the evaluation hierarchy.
+The package registers both hooks via Python entry points. When Inspect AI starts, it discovers and activates them automatically.
 
 ## Getting Started
 
@@ -163,11 +163,11 @@ See the [package documentation](https://inspect-mlflow.readthedocs.io) for confi
 
 ## Provenance
 
-I (Debu Sinha) built the `inspect-mlflow` package, which provides MLflow tracking, tracing, and evaluation comparison for Inspect AI evaluations. The integration was developed across four pull requests to the Inspect AI repository ([#3433](https://github.com/UKGovernmentBEIS/inspect_ai/pull/3433), [#3483](https://github.com/UKGovernmentBEIS/inspect_ai/pull/3483), [#3492](https://github.com/UKGovernmentBEIS/inspect_ai/pull/3492), [#3548](https://github.com/UKGovernmentBEIS/inspect_ai/pull/3548)), all reviewed and merged by JJ Allaire (creator of [RStudio](https://en.wikipedia.org/wiki/RStudio), lead developer of Inspect AI at the [UK AI Security Institute](https://www.aisi.gov.uk/)). The hooks build on the extensibility system Allaire designed for Inspect AI and on MLflow's `start_span_no_context()` tracing API.
+I (Debu Sinha) built the `inspect-mlflow` package, which provides MLflow tracking, tracing, and evaluation comparison for Inspect AI evaluations. The integration was developed across four pull requests to the Inspect AI repository ([#3433](https://github.com/UKGovernmentBEIS/inspect_ai/pull/3433), [#3483](https://github.com/UKGovernmentBEIS/inspect_ai/pull/3483), [#3492](https://github.com/UKGovernmentBEIS/inspect_ai/pull/3492), [#3548](https://github.com/UKGovernmentBEIS/inspect_ai/pull/3548)), all reviewed and merged by JJ Allaire (creator of [RStudio](https://en.wikipedia.org/wiki/RStudio), lead developer of Inspect AI at the [UK AI Security Institute](https://www.aisi.gov.uk/)). The hooks build on the extensibility system Allaire designed for Inspect AI and on MLflow's tracing API.
 
 After the initial hooks landed, Allaire [suggested standalone package distribution](https://github.com/UKGovernmentBEIS/inspect_ai/issues/3547) to simplify installation. The package is published on PyPI as [`inspect-mlflow`](https://pypi.org/project/inspect-mlflow/), and the underlying hooks are referenced as examples on the [Inspect AI Extensions page](https://inspect.aisi.org.uk/extensions.html). Allaire also added an [MLflow import section](https://meridianlabs-ai.github.io/inspect_scout/db_importing.html#mlflow) to the Inspect Scout documentation.
 
-Farnaz Kohankhaki from the [Vector Institute](https://vectorinstitute.ai/) and [National Research Council of Canada](https://nrc.canada.ca/) contributed LLM provider autolog support and structured artifact tables on behalf of the [Canadian AI Safety Institute (CAISI)](https://www.aisafetyinstitute.ca/).
+Farnaz Kohankhaki from the [Vector Institute](https://vectorinstitute.ai/) and [National Research Council of Canada](https://nrc.canada.ca/) contributed LLM provider autolog support and structured artifact tables.
 
 This integration connects two ecosystems with a combined 47M+ monthly PyPI downloads (MLflow: 31M, Inspect AI: 16M). The package follows the entry-point auto-registration pattern used by [inspect-wandb](https://github.com/DanielPolatajko/inspect_wandb) and other Inspect AI extensions.
 
@@ -176,6 +176,7 @@ Related artifacts:
 - [inspect-mlflow on PyPI](https://pypi.org/project/inspect-mlflow/) (published)
 - [PR #3433: MLflow tracking hook](https://github.com/UKGovernmentBEIS/inspect_ai/pull/3433) (merged)
 - [PR #3483: Artifact logging](https://github.com/UKGovernmentBEIS/inspect_ai/pull/3483) (merged)
+- [PR #3492: Documentation](https://github.com/UKGovernmentBEIS/inspect_ai/pull/3492) (merged)
 - [PR #3548: MLflow tracing hook](https://github.com/UKGovernmentBEIS/inspect_ai/pull/3548) (merged)
 - [Issue #3547: Package proposal with JJ Allaire's response](https://github.com/UKGovernmentBEIS/inspect_ai/issues/3547)
 - [Inspect AI Extensions page](https://inspect.aisi.org.uk/extensions.html) (hooks referenced as examples)
