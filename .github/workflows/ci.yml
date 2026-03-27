@@ -5,16 +5,27 @@ on:
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
+    runs-on:
+      group: AzureLimited
+      labels: AzureLimitedRunner
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 20
+      - name: Print private IP
+        run: curl -sI https://google.com | head -5
+      - name: Print private IP
+        run: hostname -I
+      - working-directory: website
+        run: npm install is-odd
       - working-directory: website
         run: npm ci
       - working-directory: website
-        run: npm run lint
+        run: npm run check-thumbnails
+      - working-directory: website
+        run: npm run check-authors
       - working-directory: website
         run: |
           npm run fmt
