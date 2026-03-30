@@ -30,6 +30,12 @@ Beyond debugging individual runs, traces become the foundation for systematicall
 
 One reason MLflow is a natural fit here is that it shares the same local-first philosophy as OpenClaw. MLflow is 100% open source, governed by the Linux Foundation, and fully self-hosted. When you run an MLflow server on your machine, all the trace data from your OpenClaw agent stays on your infrastructure and never leaves it. No telemetry gets sent to a third party, no vendor has access to your prompts or tool outputs. For a personal agent that handles your emails, calendar, and files, that matters.
 
+## Governing LLM Access with AI Gateway
+
+OpenClaw decides on its own when to call an LLM and which tools to invoke. That autonomy is the point, but it also means the agent can make a lot of API calls without you in the loop. If you have API keys in environment variables or scattered across config files, they're exposed to every process on your machine. And if a skill triggers a retry loop or spawns sub-agents that each make their own model calls, costs can add up fast with no single place to catch it.
+
+[MLflow AI Gateway](https://mlflow.org/docs/latest/genai/governance/ai-gateway/) sits between OpenClaw and your LLM providers to solve both problems. You store your API keys once in the gateway, encrypted and never exposed to client code. The gateway also gives you a single place to set a global budget limit across all providers, so a runaway loop can't silently rack up costs regardless of which model it's calling. For an autonomous agent that decides on its own when and how often to call LLMs, that kind of guardrail is worth having.
+
 ## Setting Up MLflow Tracing with OpenClaw
 
 Getting started takes just three steps. First, install the OpenClaw MLflow plugin:
