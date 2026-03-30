@@ -23,7 +23,7 @@ const tracingExamples: { label: string; mlflow: string; langsmith: string }[] =
 
 mlflow.langgraph.autolog()
 
-# That's it — every node, edge, and tool call
+# That's it. Every node, edge, and tool call
 # is traced automatically.`,
       langsmith: `import os
 
@@ -40,7 +40,7 @@ os.environ["LANGCHAIN_API_KEY"] = "<your-api-key>"
 
 mlflow.openai.autolog()
 
-# That's it — all OpenAI calls are
+# That's it. All OpenAI calls are
 # traced automatically.`,
       langsmith: `from langsmith.wrappers import wrap_openai
 import openai
@@ -59,7 +59,7 @@ response = client.chat.completions.create(
 
 mlflow.dspy.autolog()
 
-# That's it — every DSPy module call
+# That's it. Every DSPy module call
 # is traced automatically.`,
       langsmith: `# DSPy is not natively supported.
 # Requires manual instrumentation with
@@ -123,7 +123,7 @@ const evalFeatures: {
   { feature: "Prompt Optimization", mlflow: true, langsmith: false },
   {
     feature: "Integrated Libraries",
-    mlflow: "RAGAS, TruLens, Phoenix",
+    mlflow: "RAGAS, TruLens, Phoenix, Guardrails, and more",
     langsmith: "RAGAS, DeepEval",
   },
 ];
@@ -236,7 +236,7 @@ export default function LangSmithAlternative() {
         </title>
         <meta
           name="description"
-          content="Compare MLflow and LangSmith for LLM observability, tracing, evaluation, and agent lifecycle management. Learn why teams choose MLflow for enterprise governance, framework-neutral tracing, and automated prompt optimization."
+          content="Compare MLflow and LangSmith for LLM observability, tracing, evaluation, and agent lifecycle management. Learn why teams choose MLflow for framework-neutral tracing, production-grade evaluation, and automated prompt optimization."
         />
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
@@ -637,15 +637,15 @@ export default function LangSmithAlternative() {
           <p className="subtitle">
             LangSmith and MLflow both help teams build and monitor production AI
             agents. LangSmith is LangChain&apos;s commercial observability
-            platform with native LangGraph integration. MLflow is an open source
-            AI engineering platform that provides enterprise governance,
-            end-to-end agent lifecycle management, and automated prompt
-            optimization. In this article, we compare both platforms and help
-            you decide which is the right fit.
+            platform focused on LangChain/LangGraph integration. MLflow is an
+            open source AI engineering platform that provides the complete AI
+            platform, including observability, quality evaluation, prompt
+            management and optimization. In this article, we compare both
+            platforms and help you decide which is the right fit.
           </p>
 
           {/* What is LangSmith? */}
-          <h2 id="what-is-langsmith">What is LangSmith?</h2>
+          <h2>What is LangSmith?</h2>
           <div className="screenshot-wrap">
             <img
               src={LangSmithTracingUI}
@@ -658,20 +658,16 @@ export default function LangSmithAlternative() {
             </strong>{" "}
             is a commercial platform by LangChain Inc. for building, monitoring,
             and evaluating LLM applications. It is built by the same team as
-            LangChain and LangGraph, offering deep native integration with those
+            LangChain and LangGraph, offering tight integration with those
             frameworks. Key capabilities include tracing and observability,
-            evaluation with managed LLM judges, prompt engineering via LangChain
-            Hub, agent deployment, built-in production alerting (webhooks and
-            PagerDuty), and visual development tools including LangSmith Studio
-            for no-code agent building. LangSmith also offers conversation clustering that
-            automatically surfaces usage patterns from production traffic. It
-            provides SDKs for Python, TypeScript, Go, and Java, and is available
-            as a cloud-hosted SaaS with self-hosting available only on the
-            Enterprise plan.
+            managed LLM judges, prompt engineering via LangChain Hub, and visual
+            development tools including LangSmith Studio for no-code agent
+            building. It is available as a cloud-hosted SaaS with self-hosting
+            available only on the Enterprise plan.
           </p>
 
           {/* What is MLflow? */}
-          <h2 id="what-is-mlflow">What is MLflow?</h2>
+          <h2>What is MLflow?</h2>
           <div className="screenshot-wrap">
             <img
               src={MlflowTracingUI}
@@ -686,11 +682,11 @@ export default function LangSmithAlternative() {
             models that enables teams of all sizes to debug, evaluate, monitor,
             and optimize production-quality AI applications while controlling
             costs and managing access to models and data. MLflow provides
-            one-line integration with 60+ frameworks, enterprise-grade
-            governance through Unity Catalog, and research-backed automated
-            prompt optimization. With over 30 million monthly downloads and
-            adoption by 60%+ of the Fortune 500, thousands of organizations rely
-            on MLflow each day to ship AI to production with confidence.
+            one-line integration with 60+ frameworks and research-backed
+            automated prompt optimization. With over 30 million monthly
+            downloads and adoption by 60%+ of the Fortune 500, thousands of
+            organizations rely on MLflow each day to ship AI to production with
+            confidence.
           </p>
 
           {/* TL;DR */}
@@ -703,21 +699,17 @@ export default function LangSmithAlternative() {
               </h3>
               <ul>
                 <li>
-                  Need <strong>enterprise-grade governance</strong> with traces
-                  and AI assets co-located in Unity Catalog
-                </li>
-                <li>
-                  Want an <strong>end-to-end agent lifecycle</strong> &mdash;
-                  tracing, evaluation, prompt optimization, and AI Gateway in
-                  one governed platform
-                </li>
-                <li>
-                  Need <strong>framework-neutral</strong> observability with
-                  60+ integrations, not locked to one ecosystem
-                </li>
-                <li>
                   Care about <strong>open source</strong> (Apache 2.0, Linux
                   Foundation) with near-zero trace costs
+                </li>
+                <li>
+                  Need <strong>framework-neutral</strong> observability with 60+
+                  integrations, not locked to one ecosystem
+                </li>
+                <li>
+                  Want a <strong>complete AI platform</strong> with tracing,
+                  evaluation, prompt optimization, and AI Gateway in one
+                  platform
                 </li>
               </ul>
             </div>
@@ -733,15 +725,11 @@ export default function LangSmithAlternative() {
               <ul>
                 <li>
                   Are building primarily on <strong>LangChain/LangGraph</strong>{" "}
-                  and want native, deeply-tested integration
+                  and want deep integration to their ecosystem
                 </li>
                 <li>
                   Want a <strong>visual no-code builder</strong> (Studio) for
                   rapid experimentation and POCs
-                </li>
-                <li>
-                  Need <strong>built-in alerting</strong> with webhooks and
-                  PagerDuty native integration
                 </li>
                 <li>
                   Want <strong>conversation clustering</strong> to automatically
@@ -752,23 +740,20 @@ export default function LangSmithAlternative() {
           </div>
 
           {/* Open Source & Governance */}
-          <h2 id="open-source-governance">
-            Open Source, Governance &amp; Cost
-          </h2>
+          <h2 id="open-source-cost">Open Source &amp; Pricing</h2>
           <p>
             <strong>LangSmith</strong> is a{" "}
             <strong>closed-source proprietary product</strong> by LangChain Inc.
-            While LangChain (the framework) is open source under MIT, the
-            LangSmith platform &mdash; its UI, backend, and hosted
-            infrastructure &mdash; is closed-source and requires a paid
-            subscription for production use. Critical enterprise features
-            including SSO, RBAC, audit logs, and self-hosting are{" "}
-            <strong>gated behind the Enterprise tier</strong>. Traces are stored
-            in LangSmith&apos;s own infrastructure, separate from your broader
-            data stack, making large-scale analytics or joining with other
-            business data more cumbersome. LangSmith&apos;s per-trace pricing
-            can scale from $2K to over $200K/year with seat-based licensing on
-            top.
+            While LangChain (the agent authoring framework) is open source under
+            MIT, the LangSmith platform (its UI, backend, and hosted infrastructure) is
+            closed-source and requires a paid subscription for production use.
+            Critical enterprise features including SSO, RBAC, audit logs, and
+            self-hosting are <strong>gated behind the Enterprise tier</strong>.
+            Traces are stored in LangSmith&apos;s own infrastructure, separate
+            from your broader data stack, making large-scale analytics or
+            joining with other business data more cumbersome. LangSmith&apos;s
+            per-trace pricing can scale from $2K to over $200K/year with
+            seat-based licensing on top.
           </p>
           <p>
             <strong>MLflow</strong> is a fully open source project{" "}
@@ -779,13 +764,11 @@ export default function LangSmithAlternative() {
               </Link>
             </strong>
             , licensed under Apache 2.0 with full feature parity between its
-            open source release and managed offerings. Prompts, traces, and
-            monitoring live in the <strong>same governed data space</strong> as
-            your other assets, with Unity Catalog applying consistent controls
-            out of the box. MLflow has <strong>near-zero trace costs</strong>{" "}
-            &mdash; no per-trace fees, no per-seat fees, and no feature gating.
-            With adoption by 60%+ of the Fortune 500, MLflow is one of the most
-            widely deployed AI platforms in the enterprise.
+            open source release and managed offerings. MLflow has{" "}
+            <strong>near-zero trace costs</strong> with no per-trace fees, no
+            per-seat fees, and no feature gating. With adoption by 60%+ of the
+            Fortune 500, MLflow is one of the most widely deployed AI platforms
+            in the enterprise.
           </p>
 
           {/* Self-Hosting & Architecture */}
@@ -797,8 +780,8 @@ export default function LangSmithAlternative() {
             Self-hosting and BYOC (bring-your-own-cloud) options{" "}
             <strong>require an Enterprise contract</strong> plus Kubernetes
             infrastructure. There is no self-hosting option for Developer or
-            Plus tier users &mdash; teams on these tiers must send all trace
-            data to LangChain&apos;s cloud.
+            Plus tier users, so teams on these tiers must send all trace data to
+            LangChain&apos;s cloud.
           </p>
           <p>
             <strong>MLflow</strong> is designed for{" "}
@@ -823,9 +806,9 @@ export default function LangSmithAlternative() {
           </p>
           <p>
             <strong>LangSmith</strong>&apos;s tracing works{" "}
-            <strong>seamlessly within the LangChain ecosystem</strong> &mdash;
-            set an environment variable and all LangChain/LangGraph calls are
-            traced automatically. For non-LangChain code, it requires the{" "}
+            <strong>seamlessly within the LangChain ecosystem</strong>: set an
+            environment variable and all LangChain/LangGraph calls are traced
+            automatically. For non-LangChain code, it requires the{" "}
             <code>@traceable</code> decorator or wrapper functions like{" "}
             <code>wrap_openai</code>. LangSmith supports Python, TypeScript, Go,
             and Java SDKs, but trace data is only accessible via the LangSmith
@@ -836,9 +819,10 @@ export default function LangSmithAlternative() {
             <strong>one-line integration with 60+ frameworks</strong> (OpenAI,
             Anthropic, LangChain, LlamaIndex, DSPy, Pydantic AI, Vercel AI SDK,
             and more) via a unified <code>autolog()</code> API across Python,
-            TypeScript, Java, and R. Traces are stored in Unity Catalog &mdash;{" "}
+            TypeScript, Java, and R. Traces are stored alongside your other AI
+            assets,{" "}
             <strong>
-              queryable via dashboards, Genie, or custom SQL analytics
+              queryable via built-in dashboards and custom analytics
             </strong>
             , making MLflow powerful for agent analytics at scale.
           </p>
@@ -848,20 +832,23 @@ export default function LangSmithAlternative() {
           <h2 id="evaluation">Evaluation</h2>
           <p>
             Both platforms offer evaluation capabilities, but they differ
-            significantly in depth and automation.
+            significantly in depth, automation, and ecosystem flexibility.
           </p>
           <p>
             <strong>LangSmith</strong> provides managed LLM judges, custom code
             evaluators, and dataset management with support for RAGAS and
-            DeepEval. However, it lacks{" "}
+            DeepEval. However,{" "}
+            <strong>
+              evaluation is tightly coupled to the LangChain ecosystem
+            </strong>
+            , which is one of the most common reasons teams look for
+            alternatives. It also lacks{" "}
             <strong>
               judge alignment with human feedback, multi-turn conversation
               evaluation, conversation simulation
             </strong>
-            , and <strong>automated prompt optimization</strong> &mdash;
-            capabilities that are essential for teams shipping AI agents to
-            production. Evaluation is also tightly coupled to the LangChain
-            ecosystem.
+            , and <strong>automated prompt optimization</strong>, capabilities
+            that are essential for teams shipping AI agents to production.
           </p>
           <div className="screenshot-wrap">
             <img
@@ -934,7 +921,7 @@ export default function LangSmithAlternative() {
             Playground allows interactive testing against live models, and
             LangSmith Studio provides a{" "}
             <strong>visual, no-code interface</strong> for building and testing
-            agents &mdash; a genuine strength for teams focused on rapid
+            agents, a genuine strength for teams focused on rapid
             experimentation and POCs.
           </p>
           <p>
@@ -946,7 +933,7 @@ export default function LangSmithAlternative() {
                 automated prompt optimization
               </a>
             </strong>{" "}
-            &mdash; native, research-backed algorithms (GEPA, memAlign) that
+            using native, research-backed algorithms (GEPA, memAlign) that
             automatically improve prompts using evaluation feedback, for both
             individual prompts and end-to-end agents. No manual iteration
             required.{" "}
@@ -1029,7 +1016,7 @@ result = mlflow.genai.optimize_prompts(
               management
             </strong>
             . Tracing, evaluation, and gateway are integrated with Model
-            Serving, Vector Search, Databricks Apps, and more &mdash; forming a
+            Serving, Vector Search, Databricks Apps, and more, forming a
             complete end-to-end platform rather than requiring teams to stitch
             together disparate tools.
           </p>
@@ -1041,18 +1028,17 @@ result = mlflow.genai.optimize_prompts(
           </div>
 
           {/* Summary */}
-          <h2 id="summary">Summary</h2>
+          <h2>Summary</h2>
           <p>
             <strong>
               LangSmith is a capable observability and evaluation platform
             </strong>{" "}
             with genuine strengths in native LangChain/LangGraph integration,
-            visual agent building with Studio, built-in production alerting,
-            and conversation clustering for
-            production insights. However, it is a closed-source proprietary
-            product, tightly coupled to the LangChain ecosystem, stores traces
-            in a silo separate from your broader data stack, and lacks automated
-            prompt optimization and an AI Gateway.{" "}
+            visual agent building with Studio, built-in production alerting, and
+            conversation clustering for production insights. However, it is a
+            closed-source proprietary product, tightly coupled to the LangChain
+            ecosystem, stores traces in a silo separate from your broader data
+            stack, and lacks automated prompt optimization and an AI Gateway.{" "}
             <strong>Choose LangSmith</strong> if you are building primarily on
             LangGraph and want native integration with a managed SaaS for rapid
             experimentation.
@@ -1064,12 +1050,11 @@ result = mlflow.genai.optimize_prompts(
             </strong>{" "}
             It provides framework-neutral tracing for 60+ integrations,
             production-grade evaluation with judge alignment and multi-turn
-            support, automated prompt optimization, an AI Gateway for LLM
-            governance, and enterprise-grade data governance through Unity
-            Catalog &mdash; all open source under the Linux Foundation.{" "}
-            <strong>Choose MLflow</strong> if you need a governed,
-            vendor-neutral platform that covers the full agent lifecycle from
-            development through production monitoring and optimization.
+            support, automated prompt optimization, and an AI Gateway for LLM
+            access management, all open source under the Linux Foundation.{" "}
+            <strong>Choose MLflow</strong> if you need a vendor-neutral platform
+            that covers the full agent lifecycle from development through
+            production monitoring and optimization.
           </p>
 
           {/* Related Resources */}
@@ -1093,9 +1078,6 @@ result = mlflow.genai.optimize_prompts(
                 <Link to={`${MLFLOW_GENAI_DOCS_URL}tracing/quickstart/`}>
                   MLflow Tracing Quickstart
                 </Link>
-              </li>
-              <li>
-                <Link to="/langfuse-alternative">MLflow vs Langfuse</Link>
               </li>
               <li>
                 <Link to="/llmops">LLMOps Guide</Link>
