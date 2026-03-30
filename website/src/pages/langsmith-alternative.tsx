@@ -745,15 +745,16 @@ export default function LangSmithAlternative() {
             <strong>LangSmith</strong> is a{" "}
             <strong>closed-source proprietary product</strong> by LangChain Inc.
             While LangChain (the agent authoring framework) is open source under
-            MIT, the LangSmith platform (its UI, backend, and hosted infrastructure) is
-            closed-source and requires a paid subscription for production use.
-            Critical enterprise features including SSO, RBAC, audit logs, and
-            self-hosting are <strong>gated behind the Enterprise tier</strong>.
-            Traces are stored in LangSmith&apos;s own infrastructure, separate
-            from your broader data stack, making large-scale analytics or
-            joining with other business data more cumbersome. LangSmith&apos;s
-            per-trace pricing can scale from $2K to over $200K/year with
-            seat-based licensing on top.
+            MIT, the LangSmith platform (its UI, backend, and hosted
+            infrastructure) is closed-source and requires a paid subscription
+            for production use. Critical enterprise features including SSO,
+            RBAC, audit logs, and self-hosting are{" "}
+            <strong>gated behind the Enterprise tier</strong>. Traces are stored
+            in LangSmith&apos;s own infrastructure, separate from your broader
+            data stack, making large-scale analytics or joining with other
+            business data more cumbersome. LangSmith&apos;s per-trace pricing
+            can scale from $2K to over $200K/year with seat-based licensing on
+            top.
           </p>
           <p>
             <strong>MLflow</strong> is a fully open source project{" "}
