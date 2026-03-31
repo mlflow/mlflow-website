@@ -7,6 +7,65 @@ import BlogPostItem from "@theme/BlogPostItem";
 import TOC from "@theme/TOC";
 import CookbookLayout from "@site/src/theme/CookbookLayout";
 import Link from "@docusaurus/Link";
+import { Grid } from "../../components";
+import { SocialWidgetItem } from "../../components/SocialWidgetItem/SocialWidgetItem";
+import { useGitHubStars } from "../../hooks/useGitHubStars";
+import { MLFLOW_DOCS_URL } from "@site/src/constants";
+import GithubIcon from "@site/static/img/social/github.svg";
+import YoutubeIcon from "@site/static/img/social/youtube.svg";
+import BookIcon from "@site/static/img/social/book.svg";
+import LinkedinIcon from "@site/static/img/social/linkedin.svg";
+import XIcon from "@site/static/img/social/x.svg";
+import SlackIcon from "@site/static/img/social/slack.svg";
+
+const socials = [
+  {
+    key: "docs",
+    icon: (
+      <div>
+        <BookIcon />
+      </div>
+    ),
+    label: "Documentation",
+    description: "Read Docs",
+    href: MLFLOW_DOCS_URL,
+  },
+  {
+    key: "github",
+    icon: <GithubIcon />,
+    label: "GitHub",
+    description: "20k stars",
+    href: "https://github.com/mlflow/mlflow",
+  },
+  {
+    key: "linkedin",
+    icon: <LinkedinIcon />,
+    label: "LinkedIn",
+    description: "69k followers",
+    href: "https://www.linkedin.com/company/mlflow-org",
+  },
+  {
+    key: "youtube",
+    icon: <YoutubeIcon />,
+    label: "YouTube",
+    description: "View tutorials",
+    href: "https://www.youtube.com/@mlflowoss",
+  },
+  {
+    key: "x",
+    icon: <XIcon />,
+    label: "X",
+    description: "Follow us on X",
+    href: "https://x.com/mlflow",
+  },
+  {
+    key: "slack",
+    icon: <SlackIcon />,
+    label: "Slack",
+    description: "Join our Slack",
+    href: "https://go.mlflow.org/slack",
+  },
+];
 
 // Ordered sequences for grouped cookbooks. Pages within a group
 // navigate through the group instead of using chronological order.
@@ -132,6 +191,29 @@ function resolveNav(permalink, sidebar) {
   return { prev, next };
 }
 
+function SocialTiles() {
+  const stars = useGitHubStars();
+  return (
+    <div className="mt-16">
+      <Grid>
+        {socials.map((social) => (
+          <SocialWidgetItem
+            key={social.key}
+            href={social.href}
+            icon={social.icon}
+            label={social.label}
+            description={
+              social.key === "github" && stars
+                ? `${stars}+ stars`
+                : social.description
+            }
+          />
+        ))}
+      </Grid>
+    </div>
+  );
+}
+
 function CookbookPostContent({
   sidebar,
   children,
@@ -147,7 +229,12 @@ function CookbookPostContent({
     !hideTableOfContents && toc.length > 0 ? <TOC toc={toc} /> : undefined;
 
   return (
-    <CookbookLayout sidebar={sidebar} toc={tocElement} {...layoutProps}>
+    <CookbookLayout
+      sidebar={sidebar}
+      toc={tocElement}
+      footer={<SocialTiles />}
+      {...layoutProps}
+    >
       <BlogPostItem className="max-w-none">
         <CookbookTags tags={metadata.tags} />
         <BlogPostContent />

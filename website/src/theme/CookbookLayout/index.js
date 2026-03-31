@@ -98,7 +98,7 @@ function CookbookSidebar({ sidebar }) {
 }
 
 export default function CookbookLayout(props) {
-  const { sidebar, toc, children, ...layoutProps } = props;
+  const { sidebar, toc, footer, children, ...layoutProps } = props;
 
   return (
     <ThemeLayout {...layoutProps}>
@@ -119,6 +119,7 @@ export default function CookbookLayout(props) {
               </div>
             )}
           </div>
+          {footer}
         </div>
       </Layout>
     </ThemeLayout>
