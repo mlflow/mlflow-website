@@ -15,9 +15,7 @@ const COOKBOOK_GROUPS = {
 };
 
 // Build a set of all child permalinks for quick lookup.
-const CHILD_PERMALINKS = new Set(
-  Object.values(COOKBOOK_GROUPS).flat(),
-);
+const CHILD_PERMALINKS = new Set(Object.values(COOKBOOK_GROUPS).flat());
 
 function SidebarLink({ item, isActive, indent }) {
   return (
@@ -56,12 +54,8 @@ function CookbookSidebar({ sidebar }) {
   const topLevel = sidebar.items.filter(
     (item) => !CHILD_PERMALINKS.has(item.permalink),
   );
-  const ungrouped = topLevel.filter(
-    (item) => !COOKBOOK_GROUPS[item.permalink],
-  );
-  const grouped = topLevel.filter(
-    (item) => !!COOKBOOK_GROUPS[item.permalink],
-  );
+  const ungrouped = topLevel.filter((item) => !COOKBOOK_GROUPS[item.permalink]);
+  const grouped = topLevel.filter((item) => !!COOKBOOK_GROUPS[item.permalink]);
   const orderedItems = [...ungrouped, ...grouped];
 
   return (
@@ -75,33 +69,28 @@ function CookbookSidebar({ sidebar }) {
         </Link>
         <ul className="flex flex-col gap-0.5">
           {orderedItems.map((item) => {
-              const isActive = location.pathname === item.permalink;
-              const children = COOKBOOK_GROUPS[item.permalink];
-              return (
-                <React.Fragment key={item.permalink}>
-                  <SidebarLink
-                    item={item}
-                    isActive={isActive}
-                    indent={false}
-                  />
-                  {children &&
-                    children.map((childPermalink) => {
-                      const child = itemsByPermalink[childPermalink];
-                      if (!child) return null;
-                      const childActive =
-                        location.pathname === child.permalink;
-                      return (
-                        <SidebarLink
-                          key={child.permalink}
-                          item={child}
-                          isActive={childActive}
-                          indent={true}
-                        />
-                      );
-                    })}
-                </React.Fragment>
-              );
-            })}
+            const isActive = location.pathname === item.permalink;
+            const children = COOKBOOK_GROUPS[item.permalink];
+            return (
+              <React.Fragment key={item.permalink}>
+                <SidebarLink item={item} isActive={isActive} indent={false} />
+                {children &&
+                  children.map((childPermalink) => {
+                    const child = itemsByPermalink[childPermalink];
+                    if (!child) return null;
+                    const childActive = location.pathname === child.permalink;
+                    return (
+                      <SidebarLink
+                        key={child.permalink}
+                        item={child}
+                        isActive={childActive}
+                        indent={true}
+                      />
+                    );
+                  })}
+              </React.Fragment>
+            );
+          })}
         </ul>
       </nav>
     </aside>
@@ -124,7 +113,11 @@ export default function CookbookLayout(props) {
             >
               {children}
             </main>
-            {toc && <div className="col col--2">{toc}</div>}
+            {toc && (
+              <div className="hidden lg:block sticky top-20 self-start w-56 shrink-0 overflow-y-auto max-h-[calc(100vh-6rem)] hidden-scrollbar">
+                {toc}
+              </div>
+            )}
           </div>
         </div>
       </Layout>

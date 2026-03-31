@@ -1,6 +1,10 @@
 import React from "react";
-import { BlogPostProvider } from "@docusaurus/plugin-content-blog/client";
+import {
+  BlogPostProvider,
+  useBlogPost,
+} from "@docusaurus/plugin-content-blog/client";
 import BlogPostItem from "@theme/BlogPostItem";
+import TOC from "@theme/TOC";
 import CookbookLayout from "@site/src/theme/CookbookLayout";
 import Link from "@docusaurus/Link";
 
@@ -128,23 +132,43 @@ function resolveNav(permalink, sidebar) {
   return { prev, next };
 }
 
+function CookbookPostContent({
+  sidebar,
+  children,
+  BlogPostContent,
+  layoutProps,
+}) {
+  const { metadata, toc } = useBlogPost();
+  const { prev, next } = resolveNav(metadata.permalink, sidebar);
+  const { hide_table_of_contents: hideTableOfContents } =
+    metadata.frontMatter || {};
+
+  const tocElement =
+    !hideTableOfContents && toc.length > 0 ? <TOC toc={toc} /> : undefined;
+
+  return (
+    <CookbookLayout sidebar={sidebar} toc={tocElement} {...layoutProps}>
+      <BlogPostItem className="max-w-none">
+        <CookbookTags tags={metadata.tags} />
+        <BlogPostContent />
+        <CookbookPaginator prevItem={prev} nextItem={next} />
+      </BlogPostItem>
+    </CookbookLayout>
+  );
+}
+
 export default function CookbookPost({
   content: BlogPostContent,
   sidebar,
   ...layoutProps
 }) {
-  const { metadata } = BlogPostContent;
-  const { prev, next } = resolveNav(metadata.permalink, sidebar);
-
   return (
-    <CookbookLayout sidebar={sidebar} {...layoutProps}>
-      <BlogPostProvider content={BlogPostContent}>
-        <BlogPostItem className="max-w-none">
-          <CookbookTags tags={metadata.tags} />
-          <BlogPostContent />
-          <CookbookPaginator prevItem={prev} nextItem={next} />
-        </BlogPostItem>
-      </BlogPostProvider>
-    </CookbookLayout>
+    <BlogPostProvider content={BlogPostContent} isBlogPostPage>
+      <CookbookPostContent
+        sidebar={sidebar}
+        BlogPostContent={BlogPostContent}
+        layoutProps={layoutProps}
+      />
+    </BlogPostProvider>
   );
 }

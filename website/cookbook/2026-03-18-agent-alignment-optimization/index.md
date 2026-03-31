@@ -495,16 +495,16 @@ The optimized prompt more than doubles the pass rate on questions the optimizer 
 
 ## API Reference
 
-| Stage | MLflow API | What It Does |
-|-------|-----------|--------------|
-| Prompt versioning | [`register_prompt`](https://mlflow.org/docs/latest/python_api/mlflow.genai.html#mlflow.genai.register_prompt), [`set_prompt_alias`](https://mlflow.org/docs/latest/python_api/mlflow.genai.html#mlflow.genai.set_prompt_alias) | Version and alias system prompts |
-| Custom judge | [`make_judge`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/) | Domain-specific pass/fail evaluation |
-| Evaluation | [`mlflow.genai.evaluate`](https://mlflow.org/docs/latest/python_api/mlflow.genai.html#mlflow.genai.evaluate) | Score agent with judge |
-| Expert feedback | [`mlflow.log_feedback`](https://mlflow.org/docs/latest/genai/assessments/feedback/) | Attach human scores to traces |
-| Judge alignment | [`MemAlignOptimizer`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/judge-alignment/), [`judge.align()`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/judge-alignment/) | Calibrate judge to expert preferences |
-| Prompt optimization | [`optimize_prompts`](https://mlflow.org/docs/latest/genai/prompt-registry/optimize-prompts.html), [`GepaPromptOptimizer`](https://mlflow.org/docs/latest/genai/prompt-registry/optimize-prompts.html) | Search for better system prompts |
+| Stage               | MLflow API                                                                                                                                                                                                                     | What It Does                          |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------- |
+| Prompt versioning   | [`register_prompt`](https://mlflow.org/docs/latest/python_api/mlflow.genai.html#mlflow.genai.register_prompt), [`set_prompt_alias`](https://mlflow.org/docs/latest/python_api/mlflow.genai.html#mlflow.genai.set_prompt_alias) | Version and alias system prompts      |
+| Custom judge        | [`make_judge`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/)                                                                                                                             | Domain-specific pass/fail evaluation  |
+| Evaluation          | [`mlflow.genai.evaluate`](https://mlflow.org/docs/latest/python_api/mlflow.genai.html#mlflow.genai.evaluate)                                                                                                                   | Score agent with judge                |
+| Expert feedback     | [`mlflow.log_feedback`](https://mlflow.org/docs/latest/genai/assessments/feedback/)                                                                                                                                            | Attach human scores to traces         |
+| Judge alignment     | [`MemAlignOptimizer`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/judge-alignment/), [`judge.align()`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/judge-alignment/)           | Calibrate judge to expert preferences |
+| Prompt optimization | [`optimize_prompts`](https://mlflow.org/docs/latest/genai/prompt-registry/optimize-prompts.html), [`GepaPromptOptimizer`](https://mlflow.org/docs/latest/genai/prompt-registry/optimize-prompts.html)                          | Search for better system prompts      |
 
 ## Next Steps
 
-- [Evaluation Quickstart](/cookbook/evaluation-quickstart) for more on MLflow evaluation
-- [Prompt Engineering](/cookbook/prompt-engineering) for more on prompt versioning and aliases
+- [MLflow Evaluation docs](https://mlflow.org/docs/latest/llms/llm-evaluate/index.html) for more on MLflow evaluation
+- [Prompt Registry docs](https://mlflow.org/docs/latest/genai/prompt-registry/index.html) for more on prompt versioning and aliases

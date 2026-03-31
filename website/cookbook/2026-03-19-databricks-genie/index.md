@@ -23,11 +23,11 @@ Genie spaces improve when you can see which conversations went wrong and why. ML
 
 Work through the three cookbooks in order. Each one builds on the output of the previous step.
 
-| Step | Cookbook | What it does |
-| ---- | ------- | ------------ |
-| 1 | [Conversation Tracing Pipeline](/cookbook/genie-tracing-pipeline) | Pulls Genie conversations and logs each one as an MLflow trace. |
-| 2 | [Evaluation with LLM Judges](/cookbook/genie-evaluation-judges) | Scores traces with built-in and custom judges to flag quality issues. |
-| 3 | [Space Improvement Generator](/cookbook/genie-space-analyzer) | Feeds failed traces into an LLM that generates fixes for the Genie space. |
+| Step | Cookbook                                                          | What it does                                                              |
+| ---- | ----------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| 1    | [Conversation Tracing Pipeline](/cookbook/genie-tracing-pipeline) | Pulls Genie conversations and logs each one as an MLflow trace.           |
+| 2    | [Evaluation with LLM Judges](/cookbook/genie-evaluation-judges)   | Scores traces with built-in and custom judges to flag quality issues.     |
+| 3    | [Space Improvement Generator](/cookbook/genie-space-analyzer)     | Feeds failed traces into an LLM that generates fixes for the Genie space. |
 
 ## Prerequisites
 

@@ -10,8 +10,8 @@ export default function CookbookItemsList({ items, sidebar, ...layoutProps }) {
         <div className="flex flex-col gap-2">
           <Heading level={1}>Cookbook</Heading>
           <Body size="l" className="!text-white/60">
-            Hands-on guides for building, evaluating, and observing Agents and LLM
-            applications with MLflow — from tracing and prompt management to
+            Hands-on guides for building, evaluating, and observing Agents and
+            LLM applications with MLflow — from tracing and prompt management to
             LLM-as-a-judge evaluation and production deployment.
           </Body>
         </div>
