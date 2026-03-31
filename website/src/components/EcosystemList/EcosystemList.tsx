@@ -227,7 +227,15 @@ export const EcosystemList = ({
   title = "Works With Any Framework",
   body = "From LLM agent frameworks to traditional ML libraries - MLflow integrates seamlessly with 100+ tools across the AI ecosystem. Supports Python, TypeScript/JavaScript, Java, R, and natively integrates with OpenTelemetry.",
   items = defaultItems,
-}: { title?: string; body?: ReactNode; items?: EcosystemItem[] } = {}) => {
+  seeMoreLabel,
+  seeLessLabel,
+}: {
+  title?: string;
+  body?: ReactNode;
+  items?: EcosystemItem[];
+  seeMoreLabel?: string;
+  seeLessLabel?: string;
+} = {}) => {
   return (
     <div className="w-full px-4 md:px-8 lg:px-16 flex justify-center relative overflow-hidden">
       <Section title={title} body={body} align="center" ambient>
@@ -240,6 +248,8 @@ export const EcosystemList = ({
                 renderItem={({ title, src, href }) => (
                   <MiniLogoCard title={title} src={src} href={href} />
                 )}
+                seeMoreLabel={seeMoreLabel}
+                seeLessLabel={seeLessLabel}
               />
             )}
           </BrowserOnly>
