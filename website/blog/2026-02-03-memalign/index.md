@@ -12,7 +12,7 @@ _Note: This post was originally published on the [Databricks website](https://ww
 
 ![MemAlign: Building Better LLM Judges From Human Feedback With Scalable Memory](memalign-header.png)
 
-As GenAI adoption grows, we increasingly rely on LLM Judges to scale agent evaluation and optimization across industries. However, out-of-the-box LLM judges often fail to capture domain-specific nuances. To bridge this gap, system developers usually turn to prompt engineering (which is brittle) or fine-tuning (which is slow, expensive, and data-hungry).
+As GenAI adoption grows, we increasingly rely on [LLM judges](/llm-as-a-judge) to scale agent evaluation and optimization across industries. However, out-of-the-box LLM judges often fail to capture domain-specific nuances. To bridge this gap, system developers usually turn to prompt engineering (which is brittle) or fine-tuning (which is slow, expensive, and data-hungry).
 
 Today, we are introducing **MemAlign**, a new framework that aligns LLMs with human feedback via a lightweight dual-memory system. As part of our [Agent Learning from Human Feedback (ALHF)](https://www.databricks.com/blog/agent-learning-human-feedback-alhf-databricks-knowledge-assistant-case-study) work, MemAlign only needs a handful of natural-language feedback examples instead of hundreds of labels from human raters, and automatically creates aligned judges with competitive or better quality than state-of-the-art prompt optimizers, at **orders-of-magnitude lower cost and latency**.
 
