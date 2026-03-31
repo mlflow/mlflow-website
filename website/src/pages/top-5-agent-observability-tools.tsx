@@ -504,6 +504,40 @@ export default function Top5AgentObservabilityTools() {
             margin-bottom: 0;
           }
 
+          /* Per-product FAQ */
+          .product-faq {
+            margin: 24px 0 0 0;
+          }
+          .product-faq summary {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+            cursor: pointer;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            list-style: none;
+          }
+          .product-faq summary::-webkit-details-marker {
+            display: none;
+          }
+          .product-faq summary::before {
+            content: '+';
+            display: inline-block;
+            width: 20px;
+            font-weight: 400;
+            color: #6b7280;
+          }
+          .product-faq details[open] > summary::before {
+            content: '−';
+          }
+          .article-container .product-faq p {
+            font-size: 14px;
+            color: #4b5563;
+            margin: 8px 0 16px 20px;
+            line-height: 1.7;
+          }
+
           /* Related resources */
           .related-resources ul {
             list-style-type: none;
@@ -624,7 +658,7 @@ export default function Top5AgentObservabilityTools() {
           </div>
 
           {/* What to Look For */}
-          <h2 id="what-to-look-for">
+          <h2 id="what-to-look-for" data-toc="What to Look For">
             What to Look For in an Agent Observability Tool
           </h2>
           <p>
@@ -671,7 +705,9 @@ export default function Top5AgentObservabilityTools() {
           </p>
 
           {/* Quick Comparison Table */}
-          <h2 id="quick-comparison">Quick Comparison</h2>
+          <h2 id="quick-comparison" data-toc="Quick Comparison">
+            Quick Comparison
+          </h2>
           <QuickComparisonTable rows={quickComparisonRows} />
           <p style={{ fontSize: "13px", marginTop: "-28px" }}>
             ¹ LangSmith's PyPI count is undetermined because it is an automatic
@@ -679,7 +715,7 @@ export default function Top5AgentObservabilityTools() {
           </p>
 
           {/* ───── 1. MLflow ───── */}
-          <h2 id="mlflow">
+          <h2 id="mlflow" data-toc="1. MLflow">
             1. MLflow - Open Source Observability for Everyone
           </h2>
           <p>
@@ -799,8 +835,65 @@ export default function Top5AgentObservabilityTools() {
             gateway in one place, with no enterprise paywalls.
           </div>
 
+          <div className="product-faq">
+            <details>
+              <summary>What languages does MLflow support?</summary>
+              <p>
+                MLflow provides native SDKs for both Python and TypeScript. On
+                top of that, the{" "}
+                <Link to={`${MLFLOW_GENAI_DOCS_URL}tracing/`}>tracing API</Link>{" "}
+                is built on OpenTelemetry, so any language with an OTel SDK can
+                export traces to MLflow's tracking server, giving you broad
+                compatibility beyond the first-party SDKs.
+              </p>
+            </details>
+            <details>
+              <summary>
+                How does MLflow handle high-volume production traces?
+              </summary>
+              <p>
+                MLflow's self-hosted architecture scales with your choice of
+                database and storage backend. Teams run PostgreSQL or MySQL for
+                metadata and S3/GCS/Azure Blob for artifacts. There are no
+                vendor-imposed retention limits or per-trace pricing.
+              </p>
+            </details>
+            <details>
+              <summary>Is MLflow really free? What is the catch?</summary>
+              <p>
+                Every feature in MLflow is available under the Apache 2.0
+                license with no enterprise paywall. The project is governed by
+                the Linux Foundation, which ensures long-term neutrality.
+                Databricks offers a managed version for teams that prefer not to
+                self-host, but the open-source release is fully featured.
+              </p>
+            </details>
+            <details>
+              <summary>What agent frameworks does MLflow support?</summary>
+              <p>
+                MLflow provides auto-instrumentation for 60+ frameworks via
+                OpenTelemetry, including OpenAI Agents SDK, LangGraph,
+                LlamaIndex, DSPy, Pydantic AI, CrewAI, Anthropic, AWS Bedrock,
+                Google ADK, and more. See the full list in the{" "}
+                <Link to={`${MLFLOW_GENAI_DOCS_URL}tracing/integrations/`}>
+                  integrations docs
+                </Link>
+                .
+              </p>
+            </details>
+            <details>
+              <summary>Does MLflow have a managed solution?</summary>
+              <p>
+                Yes. MLflow is available as a managed service on multiple cloud
+                platforms, including Databricks, Amazon SageMaker, Azure ML, Red
+                Hat OpenShift AI, and Nebius AI. All of these offer the same
+                MLflow features without the overhead of self-hosting.
+              </p>
+            </details>
+          </div>
+
           {/* ───── 2. Langfuse ───── */}
-          <h2 id="langfuse">
+          <h2 id="langfuse" data-toc="2. Langfuse">
             2. Langfuse - Open-Source Tracing for ClickHouse Experts
           </h2>
           <p>
@@ -872,8 +965,42 @@ export default function Top5AgentObservabilityTools() {
             third-party eval frameworks) as your agent stack matures.
           </div>
 
+          <div className="product-faq">
+            <details>
+              <summary>Is Langfuse fully open source?</summary>
+              <p>
+                The core is MIT-licensed, but enterprise features in the{" "}
+                <code>ee</code> folders have separate licensing. Some
+                capabilities like SSO and advanced RBAC require a paid plan.
+              </p>
+            </details>
+            <details>
+              <summary>What languages does Langfuse support?</summary>
+              <p>
+                Native SDKs are available for Python and TypeScript. Other
+                languages require building custom wrappers around the REST API.
+              </p>
+            </details>
+            <details>
+              <summary>Can I use a database other than ClickHouse?</summary>
+              <p>
+                No. Langfuse's self-hosted version requires ClickHouse for trace
+                storage. There is no option to swap in PostgreSQL, MySQL, or
+                another analytical database.
+              </p>
+            </details>
+            <details>
+              <summary>What happened with the ClickHouse acquisition?</summary>
+              <p>
+                Langfuse was acquired by ClickHouse, Inc. The long-term product
+                roadmap and investment level remain to be seen. Check the
+                official Langfuse blog for the latest updates.
+              </p>
+            </details>
+          </div>
+
           {/* ───── 3. LangSmith ───── */}
-          <h2 id="langsmith">
+          <h2 id="langsmith" data-toc="3. LangSmith">
             3. LangSmith - LangChain's Own Observability Platform
           </h2>
           <p>
@@ -884,9 +1011,8 @@ export default function Top5AgentObservabilityTools() {
             </strong>{" "}
             is the commercial observability platform built by LangChain. It
             provides detailed tracing, evaluation, and monitoring capabilities
-            with strong support for LangChain and LangGraph applications,
-            though teams using other frameworks may find the experience less
-            polished.
+            with strong support for LangChain and LangGraph applications, though
+            teams using other frameworks may find the experience less polished.
           </p>
           <div className="screenshot-wrap">
             <img
@@ -940,19 +1066,57 @@ export default function Top5AgentObservabilityTools() {
             SaaS pricing that scales with trace volume.
           </div>
 
+          <div className="product-faq">
+            <details>
+              <summary>Does LangSmith only work with LangChain?</summary>
+              <p>
+                No. LangSmith supports other frameworks via OpenTelemetry
+                ingestion and a <code>traceable</code> wrapper. However,
+                community feedback suggests the experience is most polished for
+                LangChain and LangGraph applications.
+              </p>
+            </details>
+            <details>
+              <summary>Can I self-host LangSmith?</summary>
+              <p>
+                Self-hosting is only available on the Enterprise tier. The free
+                and Plus plans are SaaS-only with data stored on LangChain's
+                infrastructure.
+              </p>
+            </details>
+            <details>
+              <summary>How does LangSmith pricing work?</summary>
+              <p>
+                The free tier includes 5,000 traces/month with 14-day retention.
+                Plus is $39/seat/month with higher limits. Extended retention
+                (400 days) is available as a paid add-on. Enterprise pricing is
+                custom.
+              </p>
+            </details>
+            <details>
+              <summary>What are LangSmith's AI-powered features?</summary>
+              <p>
+                LangSmith offers Polly AI Assistant for natural-language trace
+                debugging, topic clustering for automatic behavior
+                categorization, and an insights agent that prioritizes
+                improvements by frequency and impact. Some of these features are
+                gated behind Plus or Enterprise plans.
+              </p>
+            </details>
+          </div>
+
           {/* ───── 4. Arize Phoenix ───── */}
-          <h2 id="arize-phoenix">
+          <h2 id="arize-phoenix" data-toc="4. Arize Phoenix">
             4. Arize Phoenix: Research-Grade Evaluation Metrics
           </h2>
           <p>
             <strong>
               <Link to="https://phoenix.arize.com/">Arize Phoenix</Link>
             </strong>{" "}
-            is an observability tool built by Arize AI, bringing
-            research-backed evaluation metrics directly into the tracing
-            workflow. It offers distributed tracing, 50+ built-in evaluation
-            metrics, and advanced analytics like trace clustering and drift
-            detection.
+            is an observability tool built by Arize AI, bringing research-backed
+            evaluation metrics directly into the tracing workflow. It offers
+            distributed tracing, 50+ built-in evaluation metrics, and advanced
+            analytics like trace clustering and drift detection.
           </p>
           <div className="screenshot-wrap">
             <img
@@ -990,13 +1154,12 @@ export default function Top5AgentObservabilityTools() {
           </h4>
           <p>
             Phoenix uses the Elastic License 2.0 (ELv2), which restricts
-            offering the software as a managed service. High-value
-            features like the Alyx Copilot and online evaluations are gated
-            behind paid plans. Phoenix does not offer prompt optimization, an AI
-            gateway, or governance capabilities, and scaling beyond single-node
-            deployments requires additional planning. The project is backed by
-            Arize AI, so its long-term roadmap may be influenced by commercial
-            priorities.
+            offering the software as a managed service. High-value features like
+            the Alyx Copilot and online evaluations are gated behind paid plans.
+            Phoenix does not offer prompt optimization, an AI gateway, or
+            governance capabilities, and scaling beyond single-node deployments
+            requires additional planning. The project is backed by Arize AI, so
+            its long-term roadmap may be influenced by commercial priorities.
           </p>
 
           <ProsConsTable
@@ -1018,8 +1181,51 @@ export default function Top5AgentObservabilityTools() {
             Pairs well with MLflow for teams that need a more complete platform.
           </div>
 
+          <div className="product-faq">
+            <details>
+              <summary>Is Arize Phoenix open source?</summary>
+              <p>
+                Phoenix is source-available under the Elastic License 2.0
+                (ELv2), which allows free use but restricts offering the
+                software as a managed service. This is a more restrictive
+                license than Apache 2.0 or MIT.
+              </p>
+            </details>
+            <details>
+              <summary>What is OpenInference?</summary>
+              <p>
+                OpenInference is a set of custom instrumentation SDKs built on
+                top of OpenTelemetry, maintained by Arize AI. It provides
+                framework-native tracing for 40+ integrations including
+                LlamaIndex, LangChain, and DSPy.
+              </p>
+            </details>
+            <details>
+              <summary>Can Phoenix scale beyond a single node?</summary>
+              <p>
+                The open-source version is designed for single-node deployment.
+                Scaling beyond that requires the commercial Arize AX platform,
+                which offers managed cloud hosting with tiered pricing.
+              </p>
+            </details>
+            <details>
+              <summary>
+                How does Phoenix compare to MLflow for evaluation?
+              </summary>
+              <p>
+                Phoenix focuses on research-backed metrics (faithfulness,
+                toxicity, hallucination detection) and works well for RAG
+                evaluation. MLflow covers a broader evaluation surface including
+                multi-turn evaluation, LLM judge alignment with human feedback,
+                and automated prompt optimization based on eval results. The two
+                can be used together since MLflow integrates with Phoenix as an
+                eval library.
+              </p>
+            </details>
+          </div>
+
           {/* ───── 5. Braintrust ───── */}
-          <h2 id="braintrust">
+          <h2 id="braintrust" data-toc="5. Braintrust">
             5. Braintrust: Quick Analytics for Non-Technical Users
           </h2>
           <p>
@@ -1088,8 +1294,47 @@ export default function Top5AgentObservabilityTools() {
             the vendor.
           </div>
 
+          <div className="product-faq">
+            <details>
+              <summary>Can I self-host Braintrust?</summary>
+              <p>
+                No. Braintrust is a proprietary SaaS platform with no
+                self-hosted option. All trace data is stored on Braintrust's
+                infrastructure.
+              </p>
+            </details>
+            <details>
+              <summary>What is Brainstore?</summary>
+              <p>
+                Brainstore is Braintrust's purpose-built database designed for
+                AI workload patterns. It enables fast analytical queries over
+                millions of production traces.
+              </p>
+            </details>
+            <details>
+              <summary>How does Braintrust pricing work?</summary>
+              <p>
+                Braintrust offers a free tier with limited usage. The jump to
+                Pro is $249/month, which can be steep for smaller teams. There
+                is no public Enterprise pricing.
+              </p>
+            </details>
+            <details>
+              <summary>What happens to my trace data with Braintrust?</summary>
+              <p>
+                All trace data is stored on Braintrust's infrastructure with no
+                option to self-host or bring your own storage. Data retention is
+                14 days on the Starter plan and 30 days on Pro. Teams that need
+                full control over trace data ownership should consider an
+                open-source alternative.
+              </p>
+            </details>
+          </div>
+
           {/* How to Choose */}
-          <h2 id="how-to-choose">How to Choose the Right Tool</h2>
+          <h2 id="how-to-choose" data-toc="Recommended Tool">
+            How to Choose the Right Tool
+          </h2>
           <p>
             All five tools on this list can capture traces. The difference lies
             in what happens after you collect that data, and how much control
@@ -1165,7 +1410,9 @@ export default function Top5AgentObservabilityTools() {
           </p>
 
           {/* Global FAQ */}
-          <h2 id="faq">Frequently Asked Questions</h2>
+          <h2 id="faq" data-toc="FAQ">
+            Frequently Asked Questions
+          </h2>
 
           <h3>What is agent observability?</h3>
           <p>
@@ -1210,9 +1457,8 @@ export default function Top5AgentObservabilityTools() {
             is designed to be easy to use and self-host. For example, to
             instrument an application built with the OpenAI Agents SDK, you just
             need to add a single `mlflow.openai.autolog()` call to your
-            application code. This is
-            why most teams start with observability as a first step in their
-            LLMOps journey.
+            application code. This is why most teams start with observability as
+            a first step in their LLMOps journey.
           </p>
 
           <h3>
