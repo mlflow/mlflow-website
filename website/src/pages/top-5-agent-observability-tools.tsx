@@ -617,7 +617,7 @@ export default function Top5AgentObservabilityTools() {
               <Link to="https://www.langchain.com/langsmith/observability">
                 LangSmith
               </Link>{" "}
-              for all-in LangChain teams,{" "}
+              for teams fully committed to LangChain,{" "}
               <Link to="https://www.braintrust.dev">Braintrust</Link> for fast
               prototyping with non-technical stakeholders.
             </p>
@@ -721,7 +721,7 @@ export default function Top5AgentObservabilityTools() {
             <Link to="https://www.linuxfoundation.org/">Linux Foundation</Link>{" "}
             - the trusted foundation for open-source projects like Linux,
             Kubernetes, and PyTorch. Every feature in MLflow is available in the
-            open-source release and continue to be. There is no paywall that
+            open-source release and will remain so. There is no paywall that
             gates critical capabilities. The strong commitment to openness is
             also reflected in the technical choices MLflow makes, for example,
             OpenTelemetry, the vendor-neutral observability standard, is used as
@@ -781,7 +781,7 @@ export default function Top5AgentObservabilityTools() {
 
           <ProsConsTable
             pros={[
-              "Fully open source (Apache 2.0) with Linux Foundation governance. No feature gating and vendor lock-in.",
+              "Fully open source (Apache 2.0) with Linux Foundation governance. No feature gating or vendor lock-in.",
               "Complete platform: tracing, evaluation, prompt optimization, and governance in one tool",
               "Simple self-hosting with flexible backends",
             ]}
@@ -868,7 +868,7 @@ export default function Top5AgentObservabilityTools() {
           <div className="best-for">
             <strong>Best for:</strong> Teams already running ClickHouse
             infrastructure who primarily need tracing and a prompt playground.
-            Be prepared to add separate tools (e.g. LiteLLM for AI gateway,
+            Be prepared to add separate tools (e.g., LiteLLM for AI gateway,
             third-party eval frameworks) as your agent stack matures.
           </div>
 
@@ -884,7 +884,7 @@ export default function Top5AgentObservabilityTools() {
             </strong>{" "}
             is the commercial observability platform built by LangChain. It
             provides detailed tracing, evaluation, and monitoring capabilities
-            with strong support for LangChain and LangGraph applications -
+            with strong support for LangChain and LangGraph applications,
             though teams using other frameworks may find the experience less
             polished.
           </p>
@@ -908,9 +908,9 @@ export default function Top5AgentObservabilityTools() {
           <h4 style={{ color: "black" }}>Rich AI-powered Features</h4>
           <p>
             LangSmith provides a rich set of AI-powered features, including
-            Polly AI Assistant, topic clustering, insights agent, which use LLMs
-            to analyze your trace data on behalf of you. Some of these features
-            are available only in paid plans (Plus or Enterprise).
+            Polly AI Assistant, topic clustering, and Insights Agent, which use
+            LLMs to analyze your trace data on your behalf. Some of these
+            features are available only in paid plans (Plus or Enterprise).
           </p>
 
           <h4 style={{ color: "black" }}>Proprietary, Closed-Source Model</h4>
@@ -948,7 +948,7 @@ export default function Top5AgentObservabilityTools() {
             <strong>
               <Link to="https://phoenix.arize.com/">Arize Phoenix</Link>
             </strong>{" "}
-            is an open-source observability tool built by Arize AI, bringing
+            is an observability tool built by Arize AI, bringing
             research-backed evaluation metrics directly into the tracing
             workflow. It offers distributed tracing, 50+ built-in evaluation
             metrics, and advanced analytics like trace clustering and drift
@@ -990,7 +990,7 @@ export default function Top5AgentObservabilityTools() {
           </h4>
           <p>
             Phoenix uses the Elastic License 2.0 (ELv2), which restricts
-            offering the software as a managed hosted service. High-value
+            offering the software as a managed service. High-value
             features like the Alyx Copilot and online evaluations are gated
             behind paid plans. Phoenix does not offer prompt optimization, an AI
             gateway, or governance capabilities, and scaling beyond single-node
@@ -1001,14 +1001,14 @@ export default function Top5AgentObservabilityTools() {
 
           <ProsConsTable
             pros={[
-              "Open source version (Phoenix) available for self-hosting",
+              "Source-available Phoenix is available for self-hosting",
               "Strong set of research-backed evaluation metrics out of the box",
-              "Owns openinference, custom instrumentation SDKs for OpenTelemetry that provides framework-native tracing",
+              "Owns OpenInference, a set of custom instrumentation SDKs for OpenTelemetry that provide framework-native tracing",
             ]}
             cons={[
-              "High-stake features are gated behind paid plans, such as Alyx Copilot, online evaluations.",
-              "Evaluation outside built-in metrics are limited, e.g., multi-turn evaluation",
-              "Elastic License 2.0 restricts the use of the software as a managed hosted service",
+              "High-value features are gated behind paid plans, such as Alyx Copilot and online evaluations.",
+              "Evaluation options outside the built-in metrics are limited, such as multi-turn evaluation",
+              "Elastic License 2.0 restricts the use of the software as a managed service",
             ]}
           />
 
@@ -1050,7 +1050,7 @@ export default function Top5AgentObservabilityTools() {
 
           <h4 style={{ color: "black" }}>AI Gateway for Unified LLM API</h4>
           <p>
-            The recent addition of AI Gateway (formerly known as AI proxy) let
+            The recent addition of AI Gateway (formerly known as AI proxy) lets
             you route requests to many LLM providers with a unified LLM API. It
             provides basic features for teams to manage LLM access, such as
             caching, logging, and access control.
@@ -1062,10 +1062,10 @@ export default function Top5AgentObservabilityTools() {
           <p>
             Braintrust is a proprietary SaaS platform with no self-hosted option
             and trace data stays with the vendor. The jump from free to paid
-            tiers is steep ($249/mo for Pro). There is no built-in AI gateway,
-            prompt optimization, or governance layer, and framework integration
-            coverage is narrower than platforms with native OpenTelemetry
-            support.
+            tiers is steep ($249/mo for Pro). It does not offer built-in prompt
+            optimization or a broader governance layer, and framework
+            integration coverage is narrower than platforms with native
+            OpenTelemetry support.
           </p>
 
           <ProsConsTable
@@ -1189,13 +1189,11 @@ export default function Top5AgentObservabilityTools() {
 
           <h3>What is OpenTelemetry?</h3>
           <p>
-            OpenTelemetry is an open source project that provides a set of tools
-            for collecting, processing, and exporting telemetry data. It is a
-            vendor-neutral standard for instrumenting applications with
-            telemetry data. It is supported by the OpenTelemetry community and
-            is used by many observability tools. Choosing
-            OpenTelemetry-compatible tools ensures your trace data is portable
-            and can be used with other tools. Learn more on the{" "}
+            OpenTelemetry is an open source project that provides a
+            vendor-neutral standard for collecting, processing, and exporting
+            telemetry data. It is widely used across observability tools, and
+            choosing OpenTelemetry-compatible platforms helps keep your trace
+            data portable. Learn more on the{" "}
             <Link to="https://opentelemetry.io/">OpenTelemetry</Link> website.
           </p>
 
@@ -1208,11 +1206,11 @@ export default function Top5AgentObservabilityTools() {
 
           <h3>How long does it take to adopt an observability tool?</h3>
           <p>
-            The time it takes to adopt an observability tool is generally pretty
-            quick, especially with a tool like MLflow that is designed to be
-            easy to use and self-host. For example, to instrument an application
-            built with OpenAI Agent SDK, you just need to add a single
-            `mlflow.openai.autolog()` call into your application code. This is
+            Adoption is usually quick, especially with a tool like MLflow that
+            is designed to be easy to use and self-host. For example, to
+            instrument an application built with the OpenAI Agents SDK, you just
+            need to add a single `mlflow.openai.autolog()` call to your
+            application code. This is
             why most teams start with observability as a first step in their
             LLMOps journey.
           </p>
@@ -1222,12 +1220,11 @@ export default function Top5AgentObservabilityTools() {
             observability?
           </h3>
           <p>
-            Traditional APM is focused on monitoring the performance and health
-            of your application, including latency, errors, and throughput.
-            Agent observability is focused on monitoring the behavior of your
-            agent, including the quality of the output, the tools used, and the
-            planning decisions made. Agent observability is a more comprehensive
-            view of the agent's behavior in production.
+            Traditional APM focuses on monitoring application performance and
+            health, including latency, errors, and throughput. Agent
+            observability focuses on agent behavior, including output quality,
+            tool usage, and planning decisions. It gives you a more complete
+            view of how the agent behaves in production.
           </p>
 
           {/* Related Resources */}
