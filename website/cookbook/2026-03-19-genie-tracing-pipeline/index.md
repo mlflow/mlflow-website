@@ -2,7 +2,7 @@
 title: Genie Conversation Tracing Pipeline
 slug: genie-tracing-pipeline
 description: Pull conversations from a Genie space and log each one as an MLflow trace for inspection and evaluation.
-tags: [databricks, genie, tracing, genai]
+tags: [databricks, genie, tracing, agents]
 ---
 
 This cookbook pulls conversations from a Databricks [Genie space](https://docs.databricks.com/en/genie/index.html) and logs each one as an MLflow trace. Each trace captures the user's question, the SQL Genie generated, and the answer it returned.

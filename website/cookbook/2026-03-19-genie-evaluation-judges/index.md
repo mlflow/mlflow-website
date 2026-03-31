@@ -2,7 +2,7 @@
 title: Genie Evaluation with LLM Judges
 slug: genie-evaluation-judges
 description: Score Genie traces with built-in and custom judges to find quality issues in responses and SQL generation.
-tags: [databricks, genie, evaluation, genai]
+tags: [databricks, genie, evaluation, agents]
 ---
 
 With traced Databricks Genie conversations from the [Conversation Tracing Pipeline](/cookbook/genie-tracing-pipeline), you can now score each message to find out which ones have quality issues and why. This cookbook runs three types of checks:

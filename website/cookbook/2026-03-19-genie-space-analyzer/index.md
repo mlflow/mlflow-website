@@ -2,7 +2,7 @@
 title: Genie Space Improvement Generator
 slug: genie-space-analyzer
 description: Take traces that failed evaluation, combine them with your Genie space config, and generate copy-paste-ready fixes with an LLM.
-tags: [databricks, genie, evaluation, genai]
+tags: [databricks, genie, evaluation, agents]
 ---
 
 This cookbook takes the traces that failed evaluation in the [previous cookbook](/cookbook/genie-evaluation-judges), combines them with the current Databricks [Genie space](https://docs.databricks.com/en/genie/index.html) configuration, and passes everything to an LLM that generates copy-paste-ready fixes: text instructions, SQL expressions, example queries, and benchmarks.

@@ -2,7 +2,7 @@
 title: Agent Optimization Pipeline
 slug: agent-alignment-optimization
 description: Build a tool-calling agent, evaluate it with domain-specific judges, align those judges to expert feedback, and optimize the system prompt with GEPA.
-tags: [genai, evaluation, optimization, agents, prompts]
+tags: [evaluation, optimization, agents, prompts]
 ---
 
 Most teams build an agent, eyeball a few outputs, tweak the prompt, and repeat. That works for a while, but it breaks down once the agent handles dozens of scenarios and "good enough" stops being good enough. **You can't systematically improve what you can't systematically measure.**

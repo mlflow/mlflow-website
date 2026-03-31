@@ -2,7 +2,7 @@
 title: Evaluating Databricks Genie Spaces
 slug: databricks-genie
 description: A complete pipeline for tracing, evaluating, and improving a Databricks Genie space using MLflow.
-tags: [databricks, genie, evaluation, tracing, genai]
+tags: [databricks, genie, evaluation, tracing, agents]
 ---
 
 ![Genie traces with assessment columns showing evaluation results](/img/cookbook/databricks-genie/evaluation-assessment-columns.png)
