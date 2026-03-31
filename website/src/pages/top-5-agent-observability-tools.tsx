@@ -1332,7 +1332,7 @@ export default function Top5AgentObservabilityTools() {
           </div>
 
           {/* How to Choose */}
-          <h2 id="how-to-choose" data-toc="Recommended Tool">
+          <h2 id="how-to-choose" data-toc="How to Choose the Right Tool">
             How to Choose the Right Tool
           </h2>
           <p>
@@ -1371,7 +1371,10 @@ export default function Top5AgentObservabilityTools() {
             changes.
           </p>
 
-          <h4 style={{ color: "black" }}>Our Recommendation</h4>
+          {/* Our Recommendation */}
+          <h2 id="recommendation" data-toc="Recommendation">
+            Our Recommendation
+          </h2>
           <p>
             For teams who care about trace data ownership and want to get the
             most value from that data to build production-grade agents,{" "}
@@ -1387,25 +1390,14 @@ export default function Top5AgentObservabilityTools() {
 
           <h4 style={{ color: "black" }}>Alternatives Worth Considering</h4>
           <p>
-            If your team is already invested in ClickHouse and wants to
-            self-host an open-source tracing tool, <strong>Langfuse</strong> is
-            a reasonable alternative, but keep in mind that it covers tracing
-            and prompt management only. Teams often end up combining Langfuse
-            with separate solutions like LiteLLM for an AI gateway and
-            additional evaluation frameworks, and the stack tends to grow larger
-            than expected over time.
-          </p>
-          <p>
-            If your entire codebase is built on LangChain and LangGraph and your
-            team is 100% committed to that ecosystem, <strong>LangSmith</strong>{" "}
-            provides the deepest integration, though it is proprietary and its
-            pricing scales with volume.
-          </p>
-          <p>
-            For teams doing fast prototyping with non-technical stakeholders who
-            need quick, accessible analytics, <strong>Braintrust</strong> may be
-            a good fit with its approachable UI and purpose-built analytics
-            database. Just be aware it is a proprietary SaaS with no
+            <strong>Langfuse</strong> is a reasonable self-hosted alternative if
+            your team is already invested in ClickHouse, but it covers tracing
+            and prompt management only; the stack tends to grow as you add
+            LiteLLM and separate evaluation tools. <strong>LangSmith</strong>{" "}
+            provides the deepest LangChain/LangGraph integration, though it is
+            proprietary and pricing scales with volume.{" "}
+            <strong>Braintrust</strong> suits fast prototyping with
+            non-technical stakeholders, but it is a proprietary SaaS with no
             self-hosting option.
           </p>
 
