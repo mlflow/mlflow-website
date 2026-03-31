@@ -85,7 +85,19 @@ const faqs: {
   },
   {
     question: "What features should I look for in an AI platform?",
-    answer:
+    answer: (
+      <>
+        A complete AI platform needs four core capabilities: (1) observability
+        with end-to-end tracing across multi-step workflows; (2) evaluation
+        with{" "}
+        <Link href="/llm-as-a-judge">LLM-as-a-judge</Link> scorers and
+        dataset-based testing; (3) version control for prompts,
+        configurations, and model versions; and (4) governance for safety
+        guardrails, cost controls, and compliance. MLflow provides all four,
+        integrating with whatever agent framework you choose.
+      </>
+    ),
+    answerText:
       "A complete AI platform needs four core capabilities: (1) observability with end-to-end tracing across multi-step workflows; (2) evaluation with LLM-as-a-judge scorers and dataset-based testing; (3) version control for prompts, configurations, and model versions; and (4) governance for safety guardrails, cost controls, and compliance. MLflow provides all four, integrating with whatever agent framework you choose.",
   },
   {
