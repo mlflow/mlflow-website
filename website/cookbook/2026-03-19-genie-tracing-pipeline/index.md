@@ -16,7 +16,7 @@ Once conversations are stored as traces, you can inspect them in the MLflow UI a
 You need a Databricks [Genie space](https://docs.databricks.com/en/genie/set-up.html) with at least a few conversations. To create one, open your Databricks workspace, click **Genie** in the sidebar, and follow the setup wizard to connect [Unity Catalog](https://docs.databricks.com/en/data-governance/unity-catalog/index.html) tables and add instructions.
 
 ```bash
-pip install "mlflow[genai]>=3.10" databricks-sdk
+pip install "mlflow[genai]" databricks-sdk
 ```
 
 ## Step 1: Configure

@@ -50,7 +50,7 @@ uvx --from "mlflow[genai]" mlflow server --host 127.0.0.1 --port 5000
 **With pip:**
 
 ```bash
-pip install "mlflow[genai]>=3.10" openai langgraph langchain-openai
+pip install "mlflow[genai]" openai langgraph langchain-openai
 mlflow server --host 127.0.0.1 --port 5000
 ```
 

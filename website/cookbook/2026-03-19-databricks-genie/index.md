@@ -34,7 +34,7 @@ Work through the three cookbooks in order. Each one builds on the output of the 
 All cookbooks in this series require:
 
 ```bash
-pip install "mlflow[genai]>=3.10" databricks-sdk openai
+pip install "mlflow[genai]" databricks-sdk openai
 ```
 
 They run on Databricks and require a [Genie space](https://docs.databricks.com/en/genie/set-up.html). Start with the Tracing Pipeline, then work through Evaluation and the Space Analyzer.
