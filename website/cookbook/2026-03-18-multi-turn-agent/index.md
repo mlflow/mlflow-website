@@ -10,11 +10,12 @@ Evaluate a customer support chat agent across full conversation sessions using M
 <!-- truncate -->
 
 :::tip[Prerequisites]
+
 ```bash
 pip install mlflow openai
 ```
-:::
 
+:::
 
 The agent maintains conversation history per session and responds to customer support inquiries about orders, returns, and account issues.
 
@@ -85,7 +86,6 @@ print(reply)
 # you should see a trace with the OpenAI call.
 ```
 
-
 Define realistic customer support conversations. Each conversation is a sequence of messages sharing the same `session_id`. The conversations cover a range of outcomes: a smooth resolution, a frustrated customer, and a case where the agent fails to address all questions.
 
 ```python
@@ -128,7 +128,6 @@ conversations = [
 ]
 ```
 
-
 Each call to `chat()` produces a traced turn. Because `mlflow.openai.autolog()` is enabled, every OpenAI call is automatically captured. The `session_id` metadata groups turns into sessions.
 
 ```python
@@ -143,7 +142,6 @@ for convo in conversations:
         print(f"[{session_id}] Agent: {reply[:80]}...")
         print()
 ```
-
 
 Retrieve the traces and run three session-level scorers:
 
@@ -185,7 +183,6 @@ results = mlflow.genai.evaluate(
     ],
 )
 ```
-
 
 ```python
 print(results.metrics)
@@ -250,11 +247,11 @@ Open the MLflow UI at `http://127.0.0.1:5000` and navigate to the **multi-turn-a
 
 ## Results Interpretation
 
-| Session | Completeness | Guidelines | Frustration |
-|---|---|---|---|
-| order-status | yes | yes | none |
-| frustrated-customer | yes | no | unresolved |
-| incomplete | no | yes | none |
+| Session             | Completeness | Guidelines | Frustration |
+| ------------------- | ------------ | ---------- | ----------- |
+| order-status        | yes          | yes        | none        |
+| frustrated-customer | yes          | no         | unresolved  |
+| incomplete          | no           | yes        | none        |
 
 - **order-status**: Clean conversation. All questions answered, guidelines followed, no frustration.
 - **frustrated-customer**: The agent likely promised a refund timeline (violating guideline 3) or failed to escalate to a human (violating guideline 4). The user's frustration was never resolved.

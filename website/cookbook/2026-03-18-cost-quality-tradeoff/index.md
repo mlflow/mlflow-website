@@ -13,11 +13,12 @@ estimate costs.
 <!-- truncate -->
 
 :::tip[Prerequisites]
+
 ```bash
 pip install mlflow openai
 ```
-:::
 
+:::
 
 ```python
 import mlflow
@@ -110,7 +111,6 @@ eval_data = [
 ]
 ```
 
-
 Each predict function calls a different model. The parameter
 name `question` matches the key in the `inputs` dicts.
 
@@ -150,7 +150,6 @@ def predict_gpt4o(question: str) -> str:
     return response.choices[0].message.content
 ```
 
-
 Score both models with `Correctness` (are expected facts
 present?) and `Completeness` (did the model fully address the
 question?).
@@ -172,7 +171,6 @@ results_4o = mlflow.genai.evaluate(
     scorers=scorers,
 )
 ```
-
 
 `EvaluationResult.metrics` contains aggregated scores
 across all rows.
@@ -202,7 +200,6 @@ cols = [
 print(results_mini.result_df[cols])
 print(results_4o.result_df[cols])
 ```
-
 
 MLflow traces automatically capture token usage when
 `mlflow.openai.autolog()` is enabled. Each trace stores
@@ -250,7 +247,6 @@ print("gpt-4o tokens:", usage_4o)
 #            'total_tokens': 1200}
 ```
 
-
 Apply each model's per-token pricing to the recorded usage.
 
 ```python
@@ -289,7 +285,6 @@ cost_4o = estimate_cost(usage_4o, "gpt-4o")
 print(f"gpt-4o-mini cost: ${cost_mini['total_cost']:.6f}")
 print(f"gpt-4o cost: ${cost_4o['total_cost']:.6f}")
 ```
-
 
 Combine metrics, token usage, and cost into a single table.
 
@@ -342,11 +337,13 @@ usage details.
 ## Analysis: When to Use Which Model
 
 **Use `gpt-4o-mini` when:**
+
 - The task is straightforward (simple factual questions, classification, extraction)
 - Cost is a primary constraint and you need to process high volumes
 - A small drop in correctness is acceptable
 
 **Use `gpt-4o` when:**
+
 - Accuracy matters more than cost (medical, legal, financial domains)
 - Questions require nuanced reasoning or multi-step analysis
 - Completeness is critical and partial answers are not acceptable

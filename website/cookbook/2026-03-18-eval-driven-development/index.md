@@ -10,9 +10,11 @@ Use MLflow evaluation to find weaknesses in a GenAI application, fix them, and m
 <!-- truncate -->
 
 :::tip[Prerequisites]
+
 ```bash
 pip install mlflow openai
 ```
+
 :::
 
 ## The Idea
@@ -20,7 +22,6 @@ pip install mlflow openai
 Write an eval dataset once. Run it against your app. Read the per-row scores to find failures. Improve the app. Re-run the same eval. Compare the two runs to confirm the fix worked.
 
 This cookbook walks through that cycle with a customer support agent that starts out giving vague, generic answers and ends up producing grounded, policy-aware responses.
-
 
 ```python
 import mlflow
@@ -48,7 +49,6 @@ def support_agent(question: str) -> str:
 ```
 
 This agent has no product knowledge, no policies, and no guardrails. It will answer based on whatever the LLM already knows.
-
 
 Each row has an input question and an `expected_response` that the `Correctness` scorer uses as ground truth.
 
@@ -117,7 +117,6 @@ eval_data = [
 ]
 ```
 
-
 Three scorers cover three angles:
 
 - **`Correctness`** -- does the response match the expected facts?
@@ -153,7 +152,6 @@ baseline_results = mlflow.genai.evaluate(
     ],
 )
 ```
-
 
 Start with the aggregate metrics, then drill into the per-row results.
 
@@ -193,7 +191,6 @@ Read the `correctness/rationale` and `support_policies/rationale` columns. Commo
 
 These rationales point to the root cause: the agent has no access to company policies.
 
-
 Inject the company knowledge base directly into the system prompt.
 
 ```python
@@ -232,7 +229,6 @@ def support_agent_v2(question: str) -> str:
     )
     return response.choices[0].message.content
 ```
-
 
 Run the same dataset and scorers against the improved agent.
 
@@ -290,7 +286,6 @@ print(comparison.to_string(index=False))
 # relevance_to_query   1.0       1.0
 #  support_policies    0.4       1.0
 ```
-
 
 Open `http://127.0.0.1:5000` and navigate to the `eval-driven-development` experiment. You will see two evaluation runs -- one for the baseline and one for the improved agent.
 

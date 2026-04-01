@@ -10,11 +10,12 @@ Register, version, evaluate, and promote prompt templates using MLflow's prompt 
 <!-- truncate -->
 
 :::tip[Prerequisites]
+
 ```bash
 pip install mlflow openai
 ```
-:::
 
+:::
 
 Start with a basic system prompt for a SaaS product FAQ agent that handles billing, features, and troubleshooting questions.
 
@@ -38,7 +39,6 @@ print(prompt_v1)
 # PromptVersion(name=product-faq-agent, version=1,
 #   template=You are a support agent for Acme Analytics...)
 ```
-
 
 Load the prompt by name and version, format it with user input, and call the LLM.
 
@@ -67,7 +67,6 @@ def faq_agent(question: str) -> str:
 # Quick smoke test
 print(faq_agent("How do I upgrade my plan?"))
 ```
-
 
 Define a test set covering billing, features, and troubleshooting. Each row has an `expectations` field with the `expected_response` the scorer checks against.
 
@@ -165,7 +164,6 @@ print(results_v1.metrics)
 #  'concise/mean': 0.6}
 ```
 
-
 The v1 prompt gives vague answers because it has no product knowledge. Register a v2 with explicit product details and few-shot examples.
 
 ```python
@@ -213,7 +211,6 @@ print(prompt_v2.version)
 # 2
 ```
 
-
 Update the agent to use v2, then run the same evaluation.
 
 ```python
@@ -249,7 +246,6 @@ print(results_v2.metrics)
 #  'concise/mean': 1.0}
 ```
 
-
 Pull the aggregate metrics from both runs side by side.
 
 ```python
@@ -272,7 +268,6 @@ print(comparison)
 
 You can also compare per-row results in the MLflow UI at `http://127.0.0.1:5000`. Navigate to the `prompt-engineering` experiment and open either evaluation run to see per-question scores and linked traces.
 
-
 Set a `production` alias on v2 so downstream consumers reference a stable name instead of a hard-coded version number.
 
 ```python
@@ -282,7 +277,6 @@ mlflow.genai.set_prompt_alias(
     version=2,
 )
 ```
-
 
 Production code loads the prompt via the `prompts:/name@alias` URI. When you promote a new version, the alias pointer updates and production picks it up automatically — no code changes or redeployment needed.
 

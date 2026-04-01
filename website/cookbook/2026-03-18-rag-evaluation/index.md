@@ -10,13 +10,14 @@ Build a retrieval-augmented generation (RAG) pipeline, trace it with MLflow, and
 <!-- truncate -->
 
 :::tip[Prerequisites]
+
 ```bash
 pip install mlflow openai chromadb
 ```
+
 :::
 
 ## What You'll Build
-
 
 ```python
 import mlflow
@@ -45,7 +46,6 @@ collection.add(
     ids=[f"doc_{i}" for i in range(len(docs))],
 )
 ```
-
 
 Enable OpenAI autologging so every LLM call is captured, then add manual spans for the retrieval step.
 
@@ -93,7 +93,6 @@ print(answer)
 # Check the MLflow UI at http://127.0.0.1:5000 — you'll see a trace
 # with spans for rag_answer, retrieve, and the OpenAI chat completion.
 ```
-
 
 Create test questions with expected facts. The `retrieved_context` field will be populated during evaluation from the RAG pipeline's output.
 
@@ -146,14 +145,12 @@ eval_data = [
 ]
 ```
 
-
 The predict function wraps the RAG pipeline so MLflow can run it during evaluation. Its parameter names must match the keys in the `inputs` dictionaries. The retrieval context is automatically extracted from the RETRIEVER span in the trace, so you only need to return the answer.
 
 ```python
 def predict_fn(question):
     return rag_answer(question)
 ```
-
 
 Use three built-in judges that target different aspects of RAG quality:
 
@@ -179,7 +176,6 @@ results = mlflow.genai.evaluate(
 )
 ```
 
-
 ```python
 # Aggregate metrics
 print(results.metrics)
@@ -195,6 +191,7 @@ print(df[["inputs/question", "relevance_to_query/value",
 ```
 
 Open the MLflow UI at `http://127.0.0.1:5000` and navigate to the experiment. The evaluation run shows:
+
 - A summary table with per-question scores
 - Linked traces for each evaluation row — click any row to see the full RAG execution
 

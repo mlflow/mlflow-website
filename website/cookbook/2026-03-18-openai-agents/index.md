@@ -10,13 +10,14 @@ Build an e-commerce support agent using OpenAI function calling, trace every LLM
 <!-- truncate -->
 
 :::tip[Prerequisites]
+
 ```bash
 pip install mlflow openai
 ```
+
 :::
 
 ## What You'll Build
-
 
 `mlflow.openai.autolog()` patches `openai.chat.completions.create` so every call produces a trace span. No other instrumentation is needed for OpenAI calls.
 
@@ -33,7 +34,6 @@ mlflow.openai.autolog()
 
 client = openai.OpenAI()
 ```
-
 
 Each tool is a Python function decorated with `@mlflow.trace(span_type=SpanType.TOOL)`. This creates TOOL spans in the trace that `ToolCallCorrectness` inspects during evaluation.
 
@@ -114,7 +114,6 @@ def get_product_info(product_name: str) -> str:
     return f"Product '{product_name}' not found."
 ```
 
-
 The `tools` parameter tells the model which functions are available and their argument schemas.
 
 ```python
@@ -193,7 +192,6 @@ tool_functions = {
 }
 ```
 
-
 The agent calls the LLM, checks for tool calls, executes them, feeds results back, and repeats until the model produces a final text response. The `@mlflow.trace` decorator on the outer function groups everything into a single trace.
 
 ```python
@@ -251,7 +249,6 @@ def ecommerce_agent(question: str) -> str:
             )
 ```
 
-
 ```python
 answer = ecommerce_agent(
     "Where is my order ORD-1001?"
@@ -263,7 +260,6 @@ print(answer)
 ```
 
 Open the MLflow UI at `http://127.0.0.1:5000` and navigate to the `openai-ecommerce-agent` experiment. Click on the trace to see the full execution: the parent AGENT span containing the OpenAI chat completion span (with the tool call highlighted) and the `get_order_status` TOOL span showing inputs and outputs.
-
 
 Define test scenarios with expected tool calls and expected facts. The `inputs` key must match the predict function parameter name.
 
@@ -390,7 +386,6 @@ eval_data = [
 ]
 ```
 
-
 The predict function wraps the agent so MLflow can call it for each row. Its parameter name must match the keys in `inputs`. `ToolCallCorrectness` automatically extracts tool calls from the TOOL spans in each trace and compares them against `expected_tool_calls`. `Correctness` checks whether the final answer contains the `expected_facts`.
 
 ```python
@@ -413,7 +408,6 @@ results = mlflow.genai.evaluate(
     ],
 )
 ```
-
 
 ```python
 # Aggregate pass rates across all scenarios

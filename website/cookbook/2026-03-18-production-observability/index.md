@@ -10,13 +10,14 @@ Instrument a customer-facing chatbot for production traffic, then query and anal
 <!-- truncate -->
 
 :::tip[Prerequisites]
+
 ```bash
 pip install mlflow openai
 ```
+
 :::
 
 ## What You'll Build
-
 
 ```python
 import mlflow
@@ -65,7 +66,6 @@ print(answer)
 # Check http://127.0.0.1:5000 — you should see a trace with
 # spans for support_chatbot and the OpenAI chat completion.
 ```
-
 
 Use `mlflow.update_current_trace()` to attach production metadata -- user identity, session tracking, and environment labels. Tags are mutable (editable after the trace is logged), while metadata is immutable and suited for values fixed at trace creation time.
 
@@ -125,7 +125,6 @@ print(answer)
 
 `mlflow.trace.user` and `mlflow.trace.session` are reserved metadata keys that MLflow uses to group traces by user and session in the UI. The `environment` and `app_version` tags let you filter traces by deployment context.
 
-
 By default on OSS MLflow, traces are logged synchronously -- the application blocks until the trace is persisted. In production, set the `MLFLOW_ENABLE_ASYNC_TRACE_LOGGING` environment variable to decouple tracing from your application's critical path.
 
 ```python
@@ -145,7 +144,6 @@ Set these environment variables **before** importing or initializing MLflow. Wit
 :::note
 Async logging flushes automatically at program exit. In long-running services, traces are exported continuously in the background with no manual flush required.
 :::
-
 
 At high request volumes, tracing every request is unnecessary and expensive. Use the `MLFLOW_TRACE_SAMPLING_RATIO` environment variable to sample a fraction of traces.
 
@@ -194,7 +192,6 @@ def handle_faq(question: str):
     return response.choices[0].message.content
 ```
 
-
 Simulate realistic production traffic to populate traces for analysis.
 
 ```python
@@ -228,7 +225,6 @@ for _ in range(30):
         # status automatically
         pass
 ```
-
 
 Use `mlflow.search_traces()` to query traces by tags, metadata, status, and time ranges.
 
@@ -285,7 +281,6 @@ slow_errors = mlflow.search_traces(
 )
 print(f"Slow production errors: {len(slow_errors)}")
 ```
-
 
 Compute latency distributions, error rates, and token usage patterns from trace data.
 
@@ -363,7 +358,6 @@ for uid, lats in sorted(user_latencies.items()):
     avg = sum(lats) / len(lats)
     print(f"  {uid}: {avg:.0f}ms ({len(lats)} traces)")
 ```
-
 
 Build a reusable monitoring function that queries trace metrics and fires alerts when thresholds are breached. Run this on a schedule (cron, Airflow, etc.) to catch issues early.
 

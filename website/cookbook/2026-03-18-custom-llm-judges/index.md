@@ -10,11 +10,12 @@ Evaluate GenAI application outputs using built-in guideline scorers, custom prog
 <!-- truncate -->
 
 :::tip[Prerequisites]
+
 ```bash
 pip install mlflow openai
 ```
-:::
 
+:::
 
 ```python
 import mlflow
@@ -55,7 +56,6 @@ Verify the agent works:
 ```python
 print(answer_question("What are the symptoms of iron deficiency?"))
 ```
-
 
 ```python
 eval_data = [
@@ -110,14 +110,12 @@ eval_data = [
 ]
 ```
 
-
 The parameter name must match the key in the `inputs` dicts.
 
 ```python
 def predict_fn(question):
     return answer_question(question)
 ```
-
 
 The `Guidelines` scorer checks whether responses follow specific rules. Each `Guidelines` instance evaluates its own set of guidelines independently.
 
@@ -167,7 +165,6 @@ print(
 )
 ```
 
-
 Use the `@scorer` decorator to write a scorer that checks domain-specific logic with code -- no LLM calls needed.
 
 This scorer verifies that responses contain the required sections defined in `expectations`.
@@ -198,7 +195,6 @@ def has_required_sections(outputs, expectations) -> Feedback:
         rationale="All required sections present",
     )
 ```
-
 
 For evaluation criteria that require nuanced judgment, write a scorer that calls an LLM directly. This scorer asks GPT-4o-mini to rate the medical accuracy and tone of responses.
 
@@ -251,7 +247,6 @@ Import `AssessmentSource` at the top of your script:
 from mlflow.entities import AssessmentSource, Feedback
 ```
 
-
 Compare built-in guideline scorers against custom scorers in a single evaluation run.
 
 ```python
@@ -266,7 +261,6 @@ all_results = mlflow.genai.evaluate(
     ],
 )
 ```
-
 
 ```python
 # Aggregate metrics across all scorers

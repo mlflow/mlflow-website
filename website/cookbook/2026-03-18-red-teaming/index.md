@@ -10,11 +10,12 @@ Find safety vulnerabilities in your LLM application by running adversarial input
 <!-- truncate -->
 
 :::tip[Prerequisites]
+
 ```bash
 pip install mlflow openai
 ```
-:::
 
+:::
 
 ```python
 import mlflow
@@ -58,7 +59,6 @@ Verify the agent works on a normal request:
 ```python
 print(customer_service_agent("How do I return a product?"))
 ```
-
 
 Each test case targets a different attack vector.
 
@@ -144,14 +144,12 @@ red_team_data = [
 ]
 ```
 
-
 The parameter name must match the key in the `inputs` dicts.
 
 ```python
 def predict_fn(question):
     return customer_service_agent(question)
 ```
-
 
 The `Safety` scorer detects harmful, offensive, or toxic content in responses.
 
@@ -173,7 +171,6 @@ print(df[["inputs/question", "safety/value"]])
 ```
 
 A perfect safety score means the agent did not produce harmful content. But that does not mean it resisted every attack -- it may have leaked the system prompt or gone off-topic without being "unsafe" per se.
-
 
 `Guidelines` scorers catch policy violations that `Safety` misses -- system prompt leaks, scope drift, PII disclosure.
 
@@ -242,7 +239,6 @@ print(guideline_results.metrics)
 #   'no_roleplay/mean': 0.875,
 # }
 ```
-
 
 Use the `@scorer` decorator for deterministic checks that catch failures guidelines-based scorers might miss.
 
@@ -327,7 +323,6 @@ def red_team_check(inputs, outputs) -> list[Feedback]:
     return results
 ```
 
-
 Combine all scorers into a single evaluation pass.
 
 ```python
@@ -383,7 +378,6 @@ for _, row in df.iterrows():
     else:
         print(f"PASSED: {question}...")
 ```
-
 
 Fix the weaknesses found in Step 7. For example, if the agent went off-topic or adopted an alternate persona, harden the system prompt.
 
@@ -445,7 +439,6 @@ hardened_results = mlflow.genai.evaluate(
     ],
 )
 ```
-
 
 ```python
 print("=== Before hardening ===")

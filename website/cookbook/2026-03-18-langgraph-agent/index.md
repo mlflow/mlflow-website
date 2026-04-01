@@ -10,13 +10,14 @@ Build a tool-calling travel planning agent with LangGraph, trace every step with
 <!-- truncate -->
 
 :::tip[Prerequisites]
+
 ```bash
 pip install mlflow openai langgraph langchain-openai
 ```
+
 :::
 
 ## What You'll Build
-
 
 `mlflow.langchain.autolog()` instruments both LangChain and LangGraph. Every `invoke()` call on a LangGraph graph produces a trace with nested spans for each node, tool call, and LLM interaction.
 
@@ -30,7 +31,6 @@ mlflow.set_experiment("langgraph-travel-agent")
 # and LangGraph components
 mlflow.langchain.autolog()
 ```
-
 
 Each tool is a plain Python function decorated with `@tool`. LangGraph passes these to the LLM as callable functions.
 
@@ -131,7 +131,6 @@ def search_hotels(
     return f"No hotels found in {city}."
 ```
 
-
 Use LangGraph's `create_react_agent` to wire the tools into a ReAct-style agent loop. The agent calls the LLM, which decides which tools to invoke, and the graph routes tool outputs back to the LLM until it produces a final answer.
 
 ```python
@@ -154,7 +153,6 @@ agent = create_react_agent(
     ),
 )
 ```
-
 
 ```python
 response = agent.invoke(
@@ -179,7 +177,6 @@ print(response["messages"][-1].content)
 ```
 
 Open the MLflow UI at `http://127.0.0.1:5000`. Navigate to the `langgraph-travel-agent` experiment and click on the trace. You'll see the full execution graph: the initial LLM call that selects tools, each tool invocation as a child span, and the final LLM call that synthesizes the answer.
-
 
 Define test scenarios with expected tool calls and expected facts in the final answer. The `inputs` keys must match the parameter names of the predict function you'll define next.
 
@@ -327,7 +324,6 @@ eval_data = [
 ]
 ```
 
-
 The predict function wraps the agent so MLflow can call it for each row. Parameter names must match the keys in `inputs`. Tool call information is automatically extracted from the trace produced during each invocation.
 
 ```python
@@ -357,7 +353,6 @@ results = mlflow.genai.evaluate(
 ```
 
 `ToolCallCorrectness` compares the tool calls in each trace against the `expected_tool_calls` in expectations using fuzzy matching by default — the LLM judge determines whether the actual calls semantically match the expected ones. `Correctness` checks whether the final answer contains the `expected_facts`.
-
 
 ```python
 # Aggregate pass rates across all scenarios
