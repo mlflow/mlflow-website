@@ -157,6 +157,27 @@ When `MLFLOW_UV_AUTO_DETECT` is `false`, MLflow skips uv detection entirely and 
 
 When `MLFLOW_LOG_UV_FILES` is `false`, MLflow still uses `uv export` to populate `requirements.txt`, but does not copy the lockfile and project files as artifacts. This is useful when lockfile size is a concern and you do not need `uv sync` restoration.
 
+## Supply chain security
+
+The recent LiteLLM supply chain compromise demonstrated why pinned, locked dependencies matter. In March 2026, attackers published backdoored versions of `litellm` (1.82.7 and 1.82.8) to PyPI after stealing a publish token through a compromised GitHub Action. The malicious packages harvested SSH keys, cloud credentials, and API tokens from every machine that installed them.
+
+Projects using `pip install litellm` without version pinning pulled the compromised release automatically. Projects with a lockfile that pinned `litellm==1.82.6` were not affected because the lockfile prevented the compromised version from being installed.
+
+uv lockfiles go further than simple version pinning. The `uv.lock` file records the SHA-256 hash of every package wheel. When `uv sync` installs dependencies, it verifies each downloaded package against its recorded hash. If an attacker publishes a modified package under an existing version number, the hash check fails and installation is blocked.
+
+```
+# Inside uv.lock, every package has a pinned hash:
+[[package]]
+name = "litellm"
+version = "1.82.6"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "...", hash = "sha256:abc123..." },
+]
+```
+
+When MLflow captures your `uv.lock` as a model artifact, it preserves these hashes. Any model restored with `uv sync --frozen` will verify package integrity before installation. This closes the gap between "pinned to a version" and "verified to be the exact artifact you tested with."
+
 ## Getting started
 
 **Prerequisites:** [uv](https://docs.astral.sh/uv/) version 0.5.0 or later.
