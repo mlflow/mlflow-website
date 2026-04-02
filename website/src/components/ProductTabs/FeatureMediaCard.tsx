@@ -77,7 +77,8 @@ const SideBySideImages = ({
             className="relative overflow-hidden rounded-lg border border-white/10 cursor-pointer"
             style={{ backgroundColor: "#11171d" }}
             animate={{
-              flex: hoveredIndex === index ? 5 : hoveredIndex === null ? 1 : 0.3,
+              flex:
+                hoveredIndex === index ? 5 : hoveredIndex === null ? 1 : 0.3,
             }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             onMouseEnter={() => setHoveredIndex(index)}
@@ -93,11 +94,11 @@ const SideBySideImages = ({
                 objectPosition: image.position ?? "left top",
                 transform: hoveredIndex === index ? "scale(1.2)" : "scale(1)",
                 transformOrigin: "left top",
-                  // index === 0
-                  //   ? "right top"
-                  //   : index === images.length - 1
-                  //     ? "left top"
-                  //     : "center top",
+                // index === 0
+                //   ? "right top"
+                //   : index === images.length - 1
+                //     ? "left top"
+                //     : "center top",
               }}
               loading="lazy"
             />
