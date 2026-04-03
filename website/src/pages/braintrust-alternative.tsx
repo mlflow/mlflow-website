@@ -319,6 +319,21 @@ export default function BraintrustAlternative() {
             margin-bottom: 6px;
           }
 
+          /* Force all tables in the article to be full-width */
+          .article-container table {
+            width: 100% !important;
+            min-width: 100% !important;
+            max-width: 100% !important;
+            table-layout: fixed !important;
+            box-sizing: border-box !important;
+            display: table !important;
+          }
+          .article-container .comparison-table-wrap,
+          .article-container table {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+          }
+
           /* Comparison tables */
           .comparison-table-wrap {
             width: 100%;
