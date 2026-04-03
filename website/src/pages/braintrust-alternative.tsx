@@ -322,16 +322,21 @@ export default function BraintrustAlternative() {
           /* Comparison tables */
           .comparison-table-wrap {
             width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
             overflow-x: auto;
             margin: 16px 0 40px 0;
           }
           .comparison-table {
             width: 100%;
             min-width: 100%;
+            max-width: 100%;
             table-layout: fixed;
             border-collapse: collapse;
+            border: none;
             font-family: 'DM Sans', sans-serif;
             font-size: 14px;
+            box-sizing: border-box;
           }
           .comparison-table thead th {
             text-align: left;
@@ -340,12 +345,16 @@ export default function BraintrustAlternative() {
             color: #1a1a1a;
             font-weight: 600;
             background: #f9fafb;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
           }
           .comparison-table tbody td {
             padding: 12px 16px;
             border-bottom: 1px solid #f0f0f0;
             color: #505050;
             vertical-align: top;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
           }
           .comparison-table tbody td.feature-cell {
             color: #1a1a1a;
@@ -796,12 +805,14 @@ answer_question("What is MLflow?")`}
             Evaluation is where the gap between MLflow and Braintrust is most
             pronounced.
           </p>
+          <h3>Braintrust</h3>
           <div className="screenshot-wrap">
             <img
               src={BraintrustExperiment}
               alt="Braintrust experiment UI showing evaluation results and scoring"
             />
           </div>
+          <h3>MLflow</h3>
           <div className="screenshot-wrap">
             <img
               src={MlflowEvalUI}
@@ -986,7 +997,6 @@ result = mlflow.genai.optimize_prompts(
           {/* Sources & Further Reading */}
           <h2 id="sources">Sources &amp; Further Reading</h2>
           <div className="related-resources">
-            <h3>MLflow</h3>
             <ul>
               <li>
                 <Link to="/">MLflow Official Site</Link>
@@ -1008,9 +1018,6 @@ result = mlflow.genai.optimize_prompts(
                   MLflow Prompt Optimization
                 </Link>
               </li>
-            </ul>
-            <h3>Braintrust</h3>
-            <ul>
               <li>
                 <Link to="https://www.braintrust.dev/">
                   Braintrust Official Site
