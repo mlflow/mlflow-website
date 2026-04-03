@@ -18,7 +18,7 @@ to managing and optimizing these deep learning workloads. MLflow offers a practi
 <!-- truncate -->
 
 In collaboration with [MosaicML](https://www.mosaicml.com/) and the broader ML community, MLflow is thrilled to unveil a set of eagerly awaited enhancements.
-This latest release ([MLflow 2.11](https://www.mlflow.org/releases/2.11.0)) introduces updated tracking UI capabilities in direct response to
+This latest release ([MLflow 2.11](/releases/2.11.0)) introduces updated tracking UI capabilities in direct response to
 [the feedback](https://www.linkedin.com/posts/mlflow-org_qualtrics-survey-qualtrics-experience-management-activity-7128154257924513793-RCDG?utm_source=share&utm_medium=member_desktop)
 and needs of MLflow enthusiasts. These updates are not just incremental; they represent a leap forward in addressing the needs of MLflow users doing Deep Learning.
 
@@ -48,7 +48,7 @@ now supports up to **1 million** steps (iterations) when logging metrics, allowi
 
 ### Checkpointing for Deep Learning
 
-[TensorFlow](https://mlflow.org/releases/2.11.0#autologging-for-tensorflow-and-pytorch-now-supports-checkpointing-of-model-weights:~:text=both%20PyTorch%20and-,TensorFlow,-for%20automatic%20model)
+[TensorFlow](/releases/2.11.0#autologging-for-tensorflow-and-pytorch-now-supports-checkpointing-of-model-weights)
 and [PyTorch](https://www.mlflow.org/docs/latest/python_api/mlflow.pytorch.html#mlflow.pytorch.autolog) now support model weight checkpointing when
 using autologging.
 
@@ -136,7 +136,7 @@ provides a simple way to connect MLflow to your tracking server without having t
 Dive into the latest MLflow updates today and enhance the way you manage your machine learning projects! With our newest enhancements,
 including advanced metric aggregation, automatic capturing of system metrics, intuitive feature grouping, and streamlined search capabilities,
 MLflow is here to elevate your data science workflow to new heights.
-[Get started now with MLflow's cutting-edge tools and features](https://mlflow.org/releases/2.11.0).
+[Get started now with MLflow's cutting-edge tools and features](/releases/2.11.0).
 
 ```bash
 pip install mlflow==2.11

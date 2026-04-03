@@ -1,0 +1,26 @@
+name: Link Checker
+
+on:
+  pull_request:
+
+defaults:
+  run:
+    shell: bash
+    working-directory: website
+
+jobs:
+  check-links:
+    if: github.repository == 'mlflow/mlflow-website'
+    permissions:
+      contents: read
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
+      - uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm ci
+      - name: Check links
+        run: npm run check-links

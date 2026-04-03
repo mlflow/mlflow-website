@@ -44,9 +44,9 @@ allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---
 ```
 
-This skill guides Claude through the full evaluation workflow: run the agent to understand its behavior, [select appropriate quality scorers](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/index.html), [prepare an evaluation dataset](https://mlflow.org/docs/latest/genai/eval-monitor/dataset.html), and [execute `mlflow.genai.evaluate()`](https://mlflow.org/docs/latest/genai/eval-monitor/index.html) to get a systematic quality assessment.
+This skill guides Claude through the full evaluation workflow: run the agent to understand its behavior, [select appropriate quality scorers](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/index.html), [prepare an evaluation dataset](https://mlflow.org/docs/latest/genai/datasets/), and [execute `mlflow.genai.evaluate()`](https://mlflow.org/docs/latest/genai/eval-monitor/index.html) to get a systematic quality assessment.
 
-The body is a complete walkthrough: discover the agent structure, set up [tracing](https://mlflow.org/docs/latest/genai/tracing/index.html), select [LLM scorers](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/index.html), create an [evaluation dataset](https://mlflow.org/docs/latest/genai/eval-monitor/dataset.html), and run [`mlflow.genai.evaluate()`](https://mlflow.org/docs/latest/genai/eval-monitor/index.html). It's authoritative guidance, and whatever Claude reads here shapes every decision it makes.
+The body is a complete walkthrough: discover the agent structure, set up [tracing](https://mlflow.org/docs/latest/genai/tracing/index.html), select [LLM scorers](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/index.html), create an [evaluation dataset](https://mlflow.org/docs/latest/genai/datasets/), and run [`mlflow.genai.evaluate()`](https://mlflow.org/docs/latest/genai/eval-monitor/index.html). It's authoritative guidance, and whatever Claude reads here shapes every decision it makes.
 
 This is what makes skills hard to test: there is no output to compare against. Going back to the `agent-evaluation` skill, the question "Did Claude discover the agent's entry point before trying to evaluate it?" cannot be checked with `assertEqual`.
 
