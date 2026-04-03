@@ -52,11 +52,7 @@ function MlflowCodeLabel() {
 }
 
 function BraintrustCodeLabel() {
-  return (
-    <span className="code-logo-inline">
-      Braintrust
-    </span>
-  );
+  return <span className="code-logo-inline">Braintrust</span>;
 }
 
 function CodeBlock({ code, label }: { code: string; label: string }) {
@@ -102,11 +98,7 @@ const selfHostingTable: [string, string, string][] = [
     "S3, R2, GCS, Azure Blob, HDFS, local",
     "AWS, GCP, and Azure supported cloud object storage",
   ],
-  [
-    "Control Plane",
-    "Fully self-hosted",
-    "Hosted by Braintrust (hybrid)",
-  ],
+  ["Control Plane", "Fully self-hosted", "Hosted by Braintrust (hybrid)"],
 ];
 
 const tracingTable: [string, string, string][] = [
@@ -624,9 +616,9 @@ export default function BraintrustAlternative() {
             </strong>{" "}
             is a proprietary AI observability and evaluation platform for
             monitoring LLM applications in production. Its core capabilities
-            include tracing, LLM-as-a-judge evaluation, a prompt playground,
-            and an AI assistant called Loop that generates datasets, scorers,
-            and optimized prompts from natural language. Braintrust stores trace
+            include tracing, LLM-as-a-judge evaluation, a prompt playground, and
+            an AI assistant called Loop that generates datasets, scorers, and
+            optimized prompts from natural language. Braintrust stores trace
             data in Brainstore, a purpose-built database for AI observability
             workloads. The platform offers SDKs for Python, TypeScript, Go,
             Ruby, C#, and Java.
@@ -677,8 +669,8 @@ export default function BraintrustAlternative() {
                   metrics and multi-turn agent support.
                 </li>
                 <li>
-                  Need research-backed{" "}
-                  <strong>prompt optimization</strong> (GEPA, MemAlign).
+                  Need research-backed <strong>prompt optimization</strong>{" "}
+                  (GEPA, MemAlign).
                 </li>
                 <li>
                   Want a unified solution for{" "}
@@ -689,7 +681,11 @@ export default function BraintrustAlternative() {
             </div>
             <div className="tldr-card">
               <h3>
-                <img src={BraintrustLogoImg} alt="Braintrust" className="tldr-logo" />
+                <img
+                  src={BraintrustLogoImg}
+                  alt="Braintrust"
+                  className="tldr-logo"
+                />
                 Choose Braintrust if you...
               </h3>
               <ul>
@@ -706,8 +702,7 @@ export default function BraintrustAlternative() {
                   dedicated GitHub Action.
                 </li>
                 <li>
-                  Want native SDK for{" "}
-                  <strong>Ruby, C#, and Go</strong>.
+                  Want native SDK for <strong>Ruby, C#, and Go</strong>.
                 </li>
               </ul>
             </div>
@@ -725,12 +720,10 @@ export default function BraintrustAlternative() {
           <p>
             <strong>MLflow</strong> is an open source project under Apache 2.0,
             governed by the{" "}
-            <Link to="https://www.linuxfoundation.org/">
-              Linux Foundation
-            </Link>
-            . MLflow's core capabilities — tracing, evaluation, prompt
-            management, model registry, and the AI Gateway — are fully available
-            in the open source release with no gated tiers or feature flags.
+            <Link to="https://www.linuxfoundation.org/">Linux Foundation</Link>.
+            MLflow's core capabilities — tracing, evaluation, prompt management,
+            model registry, and the AI Gateway — are fully available in the open
+            source release with no gated tiers or feature flags.
           </p>
 
           {/* Self-Hosting & Architecture */}
@@ -739,18 +732,18 @@ export default function BraintrustAlternative() {
           </h2>
           <p>
             <strong>Braintrust</strong>'s self-hosting is available{" "}
-            <strong>only for enterprise plans</strong> and uses a hybrid architecture. You deploy the data
-            plane (API, PostgreSQL, Redis, S3, and Brainstore) in your own cloud
-            via Terraform, while Braintrust hosts the control plane. This means
-            a dependency on Braintrust's cloud persists even in self-hosted
-            deployments.
+            <strong>only for enterprise plans</strong> and uses a hybrid
+            architecture. You deploy the data plane (API, PostgreSQL, Redis, S3,
+            and Brainstore) in your own cloud via Terraform, while Braintrust
+            hosts the control plane. This means a dependency on Braintrust's
+            cloud persists even in self-hosted deployments.
           </p>
           <p>
             <strong>MLflow</strong> uses a minimal{" "}
-            <strong>server + database + object storage</strong>{" "}
-            architecture. Teams can plug in PostgreSQL, MySQL, SQLite,
-            or any supported DB, paired with S3, GCS, Azure Blob, or local
-            storage. Most deployments take minutes with familiar infrastructure.
+            <strong>server + database + object storage</strong> architecture.
+            Teams can plug in PostgreSQL, MySQL, SQLite, or any supported DB,
+            paired with S3, GCS, Azure Blob, or local storage. Most deployments
+            take minutes with familiar infrastructure.
           </p>
           <ComparisonTable rows={selfHostingTable} />
 
@@ -869,9 +862,7 @@ answer_question("What is MLflow?")`}
           <ComparisonTable rows={evalTable} />
 
           {/* Prompt Management & Optimization */}
-          <h2 id="prompt-management">
-            Prompt Management &amp; Optimization
-          </h2>
+          <h2 id="prompt-management">Prompt Management &amp; Optimization</h2>
           <p>
             Both platforms support prompt versioning. Braintrust's playground is
             more mature for interactive prompt iteration. PMs and domain experts
@@ -954,15 +945,16 @@ result = mlflow.genai.optimize_prompts(
             <Link to="https://www.braintrust.dev/docs/deploy/gateway#use-the-braintrust-gateway">
               gateway
             </Link>{" "}
-            (currently in beta) for
-            routing requests to any supported provider with automatic caching,
-            cross-SDK compatibility, and observability. The gateway does not
-            currently include rate limiting, budget controls, fallbacks, or
-            guardrails.
+            (currently in beta) for routing requests to any supported provider
+            with automatic caching, cross-SDK compatibility, and observability.
+            The gateway does not currently include rate limiting, budget
+            controls, fallbacks, or guardrails.
           </p>
           <p>
             <strong>MLflow</strong> provides a full{" "}
-            <Link to={`${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/`}>AI Gateway</Link>{" "}
+            <Link to={`${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/`}>
+              AI Gateway
+            </Link>{" "}
             with governance built in: rate limiting, fallbacks, budget alerts,
             credential management, guardrails, and A/B testing. Teams can route
             requests across providers — OpenAI, Anthropic, Bedrock, Azure
@@ -978,9 +970,7 @@ result = mlflow.genai.optimize_prompts(
           <ComparisonTable rows={gatewayTable} />
 
           {/* Fine-Tuning & Reinforcement Learning */}
-          <h2 id="fine-tuning-rl">
-            Fine-Tuning &amp; Reinforcement Learning
-          </h2>
+          <h2 id="fine-tuning-rl">Fine-Tuning &amp; Reinforcement Learning</h2>
           <p>
             For teams that need to go beyond prompt optimization to model
             training, the platforms diverge completely.
@@ -1034,9 +1024,7 @@ result = mlflow.genai.optimize_prompts(
                 </Link>
               </li>
               <li>
-                <Link to="https://github.com/mlflow/mlflow">
-                  MLflow GitHub
-                </Link>
+                <Link to="https://github.com/mlflow/mlflow">MLflow GitHub</Link>
               </li>
               <li>
                 <Link
