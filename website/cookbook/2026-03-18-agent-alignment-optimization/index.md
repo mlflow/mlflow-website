@@ -259,7 +259,7 @@ In the MLflow UI, the traces tab shows each agent execution with its judge score
 
 The judge from Step 2 will disagree with your experts on edge cases. To fix that, have domain experts review agent outputs and score them pass/fail. You can do this through the MLflow UI (experts look at traces and add feedback directly) or programmatically with [`mlflow.log_feedback()`](https://mlflow.org/docs/latest/genai/assessments/feedback/). Each piece of feedback is attached to a specific trace, so it's tied to the exact input, output, and tool calls the expert reviewed.
 
-Once you have expert scores, [MemAlign](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/judge-alignment/) analyzes where the judge and experts disagree, then updates the judge with **guidelines** (rules like "fail responses that omit sample sizes") and **examples** (real scored traces the judge can reference). The result is a judge that scores more like your experts.
+Once you have expert scores, [MemAlign](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/alignment/) analyzes where the judge and experts disagree, then updates the judge with **guidelines** (rules like "fail responses that omit sample sizes") and **examples** (real scored traces the judge can reference). The result is a judge that scores more like your experts.
 
 In production, your domain experts would review traces in the MLflow UI and add their scores directly. For this cookbook, we'll attach mock expert feedback programmatically to show how the alignment workflow works:
 
@@ -330,7 +330,7 @@ aligned_judge = get_scorer(name="baseball_analysis").align(
 )
 ```
 
-You can inspect what [MemAlign](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/judge-alignment/) learned, then save the aligned judge back to the experiment:
+You can inspect what [MemAlign](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/alignment/) learned, then save the aligned judge back to the experiment:
 
 ```python
 # See the guidelines MemAlign extracted from expert feedback
@@ -501,7 +501,7 @@ The optimized prompt more than doubles the pass rate on questions the optimizer 
 | Custom judge        | [`make_judge`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/)                                                                                                                             | Domain-specific pass/fail evaluation  |
 | Evaluation          | [`mlflow.genai.evaluate`](https://mlflow.org/docs/latest/python_api/mlflow.genai.html#mlflow.genai.evaluate)                                                                                                                   | Score agent with judge                |
 | Expert feedback     | [`mlflow.log_feedback`](https://mlflow.org/docs/latest/genai/assessments/feedback/)                                                                                                                                            | Attach human scores to traces         |
-| Judge alignment     | [`MemAlignOptimizer`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/judge-alignment/), [`judge.align()`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/judge-alignment/)           | Calibrate judge to expert preferences |
+| Judge alignment     | [`MemAlignOptimizer`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/alignment/), [`judge.align()`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/alignment/)                       | Calibrate judge to expert preferences |
 | Prompt optimization | [`optimize_prompts`](https://mlflow.org/docs/latest/genai/prompt-registry/optimize-prompts.html), [`GepaPromptOptimizer`](https://mlflow.org/docs/latest/genai/prompt-registry/optimize-prompts.html)                          | Search for better system prompts      |
 
 ## Next Steps

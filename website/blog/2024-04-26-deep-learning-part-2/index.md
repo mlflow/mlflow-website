@@ -17,7 +17,7 @@ process - metrics, parameters, and artifacts - are reproducibly tracked and logg
 
 <!-- truncate -->
 
-In this blog post, we are going to be using [MLflow 2.12](https://mlflow.org/releases/2.12.1) and the
+In this blog post, we are going to be using [MLflow 2.12](/releases/2.12.1) and the
 [recently introduced MLflow Deep Learning features](https://mlflow.org/blog/deep-learning-part-1) to track all the important aspects of fine
 tuning a large language model for text classification, including the use of automated logging of training checkpoints in order to simplify
 the process of resumption of training.
@@ -338,7 +338,7 @@ within the full example repository [can be found here](https://github.com/puneet
 
 Dive into the latest MLflow updates today and enhance the way you manage your machine learning projects! With our newest enhancements,
 including advanced metric aggregation, automatic capturing of system metrics, intuitive feature grouping, and streamlined search capabilities,
-MLflow is here to elevate your ML workflow to new heights. [Get started now with MLflow's cutting-edge tools and features](https://mlflow.org/releases/2.12.1).
+MLflow is here to elevate your ML workflow to new heights. [Get started now with MLflow's cutting-edge tools and features](/releases/2.12.1).
 
 ## Feedback
 
