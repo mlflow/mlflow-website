@@ -40,10 +40,10 @@ const quickComparisonRows: [string, string, string, string, string, string][] =
     ["PyPI Downloads", "30M+/mo", "15M+/mo", "65M+/mo ¹", "1M+/mo", "3M+/mo"],
     [
       "Integration",
-      "60+ frameworks via OTel",
-      "60+ frameworks via OTel",
-      "LangChain-native + OTel",
-      "40+ via OpenInference + OTel",
+      "60+ frameworks via OpenTelemetry",
+      "60+ frameworks via OpenTelemetry",
+      "LangChain-native + OpenTelemetry",
+      "40+ via OpenInference + OpenTelemetry",
       "50+ frameworks",
     ],
     [
@@ -54,7 +54,7 @@ const quickComparisonRows: [string, string, string, string, string, string][] =
       "✔️",
       "Partial (ingest)",
     ],
-    ["Governance (AI Gateway)", "✔️", "No", "No", "No", "✔️"],
+    ["Governance\n(AI Gateway)", "✔️", "No", "No", "No", "✔️"],
     [
       "Self-Hosting",
       "Simple",
@@ -65,7 +65,7 @@ const quickComparisonRows: [string, string, string, string, string, string][] =
     ],
     [
       "Data Retention",
-      "Full control (self-hosted)",
+      "Unlimited",
       "30 days (free) to 3 years (pro)",
       "14 days (free); 400 days (paid add-on)",
       "7 days (free); 15 days (pro)",
@@ -87,7 +87,12 @@ function QuickComparisonTable({
         <thead>
           <tr>
             {header.map((cell, i) => (
-              <th key={i}>{cell}</th>
+              <th
+                key={i}
+                style={i === 1 ? { background: "#e0f2fe" } : undefined}
+              >
+                {cell}
+              </th>
             ))}
           </tr>
         </thead>
@@ -95,7 +100,11 @@ function QuickComparisonTable({
           {body.map((row, i) => (
             <tr key={i}>
               {row.map((cell, j) => (
-                <td key={j} className={j === 0 ? "feature-cell" : ""}>
+                <td
+                  key={j}
+                  className={j === 0 ? "feature-cell" : ""}
+                  style={j === 1 ? { background: "#f0f9ff" } : undefined}
+                >
                   {cell}
                 </td>
               ))}
@@ -249,6 +258,9 @@ export default function Top5AgentObservabilityTools() {
             color: #0072b0 !important;
             text-decoration: underline;
           }
+          .article-container a strong {
+            color: inherit;
+          }
           .article-container ul {
             list-style-type: disc;
             margin: 12px 0 24px 0;
@@ -343,6 +355,7 @@ export default function Top5AgentObservabilityTools() {
           .comparison-table tbody td.feature-cell {
             color: #1a1a1a;
             font-weight: 500;
+            white-space: pre-line;
           }
           .comparison-table tbody tr:hover {
             background: #f9fafb;
@@ -637,9 +650,10 @@ export default function Top5AgentObservabilityTools() {
             <p>
               <strong>
                 <Link to="/">MLflow</Link>
-              </strong>{" "}
-              is the top pick for teams who care about trace data ownership and
-              want a complete, open-source platform for building
+              </strong>
+              , the most widely adopted open source AI engineering platform with
+              30M+ monthly downloads, is the top pick for teams who care about
+              trace data ownership and want a complete platform for building
               production-grade agents. It covers observability, evaluation,
               prompt optimization, and governance in one place, with no
               enterprise paywalls.
@@ -662,7 +676,10 @@ export default function Top5AgentObservabilityTools() {
             What to Look For in an Agent Observability Tool
           </h2>
           <p>
-            Every tool on this list can capture traces. The real question is
+            <Link to="/ai-observability">Agent observability</Link> is
+            end-to-end visibility into every step an AI agent takes in
+            production: LLM calls, tool invocations, retrieval steps, and
+            planning decisions. Every tool on this list can capture traces. The real question is
             what happens after the trace lands. Before comparing platforms, here
             are the three capabilities that separate production-grade
             observability from expensive logging.
@@ -684,9 +701,12 @@ export default function Top5AgentObservabilityTools() {
             Traces that sit in a dashboard forever do not improve your agents. A
             well-integrated AI platform converts your trace data into fuel for
             the agent improvement loop. Once traces flow into the platform, you
-            can <strong>evaluate</strong>
+            can{" "}
+            <Link to="https://mlflow.org/docs/latest/genai/eval-monitor/">
+              <strong>evaluate </strong>
+            </Link>
             the agent's performance, <strong>optimize</strong> prompts, and{" "}
-            <strong>monitor</strong>
+            <strong>monitor </strong>
             the agent's behavior in production.
           </p>
 
@@ -697,11 +717,10 @@ export default function Top5AgentObservabilityTools() {
             sensitive information that must be protected. If that data is locked
             inside a proprietary SaaS with no export path, you are handing a
             strategic asset to a vendor. Look for{" "}
-            <strong>full open-source availability</strong> so you can self-host
-            on your own infrastructure and{" "}
-            <strong>flexible backend choices</strong>
-            (database, storage) so you are never locked to a single vendor's
-            architecture.
+            <strong>full open source availability</strong> so you can self-host
+            on your own infrastructure and use the database and storage systems
+            that best fit your environment, without being locked into a single
+            vendor's architecture.
           </p>
 
           {/* Quick Comparison Table */}
@@ -710,19 +729,19 @@ export default function Top5AgentObservabilityTools() {
           </h2>
           <QuickComparisonTable rows={quickComparisonRows} />
           <p style={{ fontSize: "13px", marginTop: "-28px" }}>
-            ¹ LangSmith's PyPI count is undetermined because it is an automatic
+            ¹ LangSmith's PyPI count is inflated because it is an automatic
             dependency of the <code>langchain</code> package.
           </p>
 
           {/* ───── 1. MLflow ───── */}
           <h2 id="mlflow" data-toc="1. MLflow">
-            1. MLflow - Open Source Observability for Everyone
+            1. MLflow - The Complete Open Source AI Platform
           </h2>
           <p>
             <strong>
               <Link to="/">MLflow</Link>
             </strong>{" "}
-            is the most widely deployed open-source AI engineering platform.
+            is the most widely deployed open source AI engineering platform.
             Built on top of its{" "}
             <Link to={`${MLFLOW_GENAI_DOCS_URL}tracing/`}>
               OpenTelemetry-native observability layer
@@ -755,9 +774,9 @@ export default function Top5AgentObservabilityTools() {
             Unlike tools tied to a single vendor's commercial interests, MLflow
             is governed by the{" "}
             <Link to="https://www.linuxfoundation.org/">Linux Foundation</Link>{" "}
-            - the trusted foundation for open-source projects like Linux,
+            - the trusted foundation for open source projects like Linux,
             Kubernetes, and PyTorch. Every feature in MLflow is available in the
-            open-source release and will remain so. There is no paywall that
+            open source release and will remain so. There is no paywall that
             gates critical capabilities. The strong commitment to openness is
             also reflected in the technical choices MLflow makes, for example,
             OpenTelemetry, the vendor-neutral observability standard, is used as
@@ -798,7 +817,13 @@ export default function Top5AgentObservabilityTools() {
             provides a centralized layer for governing LLM access across your
             organization, with routing, rate limiting, fallbacks, usage
             tracking, and credential management across providers (OpenAI,
-            Anthropic, Bedrock, Azure, Gemini, and more).
+            Anthropic, Bedrock, Azure, Gemini, and more). MLflow also includes a
+            built-in{" "}
+            <Link to={`${MLFLOW_GENAI_DOCS_URL}tracing/observe-with-traces/ui`}>
+              AI Assistant
+            </Link>{" "}
+            that helps you debug traces and diagnose issues directly within the
+            UI.
           </p>
 
           <h4 style={{ color: "black" }}>Simple, Flexible Self-Hosting</h4>
@@ -823,14 +848,14 @@ export default function Top5AgentObservabilityTools() {
             ]}
             cons={[
               "Might not be the best fit for teams that only need quick prototyping",
-              "Capability-rich platform means a steeper initial learning curve than single-purpose tools",
+              "Broader feature set than single-purpose tracing tools, which may not be needed for simple use cases",
             ]}
           />
 
           <div className="best-for">
             <strong>Best for:</strong> Teams who care about trace data ownership
             and want to get the most value from it for building production-grade
-            agents. The only fully open-source platform that covers
+            agents. The only fully open source platform that covers
             observability, evaluation, prompt optimization, governance, and AI
             gateway in one place, with no enterprise paywalls.
           </div>
@@ -865,7 +890,7 @@ export default function Top5AgentObservabilityTools() {
                 license with no enterprise paywall. The project is governed by
                 the Linux Foundation, which ensures long-term neutrality.
                 Databricks offers a managed version for teams that prefer not to
-                self-host, but the open-source release is fully featured.
+                self-host, but the open source release is fully featured.
               </p>
             </details>
             <details>
@@ -894,13 +919,13 @@ export default function Top5AgentObservabilityTools() {
 
           {/* ───── 2. Langfuse ───── */}
           <h2 id="langfuse" data-toc="2. Langfuse">
-            2. Langfuse - Open-Source Tracing for ClickHouse Experts
+            2. Langfuse - Tracing for ClickHouse Experts
           </h2>
           <p>
             <strong>
               <Link to="https://langfuse.com">Langfuse</Link>
             </strong>{" "}
-            is an open-source observability platform focused primarily on
+            is an open source observability platform focused primarily on
             tracing and monitoring LLM applications. Built around{" "}
             <strong>ClickHouse</strong> for its analytical query engine,
             Langfuse provides a clean UI for exploring traces, a prompt
@@ -953,7 +978,7 @@ export default function Top5AgentObservabilityTools() {
             ]}
             cons={[
               "Self-hosting requires ClickHouse expertise and requires running 5+ services.",
-              "Evaluation is behind leaders and some features are gated behind paid plans.",
+              "Key features like SSO, RBAC, and advanced evaluation are gated behind paid plans.",
               "Steep operational overhead and frequent architecture changes in the past.",
             ]}
           />
@@ -1031,7 +1056,7 @@ export default function Top5AgentObservabilityTools() {
             LangChain-centric, the first-party experience is polished.
           </p>
 
-          <h4 style={{ color: "black" }}>Rich AI-powered Features</h4>
+          <h4 style={{ color: "black" }}>AI-powered Features</h4>
           <p>
             LangSmith provides a rich set of AI-powered features, including
             Polly AI Assistant, topic clustering, and Insights Agent, which use
@@ -1145,7 +1170,7 @@ export default function Top5AgentObservabilityTools() {
             </Link>{" "}
             standard, a set of custom instrumentation SDKs for OpenTelemetry
             that provide framework-native tracing across 40+ integrations. The
-            open-source version (Phoenix) is available for self-hosting on a
+            open source version (Phoenix) is available for self-hosting on a
             single node.
           </p>
 
@@ -1155,7 +1180,8 @@ export default function Top5AgentObservabilityTools() {
           <p>
             Phoenix uses the Elastic License 2.0 (ELv2), which restricts
             offering the software as a managed service. High-value features like
-            the Alyx Copilot and online evaluations are gated behind paid plans.
+            the Alyx Copilot, online evaluations, and monitoring are gated
+            behind paid plans.
             Phoenix does not offer prompt optimization, an AI gateway, or
             governance capabilities, and scaling beyond single-node deployments
             requires additional planning. The project is backed by Arize AI, so
@@ -1203,7 +1229,7 @@ export default function Top5AgentObservabilityTools() {
             <details>
               <summary>Can Phoenix scale beyond a single node?</summary>
               <p>
-                The open-source version is designed for single-node deployment.
+                The open source version is designed for single-node deployment.
                 Scaling beyond that requires the commercial Arize AX platform,
                 which offers managed cloud hosting with tiered pricing.
               </p>
@@ -1234,10 +1260,10 @@ export default function Top5AgentObservabilityTools() {
             </strong>{" "}
             is a commercial AI observability platform designed for speed and
             ease of use, targeting teams where not everyone is deeply technical.
-            Its purpose-built database (Brainstore) can analyze millions of
-            production traces in seconds, and its AI proxy offers
-            zero-configuration instrumentation that lowers the barrier to
-            getting started.
+            Its purpose-built database (Brainstore) can efficiently analyze
+            production traces, and its AI proxy provides automatic logging of
+            LLM calls with minimal setup, though deeper agent-level tracing
+            still requires SDK instrumentation.
           </p>
           <div className="screenshot-wrap">
             <img
@@ -1248,8 +1274,8 @@ export default function Top5AgentObservabilityTools() {
           <h4 style={{ color: "black" }}>Fast Analytics and Approachable UI</h4>
           <p>
             Braintrust's purpose-built Brainstore database is designed for AI
-            workload patterns, delivering fast query performance over millions
-            of traces. The UI is approachable for prompt iteration and output
+            workload patterns, delivering fast query performance over production
+            traces. The UI is approachable for prompt iteration and output
             comparison, with 25+ built-in scorers and the ability to generate
             custom scorers from natural language descriptions.
           </p>
@@ -1278,7 +1304,7 @@ export default function Top5AgentObservabilityTools() {
             pros={[
               "Fast analytics on high-volume traces with purpose-built database",
               "Approachable UI for prompt iteration and non-technical stakeholders",
-              "Zero-config instrumentation via AI proxy lowers barrier to entry",
+              "AI proxy provides automatic LLM call logging with minimal setup",
             ]}
             cons={[
               "Proprietary SaaS with no self-hosted option. Trace data stays with the vendor.",
@@ -1326,7 +1352,7 @@ export default function Top5AgentObservabilityTools() {
                 option to self-host or bring your own storage. Data retention is
                 14 days on the Starter plan and 30 days on Pro. Teams that need
                 full control over trace data ownership should consider an
-                open-source alternative.
+                open source alternative.
               </p>
             </details>
           </div>
@@ -1366,7 +1392,7 @@ export default function Top5AgentObservabilityTools() {
           <p>
             Agent frameworks evolve fast. The tool you choose should not tie you
             to a single framework, a single database, or a single vendor. Native
-            OpenTelemetry support, a permissive open-source license, and simple
+            OpenTelemetry support, a permissive open source license, and simple
             self-hosting options all protect you from lock-in as your stack
             changes.
           </p>
@@ -1382,10 +1408,14 @@ export default function Top5AgentObservabilityTools() {
               <Link to="/">MLflow</Link>
             </strong>{" "}
             is our top recommendation. It is the only tool on this list that is
-            fully open-source under the Apache 2.0 license, backed by the Linux
+            fully open source under the Apache 2.0 license, backed by the Linux
             Foundation, and offers observability, evaluation, governance, and an
             AI gateway in a single platform, with no enterprise paywall on any
-            feature.
+            feature.{" "}
+            <Link to="https://mlflow.org/docs/latest/genai/tracing/quickstart/">
+              Get started with the Tracing Quickstart
+            </Link>
+            .
           </p>
 
           <h4 style={{ color: "black" }}>Alternatives Worth Considering</h4>
