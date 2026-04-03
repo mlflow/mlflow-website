@@ -640,7 +640,15 @@ export default function BraintrustAlternative() {
             models that enables teams to debug, evaluate, monitor, and optimize
             production-quality AI applications while controlling costs and
             managing access to models and data. MLflow is 100% open source under
-            the Apache 2.0 license and governed by the Linux Foundation. With
+            the Apache 2.0 license and governed by the{" "}
+            <strong>
+              backed by the{" "}
+              <Link href="https://www.linuxfoundation.org/">
+                Linux Foundation
+              </Link>
+            </strong>
+            , the premier open source software foundation and a neutral,
+            trusted hub for open technology. With
             50+ million monthly downloads and 20K+ GitHub stars, thousands of
             organizations rely on MLflow to ship AI to production. MLflow's
             feature set includes production-grade tracing, evaluation, prompt
@@ -721,8 +729,8 @@ export default function BraintrustAlternative() {
             <strong>MLflow</strong> is an open source project under Apache 2.0,
             governed by the{" "}
             <Link to="https://www.linuxfoundation.org/">Linux Foundation</Link>.
-            MLflow's core capabilities — tracing, evaluation, prompt management,
-            model registry, and the AI Gateway — are fully available in the open
+            MLflow's core capabilities, tracing, evaluation, prompt management,
+            model registry, and the AI Gateway, are fully available in the open
             source release with no gated tiers or feature flags.
           </p>
 
@@ -805,12 +813,6 @@ answer_question("What is MLflow?")`}
 
           <ComparisonTable rows={tracingTable} />
 
-          <p>
-            Braintrust has broader native SDK language coverage across six
-            languages. MLflow supports Python, JS/TS, and Java natively, plus R
-            for experiment tracking, and covers additional languages (Go, Rust,
-            etc.) via OpenTelemetry ingestion.
-          </p>
 
           {/* Evaluation */}
           <h2 id="evaluation">Evaluation</h2>
@@ -834,8 +836,8 @@ answer_question("What is MLflow?")`}
           </div>
           <p>
             <strong>Metric ecosystem.</strong> MLflow integrates natively with
-            five third-party evaluation libraries — RAGAS, DeepEval, Phoenix,
-            TruLens, and Guardrails AI — providing access to 60+ built-in and
+            five third-party evaluation libraries, such as RAGAS, DeepEval, Phoenix,
+            TruLens, and Guardrails AI, providing access to 60+ built-in and
             community metrics. Braintrust supports only its own AutoEvals
             library.
           </p>
@@ -933,9 +935,9 @@ result = mlflow.genai.optimize_prompts(
             </div>
           </div>
           <p>
-            Braintrust's Loop takes a natural-language approach that's more
-            accessible enabling non-technical teams to iterate on prompts but
-            has no published benchmarks against optimization baselines.
+            Braintrust's Loop takes Assistant-based approach that is
+            suitable for quick prototypying but has no published benchmarks
+            against optimization baselines.
           </p>
 
           {/* AI Gateway */}
@@ -957,8 +959,8 @@ result = mlflow.genai.optimize_prompts(
             </Link>{" "}
             with governance built in: rate limiting, fallbacks, budget alerts,
             credential management, guardrails, and A/B testing. Teams can route
-            requests across providers — OpenAI, Anthropic, Bedrock, Azure
-            OpenAI, Gemini, and more — while enforcing cost controls and usage
+            requests across providers such as OpenAI, Anthropic, Bedrock, Azure
+            OpenAI, Gemini, and more, while enforcing cost controls and usage
             policies without changing application code.
           </p>
           <div className="screenshot-wrap">
@@ -985,9 +987,9 @@ result = mlflow.genai.optimize_prompts(
           <p>
             <strong>MLflow</strong> covers the full AI development lifecycle,
             including fine-tuning and RL. MLflow integrates with leading
-            training libraries — <strong>Transformers</strong>,{" "}
+            training libraries like <strong>Transformers</strong>,{" "}
             <strong>PEFT</strong>, <strong>Unsloth</strong>, and{" "}
-            <strong>TRL</strong> — to track training runs, log model artifacts,
+            <strong>TRL</strong>, to track training runs, log model artifacts,
             and evaluate fine-tuned models. Teams can manage their entire
             workflow from LLM tracing and evaluation through model fine-tuning
             and deployment in a single platform.
@@ -996,18 +998,16 @@ result = mlflow.genai.optimize_prompts(
           {/* Summary */}
           <h2 id="summary">Summary</h2>
           <p>
-            <strong>Braintrust</strong> is a capable evaluation and
-            observability SaaS with a polished playground, broad SDK support,
-            and convenient CI/CD integration. It fits teams that want a managed
-            experience and primarily need tracing, evals, and prompt iteration.
+            <strong>Braintrust</strong> is a proprietary platform with evaluation and
+            observability capabilities. It fits teams that want a managed experience
+            and can accept depending on their proprietary control plane.
           </p>
           <p>
             <strong>MLflow</strong> is a complete, open source AI engineering
-            platform — self-hostable with zero dependencies, deeper evaluation
-            capabilities, research-backed prompt optimization, a full AI
-            Gateway, and end-to-end lifecycle coverage from tracing through
-            fine-tuning. For teams that need vendor independence, cost
-            predictability, and room to grow, MLflow is the stronger technical
+            platform that is self-hostable. It offers comprehensive observability
+            and evaluation capabilities, research-backed prompt optimization
+            a full-fledged AI Gateway. For teams that prefer vendor independence,
+            cost predictability, and room to grow, MLflow is the stronger technical
             foundation.
           </p>
 
