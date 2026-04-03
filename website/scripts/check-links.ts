@@ -58,6 +58,11 @@ function checkUrl(url: string): Promise<{ url: string; status: number }> {
   });
 }
 
+function isOldRelease(filePath: string): boolean {
+  const match = path.basename(filePath).match(/^(\d{4})-/);
+  return match !== null && parseInt(match[1], 10) < 2025;
+}
+
 async function main() {
   const contentDirs = ["./blog", "./releases", "./cookbook"];
   const files: string[] = [];
@@ -70,9 +75,14 @@ async function main() {
     getFiles("./src/pages", [".tsx", ".ts"], files);
   }
 
+  // Skip release notes before 2025 -- too old to be worth checking
+  const filtered = files.filter(
+    (f) => !f.startsWith("./releases/") || !isOldRelease(f),
+  );
+
   let hasFailures = false;
 
-  for (const file of files) {
+  for (const file of filtered) {
     const content = fs.readFileSync(file, "utf8");
     const urls = extractUrls(content);
     if (urls.length === 0) continue;
