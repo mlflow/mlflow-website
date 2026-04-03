@@ -12,6 +12,7 @@ import MlflowEvalUI from "@site/static/img/braintrust-alternative/mlflow-eval-ui
 import MlflowGatewayUI from "@site/static/img/braintrust-alternative/mlflow-gateway-ui.png";
 import BraintrustEvalUI from "@site/static/img/braintrust-alternative/braintrust-eval-UI.png";
 import BraintrustExperiment from "@site/static/img/braintrust-alternative/braintrust-experiment.png";
+import BraintrustLogoImg from "@site/static/img/braintrust-alternative/braintrust-logo.png";
 
 function ComparisonTable({ rows }: { rows: [string, string, string][] }) {
   const [header, ...body] = rows;
@@ -142,7 +143,7 @@ const tracingTable: [string, string, string][] = [
 
 const evalTable: [string, string, string][] = [
   ["Feature", "MLflow", "Braintrust"],
-  ["Built-in metrics", "60+ (5 third-party libraries)", "AutoEvals only"],
+  ["Built-in metrics", "70+ (5 third-party libraries)", "AutoEvals only"],
   [
     "Third-party integration",
     "RAGAS, DeepEval, Phoenix, TruLens, Guardrails AI",
@@ -687,7 +688,10 @@ export default function BraintrustAlternative() {
               </ul>
             </div>
             <div className="tldr-card">
-              <h3>Choose Braintrust if you...</h3>
+              <h3>
+                <img src={BraintrustLogoImg} alt="Braintrust" className="tldr-logo" />
+                Choose Braintrust if you...
+              </h3>
               <ul>
                 <li>
                   Comfortable with storing trace data in a{" "}
@@ -875,8 +879,11 @@ answer_question("What is MLflow?")`}
             in the browser, no code required.
           </p>
           <p>
-            For systematic optimization, <strong>MLflow</strong> ships
-            research-backed algorithms:
+            For systematic{" "}
+            <Link to="https://mlflow.org/docs/latest/genai/prompt-registry/optimize-prompts/">
+              prompt optimization
+            </Link>
+            , <strong>MLflow</strong> ships research-backed algorithms:
           </p>
           <ul>
             <li>
@@ -943,7 +950,11 @@ result = mlflow.genai.optimize_prompts(
           {/* AI Gateway */}
           <h2 id="ai-gateway">AI Gateway</h2>
           <p>
-            <strong>Braintrust</strong> offers a gateway (currently in beta) for
+            <strong>Braintrust</strong> offers a{" "}
+            <Link to="https://www.braintrust.dev/docs/deploy/gateway#use-the-braintrust-gateway">
+              gateway
+            </Link>{" "}
+            (currently in beta) for
             routing requests to any supported provider with automatic caching,
             cross-SDK compatibility, and observability. The gateway does not
             currently include rate limiting, budget controls, fallbacks, or
