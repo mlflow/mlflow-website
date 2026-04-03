@@ -10,6 +10,8 @@ import MlflowTracingUI from "@site/static/img/braintrust-alternative/mlflow-trac
 import MlflowLogo from "@site/static/img/braintrust-alternative/mlflow-logo.png";
 import MlflowEvalUI from "@site/static/img/braintrust-alternative/mlflow-eval-ui.png";
 import MlflowGatewayUI from "@site/static/img/braintrust-alternative/mlflow-gateway-ui.png";
+import BraintrustEvalUI from "@site/static/img/braintrust-alternative/braintrust-eval-UI.png";
+import BraintrustExperiment from "@site/static/img/braintrust-alternative/braintrust-experiment.png";
 
 function ComparisonTable({ rows }: { rows: [string, string, string][] }) {
   const [header, ...body] = rows;
@@ -325,6 +327,8 @@ export default function BraintrustAlternative() {
           }
           .comparison-table {
             width: 100%;
+            min-width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
             font-family: 'DM Sans', sans-serif;
             font-size: 14px;
@@ -449,6 +453,8 @@ export default function BraintrustAlternative() {
           /* Eval checklist */
           .eval-checklist {
             width: 100%;
+            min-width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
             font-family: 'DM Sans', sans-serif;
             font-size: 15px;
@@ -581,6 +587,12 @@ export default function BraintrustAlternative() {
 
           {/* What is Braintrust? */}
           <h2 id="what-is-braintrust">What is Braintrust?</h2>
+          <div className="screenshot-wrap">
+            <img
+              src={BraintrustEvalUI}
+              alt="Braintrust evaluation UI showing traces and scoring"
+            />
+          </div>
           <p>
             <strong>
               <Link to="https://www.braintrust.dev/">Braintrust</Link>
@@ -784,6 +796,12 @@ answer_question("What is MLflow?")`}
             Evaluation is where the gap between MLflow and Braintrust is most
             pronounced.
           </p>
+          <div className="screenshot-wrap">
+            <img
+              src={BraintrustExperiment}
+              alt="Braintrust experiment UI showing evaluation results and scoring"
+            />
+          </div>
           <div className="screenshot-wrap">
             <img
               src={MlflowEvalUI}
