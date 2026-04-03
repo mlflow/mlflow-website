@@ -962,7 +962,7 @@ result = mlflow.genai.optimize_prompts(
           </p>
           <p>
             <strong>MLflow</strong> provides a full{" "}
-            <Link to={`${MLFLOW_GENAI_DOCS_URL}gateway/`}>AI Gateway</Link>{" "}
+            <Link to={`${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/`}>AI Gateway</Link>{" "}
             with governance built in: rate limiting, fallbacks, budget alerts,
             credential management, guardrails, and A/B testing. Teams can route
             requests across providers — OpenAI, Anthropic, Bedrock, Azure
