@@ -647,12 +647,12 @@ export default function BraintrustAlternative() {
                 Linux Foundation
               </Link>
             </strong>
-            , the premier open source software foundation and a neutral,
-            trusted hub for open technology. With
-            50+ million monthly downloads and 20K+ GitHub stars, thousands of
-            organizations rely on MLflow to ship AI to production. MLflow's
-            feature set includes production-grade tracing, evaluation, prompt
-            management and optimization, and an AI Gateway.
+            , the premier open source software foundation and a neutral, trusted
+            hub for open technology. With 50+ million monthly downloads and 20K+
+            GitHub stars, thousands of organizations rely on MLflow to ship AI
+            to production. MLflow's feature set includes production-grade
+            tracing, evaluation, prompt management and optimization, and an AI
+            Gateway.
           </p>
 
           {/* Quick Comparison */}
@@ -813,7 +813,6 @@ answer_question("What is MLflow?")`}
 
           <ComparisonTable rows={tracingTable} />
 
-
           {/* Evaluation */}
           <h2 id="evaluation">Evaluation</h2>
           <p>
@@ -836,10 +835,10 @@ answer_question("What is MLflow?")`}
           </div>
           <p>
             <strong>Metric ecosystem.</strong> MLflow integrates natively with
-            five third-party evaluation libraries, such as RAGAS, DeepEval, Phoenix,
-            TruLens, and Guardrails AI, providing access to 60+ built-in and
-            community metrics. Braintrust supports only its own AutoEvals
-            library.
+            five third-party evaluation libraries, such as RAGAS, DeepEval,
+            Phoenix, TruLens, and Guardrails AI, providing access to 60+
+            built-in and community metrics. Braintrust supports only its own
+            AutoEvals library.
           </p>
           <p>
             <strong>Multi-turn agent evaluation.</strong> MLflow evaluates
@@ -935,9 +934,9 @@ result = mlflow.genai.optimize_prompts(
             </div>
           </div>
           <p>
-            Braintrust's Loop takes Assistant-based approach that is
-            suitable for quick prototypying but has no published benchmarks
-            against optimization baselines.
+            Braintrust's Loop takes Assistant-based approach that is suitable
+            for quick prototypying but has no published benchmarks against
+            optimization baselines.
           </p>
 
           {/* AI Gateway */}
@@ -998,17 +997,18 @@ result = mlflow.genai.optimize_prompts(
           {/* Summary */}
           <h2 id="summary">Summary</h2>
           <p>
-            <strong>Braintrust</strong> is a proprietary platform with evaluation and
-            observability capabilities. It fits teams that want a managed experience
-            and can accept depending on their proprietary control plane.
+            <strong>Braintrust</strong> is a proprietary platform with
+            evaluation and observability capabilities. It fits teams that want a
+            managed experience and can accept depending on their proprietary
+            control plane.
           </p>
           <p>
             <strong>MLflow</strong> is a complete, open source AI engineering
-            platform that is self-hostable. It offers comprehensive observability
-            and evaluation capabilities, research-backed prompt optimization
-            a full-fledged AI Gateway. For teams that prefer vendor independence,
-            cost predictability, and room to grow, MLflow is the stronger technical
-            foundation.
+            platform that is self-hostable. It offers comprehensive
+            observability and evaluation capabilities, research-backed prompt
+            optimization a full-fledged AI Gateway. For teams that prefer vendor
+            independence, cost predictability, and room to grow, MLflow is the
+            stronger technical foundation.
           </p>
 
           {/* Sources & Further Reading */}
