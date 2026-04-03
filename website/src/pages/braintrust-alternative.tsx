@@ -734,16 +734,17 @@ export default function BraintrustAlternative() {
             Self-Hosting &amp; Architecture
           </h2>
           <p>
-            <strong>Braintrust</strong>'s self-hosting is available only for
-            enterprise plans and uses a hybrid architecture. You deploy the data
+            <strong>Braintrust</strong>'s self-hosting is available{" "}
+            <strong>only for enterprise plans</strong> and uses a hybrid architecture. You deploy the data
             plane (API, PostgreSQL, Redis, S3, and Brainstore) in your own cloud
             via Terraform, while Braintrust hosts the control plane. This means
             a dependency on Braintrust's cloud persists even in self-hosted
             deployments.
           </p>
           <p>
-            <strong>MLflow</strong> uses a minimal server + database + object
-            storage architecture. Teams can plug in PostgreSQL, MySQL, SQLite,
+            <strong>MLflow</strong> uses a minimal{" "}
+            <strong>server + database + object storage</strong>{" "}
+            architecture. Teams can plug in PostgreSQL, MySQL, SQLite,
             or any supported DB, paired with S3, GCS, Azure Blob, or local
             storage. Most deployments take minutes with familiar infrastructure.
           </p>
