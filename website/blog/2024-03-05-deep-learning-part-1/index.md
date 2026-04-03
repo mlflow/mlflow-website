@@ -48,7 +48,7 @@ now supports up to **1 million** steps (iterations) when logging metrics, allowi
 
 ### Checkpointing for Deep Learning
 
-[TensorFlow](/releases/2.11.0#autologging-for-tensorflow-and-pytorch-now-supports-checkpointing-of-model-weights:~:text=both%20PyTorch%20and-,TensorFlow,-for%20automatic%20model)
+[TensorFlow](/releases/2.11.0#autologging-for-tensorflow-and-pytorch-now-supports-checkpointing-of-model-weights)
 and [PyTorch](https://www.mlflow.org/docs/latest/python_api/mlflow.pytorch.html#mlflow.pytorch.autolog) now support model weight checkpointing when
 using autologging.
 
