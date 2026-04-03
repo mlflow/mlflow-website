@@ -99,7 +99,7 @@ const selfHostingTable: [string, string, string][] = [
   [
     "Storage Choices",
     "S3, R2, GCS, Azure Blob, HDFS, local",
-    "AWS, GCP, and Azure supported object storage",
+    "AWS, GCP, and Azure supported cloud object storage",
   ],
   [
     "Control Plane",
