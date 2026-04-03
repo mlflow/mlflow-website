@@ -2,7 +2,11 @@ import markdownLinkCheck from "markdown-link-check";
 import fs from "fs";
 import path from "path";
 
-function getMarkdownFiles(dir: string, fileList: string[] = []): string[] {
+function getFiles(
+  dir: string,
+  extensions: string[],
+  fileList: string[] = [],
+): string[] {
   const files = fs.readdirSync(dir);
 
   files.forEach((file) => {
@@ -10,13 +14,27 @@ function getMarkdownFiles(dir: string, fileList: string[] = []): string[] {
     const stat = fs.statSync(filePath);
 
     if (stat.isDirectory()) {
-      getMarkdownFiles(filePath, fileList);
-    } else if (filePath.endsWith(".md") || filePath.endsWith(".mdx")) {
+      getFiles(filePath, extensions, fileList);
+    } else if (extensions.some((ext) => filePath.endsWith(ext))) {
       fileList.push(filePath);
     }
   });
 
   return fileList;
+}
+
+/**
+ * Extract URLs from TSX/TS files and convert them into markdown links
+ * so that markdown-link-check can validate them.
+ */
+function extractLinksAsMarkdown(tsxContent: string): string {
+  const urlPattern = /href=["'](https?:\/\/[^"']+)["']/g;
+  const links: string[] = [];
+  let match;
+  while ((match = urlPattern.exec(tsxContent)) !== null) {
+    links.push(`[link](${match[1]})`);
+  }
+  return links.join("\n");
 }
 
 type Result = {
@@ -26,10 +44,7 @@ type Result = {
   err: Error | null;
 };
 
-async function check(
-  content: string,
-  checkExternalLinks: boolean,
-): Promise<Result[]> {
+async function check(content: string): Promise<Result[]> {
   return new Promise((resolve, reject) => {
     const config = {
       httpHeaders: [
@@ -41,18 +56,12 @@ async function check(
           },
         },
       ],
-      ignorePatterns: checkExternalLinks
-        ? [
-            { pattern: "^(?!http)" }, // relative links
-            { pattern: "^http:\\/\\/127\\.0\\.0\\.1" },
-            { pattern: "^http:\\/\\/localhost" },
-          ]
-        : [
-            {
-              pattern:
-                "^(?!https?:\\/\\/(www\\.)?mlflow\\.org|https:\\/\\/(www\\.)?github\\.com\\/mlflow\\/mlflow)",
-            },
-          ],
+      ignorePatterns: [
+        {
+          pattern:
+            "^(?!https?:\\/\\/(www\\.)?mlflow\\.org|https:\\/\\/(www\\.)?github\\.com\\/mlflow\\/mlflow)",
+        },
+      ],
     };
 
     markdownLinkCheck(
@@ -83,21 +92,39 @@ async function check(
 async function main() {
   let encounteredBrokenLinks = false;
 
-  const checkExternalLinks = process.env.CHECK_EXTERNAL_LINKS === "true";
+  // Markdown/MDX content directories
   const contentDirs = ["./blog", "./releases", "./cookbook"];
   const markdownFiles: string[] = [];
-
   for (const dir of contentDirs) {
     if (fs.existsSync(dir)) {
-      getMarkdownFiles(dir, markdownFiles);
+      getFiles(dir, [".md", ".mdx"], markdownFiles);
     }
   }
 
-  for (const filename of markdownFiles) {
-    console.log(`[CHECKING] ${filename}`);
+  // TSX/TS pages
+  const pagesDir = "./src/pages";
+  const pageFiles: string[] = [];
+  if (fs.existsSync(pagesDir)) {
+    getFiles(pagesDir, [".tsx", ".ts"], pageFiles);
+  }
 
-    const content = fs.readFileSync(filename, "utf8");
-    const brokenLinks = await check(content, checkExternalLinks);
+  const allFiles = [
+    ...markdownFiles.map((f) => ({ path: f, type: "markdown" as const })),
+    ...pageFiles.map((f) => ({ path: f, type: "tsx" as const })),
+  ];
+
+  for (const file of allFiles) {
+    console.log(`[CHECKING] ${file.path}`);
+
+    const rawContent = fs.readFileSync(file.path, "utf8");
+    const content =
+      file.type === "tsx" ? extractLinksAsMarkdown(rawContent) : rawContent;
+
+    if (file.type === "tsx" && content.length === 0) {
+      continue; // no external links to check
+    }
+
+    const brokenLinks = await check(content);
 
     if (brokenLinks.length > 0) {
       console.log("[BROKEN LINKS]");

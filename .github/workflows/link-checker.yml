@@ -1,17 +1,7 @@
-name: External Link Checker
+name: Link Checker
 
 on:
-  schedule:
-    # Runs at 13:00 UTC every day
-    - cron: "0 13 * * *"
-  workflow_dispatch: # Allow manual runs
   pull_request:
-    paths:
-      - ".github/workflows/link-checker.yml"
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
-  cancel-in-progress: true
 
 defaults:
   run:
@@ -19,8 +9,7 @@ defaults:
     working-directory: website
 
 jobs:
-  check-external-links:
-    # Only run on the main repository
+  check-links:
     if: github.repository == 'mlflow/mlflow-website'
     permissions:
       contents: read
@@ -30,10 +19,8 @@ jobs:
       - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
       - uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3
         with:
-          node-version: 20
+          node-version: 22
       - name: Install dependencies
         run: npm ci
-      - name: Run external links checker
-        env:
-          CHECK_EXTERNAL_LINKS: "true"
+      - name: Check links
         run: npm run check-links
