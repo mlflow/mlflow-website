@@ -1157,16 +1157,16 @@ export default function Top5AgentObservabilityTools() {
 
           {/* ───── 4. Arize Phoenix ───── */}
           <h2 id="arize-phoenix" data-toc="4. Arize Phoenix">
-            4. Arize Phoenix: Research-Grade Evaluation Metrics
+            4. Arize Phoenix: ML Monitoring Meets Observability
           </h2>
           <p>
             <strong>
               <Link to="https://phoenix.arize.com/">Arize Phoenix</Link>
             </strong>{" "}
-            is an observability tool built by Arize AI, bringing research-backed
-            evaluation metrics directly into the tracing workflow. It offers
-            distributed tracing, 50+ built-in evaluation metrics, and advanced
-            analytics like trace clustering and drift detection.
+            is the open source observability tool from Arize AI, a company that
+            started in classical ML monitoring and is now expanding into the
+            GenAI space. That monitoring heritage shows in Phoenix's strengths:
+            built-in evaluation metrics, drift detection, and trace analytics.
           </p>
           <div className="screenshot-wrap">
             <img
@@ -1176,7 +1176,7 @@ export default function Top5AgentObservabilityTools() {
           </div>
 
           <h4 style={{ color: "black" }}>
-            Rich Evaluation Metrics Out of the Box
+            Built-in Evaluation Metrics
           </h4>
           <p>
             Phoenix ships with 50+ research-backed metrics covering
