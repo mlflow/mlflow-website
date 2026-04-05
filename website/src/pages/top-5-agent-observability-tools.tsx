@@ -679,6 +679,23 @@ export default function Top5AgentObservabilityTools() {
             </p>
           </div>
 
+          <div
+            style={{
+              margin: "40px 0",
+              borderRadius: "8px",
+              overflow: "hidden",
+              border: "1px solid #e5e7eb",
+            }}
+          >
+            <video width="100%" controls autoPlay loop muted playsInline>
+              <source
+                src="https://mlflow.org/docs/latest/images/llms/tracing/tracing-top.mp4"
+                type="video/mp4"
+              />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+
           {/* What to Look For */}
           <h2 id="what-to-look-for" data-toc="What to Look For">
             What to Look For in an Agent Observability Tool
