@@ -64,6 +64,14 @@ const quickComparisonRows: [string, string, string, string, string, string][] =
       "Not available",
     ],
     [
+      "Production Scale",
+      "✔️ (self-hosted, scales with your infra)",
+      "✔️ (ClickHouse-based)",
+      "✔️ (managed SaaS)",
+      "Single-node OSS; managed SaaS for scale",
+      "✔️ (managed SaaS)",
+    ],
+    [
       "Data Retention",
       "Unlimited",
       "30 days (free) to 3 years (pro)",
