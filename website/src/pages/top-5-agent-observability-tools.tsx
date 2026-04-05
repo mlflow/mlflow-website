@@ -704,10 +704,10 @@ export default function Top5AgentObservabilityTools() {
             <Link to="/ai-observability">Agent observability</Link> is
             end-to-end visibility into every step an AI agent takes in
             production: LLM calls, tool invocations, retrieval steps, and
-            planning decisions. Every tool on this list can capture traces. The real question is
-            what happens after the trace lands. Before comparing platforms, here
-            are the three capabilities that separate production-grade
-            observability from expensive logging.
+            planning decisions. Every tool on this list can capture traces. The
+            real question is what happens after the trace lands. Before
+            comparing platforms, here are the three capabilities that separate
+            production-grade observability from expensive logging.
           </p>
 
           <h3>1. Framework and ecosystem flexibility</h3>
@@ -1175,9 +1175,7 @@ export default function Top5AgentObservabilityTools() {
             />
           </div>
 
-          <h4 style={{ color: "black" }}>
-            Built-in Evaluation Metrics
-          </h4>
+          <h4 style={{ color: "black" }}>Built-in Evaluation Metrics</h4>
           <p>
             Phoenix ships with 50+ research-backed metrics covering
             faithfulness, relevance, safety, toxicity, and hallucination
@@ -1206,11 +1204,11 @@ export default function Top5AgentObservabilityTools() {
             Phoenix uses the Elastic License 2.0 (ELv2), which restricts
             offering the software as a managed service. High-value features like
             the Alyx Copilot, online evaluations, and monitoring are gated
-            behind paid plans.
-            Phoenix does not offer prompt optimization, an AI gateway, or
-            governance capabilities, and scaling beyond single-node deployments
-            requires additional planning. The project is backed by Arize AI, so
-            its long-term roadmap may be influenced by commercial priorities.
+            behind paid plans. Phoenix does not offer prompt optimization, an AI
+            gateway, or governance capabilities, and scaling beyond single-node
+            deployments requires additional planning. The project is backed by
+            Arize AI, so its long-term roadmap may be influenced by commercial
+            priorities.
           </p>
 
           <ProsConsTable
@@ -1376,8 +1374,8 @@ export default function Top5AgentObservabilityTools() {
                 All trace data is stored on Braintrust's infrastructure with no
                 option to self-host or bring your own storage. Data retention is
                 14 days on the Starter plan and 30 days on Pro. Teams that need
-                full control over trace data ownership should consider an
-                open source alternative.
+                full control over trace data ownership should consider an open
+                source alternative.
               </p>
             </details>
           </div>
