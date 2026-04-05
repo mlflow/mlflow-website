@@ -1804,6 +1804,11 @@ results = mlflow.genai.evaluate(
               <Link href="/ai-monitoring">AI Monitoring FAQ</Link>
             </li>
             <li>
+              <Link href="/top-5-agent-evaluation-frameworks">
+                Top 5 Agent Evaluation Tools Comparison
+              </Link>
+            </li>
+            <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>
             </li>
           </ul>

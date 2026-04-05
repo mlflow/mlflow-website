@@ -9,7 +9,6 @@ import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
 /* ───────── images ───────── */
-import MlflowEvalUI from "@site/static/img/langfuse-alternative/mlflow-eval-ui.png";
 import ArizePhoenixUI from "@site/static/img/arize-phoenix-alternative/arize-phoenix-ui.png";
 import LangsmithEvalUI from "@site/static/img/langsmith-alternative/langsmith-eval-ui.png";
 import RagasEvalUI from "@site/static/img/top-5-eval/ragas-eval-ui.png";
@@ -59,7 +58,12 @@ function QuickComparisonTable({
         <thead>
           <tr>
             {header.map((cell, i) => (
-              <th key={i}>{cell}</th>
+              <th
+                key={i}
+                style={i === 1 ? { background: "#e0f2fe" } : undefined}
+              >
+                {cell}
+              </th>
             ))}
           </tr>
         </thead>
@@ -67,7 +71,11 @@ function QuickComparisonTable({
           {body.map((row, i) => (
             <tr key={i}>
               {row.map((cell, j) => (
-                <td key={j} className={j === 0 ? "feature-cell" : ""}>
+                <td
+                  key={j}
+                  className={j === 0 ? "feature-cell" : ""}
+                  style={j === 1 ? { background: "#f0f9ff" } : undefined}
+                >
                   {cell}
                 </td>
               ))}
@@ -140,7 +148,7 @@ export default function Top5AgentEvaluationFrameworks() {
   return (
     <>
       <Head>
-        <title>Top 5 Agent Evaluation Frameworks in 2026 | MLflow</title>
+        <title>Top 5 Agent Evaluation Tools in 2026 | MLflow</title>
         <meta
           name="description"
           content="Compare the best agent evaluation frameworks for testing, scoring, and improving AI agents. See how MLflow, DeepEval, Ragas, Arize Phoenix, and LangSmith stack up on metrics, multi-turn support, and CI/CD integration."
@@ -220,6 +228,9 @@ export default function Top5AgentEvaluationFrameworks() {
           .article-container a:hover {
             color: #0072b0 !important;
             text-decoration: underline;
+          }
+          .article-container a strong {
+            color: inherit;
           }
           .article-container ul {
             list-style-type: disc;
@@ -595,7 +606,7 @@ export default function Top5AgentEvaluationFrameworks() {
         <Header />
 
         <div className="article-container">
-          <h1>Top 5 Agent Evaluation Frameworks in 2026</h1>
+          <h1>Top 5 Agent Evaluation Tools in 2026</h1>
           <p className="subtitle">
             Shipping an AI agent without evaluation is like deploying code
             without tests. As agents grow more complex, with multi-step
@@ -606,16 +617,34 @@ export default function Top5AgentEvaluationFrameworks() {
             your team.
           </p>
 
+          <div
+            style={{
+              margin: "40px 0",
+              borderRadius: "8px",
+              overflow: "hidden",
+              border: "1px solid #e5e7eb",
+            }}
+          >
+            <video width="100%" controls autoPlay loop muted playsInline>
+              <source
+                src="https://mlflow.org/docs/latest/images/mlflow-3/eval-monitor/evaluation-result-video.mp4"
+                type="video/mp4"
+              />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+
           <div className="tldr-box">
             <span className="tldr-label">TL;DR</span>
             <p>
               <strong>
                 <Link to="/">MLflow</Link>
               </strong>{" "}
-              is our top pick. It has the broadest metric coverage, supports
-              both rule-based and LLM judge custom metrics, and lets human
-              reviewers label results so that automated judges improve
-              automatically from that feedback.
+              , the most widely adopted open source AI engineering platform with
+              30M+ monthly downloads, is our top pick. It has the broadest
+              metric coverage, supports both rule-based and LLM judge custom
+              metrics, and lets human reviewers label results so that automated
+              judges improve automatically from that feedback.
             </p>
             <p>
               <strong>Alternatives:</strong>{" "}
@@ -631,7 +660,7 @@ export default function Top5AgentEvaluationFrameworks() {
 
           {/* What to Look For */}
           <h2 id="what-to-look-for" data-toc="What to Look For">
-            What to Look For in an Agent Evaluation Framework
+            What to Look For in an Agent Evaluation Tool
           </h2>
           <p>
             Every framework on this list can score LLM outputs. The real
@@ -641,9 +670,9 @@ export default function Top5AgentEvaluationFrameworks() {
             production-grade evaluation from basic output checking.
           </p>
 
-          <h3>1. Flexible custom metrics</h3>
+          <h3>1. Comprehensive, high-quality built-in metrics</h3>
           <p>
-            Built-in metrics are good start, but almost every real project
+            Built-in metrics are a good start, but almost every real project
             requires some sort of custom evaluation criteria. The framework must
             make it easy to define both rule-based checks (format validation,
             tool call verification) and LLM judges (for nuanced dimensions like
@@ -698,20 +727,19 @@ export default function Top5AgentEvaluationFrameworks() {
           </h2>
           <QuickComparisonTable rows={quickComparisonRows} />
           <p style={{ fontSize: "13px", marginTop: "-28px" }}>
-            {"\u00b9"} LangSmith's PyPI count is undetermined because it is an
+            {"\u00b9"} LangSmith's PyPI count is inflated because it is an
             automatic dependency of the <code>langchain</code> package.
           </p>
 
           {/* ───── 1. MLflow ───── */}
           <h2 id="mlflow" data-toc="1. MLflow">
-            1. MLflow - Widest Metric Coverage Including Multi-Turn and Human
-            Alignment
+            1. MLflow - The Complete Evaluation Platform
           </h2>
           <p>
             <strong>
               <Link to="/">MLflow</Link>
             </strong>{" "}
-            is the most widely deployed open-source AI engineering platform, and
+            is the most widely deployed open source AI engineering platform, and
             its{" "}
             <Link to={`${MLFLOW_GENAI_DOCS_URL}eval-monitor/`}>
               evaluation system
@@ -720,7 +748,7 @@ export default function Top5AgentEvaluationFrameworks() {
             standalone evaluation libraries that score outputs in isolation,
             MLflow's{" "}
             <Link to={`${MLFLOW_GENAI_DOCS_URL}concepts/scorers/`}>
-              scorer framework
+              scorer (LLM judge) framework
             </Link>{" "}
             evaluates full execution traces, including tool calls, reasoning
             chains, and planning decisions. Combined with{" "}
@@ -733,11 +761,21 @@ export default function Top5AgentEvaluationFrameworks() {
             , and <Link to="/ai-gateway">governance</Link>, MLflow provides the
             complete evaluation-to-improvement pipeline in one tool.
           </p>
-          <div className="screenshot-wrap">
-            <img
-              src={MlflowEvalUI}
-              alt="MLflow evaluation UI showing scorer results, metrics, and trace-level assessment"
-            />
+          <div
+            style={{
+              margin: "24px 0",
+              borderRadius: "8px",
+              overflow: "hidden",
+              border: "1px solid #e5e7eb",
+            }}
+          >
+            <video width="100%" controls autoPlay loop muted playsInline>
+              <source
+                src="https://mlflow.org/docs/latest/images/mlflow-3/eval-monitor/evaluation-result-video.mp4"
+                type="video/mp4"
+              />
+              Your browser does not support the video tag.
+            </video>
           </div>
 
           <h4 style={{ color: "black" }}>
@@ -795,6 +833,20 @@ export default function Top5AgentEvaluationFrameworks() {
             , MLflow provides the widest metric coverage of any evaluation
             framework on this list. All scorer results are tracked, versioned,
             and visualized in the MLflow UI alongside traces and experiments.
+            MLflow also includes{" "}
+            <Link
+              to={`${MLFLOW_GENAI_DOCS_URL}eval-monitor/ai-insights/detect-issues`}
+            >
+              automatic issue detection
+            </Link>{" "}
+            that scans thousands of traces using LLMs and clustering algorithms
+            to surface actionable quality issues, ranked by severity, without
+            requiring manual trace review. Combined with a built-in{" "}
+            <Link to={`${MLFLOW_GENAI_DOCS_URL}tracing/observe-with-traces/ui`}>
+              AI Assistant
+            </Link>
+            , this makes issue identification streamlined even for less
+            technical team members.
           </p>
 
           <ProsConsTable
@@ -804,8 +856,7 @@ export default function Top5AgentEvaluationFrameworks() {
               "Built-in human feedback collection and automated LLM judge alignment",
             ]}
             cons={[
-              "Broader platform means more initial concepts to learn than a single-purpose eval library",
-              "Teams doing quick ad-hoc evaluation may not need the full platform capabilities",
+              "Broader feature set than single-purpose eval libraries, which may not be needed for simple use cases",
             ]}
           />
 
@@ -813,9 +864,9 @@ export default function Top5AgentEvaluationFrameworks() {
             <strong>Best for:</strong> Teams that need the widest metric
             coverage for agent evaluation, with native integration for leading
             eval libraries, a unified interface for custom and LLM judge
-            metrics, and built-in human feedback alignment. The only fully
-            open-source platform that connects evaluation to prompt optimization
-            and governance.
+            metrics, and built-in human feedback alignment. The only fully open
+            source platform that connects evaluation to prompt optimization and
+            governance.
           </div>
 
           <div className="product-faq">
@@ -842,9 +893,13 @@ export default function Top5AgentEvaluationFrameworks() {
                 Yes. MLflow integrates with Ragas, DeepEval, Arize Phoenix,
                 TruLens, and Guardrails AI as evaluation libraries. You can use
                 their metrics as scorers within{" "}
-                <code>mlflow.genai.evaluate()</code>, combining the best metrics
-                from multiple libraries while keeping results centralized in
-                MLflow.
+                <Link
+                  to={`${MLFLOW_GENAI_DOCS_URL}eval-monitor/running-evaluation/agents/`}
+                >
+                  <code>mlflow.genai.evaluate()</code>
+                </Link>
+                , combining the best metrics from multiple libraries while
+                keeping results centralized in MLflow.
               </p>
             </details>
             <details>
@@ -886,7 +941,7 @@ export default function Top5AgentEvaluationFrameworks() {
             <strong>
               <Link to="https://deepeval.com/">DeepEval</Link>
             </strong>{" "}
-            is an open-source LLM evaluation framework built by Confident AI
+            is an open source LLM evaluation framework built by Confident AI
             that brings a pytest-native testing experience to agent evaluation.
             With 50+ research-backed metrics and a familiar testing interface,
             DeepEval makes it easy to add LLM evaluation to existing CI/CD
@@ -943,12 +998,11 @@ export default function Top5AgentEvaluationFrameworks() {
           <ProsConsTable
             pros={[
               "Open source (Apache 2.0) with pytest-native testing interface",
-              "50+ research-backed metrics covering agents, RAG, chatbots, and safety",
               "50+ pre-built metrics covering agents, RAG, chatbots, and safety",
             ]}
             cons={[
               "Visualization and team collaboration require Confident AI ($19.99+/user/month)",
-              "No built-in tracing, prompt optimization, or governance capabilities",
+              "No production monitoring, tracing, prompt optimization, or governance capabilities",
               "Not trace-aware; evaluation runs on provided data, not production traces",
             ]}
           />
@@ -999,7 +1053,7 @@ export default function Top5AgentEvaluationFrameworks() {
                 What is the difference between DeepEval and Confident AI?
               </summary>
               <p>
-                DeepEval is the open-source evaluation library that provides the
+                DeepEval is the open source evaluation library that provides the
                 metrics and testing logic. Confident AI is the commercial
                 platform built by the same team that adds visualization, dataset
                 management, production monitoring, and team collaboration on top
@@ -1016,7 +1070,7 @@ export default function Top5AgentEvaluationFrameworks() {
             <strong>
               <Link to="https://docs.ragas.io/">Ragas</Link>
             </strong>{" "}
-            is an open-source evaluation framework that started as the standard
+            is an open source evaluation framework that started as the standard
             for RAG evaluation and has expanded to cover agent evaluation as
             well. Born from an{" "}
             <Link to="https://arxiv.org/abs/2309.15217">
@@ -1034,18 +1088,16 @@ export default function Top5AgentEvaluationFrameworks() {
             />
           </div>
 
-          <h4 style={{ color: "black" }}>
-            The Academic Standard for RAG Evaluation
-          </h4>
+          <h4 style={{ color: "black" }}>Built for RAG Evaluation</h4>
           <p>
             Ragas established many of the evaluation metrics that other
             frameworks have since adopted. Its core RAG metrics (faithfulness,
             answer relevancy, context precision, context recall) are
             well-documented in peer-reviewed research and widely cited in the
-            community. For teams evaluating RAG pipelines, Ragas provides the
-            most thoroughly validated set of metrics available, with clear
-            mathematical definitions and known failure modes documented in the
-            research literature.
+            community. For teams evaluating RAG pipelines, Ragas provides a
+            thoroughly validated set of metrics, with clear mathematical
+            definitions and known failure modes documented in the research
+            literature.
           </p>
 
           <h4 style={{ color: "black" }}>
@@ -1069,9 +1121,9 @@ export default function Top5AgentEvaluationFrameworks() {
             platform layer. This is both a strength and a limitation. It is easy
             to integrate into any workflow and has no vendor lock-in, but teams
             will need to build their own infrastructure for visualizing results,
-            managing datasets, and tracking evaluation over time. Ragas metrics
-            use LLM calls for scoring, which adds cost and latency to each
-            evaluation run. The framework also does not provide trace-aware
+            managing datasets, and tracking evaluation results over time. Ragas
+            metrics use LLM calls for scoring, which adds cost and latency to
+            each evaluation run. The framework also does not provide trace-aware
             evaluation; you need to extract and format data from your tracing
             system before passing it to Ragas.
           </p>
@@ -1194,12 +1246,13 @@ export default function Top5AgentEvaluationFrameworks() {
           <p>
             Phoenix uses the Elastic License 2.0 (ELv2), which restricts
             offering the software as a managed service. High-value features like
-            the Alyx Copilot and online evaluations are gated behind paid plans
-            on the commercial Arize AX platform. Phoenix does not offer prompt
-            optimization or governance capabilities, and multi-turn evaluation
-            support is more limited than dedicated evaluation libraries. The
-            free tier retains data for only 7 days, and scaling beyond
-            single-node deployments requires the commercial platform.
+            the Alyx Copilot, online evaluations, and monitoring are gated
+            behind paid plans on the commercial Arize AX platform. Phoenix does
+            not offer prompt optimization or governance capabilities, and
+            multi-turn evaluation support is more limited than dedicated
+            evaluation libraries. The free tier retains data for only 7 days,
+            and scaling beyond single-node deployments requires the commercial
+            platform.
           </p>
 
           <ProsConsTable
@@ -1210,7 +1263,7 @@ export default function Top5AgentEvaluationFrameworks() {
             ]}
             cons={[
               "Elastic License 2.0 restricts use as a managed service",
-              "High-value features (Alyx Copilot, online eval) gated behind paid plans",
+              "High-value features (Alyx Copilot, online eval, monitoring) gated behind paid plans",
               "No multi-turn or conversation-level evaluation support",
             ]}
           />
@@ -1230,7 +1283,7 @@ export default function Top5AgentEvaluationFrameworks() {
                 (ELv2), which allows free use but restricts offering the
                 software as a managed service. This is a more restrictive
                 license than Apache 2.0 or MIT. The commercial Arize AX platform
-                adds features not available in the open-source version.
+                adds features not available in the open source version.
               </p>
             </details>
             <details>
@@ -1270,7 +1323,7 @@ export default function Top5AgentEvaluationFrameworks() {
 
           {/* ───── 5. LangSmith ───── */}
           <h2 id="langsmith" data-toc="5. LangSmith">
-            5. LangSmith - LangChain's Commercial Evaluation Platform
+            5. LangSmith - LangChain's Paid Evaluation Platform
           </h2>
           <p>
             <strong>
@@ -1452,12 +1505,29 @@ export default function Top5AgentEvaluationFrameworks() {
             is our top recommendation. It provides the widest metric coverage
             through native integration with DeepEval, Ragas, Arize Phoenix,
             TruLens, and Guardrails AI as pluggable scorers. Its unified{" "}
-            <code>@scorer</code> decorator and <code>make_judge()</code> API
-            make it easy to define, version, and manage custom metrics. And its
-            built-in human feedback collection with the <code>align()</code> API
-            for automatic LLM judge alignment is a capability you will not find
-            in any other framework on this list. All of this is fully open
-            source under the Apache 2.0 license, backed by the Linux Foundation.
+            <Link to={`${MLFLOW_GENAI_DOCS_URL}concepts/scorers/`}>
+              <code>@scorer</code> decorator
+            </Link>{" "}
+            and{" "}
+            <Link
+              to={`${MLFLOW_GENAI_DOCS_URL}concepts/scorers/custom-scorers/#llm-judges`}
+            >
+              <code>make_judge()</code>
+            </Link>{" "}
+            API make it easy to define, version, and manage custom metrics. And
+            its built-in human feedback collection with the{" "}
+            <Link
+              to={`${MLFLOW_GENAI_DOCS_URL}prompt-registry/optimize-prompts/`}
+            >
+              <code>align()</code>
+            </Link>{" "}
+            API for automatic LLM judge alignment is a capability you will not
+            find in any other framework on this list. All of this is fully open
+            source under the Apache 2.0 license, backed by the Linux Foundation.{" "}
+            <Link to={`${MLFLOW_GENAI_DOCS_URL}eval-monitor/quickstart/`}>
+              Get started with the Evaluation Quickstart
+            </Link>
+            .
           </p>
 
           <h4 style={{ color: "black" }}>Alternatives Worth Considering</h4>
@@ -1511,10 +1581,12 @@ export default function Top5AgentEvaluationFrameworks() {
           <p>
             Yes, but managing each library's own interface, data format, and
             result storage quickly becomes a mess. The practical approach is to
-            use a platform that integrates with multiple metric libraries
-            through a single unified interface, so you get
-            academically-validated RAG metrics from Ragas and pytest-native
-            agent metrics from DeepEval without juggling separate workflows.
+            use a platform like{" "}
+            <Link to={`${MLFLOW_GENAI_DOCS_URL}eval-monitor/`}>MLflow</Link>{" "}
+            that integrates with multiple metric libraries through a single
+            unified interface, so you get academically-validated RAG metrics
+            from Ragas and pytest-native agent metrics from DeepEval without
+            juggling separate workflows.
           </p>
 
           <h3>How do I align LLM judges with human feedback?</h3>
@@ -1528,7 +1600,13 @@ export default function Top5AgentEvaluationFrameworks() {
               MemAlign
             </a>{" "}
             and GEPA formalize this process, making judge calibration
-            reproducible and measurable rather than ad hoc.
+            reproducible and measurable rather than ad hoc. See the{" "}
+            <Link
+              to={`${MLFLOW_GENAI_DOCS_URL}prompt-registry/optimize-prompts/`}
+            >
+              MLflow judge alignment guide
+            </Link>{" "}
+            for a walkthrough.
           </p>
 
           <h3>How do I evaluate multi-turn agent conversations?</h3>
