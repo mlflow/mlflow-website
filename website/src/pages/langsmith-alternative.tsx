@@ -1083,6 +1083,11 @@ result = mlflow.genai.optimize_prompts(
               <li>
                 <Link to="/llmops">LLMOps Guide</Link>
               </li>
+              <li>
+                <Link to="/top-5-agent-observability-tools">
+                  Top 5 Agent Observability Tools Comparison
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
