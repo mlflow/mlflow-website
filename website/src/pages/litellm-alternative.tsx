@@ -192,7 +192,7 @@ export default function LitellmAlternative() {
     <>
       <Head>
         <title>
-          Open Source LiteLLM Alternative? MLflow vs LiteLLM | MLflow
+          Open Source LiteLLM AI Gateway Alternative? MLflow vs LiteLLM | MLflow
         </title>
         <meta
           name="description"
@@ -275,7 +275,7 @@ export default function LitellmAlternative() {
           .article-container ul {
             list-style-type: disc;
             margin: 12px 0 24px 0;
-            padding-left: 40px;
+            padding-left: 24px;
             list-style-position: outside;
           }
           .article-container li {
@@ -505,19 +505,6 @@ export default function LitellmAlternative() {
             background: #f9fafb;
           }
 
-          /* Related resources */
-          .related-resources ul {
-            list-style-type: none;
-            padding-left: 0;
-          }
-          .related-resources li {
-            padding-left: 0;
-            margin-bottom: 12px;
-          }
-          .related-resources li a {
-            font-weight: 500;
-          }
-
           /* Sidebar TOC */
           .article-sidebar {
             position: fixed;
@@ -593,7 +580,7 @@ export default function LitellmAlternative() {
         <Header />
 
         <div className="article-container">
-          <h1>Open Source LiteLLM Alternative? LiteLLM vs MLflow</h1>
+          <h1>Open Source LiteLLM AI Gateway Alternative? LiteLLM vs MLflow</h1>
           <p className="subtitle">
             This article is for teams looking for a secure, enterprise-ready,
             open-source alternative to LiteLLM. We compare the two across
@@ -613,12 +600,11 @@ export default function LitellmAlternative() {
             <strong>
               <Link href="https://www.litellm.ai/">LiteLLM</Link>
             </strong>{" "}
-            is an open source AI gateway and proxy maintained by BerriAI, a Y
-            Combinator-backed startup. It provides a nified, OpenAI-compatible
+            is an open source AI gateway maintained by BerriAI, a Y
+            Combinator-backed startup. It provides a unified, OpenAI-compatible
             interface to over 100 LLM providers, with built-in features like
-            cost tracking, rate limiting, and automatic fallbacks. LiteLLM
-            offers both a Python SDK for direct integration and a self-hosted
-            proxy server for centralized gateway deployment.
+            cost tracking, rate limiting, and automatic fallbacks. LiteLLM also
+            offers a Python SDK for direct client integration.
           </p>
 
           {/* What is MLflow? */}
@@ -648,8 +634,8 @@ export default function LitellmAlternative() {
               </h3>
               <ul>
                 <li>
-                  Need <strong>secure alternative</strong> trusted by thousands
-                  of enterprises
+                  Need a <strong>secure gateway solution</strong> trusted by
+                  thousands of enterprises
                 </li>
                 <li>
                   Care about performance and want a{" "}
@@ -702,16 +688,16 @@ export default function LitellmAlternative() {
             <strong>MLflow</strong> is open source under Apache 2.0 and is{" "}
             <strong>
               backed by the{" "}
-              <Link href="https://www.linuxfoundation.org/">
+              <Link href="https://www.linuxfoundation.org/press/press-release/the-mlflow-project-joins-linux-foundation">
                 Linux Foundation
               </Link>
             </strong>
             , the premier open source software foundation who also owns Linux,
             Kubernetes, and Pytorch. MLflow has been powering production AI
             since 2018 and maintains full feature parity between its open source
-            release and managed offerings. With adoption by 60%+ of the Fortune
-            500, MLflow is one of the most widely deployed AI platforms in the
-            enterprise.
+            release and managed offerings. With over 30 million monthly
+            downloads and thousands of enterprise users, MLflow is one of the
+            most widely deployed AI platforms.
           </p>
 
           {/* Security & Reliability */}
@@ -745,8 +731,8 @@ export default function LitellmAlternative() {
           <p>
             <strong>MLflow</strong> benefits from{" "}
             <strong>Databricks' dedicated security team</strong> and nearly a
-            decade of hardening for enterprise deployments. With adoption across
-            60%+ of the Fortune 500, MLflow has a proven track record of
+            decade of hardening for enterprise deployments. With thousands of
+            enterprise users worldwide, MLflow has a proven track record of
             reliability and security at scale. The Linux Foundation governance
             provides additional assurance that security practices meet
             enterprise standards, and the large contributor community means more
@@ -758,7 +744,9 @@ export default function LitellmAlternative() {
           <p>
             Both MLflow and LiteLLM offer AI Gateway capabilities for routing
             requests to multiple LLM providers, managing costs, and enforcing
-            usage policies. This is the primary overlap between the two tools.
+            usage policies. Most major providers (OpenAI, Anthropic, Google,
+            Azure, AWS Bedrock, and more) are supported by both gateways. This
+            is the primary overlap between the two tools.
           </p>
           <p>
             <strong>LiteLLM</strong> is purpose-built as a gateway proxy,
@@ -902,9 +890,9 @@ export default function LitellmAlternative() {
               >
                 <strong>Prompt optimization</strong>
               </Link>{" "}
-              with state-of-the-art algorithms (GEPA, MIPRO) that automatically
-              improve prompts based on evaluation results, for both individual
-              prompts and end-to-end agents
+              with state-of-the-art algorithms (GEPA) that automatically improve
+              prompts based on evaluation results, for both individual prompts
+              and end-to-end agents
             </li>
             <li>
               <Link to={`${MLFLOW_GENAI_DOCS_URL}prompt-registry/`}>
@@ -951,8 +939,7 @@ export default function LitellmAlternative() {
 
           {/* Related Resources */}
           <h2>Related Resources</h2>
-          <div className="related-resources">
-            <ul>
+          <ul>
               <li>
                 <Link to="/ai-gateway">What is AI Gateway?</Link>
               </li>
@@ -980,8 +967,7 @@ export default function LitellmAlternative() {
               <li>
                 <Link to="/llmops">LLMOps Guide</Link>
               </li>
-            </ul>
-          </div>
+          </ul>
         </div>
 
         <ArticleSidebar />
