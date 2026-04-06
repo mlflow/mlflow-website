@@ -24,18 +24,14 @@ const tracingExamples: { label: string; mlflow: string; litellm: string }[] = [
 # and error details. No code changes.
 from openai import OpenAI
 
-client = OpenAI(
-    base_url="http://localhost:5000/gateway/v1",
-)
-response = client.chat.completions.create(
-    model="my-endpoint",
-    messages=[{"role": "user", "content": "Hi"}],
-)`,
+client = OpenAI(base_url="http://localhost:5000/gateway/v1")
+
+# Invoke the client as usual
+`,
     litellm: `import litellm
 
-# LiteLLM has no native tracing.
-# You must set up an external tool
-# like Datadog for observability.
+# Observability requires configuring an
+# external callback (e.g. Datadog, Langfuse).
 
 litellm.success_callback = ["datadog"]
 litellm.failure_callback = ["datadog"]
@@ -58,15 +54,14 @@ mlflow.langgraph.autolog()
 # Agent traces and gateway traces are
 # linked automatically via distributed
 # tracing - no extra code needed.`,
-    litellm: `# LiteLLM only proxies individual
-# LLM API calls. It cannot trace
-# agent workflows, tool calls, or
-# multi-step reasoning chains.
+    litellm: `# LiteLLM focuses on LLM API call
+# proxying. Agent-level tracing (tool
+# calls, multi-step reasoning) requires
+# a separate tool.
 #
-# Client-side and proxy-side traces
-# cannot be connected. Teams must
-# manually correlate logs across
-# separate observability systems.`,
+# Client-side and proxy-side traces are
+# independent -- connecting them requires
+# manual correlation across systems.`,
   },
 ];
 
@@ -79,16 +74,10 @@ const gatewayFeatures: [string, string, string][] = [
   ["Fallbacks & Load Balancing", "✅", "✅"],
   ["Passthrough / Native Provider APIs", "✅", "✅"],
   ["Guardrails", "✅", "Enterprise only"],
-  ["Observability", "✅", "❌ (external tools required)"],
+  ["Observability", "✅", <>❌<br/> (external tools required)</>],
 ];
 
-const overheadBenchmarks: [string, string, string][] = [
-  ["Metric", "MLflow", "LiteLLM"],
-  ["P50 Latency", "13.6 ms", "40.1 ms"],
-  ["P99 Latency", "64.5 ms", "232.5 ms"],
-];
-
-function ComparisonTable({ rows }: { rows: [string, string, string][] }) {
+function ComparisonTable({ rows }: { rows: string[][] }) {
   const [header, ...body] = rows;
   return (
     <div className="comparison-table-wrap">
@@ -275,7 +264,7 @@ export default function LitellmAlternative() {
           .article-container ul {
             list-style-type: disc;
             margin: 12px 0 24px 0;
-            padding-left: 24px;
+            padding-left: 24px !important;
             list-style-position: outside;
           }
           .article-container li {
@@ -353,22 +342,31 @@ export default function LitellmAlternative() {
             font-size: 14px;
           }
           .comparison-table thead th {
-            text-align: left;
+            text-align: center;
             padding: 12px 16px;
             border-bottom: 2px solid #e5e7eb;
             color: #1a1a1a;
             font-weight: 600;
             background: #f9fafb;
           }
+          .comparison-table thead th:first-child {
+            text-align: left;
+          }
           .comparison-table tbody td {
             padding: 12px 16px;
             border-bottom: 1px solid #f0f0f0;
             color: #505050;
             vertical-align: top;
+            text-align: center;
           }
           .comparison-table tbody td.feature-cell {
             color: #1a1a1a;
             font-weight: 500;
+            text-align: left;
+          }
+          .comparison-table tbody td.diff-cell {
+            color: #16a34a;
+            font-weight: 600;
           }
           .comparison-table tbody tr:hover {
             background: #f9fafb;
@@ -638,12 +636,12 @@ export default function LitellmAlternative() {
                   thousands of enterprises
                 </li>
                 <li>
-                  Care about performance and want a{" "}
-                  <strong>low-overhead</strong> gateway solution
-                </li>
-                <li>
                   Want <strong>native observability</strong> integrated with
                   your gateway
+                </li>
+                <li>
+                  Care about performance and want a{" "}
+                  <strong>low-overhead</strong> gateway solution
                 </li>
               </ul>
             </div>
@@ -654,7 +652,7 @@ export default function LitellmAlternative() {
               </h3>
               <ul>
                 <li>
-                  Only need a <strong>LLM proxy</strong> for model routing
+                  Need a <strong>dedicated LLM proxy</strong> for model routing
                 </li>
                 <li>
                   Use <strong>long-tail LLM providers</strong> that only LiteLLM
@@ -710,27 +708,20 @@ export default function LitellmAlternative() {
             access, and sensitive data.
           </p>
           <p>
-            In March 2026, <strong>LiteLLM</strong> was the target of a{" "}
-            <strong>
-              <Link href="https://securitylabs.datadoghq.com/articles/litellm-compromised-pypi-teampcp-supply-chain-campaign/">
-                supply chain attack
-              </Link>
-            </strong>{" "}
-            that compromised its PyPI packages with credential-stealing malware.
-            Malicious versions were published on PyPI, which includes a
-            credential stealer that could exfiltrate SSH keys, cloud
-            credentials, and Kubernetes tokens for users who installed them
-            during that window. While BerriAI responded and engaged Mandiant for
-            forensic analysis, the incident underscores the{" "}
-            <strong>
-              importance of choosing a secure and trusted software
-            </strong>{" "}
-            for critical AI infrastructure. A growing startup often has fewer
-            resources to dedicate to security hardening and CI/CD protection.
+            In March 2026, <strong>LiteLLM</strong> experienced a{" "}
+            <Link href="https://securitylabs.datadoghq.com/articles/litellm-compromised-pypi-teampcp-supply-chain-campaign/">
+              supply chain incident
+            </Link>{" "}
+            where compromised packages were briefly published to PyPI. BerriAI
+            responded promptly and engaged Mandiant for forensic analysis. While
+            such incidents can affect any open source project, this highlights
+            the importance of evaluating the{" "}
+            security practices and governance model of tools in
+            your AI infrastructure.
           </p>
           <p>
             <strong>MLflow</strong> benefits from{" "}
-            <strong>Databricks' dedicated security team</strong> and nearly a
+            <strong>dedicated security team</strong> from Databricks and nearly a
             decade of hardening for enterprise deployments. With thousands of
             enterprise users worldwide, MLflow has a proven track record of
             reliability and security at scale. The Linux Foundation governance
@@ -749,7 +740,11 @@ export default function LitellmAlternative() {
             is the primary overlap between the two tools.
           </p>
           <p>
-            <strong>LiteLLM</strong> is purpose-built as a gateway proxy,
+            <strong>LiteLLM</strong> is purpose-built as a{" "}
+            <Link href="https://docs.litellm.ai/docs/simple_proxy">
+              gateway proxy
+            </Link>
+            ,
             offering broad provider support (100+), virtual key management, and
             an OpenAI-compatible API format that enables applications to switch
             providers without code changes. It offers rate limiting, cost
@@ -784,24 +779,55 @@ export default function LitellmAlternative() {
             is multiplied across millions of requests.
           </p>
           <p>
-            To isolate the overhead each gateway adds, we benchmarked pure proxy
-            latency with zero simulated provider delay (4 workers, 50 concurrent
-            users). The results show that MLflow's AI Gateway adds{" "}
-            <strong>3x less overhead</strong> and delivers{" "}
-            <strong>2.8x the throughput</strong> compared to LiteLLM.
+            We benchmarked both gateways with a 50 ms simulated provider delay
+            (4 workers, 50 concurrent users). The overhead column shows gateway
+            latency after subtracting the simulated delay. The results show that
+            MLflow's AI Gateway adds{" "}
+            <strong>approximately half the overhead</strong> and delivers{" "}
+            <strong>67% higher throughput</strong> compared to LiteLLM.
           </p>
-          <ComparisonTable rows={overheadBenchmarks} />
-          <p>
-            LiteLLM also suffers from well-documented{" "}
-            <Link href="https://github.com/BerriAI/litellm/issues/7605">
-              slow import times
-            </Link>
-            , with users reporting 2 to 7+ seconds just to{" "}
-            <code>import litellm</code> due to eager loading of a deep
-            dependency tree. This is particularly painful for serverless
-            deployments and cold starts. The issue has been open since January
-            2025 and remains unresolved as of 2026.
-          </p>
+          <div className="comparison-table-wrap">
+            <table className="comparison-table">
+              <thead>
+                <tr>
+                  <th rowSpan={2}>Metric</th>
+                  <th colSpan={2}>MLflow</th>
+                  <th colSpan={2}>LiteLLM</th>
+                  <th rowSpan={2}>Overhead Diff</th>
+                </tr>
+                <tr>
+                  <th>Latency</th>
+                  <th>Overhead</th>
+                  <th>Latency</th>
+                  <th>Overhead</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="feature-cell">P50</td>
+                  <td>78.6 ms</td>
+                  <td>28.6 ms</td>
+                  <td>106.7 ms</td>
+                  <td>56.7 ms</td>
+                  <td className="diff-cell">-50%</td>
+                </tr>
+                <tr>
+                  <td className="feature-cell">P99</td>
+                  <td>184.2 ms</td>
+                  <td>134.2 ms</td>
+                  <td>388.8 ms</td>
+                  <td>338.8 ms</td>
+                  <td className="diff-cell">-60%</td>
+                </tr>
+                <tr>
+                  <td className="feature-cell">Throughput</td>
+                  <td colSpan={2}>598 req/s</td>
+                  <td colSpan={2}>358 req/s</td>
+                  <td className="diff-cell">+67%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
           {/* Tracing & Observability */}
           <h2 id="tracing-observability">Observability & Monitoring</h2>
@@ -877,7 +903,7 @@ export default function LitellmAlternative() {
             </li>
             <li>
               <Link to={`${MLFLOW_GENAI_DOCS_URL}evaluation/`}>
-                <strong>Production-grade evaluation</strong>
+                <strong>Agent evaluation</strong>
               </Link>{" "}
               with built-in scorers, integration with leading evaluation
               libraries (RAGAS, DeepEval, Phoenix, TruLens, Guardrails AI),
@@ -885,20 +911,16 @@ export default function LitellmAlternative() {
               with human feedback
             </li>
             <li>
+              <Link to={`${MLFLOW_GENAI_DOCS_URL}prompt-registry/`}>
+                <strong>Prompt engineering</strong>
+              </Link>{" "}
+              with a versioned prompt registry, lineage tracking, and{" "}
               <Link
                 to={`${MLFLOW_GENAI_DOCS_URL}prompt-registry/optimize-prompts/`}
               >
-                <strong>Prompt optimization</strong>
+                automatic optimization
               </Link>{" "}
-              with state-of-the-art algorithms (GEPA) that automatically improve
-              prompts based on evaluation results, for both individual prompts
-              and end-to-end agents
-            </li>
-            <li>
-              <Link to={`${MLFLOW_GENAI_DOCS_URL}prompt-registry/`}>
-                <strong>Prompt registry</strong>
-              </Link>{" "}
-              with versioning, tagging, and lineage tracking
+              that improves prompts based on evaluation results
             </li>
             <li>
               <strong>Fine-tuning and reinforcement learning</strong> support
@@ -918,19 +940,17 @@ export default function LitellmAlternative() {
             <strong>
               Choose <Link href="https://www.litellm.ai/">LiteLLM</Link>
             </strong>{" "}
-            if you only need a <strong>simple LLM proxy</strong> for model
-            routing, depend on long-tail LLM providers that only LiteLLM
-            supports, or are already satisfied with its experience and
-            stability. Be aware that some LiteLLM users report stability and
-            performance concerns. An recent supply chain attack has raised
-            concerns about the security governance of the project.
+            if you need a <strong>dedicated LLM proxy</strong> for model
+            routing, use long-tail LLM providers that only LiteLLM supports, or
+            are already integrated with <strong>LiteLLM's client SDK</strong> and
+            proxy in your stack.
           </p>
           <p>
             <strong>
               Choose <Link to="/">MLflow</Link>
             </strong>{" "}
-            if you need a <strong>secure AI gateway</strong> alternative trusted
-            by thousands of enterprises, with native observability and
+            if you need a <strong>secure AI gateway</strong> trusted by
+            enterprises, with <strong>native observability</strong> and
             evaluation integrated with your gateway. MLflow covers the entire AI
             lifecycle: gateway, tracing, evaluation, prompt optimization, all in
             one platform. Teams who build production-grade LLM applications and
@@ -940,33 +960,33 @@ export default function LitellmAlternative() {
           {/* Related Resources */}
           <h2>Related Resources</h2>
           <ul>
-              <li>
-                <Link to="/ai-gateway">What is AI Gateway?</Link>
-              </li>
-              <li>
-                <Link to="/ai-platform">What is AI Platform?</Link>
-              </li>
-              <li>
-                <Link to={`${MLFLOW_GENAI_DOCS_URL}gateway/`}>
-                  MLflow AI Gateway Guide
-                </Link>
-              </li>
-              <li>
-                <Link to={`${MLFLOW_GENAI_DOCS_URL}tracing/quickstart/`}>
-                  MLflow Tracing Quickstart
-                </Link>
-              </li>
-              <li>
-                <Link to={MLFLOW_GENAI_DOCS_URL}>MLflow Documentation</Link>
-              </li>
-              <li>
-                <Link href="https://docs.litellm.ai/docs/">
-                  LiteLLM Documentation
-                </Link>
-              </li>
-              <li>
-                <Link to="/llmops">LLMOps Guide</Link>
-              </li>
+            <li>
+              <Link to="/ai-gateway">What is AI Gateway?</Link>
+            </li>
+            <li>
+              <Link to="/ai-platform">What is AI Platform?</Link>
+            </li>
+            <li>
+              <Link to={`${MLFLOW_GENAI_DOCS_URL}gateway/`}>
+                MLflow AI Gateway Guide
+              </Link>
+            </li>
+            <li>
+              <Link to={`${MLFLOW_GENAI_DOCS_URL}tracing/quickstart/`}>
+                MLflow Tracing Quickstart
+              </Link>
+            </li>
+            <li>
+              <Link to={MLFLOW_GENAI_DOCS_URL}>MLflow Documentation</Link>
+            </li>
+            <li>
+              <Link href="https://docs.litellm.ai/docs/">
+                LiteLLM Documentation
+              </Link>
+            </li>
+            <li>
+              <Link to="/llmops">LLMOps Guide</Link>
+            </li>
           </ul>
         </div>
 
