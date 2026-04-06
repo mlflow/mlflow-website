@@ -1211,6 +1211,11 @@ const result = await generateText({
               <Link href="/ai-monitoring">AI Monitoring FAQ</Link>
             </li>
             <li>
+              <Link href="/top-5-agent-observability-tools">
+                Top 5 Agent Observability Tools Comparison
+              </Link>
+            </li>
+            <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>
             </li>
             <li>

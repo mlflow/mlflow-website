@@ -1179,6 +1179,16 @@ export default function ArizePhoenixAlternative() {
               <li>
                 <Link to="/ai-gateway">MLflow AI Gateway</Link>
               </li>
+              <li>
+                <Link to="/top-5-agent-observability-tools">
+                  Top 5 Agent Observability Tools Comparison
+                </Link>
+              </li>
+              <li>
+                <Link to="/top-5-agent-evaluation-frameworks">
+                  Top 5 Agent Evaluation Tools Comparison
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
