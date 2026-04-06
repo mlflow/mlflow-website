@@ -25,8 +25,15 @@ const qualityFeatures: Feature[] = [
   {
     id: "prebuilt-judges",
     title: "Pre-built LLM judges",
-    description:
-      "Quickly start with built-in LLM judges for safety, hallucination, retrieval quality, and relevance. Our research-backed judges provide accurate, reliable quality evaluation aligned with human expertise.",
+    description: (
+      <>
+        Quickly start with built-in{" "}
+        <Link href="/llm-as-a-judge">LLM judges</Link> for safety,
+        hallucination, retrieval quality, and relevance. Our research-backed
+        judges provide accurate, reliable quality evaluation aligned with
+        human expertise.
+      </>
+    ),
     imageSrc: Card1,
     codeSnippet: `import mlflow
 from mlflow.genai.scorers import (

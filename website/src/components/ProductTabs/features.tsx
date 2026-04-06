@@ -90,7 +90,14 @@ response = client.chat.completions.create(
           evaluations
         </Link>
         , track quality metrics over time, and catch regressions before they
-        reach production. Choose from 50+ built-in metrics and LLM judges, or
+        reach production. Choose from 50+ built-in metrics and{" "}
+        <Link
+          href="/llm-as-a-judge"
+          className="text-white/90 hover:text-white underline"
+        >
+          LLM judges
+        </Link>
+        , or
         define your own with highly flexible APIs.
       </>
     ),

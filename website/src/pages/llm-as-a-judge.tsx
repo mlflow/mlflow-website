@@ -8,52 +8,19 @@ import { ArticleSidebar } from "../components/ArticleSidebar/ArticleSidebar";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
+import EvalScreenshot from "@site/static/img/GenAI_evaluations/GenAI_evaluations_5.png";
 
 const SEO_TITLE =
   "LLM-as-a-Judge Evaluation for LLMs & Agents | MLflow Agent Platform";
 const SEO_DESCRIPTION =
   "Learn how to use LLM-as-a-judge to evaluate LLM and agent quality at scale with MLflow--the comprehensive, open-source agent engineering and ops platform.";
 
-const BUILTIN_CODE = `import mlflow
-from mlflow.genai.scorers import Correctness, RelevanceToQuery, RetrievalGroundedness
-
-eval_data = [
-    {
-        "inputs": {"question": "What is MLflow?"},
-        "outputs": "MLflow is an open-source platform for managing the ML lifecycle.",
-        "expectations": {
-            "expected_facts": ["open-source platform", "ML lifecycle management"],
-        },
-    },
-]
-
-results = mlflow.genai.evaluate(
-    data=eval_data,
-    scorers=[
-        Correctness(),
-        RelevanceToQuery(),
-        RetrievalGroundedness(),
-    ],
-)`;
-
-const THIRD_PARTY_CODE = `from mlflow.genai.scorers.deepeval import AnswerRelevancy
-from mlflow.genai.scorers.ragas import FactualCorrectness
-from mlflow.genai.scorers.phoenix import Toxicity
-from mlflow.genai.scorers import Correctness
-
-results = mlflow.genai.evaluate(
-    data=eval_data,
-    scorers=[
-        Correctness(),
-        AnswerRelevancy(model="openai:/gpt-5"),
-        FactualCorrectness(model="openai:/gpt-5"),
-        Toxicity(model="openai:/gpt-5"),
-    ],
-)`;
-
-const CUSTOM_CODE = `from mlflow.genai.judges import make_judge
+const JUDGES_CODE = `import mlflow
+from mlflow.genai.scorers import Correctness, RelevanceToQuery
+from mlflow.genai.judges import make_judge
 from typing import Literal
 
+# Define a custom judge
 domain_accuracy = make_judge(
     name="domain_accuracy",
     instructions="Evaluate whether the {{ outputs }} provides accurate domain-specific information for the given {{ inputs }}. Return 'accurate' if correct, 'inaccurate' if not.",
@@ -61,9 +28,14 @@ domain_accuracy = make_judge(
     model="openai:/gpt-5",
 )
 
+# Run evaluation with built-in and custom judges together
 results = mlflow.genai.evaluate(
     data=eval_data,
-    scorers=[domain_accuracy],
+    scorers=[
+        Correctness(),
+        RelevanceToQuery(),
+        domain_accuracy,
+    ],
 )`;
 
 const MEMALIGN_CODE = `from mlflow.genai.judges.optimizers import MemAlignOptimizer
@@ -106,6 +78,21 @@ const faqs: {
       "Properly calibrated LLM judges achieve over 80% agreement with human evaluators on correctness and readability, and 95% agreement when measured within one-score distance. This matches typical human-to-human inter-rater reliability. Judge optimization with MemAlign can improve agreement by an additional 30-50%.",
   },
   {
+    question: "What are common pitfalls with LLM-as-a-judge?",
+    answer:
+      "LLM judges can exhibit biases: position bias (favoring certain answer positions in comparisons), verbosity bias (preferring longer responses), and self-preference bias (favoring outputs from the same model family). Mitigate these with clear rubrics, calibration examples, and validation against human feedback. MLflow's judge optimization automates this calibration process.",
+  },
+  {
+    question: "How do I define good evaluation criteria?",
+    answer:
+      'Good criteria are specific, measurable, and include examples. Instead of "Is this response good?", use "Does the response directly answer the user\'s question with accurate information supported by the retrieved documents?" Include 3-5 example judgments with scores and justifications to calibrate the judge.',
+  },
+  {
+    question: "How much does LLM-as-a-judge cost?",
+    answer:
+      "Costs depend on your judge model and evaluation volume. Track spending using MLflow's trace cost tracking. Strategies to reduce costs: use smaller judge models for simpler criteria, evaluate a sample of production traffic rather than 100%, and cache judgments for repeated inputs.",
+  },
+  {
     question: "How do I get started with LLM-as-a-judge in MLflow?",
     answer: (
       <>
@@ -124,17 +111,7 @@ const faqs: {
       "Install MLflow, prepare an evaluation dataset with inputs and outputs, and run mlflow.genai.evaluate() with built-in scorers like Correctness and RetrievalGroundedness. MLflow provides 50+ built-in judges that work immediately, or you can create custom judges with the Judge Builder UI—no code required.",
   },
   {
-    question: "What are common pitfalls with LLM-as-a-judge?",
-    answer:
-      "LLM judges can exhibit biases: position bias (favoring certain answer positions in comparisons), verbosity bias (preferring longer responses), and self-preference bias (favoring outputs from the same model family). Mitigate these with clear rubrics, calibration examples, and validation against human feedback. MLflow's judge optimization automates this calibration process.",
-  },
-  {
-    question: "How do I define good evaluation criteria?",
-    answer:
-      'Good criteria are specific, measurable, and include examples. Instead of "Is this response good?", use "Does the response directly answer the user\'s question with accurate information supported by the retrieved documents?" Include 3-5 example judgments with scores and justifications to calibrate the judge.',
-  },
-  {
-    question: "Can I use LLM-as-a-judge for agent evaluation?",
+    question: "Can I use LLM-as-a-judge for agent evaluation in MLflow?",
     answer: (
       <>
         Yes. MLflow provides specialized judges for agent evaluation:{" "}
@@ -158,7 +135,7 @@ const faqs: {
       "Yes. MLflow provides specialized judges for agent evaluation: ToolCallCorrectness assesses whether agents choose appropriate tools with correct arguments, and ToolCallEfficiency identifies redundant calls and wasted token spend. For conversational agents, multi-turn judges evaluate dialogue quality across complete sessions.",
   },
   {
-    question: "Can I create judges without writing code?",
+    question: "Can I create judges without writing code in MLflow?",
     answer: (
       <>
         Yes. MLflow's{" "}
@@ -176,7 +153,7 @@ const faqs: {
   },
   {
     question:
-      "How do I improve judge accuracy when scores don't match my quality standards?",
+      "How do I improve judge accuracy in MLflow when scores don't match my quality standards?",
     answer: (
       <>
         Use MLflow's judge optimization with{" "}
@@ -198,7 +175,7 @@ const faqs: {
       "Use MLflow's judge optimization with MemAlign. Provide 20-50 examples where humans have scored outputs, and MemAlign automatically refines the judge's instructions using a dual-memory system. This improves agreement with human evaluators by 30-50%, transforming generic judges into domain-specific evaluators.",
   },
   {
-    question: "Can I use LLM-as-a-judge for production monitoring?",
+    question: "Can I use LLM-as-a-judge for production monitoring in MLflow?",
     answer: (
       <>
         Yes. MLflow's online evaluation runs judges continuously against
@@ -213,7 +190,7 @@ const faqs: {
       "Yes. MLflow's online evaluation runs judges continuously against production traces. Set quality thresholds and receive alerts when scores drop. MLflow's in-UI trace evaluation lets you run judges on any trace directly from the interface without code.",
   },
   {
-    question: "How do I evaluate multi-turn conversations?",
+    question: "How do I evaluate multi-turn conversations in MLflow?",
     answer: (
       <>
         MLflow supports{" "}
@@ -229,11 +206,6 @@ const faqs: {
     ),
     answerText:
       "MLflow supports multi-turn evaluation and simulation. Use session-level judges like ConversationCompleteness, KnowledgeRetention, and UserFrustration to evaluate complete conversation threads. Simulation mode replaces manual testing with an LLM that plays the user role, evaluating hundreds of conversations in minutes.",
-  },
-  {
-    question: "How much does LLM-as-a-judge cost?",
-    answer:
-      "Costs depend on your judge model and evaluation volume. Track spending using MLflow's trace cost tracking. Strategies to reduce costs: use smaller judge models for simpler criteria, evaluate a sample of production traffic rather than 100%, and cache judgments for repeated inputs.",
   },
 ];
 
@@ -578,8 +550,9 @@ export default function LLMAsAJudge() {
             LLM-as-a-judge evaluates the outputs of LLM applications and
             agents across quality dimensions like correctness, relevance,
             groundedness, safety, and helpfulness. Any model can act as a
-            judge (OpenAI, Claude, Gemini, open-source, etc.), and each
-            assessment produces both a score and a written justification.
+            judge (OpenAI, Claude, Gemini, open source models, and beyond).
+            When a judge analyzes agent outputs and behavior, it produces
+            a score and a written justification.
           </p>
 
           <p>
@@ -637,15 +610,6 @@ export default function LLMAsAJudge() {
                 <a href="#why-llm-as-a-judge-matters">
                   Why LLM-as-a-Judge Matters
                 </a>
-              </li>
-              <li style={{ marginBottom: "8px" }}>
-                <a href="#out-of-the-box-judges">Out-of-the-Box Judges</a>
-              </li>
-              <li style={{ marginBottom: "8px" }}>
-                <a href="#custom-judges">Custom Judges</a>
-              </li>
-              <li style={{ marginBottom: "8px" }}>
-                <a href="#judge-optimization">Judge Optimization</a>
               </li>
               <li style={{ marginBottom: "8px" }}>
                 <a href="#common-use-cases">
@@ -727,175 +691,11 @@ export default function LLMAsAJudge() {
               </p>
               <p>
                 <strong>Solution:</strong> LLM judges provide quantitative
-                scores. Baseline: 3.2 correctness. New prompt: 3.8. MLflow
+                scores. (For example: 'Baseline: 3.2 correctness. New prompt: 3.8'). MLflow
                 tracks all runs for easy comparison.
               </p>
             </div>
           </div>
-
-          {/* ---- Out-of-the-Box Judges ---- */}
-          <h2 id="out-of-the-box-judges">Out-of-the-Box Judges</h2>
-
-          <p>
-            Some quality checks are common across every LLM application:
-            correctness, safety, groundedness, relevance. MLflow ships with
-            built-in judges for these, each returning a score and a written
-            justification for every output it evaluates.
-          </p>
-
-          <p>
-            <Link
-              href={
-                MLFLOW_GENAI_DOCS_URL +
-                "eval-monitor/scorers/llm-judge/predefined"
-              }
-              style={{ color: "#007bff", fontWeight: "600" }}
-            >
-              Grounding judges
-            </Link>{" "}
-            verify that responses are supported by source documents and
-            catch hallucinations.{" "}
-            <Link
-              href={
-                MLFLOW_GENAI_DOCS_URL +
-                "eval-monitor/scorers/llm-judge/predefined"
-              }
-              style={{ color: "#007bff", fontWeight: "600" }}
-            >
-              Response quality judges
-            </Link>{" "}
-            cover correctness against expected answers, safety screening
-            for toxic or harmful outputs, and adherence to{" "}
-            <Link
-              href={
-                MLFLOW_GENAI_DOCS_URL +
-                "eval-monitor/scorers/llm-judge/guidelines/"
-              }
-              style={{ color: "#007bff", fontWeight: "600" }}
-            >
-              custom guidelines
-            </Link>{" "}
-            you define yourself.
-          </p>
-
-          <p>
-            For conversational applications, single-turn evaluation isn't
-            enough. A chatbot can answer individual questions well but still
-            lose context, go in circles, or frustrate users over the course of
-            a conversation. MLflow's{" "}
-            <Link
-              href={
-                MLFLOW_GENAI_DOCS_URL + "eval-monitor/"
-              }
-              style={{ color: "#007bff", fontWeight: "600" }}
-            >
-              multi-turn judges
-            </Link>{" "}
-            evaluate complete conversation sessions for context retention,
-            resolution, and user satisfaction. And for agentic systems,{" "}
-            <Link
-              href={
-                MLFLOW_GENAI_DOCS_URL +
-                "eval-monitor/scorers/llm-judge/predefined"
-              }
-              style={{ color: "#007bff", fontWeight: "600" }}
-            >
-              tool call judges
-            </Link>{" "}
-            assess whether agents are choosing the right tools and using
-            them efficiently.
-          </p>
-
-          <h2 id="third-party-judge-integrations">Third-Party Judge Integrations</h2>
-
-          <p>
-            Beyond its own judges, MLflow integrates with{" "}
-            <strong>DeepEval</strong>, <strong>RAGAS</strong>, and{" "}
-            <strong>Arize Phoenix</strong>, giving you access to 20+ additional
-            evaluation metrics. Third-party judges are imported directly
-            from their packages and
-            work alongside MLflow's built-in judges in a single evaluation
-            run.
-          </p>
-
-          {/* ---- Custom Judges ---- */}
-          <h2 id="custom-judges">Custom Judges</h2>
-
-          <p>
-            Built-in judges cover the most common quality dimensions, but
-            every team has criteria specific to what they're building. A
-            healthcare company needs to verify medical accuracy. A financial
-            services firm needs to check regulatory compliance. An e-commerce
-            platform needs to ensure product recommendations match user intent.
-            Built-in judges can't cover these.
-          </p>
-
-          <p>
-            The fastest way to create a custom judge is through MLflow's{" "}
-            <Link
-              href={
-                MLFLOW_GENAI_DOCS_URL +
-                "eval-monitor/scorers/llm-judge/custom-judges/create-custom-judge/#step-2-define-custom-judges"
-              }
-              style={{ color: "#007bff", fontWeight: "600" }}
-            >
-              Judge Builder UI
-            </Link>
-            . Define your evaluation criteria in plain language, test the judge
-            against sample traces to see how it scores, iterate on the
-            instructions until it matches your expectations, and deploy. You
-            can also{" "}
-            <Link
-              href={
-                MLFLOW_GENAI_DOCS_URL +
-                "eval-monitor/scorers/llm-judge/custom-judges/"
-              }
-              style={{ color: "#007bff", fontWeight: "600" }}
-            >
-              define judges in code
-            </Link>{" "}
-            for version control and integration into your evaluation
-            pipelines.
-          </p>
-
-          {/* ---- Judge Optimization ---- */}
-          <h2 id="judge-optimization">Judge Optimization</h2>
-
-          <p>
-            Even well-designed judges can disagree with your team's quality
-            assessments. A judge might score a response as "correct" when your
-            domain experts would flag it as incomplete, or pass outputs that
-            don't meet your organization's specific standards. MLflow's judge
-            optimization uses human feedback to automatically refine judge
-            instructions, improving agreement with human evaluators by
-            30-50%.
-          </p>
-
-          <p>
-            Start with a built-in or custom judge, collect human feedback
-            on 20-50 example outputs via the MLflow UI or programmatically,
-            run alignment, and deploy the optimized judge. MLflow's{" "}
-            <Link
-              href={
-                MLFLOW_GENAI_DOCS_URL +
-                "eval-monitor/scorers/llm-judge/memalign/"
-              }
-            >
-              MemAlign optimizer
-            </Link>{" "}
-            (experimental) uses a dual-memory system that learns from a
-            handful of feedback examples instead of requiring hundreds of
-            labeled samples. One memory stores general guidelines extracted
-            from your feedback; the other stores specific edge cases that
-            the guidelines alone don't cover.
-          </p>
-
-          <p>
-            Judge optimization is most valuable when you're moving from
-            development to production and need judges that reflect your
-            organization's actual quality bar, not just generic best
-            practices.
-          </p>
 
           {/* ---- Common Use Cases ---- */}
           <h2 id="common-use-cases">
@@ -959,8 +759,89 @@ export default function LLMAsAJudge() {
           </h2>
 
           <p>
-            Getting started with LLM-as-a-judge in MLflow takes a few lines
-            of code. Check out the{" "}
+            MLflow's evaluation framework ships with{" "}
+            <Link
+              href={
+                MLFLOW_GENAI_DOCS_URL +
+                "eval-monitor/scorers/llm-judge/predefined"
+              }
+              style={{ color: "#007bff", fontWeight: "600" }}
+            >
+              built-in judges
+            </Link>{" "}
+            for grounding, correctness, safety, relevance, and{" "}
+            <Link
+              href={
+                MLFLOW_GENAI_DOCS_URL +
+                "eval-monitor/scorers/llm-judge/guidelines/"
+              }
+              style={{ color: "#007bff", fontWeight: "600" }}
+            >
+              custom guidelines
+            </Link>
+            . For conversational applications,{" "}
+            <Link
+              href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}
+              style={{ color: "#007bff", fontWeight: "600" }}
+            >
+              multi-turn judges
+            </Link>{" "}
+            evaluate complete sessions for context retention and user
+            satisfaction. For agentic systems,{" "}
+            <Link
+              href={
+                MLFLOW_GENAI_DOCS_URL +
+                "eval-monitor/scorers/llm-judge/predefined"
+              }
+              style={{ color: "#007bff", fontWeight: "600" }}
+            >
+              tool call judges
+            </Link>{" "}
+            assess whether agents are choosing the right tools and using
+            them efficiently. MLflow also integrates with{" "}
+            <strong>DeepEval</strong>, <strong>RAGAS</strong>, and{" "}
+            <strong>Arize Phoenix</strong> for 20+ additional evaluation
+            metrics.
+          </p>
+
+          <p>
+            When built-in judges don't cover your needs, create{" "}
+            <Link
+              href={
+                MLFLOW_GENAI_DOCS_URL +
+                "eval-monitor/scorers/llm-judge/custom-judges/"
+              }
+              style={{ color: "#007bff", fontWeight: "600" }}
+            >
+              custom judges
+            </Link>{" "}
+            through the{" "}
+            <Link
+              href={
+                MLFLOW_GENAI_DOCS_URL +
+                "eval-monitor/scorers/llm-judge/custom-judges/create-custom-judge/#step-2-define-custom-judges"
+              }
+              style={{ color: "#007bff", fontWeight: "600" }}
+            >
+              Judge Builder UI
+            </Link>{" "}
+            or in code. If judges don't match your team's quality standards,{" "}
+            <Link
+              href={
+                MLFLOW_GENAI_DOCS_URL +
+                "eval-monitor/scorers/llm-judge/memalign/"
+              }
+              style={{ color: "#007bff", fontWeight: "600" }}
+            >
+              judge optimization with MemAlign
+            </Link>{" "}
+            (experimental) uses human feedback to automatically refine
+            judge instructions, improving agreement with human evaluators
+            by 30-50%.
+          </p>
+
+          <p>
+            Check out the{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
               evaluation documentation
             </Link>{" "}
@@ -968,7 +849,7 @@ export default function LLMAsAJudge() {
           </p>
 
           <p style={{ marginTop: "32px", marginBottom: "0px" }}>
-            <strong>Evaluation with Built-in Judges</strong>
+            <strong>Evaluation with Built-in and Custom Judges</strong>
           </p>
 
           <div
@@ -977,12 +858,12 @@ export default function LLMAsAJudge() {
           >
             <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
               <span className="text-xs text-white/50 font-mono">python</span>
-              <CopyButton code={BUILTIN_CODE} />
+              <CopyButton code={JUDGES_CODE} />
             </div>
             <div className="p-3 overflow-x-auto">
               <Highlight
                 theme={customNightOwl}
-                code={BUILTIN_CODE}
+                code={JUDGES_CODE}
                 language="python"
               >
                 {({ style, tokens, getLineProps, getTokenProps }) => (
@@ -1007,85 +888,7 @@ export default function LLMAsAJudge() {
           </div>
 
           <p style={{ marginTop: "32px", marginBottom: "0px" }}>
-            <strong>Evaluation with Third-Party Judges</strong>
-          </p>
-
-          <div
-            className="rounded-lg border border-white/10 overflow-hidden"
-            style={{ backgroundColor: CODE_BG, margin: "8px 0" }}
-          >
-            <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
-              <span className="text-xs text-white/50 font-mono">python</span>
-              <CopyButton code={THIRD_PARTY_CODE} />
-            </div>
-            <div className="p-3 overflow-x-auto">
-              <Highlight
-                theme={customNightOwl}
-                code={THIRD_PARTY_CODE}
-                language="python"
-              >
-                {({ style, tokens, getLineProps, getTokenProps }) => (
-                  <pre
-                    className="text-xs font-mono !m-0 !p-0 text-left"
-                    style={{
-                      ...style,
-                      backgroundColor: "transparent",
-                    }}
-                  >
-                    {tokens.map((line, i) => (
-                      <div key={i} {...getLineProps({ line })}>
-                        {line.map((token, key) => (
-                          <span key={key} {...getTokenProps({ token })} />
-                        ))}
-                      </div>
-                    ))}
-                  </pre>
-                )}
-              </Highlight>
-            </div>
-          </div>
-
-          <p style={{ marginTop: "32px", marginBottom: "0px" }}>
-            <strong>Evaluation with Custom Judges</strong>
-          </p>
-
-          <div
-            className="rounded-lg border border-white/10 overflow-hidden"
-            style={{ backgroundColor: CODE_BG, margin: "8px 0" }}
-          >
-            <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-white/5">
-              <span className="text-xs text-white/50 font-mono">python</span>
-              <CopyButton code={CUSTOM_CODE} />
-            </div>
-            <div className="p-3 overflow-x-auto">
-              <Highlight
-                theme={customNightOwl}
-                code={CUSTOM_CODE}
-                language="python"
-              >
-                {({ style, tokens, getLineProps, getTokenProps }) => (
-                  <pre
-                    className="text-xs font-mono !m-0 !p-0 text-left"
-                    style={{
-                      ...style,
-                      backgroundColor: "transparent",
-                    }}
-                  >
-                    {tokens.map((line, i) => (
-                      <div key={i} {...getLineProps({ line })}>
-                        {line.map((token, key) => (
-                          <span key={key} {...getTokenProps({ token })} />
-                        ))}
-                      </div>
-                    ))}
-                  </pre>
-                )}
-              </Highlight>
-            </div>
-          </div>
-
-          <p style={{ marginTop: "32px", marginBottom: "0px" }}>
-            <strong>Judge Alignment with MemAlign</strong>
+            <strong>Judge Optimization with MemAlign</strong>
           </p>
 
           <div
@@ -1121,6 +924,18 @@ export default function LLMAsAJudge() {
                 )}
               </Highlight>
             </div>
+          </div>
+
+          <div style={{ margin: "40px 0", textAlign: "center" }}>
+            <img
+              src={EvalScreenshot}
+              alt="MLflow evaluation UI showing LLM judge scores and justifications for each output"
+              style={{
+                width: "100%",
+                borderRadius: "8px",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+              }}
+            />
           </div>
 
           <div className="info-box">
