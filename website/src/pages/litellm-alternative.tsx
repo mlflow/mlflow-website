@@ -74,7 +74,13 @@ const gatewayFeatures: [string, string, string][] = [
   ["Fallbacks & Load Balancing", "✅", "✅"],
   ["Passthrough / Native Provider APIs", "✅", "✅"],
   ["Guardrails", "✅", "Enterprise only"],
-  ["Observability", "✅", <>❌<br/> (external tools required)</>],
+  [
+    "Observability",
+    "✅",
+    <>
+      ❌<br /> (external tools required)
+    </>,
+  ],
 ];
 
 function ComparisonTable({ rows }: { rows: string[][] }) {
@@ -715,14 +721,13 @@ export default function LitellmAlternative() {
             where compromised packages were briefly published to PyPI. BerriAI
             responded promptly and engaged Mandiant for forensic analysis. While
             such incidents can affect any open source project, this highlights
-            the importance of evaluating the{" "}
-            security practices and governance model of tools in
-            your AI infrastructure.
+            the importance of evaluating the security practices and governance
+            model of tools in your AI infrastructure.
           </p>
           <p>
             <strong>MLflow</strong> benefits from{" "}
-            <strong>dedicated security team</strong> from Databricks and nearly a
-            decade of hardening for enterprise deployments. With thousands of
+            <strong>dedicated security team</strong> from Databricks and nearly
+            a decade of hardening for enterprise deployments. With thousands of
             enterprise users worldwide, MLflow has a proven track record of
             reliability and security at scale. The Linux Foundation governance
             provides additional assurance that security practices meet
@@ -744,10 +749,9 @@ export default function LitellmAlternative() {
             <Link href="https://docs.litellm.ai/docs/simple_proxy">
               gateway proxy
             </Link>
-            ,
-            offering broad provider support (100+), virtual key management, and
-            an OpenAI-compatible API format that enables applications to switch
-            providers without code changes. It offers rate limiting, cost
+            , offering broad provider support (100+), virtual key management,
+            and an OpenAI-compatible API format that enables applications to
+            switch providers without code changes. It offers rate limiting, cost
             tracking, and automatic fallbacks. However, LiteLLM operates{" "}
             <strong>
               in isolation from the rest of the AI development stack
@@ -942,8 +946,8 @@ export default function LitellmAlternative() {
             </strong>{" "}
             if you need a <strong>dedicated LLM proxy</strong> for model
             routing, use long-tail LLM providers that only LiteLLM supports, or
-            are already integrated with <strong>LiteLLM's client SDK</strong> and
-            proxy in your stack.
+            are already integrated with <strong>LiteLLM's client SDK</strong>{" "}
+            and proxy in your stack.
           </p>
           <p>
             <strong>
