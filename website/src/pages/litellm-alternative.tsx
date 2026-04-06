@@ -924,7 +924,8 @@ export default function LitellmAlternative() {
               >
                 automatic optimization
               </Link>{" "}
-              that improves prompts based on evaluation results
+              that improves prompts based on evaluation results using the
+              state-of-the-art algorithms like GEPA.
             </li>
             <li>
               <strong>Fine-tuning and reinforcement learning</strong> support
