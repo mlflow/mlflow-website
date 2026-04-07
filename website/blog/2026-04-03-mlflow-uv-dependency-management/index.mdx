@@ -60,7 +60,7 @@ Behind the scenes, MLflow:
 3. Writes the result to `requirements.txt` in the model artifact
 4. Copies `uv.lock`, `pyproject.toml`, and `.python-version` (if present) as model artifacts
 
-The saved `uv.lock` enables exact environment restoration via `uv sync --frozen` when the model is loaded later. If uv is not available at restore time, MLflow falls back to pip-based installation from `requirements.txt`.
+The saved `uv.lock` enables exact environment restoration via `uv sync --frozen` when the model is loaded later. If uv is not available or `uv sync` fails at restore time, MLflow raises an error rather than silently falling back to pip. This ensures the hash-verified lockfile is always used and prevents unpinned dependencies from reaching production.
 
 ## Monorepos and explicit paths
 
@@ -79,7 +79,7 @@ This is useful when your repository has multiple services with separate lockfile
 ## Dependency groups and extras
 
 Production systems typically need a much tighter set of dependencies than local development environments. Your training environment needs `torch` and `xgboost`, your serving environment needs `flask` and
-  `uvicorn`, and your dev environment needs `pytest` and `ruff`. MLflow lets you selectively include specific [dependency groups](https://docs.astral.sh/uv/concepts/projects/dependencies/#dependency-groups) and [optional extras](https://docs.astral.sh/uv/concepts/projects/dependencies/#optional-dependencies) when exporting from the lockfile:
+`uvicorn`, and your dev environment needs `pytest` and `ruff`. MLflow lets you selectively include specific [dependency groups](https://docs.astral.sh/uv/concepts/projects/dependencies/#dependency-groups) and [optional extras](https://docs.astral.sh/uv/concepts/projects/dependencies/#optional-dependencies) when exporting from the lockfile:
 
 ```python
 mlflow.pyfunc.log_model(
@@ -109,11 +109,11 @@ The resulting `requirements.txt` will contain all base dependencies plus `xgboos
 
 The following table summarizes the three parameters:
 
-| Parameter | Type | What it does |
-| --- | --- | --- |
-| `uv_project_path` | `str` or `Path` | Path to the uv project directory containing `uv.lock` |
-| `uv_groups` | `list[str]` | Dependency groups to include (maps to `uv export --group`) |
-| `uv_extras` | `list[str]` | Optional extras to include (maps to `uv export --extra`) |
+| Parameter         | Type            | What it does                                               |
+| ----------------- | --------------- | ---------------------------------------------------------- |
+| `uv_project_path` | `str` or `Path` | Path to the uv project directory containing `uv.lock`      |
+| `uv_groups`       | `list[str]`     | Dependency groups to include (maps to `uv export --group`) |
+| `uv_extras`       | `list[str]`     | Optional extras to include (maps to `uv export --extra`)   |
 
 All three parameters are available on both `mlflow.pyfunc.log_model()` and `mlflow.pyfunc.save_model()`.
 
@@ -123,7 +123,7 @@ The integration touches two sides of the model lifecycle: logging and restoring.
 
 <img
   src={require("./uv-dependency-flow.png").default}
-  alt="Architecture diagram showing the uv dependency flow in MLflow. Left side: log time flow from log_model through detect_uv_project, uv export, and artifact saving. Right side: restore time flow from model loading through uv sync with pip fallback."
+  alt="Architecture diagram showing the uv dependency flow in MLflow. Left side: log time flow from log_model through detect_uv_project, uv export, and artifact saving. Right side: restore time flow from model loading through uv sync with error on failure."
   style={{ width: "100%", margin: "0 auto", display: "block" }}
 />
 
@@ -143,16 +143,16 @@ If `uv_groups` or `uv_extras` are specified, the corresponding `--group` and `--
 
 When a model with a `uv.lock` artifact is loaded, MLflow uses `uv sync --frozen --no-dev` to recreate the environment from the lockfile. This is faster than pip-based installation because uv resolves and installs dependencies in parallel, and the lockfile eliminates the need for resolution entirely.
 
-If uv is not available on the deployment machine, MLflow falls back to pip-based installation from `requirements.txt` with a warning logged. Note that the pip fallback uses the pinned versions from the exported requirements but does not verify package hashes.
+If uv is not available on the deployment machine or `uv sync` fails, MLflow raises an error instead of silently falling back to pip. This is intentional: a silent fallback would install unpinned dependencies without hash verification, defeating the security guarantees of the lockfile. To deploy models logged with uv, make sure uv is installed in the target environment.
 
 ## Environment variables
 
 Two environment variables provide fine-grained control:
 
-| Variable | Default | What it does |
-| --- | --- | --- |
-| `MLFLOW_UV_AUTO_DETECT` | `true` | Set `false` to disable auto-detection of uv projects |
-| `MLFLOW_LOG_UV_FILES` | `true` | Set `false` to skip saving `uv.lock` and `pyproject.toml` as artifacts |
+| Variable                | Default | What it does                                                           |
+| ----------------------- | ------- | ---------------------------------------------------------------------- |
+| `MLFLOW_UV_AUTO_DETECT` | `true`  | Set `false` to disable auto-detection of uv projects                   |
+| `MLFLOW_LOG_UV_FILES`   | `true`  | Set `false` to skip saving `uv.lock` and `pyproject.toml` as artifacts |
 
 When `MLFLOW_UV_AUTO_DETECT` is `false`, MLflow skips uv detection entirely and uses standard pip-based inference. An explicit `uv_project_path` parameter overrides this setting.
 
