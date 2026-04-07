@@ -39,7 +39,7 @@ SYSTEM_PROMPT_V1 = "You are a customer support agent."
 @mlflow.trace
 def support_agent(question: str) -> str:
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-5.4-mini",
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT_V1},
             {"role": "user", "content": question},
@@ -221,7 +221,7 @@ Register with a .edu email at the student portal.\
 @mlflow.trace
 def support_agent_v2(question: str) -> str:
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-5.4-mini",
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT_V2},
             {"role": "user", "content": question},

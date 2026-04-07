@@ -45,7 +45,7 @@ SYSTEM_PROMPT = (
 @mlflow.trace
 def customer_service_agent(question: str) -> str:
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-5.4-mini",
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": question},
@@ -407,7 +407,7 @@ HARDENED_SYSTEM_PROMPT = (
 @mlflow.trace
 def hardened_agent(question: str) -> str:
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-5.4-mini",
         messages=[
             {
                 "role": "system",

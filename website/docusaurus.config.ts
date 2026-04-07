@@ -146,6 +146,7 @@ const config: Config = {
         blogTitle: "Cookbook",
         blogDescription:
           "Practical guides and code examples for MLflow features.",
+        postsPerPage: "ALL",
         onUntruncatedBlogPosts: "ignore",
         showReadingTime: true,
       },

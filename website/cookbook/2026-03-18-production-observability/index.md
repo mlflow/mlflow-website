@@ -51,7 +51,7 @@ def support_chatbot(
     messages.append({"role": "user", "content": user_message})
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-5.4-mini",
         messages=messages,
     )
 
@@ -107,7 +107,7 @@ def support_chatbot(
     messages.append({"role": "user", "content": user_message})
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-5.4-mini",
         messages=messages,
     )
 
@@ -164,7 +164,7 @@ def process_billing_request(user_id: str, action: str):
         metadata={"mlflow.trace.user": user_id},
     )
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-5.4-mini",
         messages=[
             {
                 "role": "system",
@@ -180,7 +180,7 @@ def process_billing_request(user_id: str, action: str):
 @mlflow.trace(sampling_ratio_override=0.05)
 def handle_faq(question: str):
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-5.4-mini",
         messages=[
             {
                 "role": "system",

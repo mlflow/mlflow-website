@@ -72,7 +72,7 @@ def rag_answer(question: str) -> str:
     context = "\n".join(doc.page_content for doc in docs)
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-5.4-mini",
         messages=[
             {
                 "role": "system",
