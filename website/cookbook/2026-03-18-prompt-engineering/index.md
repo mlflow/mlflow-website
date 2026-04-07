@@ -56,7 +56,7 @@ def faq_agent(question: str) -> str:
     )
     system_message = prompt.format(question=question)
     response = oai_client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-5.4-mini",
         messages=[
             {"role": "system", "content": system_message},
         ],
@@ -221,7 +221,7 @@ def faq_agent_v2(question: str) -> str:
     )
     system_message = prompt.format(question=question)
     response = oai_client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-5.4-mini",
         messages=[
             {"role": "system", "content": system_message},
         ],
@@ -288,7 +288,7 @@ def faq_agent_prod(question: str) -> str:
     )
     system_message = prompt.format(question=question)
     response = oai_client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-5.4-mini",
         messages=[
             {"role": "system", "content": system_message},
         ],

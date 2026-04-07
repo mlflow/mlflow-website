@@ -62,7 +62,7 @@ def chat(message: str, session_id: str) -> str:
     )
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-5.4-mini",
         messages=conversation_histories[session_id],
     )
 
