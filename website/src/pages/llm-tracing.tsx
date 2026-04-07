@@ -1182,6 +1182,11 @@ const result = await generateText({
               </Link>
             </li>
             <li>
+              <Link href="/top-5-agent-observability-tools">
+                Top 5 Agent Observability Tools Comparison
+              </Link>
+            </li>
+            <li>
               <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
                 MLflow Tracing Documentation
               </Link>

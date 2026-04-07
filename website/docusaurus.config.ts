@@ -133,6 +133,25 @@ const config: Config = {
       },
     ],
     [
+      "@docusaurus/plugin-content-blog",
+      {
+        id: "cookbook",
+        routeBasePath: "cookbook",
+        path: "./cookbook",
+        blogListComponent: "@site/src/theme/CookbookItemsList",
+        blogPostComponent: "@site/src/theme/CookbookPost",
+        blogTagsPostsComponent: "@site/src/theme/CookbookTagsPostsPage",
+        blogSidebarTitle: "All cookbooks",
+        blogSidebarCount: "ALL",
+        blogTitle: "Cookbook",
+        blogDescription:
+          "Practical guides and code examples for MLflow features.",
+        postsPerPage: "ALL",
+        onUntruncatedBlogPosts: "ignore",
+        showReadingTime: true,
+      },
+    ],
+    [
       // This plugin is always inactive in development and only active in production because it works on the build output.
       // Run `npm run build` and then `npm run serve` for testing.
       "@docusaurus/plugin-client-redirects",
