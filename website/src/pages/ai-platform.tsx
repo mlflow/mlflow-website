@@ -88,13 +88,12 @@ const faqs: {
     answer: (
       <>
         A complete AI platform needs four core capabilities: (1) observability
-        with end-to-end tracing across multi-step workflows; (2) evaluation
-        with{" "}
+        with end-to-end tracing across multi-step workflows; (2) evaluation with{" "}
         <Link href="/llm-as-a-judge">LLM-as-a-judge</Link> scorers and
-        dataset-based testing; (3) version control for prompts,
-        configurations, and model versions; and (4) governance for safety
-        guardrails, cost controls, and compliance. MLflow provides all four,
-        integrating with whatever agent framework you choose.
+        dataset-based testing; (3) version control for prompts, configurations,
+        and model versions; and (4) governance for safety guardrails, cost
+        controls, and compliance. MLflow provides all four, integrating with
+        whatever agent framework you choose.
       </>
     ),
     answerText:

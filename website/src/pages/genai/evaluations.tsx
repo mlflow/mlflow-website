@@ -30,8 +30,8 @@ const qualityFeatures: Feature[] = [
         Quickly start with built-in{" "}
         <Link href="/llm-as-a-judge">LLM judges</Link> for safety,
         hallucination, retrieval quality, and relevance. Our research-backed
-        judges provide accurate, reliable quality evaluation aligned with
-        human expertise.
+        judges provide accurate, reliable quality evaluation aligned with human
+        expertise.
       </>
     ),
     imageSrc: Card1,

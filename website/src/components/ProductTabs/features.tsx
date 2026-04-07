@@ -97,8 +97,7 @@ response = client.chat.completions.create(
         >
           LLM judges
         </Link>
-        , or
-        define your own with highly flexible APIs.
+        , or define your own with highly flexible APIs.
       </>
     ),
     imageSrc: EvaluationTabImg,
