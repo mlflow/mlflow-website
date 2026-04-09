@@ -8,7 +8,7 @@ thumbnail: /img/blog/mlflow-uv-thumbnail.png
 image: /img/blog/mlflow-uv-thumbnail.png
 ---
 
-The recent LiteLLM supply chain compromise demonstrated why pinned, locked dependencies matter for ML models. In March 2026, attackers published backdoored versions of `litellm` to PyPI after stealing a publish token through a compromised GitHub Action. The malicious packages harvested SSH keys, cloud credentials, and API tokens from every machine that installed them. Projects using `pip install litellm` without version pinning pulled the compromised release automatically. Projects with a lockfile that pinned the previous version were not affected.
+The recent LiteLLM supply chain compromise demonstrated why pinned, locked dependencies matter for ML models. In March 2026, attackers published backdoored versions of `litellm` to PyPI after stealing a publish token through a compromised GitHub Action. The malicious packages harvested SSH keys, cloud credentials, and API tokens from every machine that installed them. Projects using `pip install litellm` without version pinning pulled the compromised release automatically. Projects with a lockfile that pinned the previous version weren't affected.
 
 MLflow, with over 33 million monthly PyPI downloads, now integrates with [uv](https://docs.astral.sh/uv/), the fast Python package manager from [Astral](https://astral.sh/). When you work in a uv-managed project, MLflow automatically uses your lockfile to capture the complete, hash-verified dependency graph. No extra parameters, no manual `uv export`, no glue code.
 
@@ -16,12 +16,12 @@ MLflow, with over 33 million monthly PyPI downloads, now integrates with [uv](ht
 
 ## What uv lockfiles give you
 
-Before this integration, MLflow inferred model dependencies by inspecting the packages imported during `log_model()`. This approach has known gaps:
+Before this integration, MLflow inferred model dependencies by inspecting the packages imported during `log_model()`. This approach has known gaps, and they're not subtle:
 
-- **Missing transitive dependencies.** If your model depends on `pandas`, which depends on `pytz`, but `pytz` was never imported directly, it might not appear in `requirements.txt`.
+- **Missing transitive dependencies.** If your model depends on `pandas`, which depends on `pytz`, but `pytz` was never imported directly, it won't appear in `requirements.txt`.
 - **Environment bleed.** Dev tools, test frameworks, and unrelated packages from your virtualenv leak into the captured requirements.
 - **No platform markers.** `pip freeze` strips PEP 508 environment markers, so platform-specific dependencies break on different operating systems.
-- **No integrity verification.** Version pinning alone does not prevent tampered packages. An attacker who overwrites a pinned version on PyPI bypasses version checks entirely.
+- **No integrity verification.** Version pinning alone doesn't prevent tampered packages. An attacker who overwrites a pinned version on PyPI bypasses version checks entirely.
 
 uv lockfiles solve all four. A `uv.lock` file captures the complete transitive dependency graph with exact versions, platform markers, and SHA-256 hashes for every package wheel. When `uv sync` installs dependencies, it verifies each downloaded package against its recorded hash. If an attacker publishes a modified package under an existing version number, the hash check fails and installation is blocked.
 
@@ -40,7 +40,7 @@ When MLflow captures your `uv.lock` as a model artifact, it preserves these hash
 
 ## Zero-config auto-detection
 
-If your project already uses uv, there is nothing to change. MLflow detects the presence of `uv.lock` and `pyproject.toml` in your working directory and handles everything automatically:
+If your project already uses uv, there's nothing to change. MLflow detects the presence of `uv.lock` and `pyproject.toml` in your working directory and handles everything automatically:
 
 ```python
 import mlflow
@@ -74,7 +74,7 @@ mlflow.pyfunc.log_model(
 )
 ```
 
-This is useful when your repository has multiple services with separate lockfiles, or when your training job runs from a subdirectory that does not contain the project root.
+This is useful when your repository has multiple services with separate lockfiles, or when your training job runs from a subdirectory that doesn't contain the project root.
 
 ## Dependency groups and extras
 
@@ -124,7 +124,7 @@ The integration touches two sides of the model lifecycle: logging and restoring.
 <img
   src={require("./uv-dependency-flow.png").default}
   alt="Architecture diagram showing the uv dependency flow in MLflow. Left side: log time flow from log_model through detect_uv_project, uv export, and artifact saving. Right side: restore time flow from model loading through uv sync with error on failure."
-  style={{ width: "100%", margin: "0 auto", display: "block" }}
+  style={{ maxWidth: "800px", width: "100%", margin: "0 auto", display: "block" }}
 />
 
 ### Logging models
@@ -143,7 +143,7 @@ If `uv_groups` or `uv_extras` are specified, the corresponding `--group` and `--
 
 When a model with a `uv.lock` artifact is loaded, MLflow uses `uv sync --frozen --no-dev` to recreate the environment from the lockfile. This is faster than pip-based installation because uv resolves and installs dependencies in parallel, and the lockfile eliminates the need for resolution entirely.
 
-If uv is not available on the deployment machine or `uv sync` fails, MLflow raises an error instead of silently falling back to pip. This is intentional: a silent fallback would install unpinned dependencies without hash verification, defeating the security guarantees of the lockfile. To deploy models logged with uv, make sure uv is installed in the target environment.
+If uv isn't available on the deployment machine or `uv sync` fails, MLflow raises an error instead of silently falling back to pip. That's intentional: a silent fallback would install unpinned dependencies without hash verification, defeating the security guarantees of the lockfile. To deploy models logged with uv, make sure uv is installed in the target environment.
 
 ## Environment variables
 
@@ -156,7 +156,7 @@ Two environment variables provide fine-grained control:
 
 When `MLFLOW_UV_AUTO_DETECT` is `false`, MLflow skips uv detection entirely and uses standard pip-based inference. An explicit `uv_project_path` parameter overrides this setting.
 
-When `MLFLOW_LOG_UV_FILES` is `false`, MLflow still uses `uv export` to populate `requirements.txt`, but does not copy the lockfile and project files as artifacts. This is useful when lockfile size is a concern and you do not need `uv sync` restoration.
+When `MLFLOW_LOG_UV_FILES` is `false`, MLflow still uses `uv export` to populate `requirements.txt`, but doesn't copy the lockfile and project files as artifacts. This is useful when lockfile size is a concern and you don't need `uv sync` restoration.
 
 ## Getting started
 
@@ -185,7 +185,7 @@ For a complete, runnable example demonstrating auto-detection, explicit paths, g
 
 ## Provenance
 
-I (Debu Sinha) contributed this integration across [PR #20344](https://github.com/mlflow/mlflow/pull/20344), [PR #20935](https://github.com/mlflow/mlflow/pull/20935), and [PR #21528](https://github.com/mlflow/mlflow/pull/21528). Reviewed and merged by [WeichenXu123](https://github.com/WeichenXu123) and [harupy](https://github.com/harupy) (MLflow maintainers). WeichenXu123 requested this blog post as part of the documentation review.
+I (Debu Sinha) contributed this integration across three PRs, reviewed and merged by WeichenXu123 and harupy (MLflow maintainers, Databricks). WeichenXu123 requested this blog post as part of the documentation review.
 
 ## Resources
 
