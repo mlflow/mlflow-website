@@ -1,0 +1,204 @@
+---
+title: "End-to-End RAG Evaluation"
+slug: rag-evaluation
+description: "Build a RAG pipeline, trace it with MLflow, and evaluate retrieval and generation quality with built-in judges."
+tags: [evaluation, rag, retrieval]
+---
+
+Build a retrieval-augmented generation (RAG) pipeline, trace it with MLflow, and evaluate both retrieval and generation quality using built-in judges.
+
+<!-- truncate -->
+
+:::tip[Prerequisites]
+
+```bash
+pip install mlflow openai chromadb
+```
+
+:::
+
+## What You'll Build
+
+```python
+import mlflow
+import openai
+import chromadb
+
+mlflow.set_tracking_uri("http://127.0.0.1:5000")
+mlflow.set_experiment("rag-evaluation")
+
+# Create a small knowledge base
+docs = [
+    "MLflow is an open-source platform for managing the ML lifecycle, including experimentation, reproducibility, and deployment.",
+    "MLflow Tracing captures the inputs, outputs, and metadata of each step in a GenAI application, making it easy to debug issues.",
+    "MLflow Evaluation uses LLM judges to score the quality of GenAI outputs on metrics like correctness, groundedness, and relevance.",
+    "ChromaDB is an open-source vector database for building AI applications with embeddings.",
+    "RAG (Retrieval-Augmented Generation) combines a retriever that fetches relevant documents with an LLM that generates answers based on those documents.",
+    "MLflow supports over 30 framework integrations including LangChain, LlamaIndex, OpenAI, and Anthropic.",
+    "The MLflow AI Gateway provides a unified interface to multiple LLM providers with rate limiting and cost tracking.",
+    "MLflow prompt management lets you version, compare, and optimize prompt templates across your applications.",
+]
+
+chroma_client = chromadb.Client()
+collection = chroma_client.create_collection("knowledge_base")
+collection.add(
+    documents=docs,
+    ids=[f"doc_{i}" for i in range(len(docs))],
+)
+```
+
+Enable OpenAI autologging so every LLM call is captured, then add manual spans for the retrieval step.
+
+```python
+from mlflow.entities import Document
+
+mlflow.openai.autolog()
+
+client = openai.OpenAI()
+
+
+@mlflow.trace(span_type="RETRIEVER")
+def retrieve(question: str, n_results: int = 3) -> list[Document]:
+    results = collection.query(query_texts=[question], n_results=n_results)
+    return [
+        Document(page_content=doc, metadata={"doc_id": doc_id})
+        for doc, doc_id in zip(results["documents"][0], results["ids"][0])
+    ]
+
+
+@mlflow.trace
+def rag_answer(question: str) -> str:
+    docs = retrieve(question)
+    context = "\n".join(doc.page_content for doc in docs)
+
+    response = client.chat.completions.create(
+        model="gpt-5.4-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": f"Answer the question based only on the following context:\n\n{context}",
+            },
+            {"role": "user", "content": question},
+        ],
+    )
+
+    return response.choices[0].message.content
+```
+
+Test it with a single question to verify tracing works:
+
+```python
+answer = rag_answer("What is MLflow Tracing?")
+print(answer)
+# Check the MLflow UI at http://127.0.0.1:5000 — you'll see a trace
+# with spans for rag_answer, retrieve, and the OpenAI chat completion.
+```
+
+Create test questions with expected facts. The `retrieved_context` field will be populated during evaluation from the RAG pipeline's output.
+
+```python
+eval_data = [
+    {
+        "inputs": {"question": "What is MLflow?"},
+        "expectations": {
+            "expected_facts": [
+                "open-source platform",
+                "managing the ML lifecycle",
+            ]
+        },
+    },
+    {
+        "inputs": {"question": "How does MLflow Tracing work?"},
+        "expectations": {
+            "expected_facts": [
+                "captures inputs and outputs",
+                "each step in a GenAI application",
+            ]
+        },
+    },
+    {
+        "inputs": {"question": "What is RAG?"},
+        "expectations": {
+            "expected_facts": [
+                "retrieval-augmented generation",
+                "retriever",
+                "LLM",
+            ]
+        },
+    },
+    {
+        "inputs": {"question": "What vector databases does MLflow integrate with?"},
+        "expectations": {
+            "expected_facts": ["ChromaDB"],
+        },
+    },
+    {
+        "inputs": {"question": "How do you evaluate LLM outputs with MLflow?"},
+        "expectations": {
+            "expected_facts": [
+                "LLM judges",
+                "correctness",
+                "groundedness",
+            ]
+        },
+    },
+]
+```
+
+The predict function wraps the RAG pipeline so MLflow can run it during evaluation. Its parameter names must match the keys in the `inputs` dictionaries. The retrieval context is automatically extracted from the RETRIEVER span in the trace, so you only need to return the answer.
+
+```python
+def predict_fn(question):
+    return rag_answer(question)
+```
+
+Use three built-in judges that target different aspects of RAG quality:
+
+- **`RelevanceToQuery`** — Is the answer relevant to the question?
+- **`RetrievalGroundedness`** — Is the answer grounded in the retrieved context (not hallucinated)?
+- **`RetrievalSufficiency`** — Did the retriever fetch enough relevant context to answer the question?
+
+```python
+from mlflow.genai.scorers import (
+    RelevanceToQuery,
+    RetrievalGroundedness,
+    RetrievalSufficiency,
+)
+
+results = mlflow.genai.evaluate(
+    data=eval_data,
+    predict_fn=predict_fn,
+    scorers=[
+        RelevanceToQuery(),
+        RetrievalGroundedness(),
+        RetrievalSufficiency(),
+    ],
+)
+```
+
+```python
+# Aggregate metrics
+print(results.metrics)
+# Example output:
+# {'relevance_to_query/mean': 1.0,
+#  'retrieval_groundedness/mean': 0.9,
+#  'retrieval_sufficiency/mean': 0.8}
+
+# Per-question breakdown
+df = results.result_df
+print(df[["inputs/question", "relevance_to_query/value",
+          "retrieval_groundedness/value", "retrieval_sufficiency/value"]])
+```
+
+Open the MLflow UI at `http://127.0.0.1:5000` and navigate to the experiment. The evaluation run shows:
+
+- A summary table with per-question scores
+- Linked traces for each evaluation row — click any row to see the full RAG execution
+
+Questions where `retrieval_sufficiency` scores low indicate the retriever is not fetching relevant documents. Questions where `retrieval_groundedness` scores low indicate the LLM is generating claims not supported by the retrieved context.
+
+## Next Steps
+
+- [Custom LLM Judges](/cookbook/custom-llm-judges) — Build domain-specific judges for your use case
+- [Evaluation-Driven Development](/cookbook/eval-driven-development) — Use evaluation to systematically improve your RAG pipeline
+- [Built-in Judges Reference](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/predefined) — Full list of available judges

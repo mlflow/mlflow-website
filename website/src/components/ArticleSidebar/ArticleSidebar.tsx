@@ -17,7 +17,7 @@ export function ArticleSidebar() {
     h2s.forEach((h2) => {
       items.push({
         id: h2.id,
-        text: h2.textContent || "",
+        text: h2.getAttribute("data-toc") || h2.textContent || "",
       });
     });
     setTocItems(items);

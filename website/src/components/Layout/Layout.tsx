@@ -43,6 +43,8 @@ function getLayoutType(pathname: string) {
     return "blog";
   } else if (pathname.startsWith(useBaseUrl("/releases"))) {
     return "releases";
+  } else if (pathname.startsWith(useBaseUrl("/cookbook"))) {
+    return "cookbook";
   } else if (pathname === useBaseUrl("/")) {
     return "home";
   } else {
@@ -54,7 +56,10 @@ export const Layout = ({ children }: Props) => {
   const location = useLocation();
 
   const layoutType = getLayoutType(location.pathname);
-  const hasReducedGradient = layoutType === "blog" || layoutType === "releases";
+  const hasReducedGradient =
+    layoutType === "blog" ||
+    layoutType === "releases" ||
+    layoutType === "cookbook";
   const variant = layoutType.startsWith("genai")
     ? "red"
     : layoutType.startsWith("classical-ml")

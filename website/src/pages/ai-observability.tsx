@@ -73,8 +73,20 @@ const faqs: {
   },
   {
     question: "How does MLflow compare to other AI observability tools?",
-    answer:
-      "Unlike proprietary tools that lock you into a vendor's ecosystem, MLflow provides a complete, open source observability stack with no vendor lock-in. It supports any LLM or agent authoring framework, is OpenTelemetry compatible, and is trusted by thousands of organizations worldwide. MLflow is also available on Databricks, AWS, and other platforms.",
+    answer: (
+      <>
+        Unlike proprietary tools that lock you into a vendor's ecosystem, MLflow
+        provides a complete, open source observability stack with no vendor
+        lock-in. For teams evaluating specific competitors, see this{" "}
+        <Link href="/arize-phoenix-alternative">
+          Arize Phoenix alternative comparison
+        </Link>
+        . MLflow supports any LLM or agent authoring framework, is OpenTelemetry
+        compatible, and is trusted by thousands of organizations worldwide.
+      </>
+    ),
+    answerText:
+      "Unlike proprietary tools that lock you into a vendor's ecosystem, MLflow provides a complete, open source observability stack with no vendor lock-in. For teams evaluating specific competitors, see the Arize Phoenix alternative comparison. MLflow supports any LLM or agent authoring framework, is OpenTelemetry compatible, and is trusted by thousands of organizations worldwide.",
   },
   {
     question: "Does MLflow support OpenTelemetry?",
@@ -536,8 +548,7 @@ export default function AIObservability() {
             different outputs depending on model state, retrieved context, and
             multi-step agent reasoning. This makes traditional logging and
             monitoring insufficient. AI observability captures the full
-            execution context (
-            <Link href={MLFLOW_GENAI_DOCS_URL + "prompts/"}>prompts</Link>,
+            execution context (<Link href="/prompt-registry">prompts</Link>,
             model responses,{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>tool calls</Link>,
             retrieval results, and{" "}
@@ -674,8 +685,9 @@ export default function AIObservability() {
             best results, identify expensive or slow queries, and detect quality
             regressions when models are updated. By tracing every LLM call with
             full context (system prompts, user messages, temperature settings,
-            token counts), you can debug hallucinations, optimize prompt
-            templates, and track costs across different models and use cases.
+            token counts), you can debug hallucinations, optimize{" "}
+            <Link href="/prompt-registry">prompt templates</Link>, and track
+            costs across different models and use cases.
           </p>
 
           <p>
@@ -1098,13 +1110,15 @@ const result = await generateText({
                 <strong>MLflow</strong>
               </Link>{" "}
               is the largest open-source{" "}
-              <strong>AI engineering platform</strong>, with over 30 million
-              monthly downloads. Thousands of organizations use MLflow to debug,
-              evaluate, monitor, and optimize production-quality AI agents and
-              LLM applications while controlling costs and managing access to
-              models and data. Backed by the Linux Foundation and licensed under
-              Apache 2.0, MLflow provides a complete observability stack with no
-              vendor lock-in.{" "}
+              <strong>
+                AI engineering platform for agents, LLMs, and ML models
+              </strong>
+              , with over 30 million monthly downloads. Thousands of
+              organizations use MLflow to debug, evaluate, monitor, and optimize
+              production-quality AI agents and LLM applications while
+              controlling costs and managing access to models and data. Backed
+              by the Linux Foundation and licensed under Apache 2.0, MLflow
+              provides a complete observability stack with no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>
@@ -1195,6 +1209,11 @@ const result = await generateText({
             </li>
             <li>
               <Link href="/ai-monitoring">AI Monitoring FAQ</Link>
+            </li>
+            <li>
+              <Link href="/top-5-agent-observability-tools">
+                Top 5 Agent Observability Tools Comparison
+              </Link>
             </li>
             <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>

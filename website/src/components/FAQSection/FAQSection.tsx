@@ -10,14 +10,12 @@ const faqs: { question: string; answer: ReactNode }[] = [
     answer: (
       <>
         MLflow is the largest{" "}
-        <strong>open source AI engineering platform</strong>. MLflow enables
-        teams of all sizes to debug, evaluate, monitor, and optimize
-        production-quality{" "}
+        <strong>open source AI engineering platform</strong> for{" "}
         <Link
           to="/genai"
           className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
         >
-          AI agents, LLM applications
+          agents, LLMs
         </Link>
         , and{" "}
         <Link
@@ -25,10 +23,12 @@ const faqs: { question: string; answer: ReactNode }[] = [
           className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
         >
           ML models
-        </Link>{" "}
-        while controlling costs and managing access to models and data. With
-        over 30 million monthly downloads, thousands of organizations rely on
-        MLflow each day to ship AI to production with confidence.
+        </Link>
+        . MLflow enables teams of all sizes to debug, evaluate, monitor, and
+        optimize production-quality AI applications while controlling costs and
+        managing access to models and data. With over 30 million monthly
+        downloads, thousands of organizations rely on MLflow each day to ship AI
+        to production with confidence.
         <br />
         <br />
         MLflow's comprehensive feature set for agents and LLM applications
@@ -48,7 +48,7 @@ const faqs: { question: string; answer: ReactNode }[] = [
         </Link>
         ,{" "}
         <Link
-          to="/genai/prompt-registry"
+          to="/prompt-registry"
           className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
         >
           prompt management
@@ -114,13 +114,19 @@ const faqs: { question: string; answer: ReactNode }[] = [
     answer: (
       <>
         Getting an AI agent or LLM application to work in a demo is easy.
-        Getting it to work reliably in production is a different problem
-        entirely. Agents can take incorrect or destructive actions, leak
-        sensitive data, generate harmful responses, burn through API budgets
-        with unnecessary model calls, or unexpectedly degrade in quality over
-        time. Overcoming these challenges requires full visibility into what
-        your agents are doing, control over what they can access, and a
-        systematic way to measure and improve their quality. MLflow provides the{" "}
+        Getting it to work reliably in production requires a comprehensive{" "}
+        <Link
+          to="/ai-platform"
+          className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
+        >
+          AI agent platform
+        </Link>
+        . Agents can take incorrect or destructive actions, leak sensitive data,
+        generate harmful responses, burn through API budgets with unnecessary
+        model calls, or unexpectedly degrade in quality over time. Overcoming
+        these challenges requires full visibility into what your agents are
+        doing, control over what they can access, and a systematic way to
+        measure and improve their quality. MLflow provides the{" "}
         <Link
           to="/ai-observability"
           className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"

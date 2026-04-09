@@ -1,12 +1,20 @@
 import React from "react";
 import TracingTabImg from "@site/static/img/GenAI_home/GenAI_trace_darkmode.png";
 import EvaluationTabImg from "@site/static/img/GenAI_home/GenAI_evaluation_darkmode.png";
+import IssueDetectionImg from "@site/static/img/GenAI_home/GenAI_issue_detection_darkmode.png";
 import GatewayTabImg from "@site/static/img/GenAI_home/GenAI_gateway_darkmode.png";
 import PromptTabImg from "@site/static/img/GenAI_home/GenAI_prompts_darkmode.png";
 import ExperimentTrackingImg from "@site/static/img/GenAI_home/model_training_darkmode.png";
 import ModelRegistryImg from "@site/static/img/GenAI_home/model_registry_darkmode.png";
 import DeploymentImg from "@site/static/img/GenAI_home/deployment.png";
 import Link from "@docusaurus/Link";
+
+export type FeatureImage = {
+  src: string;
+  zoom?: number;
+  position?: string;
+  fit?: "cover" | "contain";
+};
 
 export type Feature = {
   id: string;
@@ -20,6 +28,7 @@ export type Feature = {
   codeLanguage?: "python" | "typescript";
   fullBleedImage?: boolean;
   imageFit?: "cover" | "contain";
+  images?: FeatureImage[];
 };
 
 export type Category = {
@@ -90,11 +99,30 @@ response = client.chat.completions.create(
           evaluations
         </Link>
         , track quality metrics over time, and catch regressions before they
-        reach production. Choose from 50+ built-in metrics and LLM judges, or
-        define your own with highly flexible APIs.
+        reach production. Choose from 50+ built-in metrics and{" "}
+        <Link
+          href="/llm-as-a-judge"
+          className="text-white/90 hover:text-white underline"
+        >
+          LLM judges
+        </Link>
+        , or define your own with highly flexible APIs.
+        <br />
+        <br />
+        <Link
+          href="https://mlflow.org/docs/latest/genai/eval-monitor/ai-insights/detect-issues/"
+          className="text-white hover:text-white underline font-semibold"
+        >
+          Automatically detect issues
+        </Link>{" "}
+        in your traces using AI-powered analysis across correctness, latency,
+        execution, adherence, relevance, and safety dimensions.
       </>
     ),
-    imageSrc: EvaluationTabImg,
+    images: [
+      { src: EvaluationTabImg, zoom: 100, position: "left top" },
+      { src: IssueDetectionImg, zoom: 170, position: "left top" },
+    ],
     quickstartLink:
       "https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/",
     codeSnippet: `import mlflow
@@ -120,11 +148,17 @@ results = mlflow.genai.evaluate(
     title: "Prompts & Optimization",
     description: (
       <>
-        Version, test, and deploy prompts with full lineage tracking.
-        Automatically{" "}
+        Version, test, and deploy{" "}
         <Link
-          to="/prompt-optimization"
-          style={{ color: "inherit", textDecoration: "none" }}
+          href="/prompt-registry"
+          className="text-white/90 hover:text-white underline"
+        >
+          prompts
+        </Link>{" "}
+        with full lineage tracking. Automatically{" "}
+        <Link
+          href="/prompt-optimization"
+          className="text-white/90 hover:text-white underline"
         >
           optimize prompts
         </Link>{" "}

@@ -34,11 +34,11 @@ const faqs: {
     question: "What is an LLM judge?",
     answer: (
       <>
-        An LLM judge is a language model used to automatically evaluate the
-        outputs of an agent or LLM application. Instead of relying solely on
-        human review (which is slow and expensive), LLM judges can assess
-        thousands of responses for qualities like correctness, relevance,
-        safety, and helpfulness.{" "}
+        An <Link href="/llm-as-a-judge">LLM judge</Link> is a language model
+        used to automatically evaluate the outputs of an agent or LLM
+        application. Instead of relying solely on human review (which is slow
+        and expensive), LLM judges can assess thousands of responses for
+        qualities like correctness, relevance, safety, and helpfulness.{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/"}>
           MLflow provides built-in judges
         </Link>{" "}
@@ -1281,10 +1281,11 @@ export default function AgentEvaluation() {
 
           <ul>
             <li>
-              <strong>Pre-deployment Testing:</strong> Before releasing new
-              prompts, models, or agent logic, run comprehensive evaluations
-              against benchmark datasets. Compare quality metrics to previous
-              versions to ensure changes improve, not degrade, your application.
+              <strong>Pre-deployment Testing:</strong> Before releasing new{" "}
+              <Link href="/prompt-registry">prompts</Link>, models, or agent
+              logic, run comprehensive evaluations against benchmark datasets.
+              Compare quality metrics to previous versions to ensure changes
+              improve, not degrade, your application.
             </li>
             <li>
               <strong>Continuous Quality Monitoring:</strong> In production,
@@ -1301,8 +1302,9 @@ export default function AgentEvaluation() {
               wrong.
             </li>
             <li>
-              <strong>A/B Testing Prompt Changes:</strong> Before deploying
-              prompt modifications to production, run{" "}
+              <strong>A/B Testing Prompt Changes:</strong> Before deploying{" "}
+              <Link href="/prompt-registry">prompt</Link> modifications to
+              production, run{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
                 side-by-side evaluations
               </Link>{" "}
@@ -1694,13 +1696,15 @@ results = mlflow.genai.evaluate(
                 <strong>MLflow</strong>
               </Link>{" "}
               is the largest open-source{" "}
-              <strong>AI engineering platform</strong>, with over 30 million
-              monthly downloads. Thousands of organizations use MLflow to debug,
-              evaluate, monitor, and optimize production-quality AI agents and
-              LLM applications while controlling costs and managing access to
-              models and data. Backed by the Linux Foundation and licensed under
-              Apache 2.0, MLflow provides a complete evaluation solution with no
-              vendor lock-in.{" "}
+              <strong>
+                AI engineering platform for agents, LLMs, and ML models
+              </strong>
+              , with over 30 million monthly downloads. Thousands of
+              organizations use MLflow to debug, evaluate, monitor, and optimize
+              production-quality AI agents and LLM applications while
+              controlling costs and managing access to models and data. Backed
+              by the Linux Foundation and licensed under Apache 2.0, MLflow
+              provides a complete evaluation solution with no vendor lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL}>Get started →</Link>
             </p>
           </div>
@@ -1798,6 +1802,11 @@ results = mlflow.genai.evaluate(
             </li>
             <li>
               <Link href="/ai-monitoring">AI Monitoring FAQ</Link>
+            </li>
+            <li>
+              <Link href="/top-5-agent-evaluation-frameworks">
+                Top 5 Agent Evaluation Tools Comparison
+              </Link>
             </li>
             <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>
