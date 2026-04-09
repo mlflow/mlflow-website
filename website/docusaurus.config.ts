@@ -14,7 +14,7 @@ const config: Config = {
   favicon: "img/mlflow-favicon.ico",
 
   // Set the production url of your site here
-  url: "http://mlflow.org",
+  url: "https://mlflow.org",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl,
