@@ -88,6 +88,9 @@ const config: Config = {
           trackingID: "AW-16857946923",
           anonymizeIP: true,
         },
+        sitemap: {
+          filename: "sitemap-website.xml",
+        },
       } satisfies Preset.Options,
     ],
   ],
