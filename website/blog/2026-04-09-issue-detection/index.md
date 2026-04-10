@@ -1,5 +1,5 @@
 ---
-title: "Introducing Automatic Issue Detection: AI-Powered Quality Check for LLM Applications"
+title: "Tired of Manually Reviewing Traces to Find Issues in Your Agent? Meet Automatic Issue Detection"
 tags:
   [genai, evaluation, quality, ai-insights, tracing, observability, automatic]
 slug: issue-detection
