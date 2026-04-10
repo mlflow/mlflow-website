@@ -1,5 +1,5 @@
 ---
-title: "Tired of Manually Reviewing Traces to Find Issues in Your Agent? Meet Automatic Issue Detection"
+title: "Tired of Reviewing Traces? Meet Automatic Issue Detection for Your Agent"
 tags:
   [genai, evaluation, quality, ai-insights, tracing, observability, automatic]
 slug: issue-detection
@@ -8,7 +8,11 @@ thumbnail: /img/blog/issue-detection-thumbnail.png
 image: /img/blog/issue-detection-thumbnail.png
 ---
 
-Detecting issues in your agent is tedious, inconsistent, and hard to scale. Today we're announcing [**Automatic Issue Detection**](https://mlflow.org/docs/latest/genai/eval-monitor/ai-insights/detect-issues/), a new MLflow AI Insights feature that makes it simpler to find and triage problems directly from your LLM application traces.
+[Observability](https://mlflow.org/docs/latest/genai/tracing/) has become a norm for AI agents in production. But recording logs, metrics, and traces alone doesn't make the user experience better. You need to act on the data.
+
+The problem is that finding actionable insights from massive traces is a needle-in-a-haystack problem. From thousands of production logs, how do you spot conversations where users got frustrated or dropped out? How do you catch an agent that silently returns wrong answers with high confidence and misleads users? Manually reviewing traces one by one doesn't scale.
+
+Today we're announcing [**Automatic Issue Detection**](https://mlflow.org/docs/latest/genai/eval-monitor/ai-insights/detect-issues/) in MLflow, a new AI-driven Insights feature that replaces hours of manual check and triage to just 3 clicks.
 
 <video width="100%" controls autoPlay loop muted>
   <source
@@ -22,21 +26,23 @@ Detecting issues in your agent is tedious, inconsistent, and hard to scale. Toda
 As LLM applications grow in production, maintaining agent quality becomes increasingly challenging. Four problems compound as traffic scales:
 
 - **Manual review doesn't scale:** Inspecting individual traces one by one is unsustainable as request volume grows.
-- **Unclear metrics:** It's hard to know which quality dimensions to measure without predefined baselines to start from.
+- **Unclear criteria:** It's hard to know which quality dimensions to measure without predefined baselines to start from.
 - **Scattered failure patterns:** Related failures spread across thousands of traces with no systematic grouping, making recurring issues easy to miss.
 - **Unstructured tracking:** Without formal issue management, identified problems disappear into notes and Slack threads—and regressions go undetected.
 
 Automatic Issue Detection moves teams from reactive, manual debugging to proactive, systematic quality identification.
 
-## How It Works
+## Getting Started
 
 Issue Detection is built into the MLflow UI and runs directly against the traces you've already collected.
 
 ![EntryPoint](./detect-issues-button.png)
 
+## How It Works
+
 ### The CLEARS Framework
 
-MLflow organizes issue detection across six quality dimensions, forming the **CLEARS** framework (**C**orrectness, **L**atency, **E**xecution, **A**dherence, **R**elevance, **S**afety). Choose which categories to focus on based on your application's requirements:
+MLflow organizes issue detection across six quality dimensions, forming the [**CLEARS** framework](https://mlflow.org/docs/latest/genai/eval-monitor/ai-insights/detect-issues/#issue-categories-clears) (**C**orrectness, **L**atency, **E**xecution, **A**dherence, **R**elevance, **S**afety). Choose which categories to focus on based on your application's requirements:
 
 ![Categories](./categories.png)
 
@@ -54,7 +60,6 @@ Once you start an analysis run, MLflow:
 The analysis runs asynchronously with real-time progress tracking, so you can kick it off and come back to the results.
 
 ![In-progress Job](./issue-detection-progress.png)
-![Complete Job](./issue-detection-complete.png)
 
 ### Issue Triage
 
