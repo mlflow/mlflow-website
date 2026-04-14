@@ -35,7 +35,7 @@ Without a structured process and a development platform, such as MLflow, to faci
 
 <video width="100%" controls autoPlay loop muted>
   <source
-    src={require("@site/static/img/tructured-ai-eval/traces_sesions.mp4").default}
+    src={require("@site/static/img/tructured-ai-eval/tracing-top.mp4").default}
     type="video/mp4"
   />
 </video>
@@ -181,13 +181,7 @@ The final bit in phase 2 is optimizing your prompts for better and best alignmen
 
 During testing, you will want to tweak prompts and try different versions. A prompt change is a behavior change, and without version control, you lose the ability to correlate “this prompt” with “these evaluation scores.” 
 
-
-<video width="100%" controls autoPlay loop muted>
-  <source
-    src={require("@site/static/img/tructured-ai-eval/prompts_registry.mp4").default}
-    type="video/mp4"
-  />
-</video>
+![prompt-registery](./prompts_versions.png)
 
 Aside from versioning, another real benefit is automated prompt optimization, an algorithmic approach to help you automatically discover a better prompt.  Instead of manually iterating on phrasing, [MLflow’s optimize_prompts API](https://mlflow.org/docs/3.2.0/genai/prompt-registry/optimize-prompts/) runs optimization algorithms like [GEPA](https://arxiv.org/abs/2507.19457) against your evaluation dataset and judges, converging on prompt versions that score higher without you having to guess your way there.
 
