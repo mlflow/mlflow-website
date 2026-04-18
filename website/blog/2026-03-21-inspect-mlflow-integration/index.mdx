@@ -38,17 +38,7 @@ Eval scores also log as MLflow trace assessments, so they appear directly in the
 
 ## Debugging with Execution Traces
 
-Setting `MLFLOW_INSPECT_TRACING=true` activates the tracing hook, which maps every evaluation event to an MLflow trace span. The span tree mirrors the eval hierarchy:
-
-```
-eval_run (CHAIN)
-  task (CHAIN)
-    sample (CHAIN)
-      solvers -> generate -> model:openai/gpt-4o-mini (LLM)
-      scorers -> match -> score (EVALUATOR)
-```
-
-Each span type captures different data. LLM spans record the model name, input and output token counts, temperature, cache status, and the response text. Tool spans show the function name, arguments, result, and execution time. Evaluator spans capture the score value and explanation. The span tree below shows a full evaluation with three samples, each containing solver and scorer spans:
+Setting `MLFLOW_INSPECT_TRACING=true` activates the tracing hook, which maps every evaluation event to an [MLflow trace span](https://mlflow.org/docs/latest/tracing.html). The span tree mirrors the eval hierarchy, so you can drill into any sample and see exactly what the model did at each step. The span tree below shows a full evaluation with three samples, each containing solver and scorer spans:
 
 <img
   src={require("./screenshot-tracing.png").default}
