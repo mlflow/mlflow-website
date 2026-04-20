@@ -35,7 +35,7 @@ Without a structured process and a development platform, such as MLflow, to faci
 
 <video width="100%" controls autoPlay loop muted>
   <source
-    src={require("@site/static/img/tructured-ai-eval/tracing-top.mp4").default}
+    src={require("@site/static/img/structured-ai-eval/tracing-top.mp4").default}
     type="video/mp4"
   />
 </video>
