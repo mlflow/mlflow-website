@@ -235,9 +235,8 @@ If this was useful, give us a star on [GitHub](https://github.com/mlflow/mlflow)
 1. [Your Agents Need an AI Platform](https://mlflow.org/blog/agents-need-ai-platform)
 2. [Testing and Refining Claude Code Skills with MLflow](https://mlflow.org/blog/evaluating-skills-mlflow)
 3. [End-to-end Workflow: Eval Driven Development](https://mlflow.org/docs/latest/genai/datasets/end-to-end-workflow/)
-4. [MLflow Tracing: Debugging and AI Observability for GenAI](https://www.youtube.com/watch?v=npiKufwkyoo&list=PLaoPu6xpLk9EI99TuOjSgy-UuDWowJ_mR&index=2&pp=iAQB) 
-5. [Advanced MLflow Tracing: Manual Spans, RAG, and Agent workflows](https://www.youtube.com/watch?v=SND52zOVQRs    )
-
+4. [MLflow Tracing: Debugging and AI Observability for GenAI](https://www.youtube.com/watch?v=npiKufwkyoo&list=PLaoPu6xpLk9EI99TuOjSgy-UuDWowJ_mR&index=2&pp=iAQB)
+5. [Advanced MLflow Tracing: Manual Spans, RAG, and Agent workflows](https://www.youtube.com/watch?v=SND52zOVQRs)
 
 
 
