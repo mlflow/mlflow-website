@@ -1,7 +1,6 @@
 ---
 title: "Structuring AI Evaluation and Observability with MLflow: From Development to Production"
-tags:
-  [genai, evaluation, quality, tracing, observability]
+tags: [genai, evaluation, quality, tracing, observability]
 slug: structured-ai-eval
 authors: [jules-damji]
 thumbnail: /img/blog/agent_lifecycle.svg
@@ -12,14 +11,13 @@ Shipping your first AI agent or LLM application feels fulfilling until you have 
 
 But then the silent failures and quality issues begin. You tweak a prompt to improve one behavior, and three others get worse. You can’t tell if your latest update is a step forward, a step backward, or simply a desperate, guesswork move.
 
-At some point, you have to trade the vibe check for a structured approach. Without a structured way to measure what’s happening, you’re hoping for the best. 
+At some point, you have to trade the vibe check for a structured approach. Without a structured way to measure what’s happening, you’re hoping for the best.
 
 This post is about making that transition: adopting a structured, systematic way to evaluate your AI application. We’ll walk through integrating MLflow’s four pillars: [Tracing](https://mlflow.org/docs/latest/genai/tracing/), [Evaluation and Human Feedback](https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/), [Prompt Versioning](https://mlflow.org/docs/latest/genai/prompt-registry/), and [AI Governance](https://mlflow.org/docs/latest/genai/governance/ai-gateway/), focusing on the phases where it actually matters, as part of this systematic approach called eval-driven development cycle.
 
 ![four_pillars](./mlflow_four_pillars.png)
 
 _Figure 1. MLflow Open Source AI Platform’s four pillars_
-
 
 ## Why Agents Break Differently: The Case for AI Observability
 
@@ -31,7 +29,7 @@ And finally, you’re navigating trade-offs between cost, latency, and quality o
 
 Without a structured process and a development platform, such as MLflow, to facilitate the rigor necessary, the workflow looks something like this: write the agent, run a few prompts locally, ship to production, and hope for the best. Not a good idea!
 
-[AI observability](https://mlflow.org/ai-observability) is the foundation you need before anything else makes sense. If you can’t see what your agent is doing at each step, then you can’t monitor, debug, and improve its quality. Tracing gives you that visibility, and it changes the conversation from “I think the agent is working” (guessing) to “here’s exactly what happened in this request” (measuring). 
+[AI observability](https://mlflow.org/ai-observability) is the foundation you need before anything else makes sense. If you can’t see what your agent is doing at each step, then you can’t monitor, debug, and improve its quality. Tracing gives you that visibility, and it changes the conversation from “I think the agent is working” (guessing) to “here’s exactly what happened in this request” (measuring).
 
 <video width="100%" controls autoPlay loop muted>
   <source
@@ -57,6 +55,7 @@ mlflow.openai.autolog()
 ```
 
 Manual tracing of your tool usage captures operations that autologging may not. For example,
+
 ```python
 @mlflow.trace(name="get_embedding", span_type="LLM")
 def get_embedding(query: str) -> List[float]:
@@ -73,14 +72,15 @@ def embed_query(query: str) -> List[float]:
     return get_embedding(query)
 ```
 
-Once tracing is enabled, your vibe checks become data-backed. Instead of reading a response and guessing whether it’s good, you can inspect the full trajectory: 
- * Did a tool call fail silently?
- * Did retrieval pull the wrong documents? 
- * Is one span burning 4 seconds while the rest finish in milliseconds? 
+Once tracing is enabled, your vibe checks become data-backed. Instead of reading a response and guessing whether it’s good, you can inspect the full trajectory:
+
+- Did a tool call fail silently?
+- Did retrieval pull the wrong documents?
+- Is one span burning 4 seconds while the rest finish in milliseconds?
 
 These are questions you can actually answer now by looking at traces in the MLflow UI rather than re-running prompts and squinting at outputs.
 
-### Phase 2: Incorporate subject-matter expert feedback, add judges, and create evaluation datasets. 
+### Phase 2: Incorporate subject-matter expert feedback, add judges, and create evaluation datasets.
 
 Tracing tells you what happened. Evaluation tells you whether it was any good. [MLflow’s labeling and feedback collection UI](https://mlflow.org/docs/latest/genai/assessments/feedback/#add-human-evaluation-via-ui) lets you share your prototype with domain experts who interact with the agent and submit structured feedback on correctness, relevance, safety, and any other dimensions that matter to your use case.
 
@@ -107,6 +107,7 @@ results = mlflow.genai.evaluate(
     ],
 )
 ```
+
 Each judge examines traces from a different angle. Built-in judges handle the common dimensions, while guidelines judge enforce policy. Running them together across hundreds of traces is where you catch the issues, faults, or unexpected or undesirable agent behavior that vibe-checking misses entirely.
 
 During your initial evaluation, if judges score low or do not align with the expected behavior, it indicates you need to either reexamine the evaluation or build an [evaluation dataset](https://mlflow.org/docs/latest/genai/datasets/) to better align the judges with the outcome.
@@ -132,12 +133,13 @@ new_records = [
     },
     ...
   ]
-# create your evalaution set 
+# create your evalaution set
 evalution_dataset.merge_records(new_records)
 ```
+
 Next, in phase 2, bolster your evaluation strategy with custom judges that capture your domain-specific requirements.
 
-##  From Built-in Judges to Custom Evaluations: Layering Your Agent Scoring Strategy
+## From Built-in Judges to Custom Evaluations: Layering Your Agent Scoring Strategy
 
 Built-in judges can’t know your business. If your agent handles insurance claims, “correct” means something very specific that no generic scorer will capture. That’s where custom judges fill the gap. The [make_judge](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/) API lets you define domain-specific evaluation logic declaratively, without writing scoring functions from scratch.
 
@@ -177,13 +179,13 @@ The final bit in phase 2 is optimizing your prompts for better and best alignmen
 
 ## Systematically Improving and Optimizing Prompts in LLMOps
 
-[MLflow’s Prompt Registry](https://mlflow.org/docs/3.2.0/genai/prompt-registry/) versions every prompt and links it directly to traces and evaluation metrics, giving you the A/B testing infrastructure that prompt engineering has always needed. Just as human feedback is part and parcel of your phase 2 evaluation strategy, so is versioning prompts and optimizing them for systematic agent testing. 
+[MLflow’s Prompt Registry](https://mlflow.org/docs/3.2.0/genai/prompt-registry/) versions every prompt and links it directly to traces and evaluation metrics, giving you the A/B testing infrastructure that prompt engineering has always needed. Just as human feedback is part and parcel of your phase 2 evaluation strategy, so is versioning prompts and optimizing them for systematic agent testing.
 
-During testing, you will want to tweak prompts and try different versions. A prompt change is a behavior change, and without version control, you lose the ability to correlate “this prompt” with “these evaluation scores.” 
+During testing, you will want to tweak prompts and try different versions. A prompt change is a behavior change, and without version control, you lose the ability to correlate “this prompt” with “these evaluation scores.”
 
 ![prompt-registery](./prompts_versions.png)
 
-Aside from versioning, another real benefit is automated prompt optimization, an algorithmic approach to help you automatically discover a better prompt.  Instead of manually iterating on phrasing, [MLflow’s optimize_prompts API](https://mlflow.org/docs/3.2.0/genai/prompt-registry/optimize-prompts/) runs optimization algorithms like [GEPA](https://arxiv.org/abs/2507.19457) against your evaluation dataset and judges, converging on prompt versions that score higher without you having to guess your way there.
+Aside from versioning, another real benefit is automated prompt optimization, an algorithmic approach to help you automatically discover a better prompt. Instead of manually iterating on phrasing, [MLflow’s optimize_prompts API](https://mlflow.org/docs/3.2.0/genai/prompt-registry/optimize-prompts/) runs optimization algorithms like [GEPA](https://arxiv.org/abs/2507.19457) against your evaluation dataset and judges, converging on prompt versions that score higher without you having to guess your way there.
 
 ```python
 from mlflow.genai.optimize.optimizers import GepaPromptOptimizer
@@ -216,13 +218,13 @@ _Figure 3. Creating a LLM judge for online monitoring_
 
 ## Key Takeaways for a Structured Approach to AI Observability
 
- **Evals aren't just for research teams**. If you're shipping an agent, you need a structured evaluation approach to catch issues and fix them before your users do.
+**Evals aren't just for research teams**. If you're shipping an agent, you need a structured evaluation approach to catch issues and fix them before your users do.
 
- **You don't need perfect ground truth labels to make progress**. Begin with inputs, add expected outputs where you're confident, use LLM judges for the rest, and let your evaluation dataset grow with each iteration.
+**You don't need perfect ground truth labels to make progress**. Begin with inputs, add expected outputs where you're confident, use LLM judges for the rest, and let your evaluation dataset grow with each iteration.
 
- **Trace everything, evaluate in layers, version your prompts**. Tracing reveals how agents behave. Adding more judges and versioning and optimizing your prompts leads to your agent’s expected behavior. 
+**Trace everything, evaluate in layers, version your prompts**. Tracing reveals how agents behave. Adding more judges and versioning and optimizing your prompts leads to your agent’s expected behavior.
 
- **Getting started is easy**. Add mlflow.openai.autolog(), run one evaluation with a couple of built-in scorers, and you've moved from guessing to measuring. Everything else builds from there.
+**Getting started is easy**. Add mlflow.openai.autolog(), run one evaluation with a couple of built-in scorers, and you've moved from guessing to measuring. Everything else builds from there.
 
 In short, stop guessing, start measuring!
 
