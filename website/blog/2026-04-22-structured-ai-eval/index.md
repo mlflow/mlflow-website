@@ -29,7 +29,7 @@ Agents, by contrast, don’t follow that playbook for several reasons. First, th
 
 And finally, you’re navigating trade-offs between cost, latency, and quality on every agentic workflow invocation. Without instrumentation, you have no data to guide you.
 
-Without a structured process and a development platform, such as MLflow, to facilitate the rigor necessary, the workflow looks something like this: write the agent, run a few prompts locally, ship to production, and hope for the best. Not a good idea.
+Without a structured process and a development platform, such as MLflow, to facilitate the rigor necessary, the workflow looks something like this: write the agent, run a few prompts locally, ship to production, and hope for the best. Not a good idea!
 
 [AI observability](https://mlflow.org/ai-observability) is the foundation you need before anything else makes sense. If you can’t see what your agent is doing at each step, then you can’t monitor, debug, and improve its quality. Tracing gives you that visibility, and it changes the conversation from “I think the agent is working” (guessing) to “here’s exactly what happened in this request” (measuring). 
 
