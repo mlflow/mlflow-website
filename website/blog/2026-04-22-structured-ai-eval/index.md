@@ -3,8 +3,8 @@ title: "Structuring AI Evaluation and Observability with MLflow: From Developmen
 tags: [genai, evaluation, quality, tracing, observability]
 slug: structured-ai-eval
 authors: [jules-damji]
-thumbnail: /img/blog/agent_lifecycle.svg
-image: /img/blog/agent_lifecycle.svg
+thumbnail: /img/blog/agent_lifecycle.png
+image: /img/blog/agent_lifecycle.png
 ---
 
 Shipping your first AI agent or LLM application feels fulfilling until you have to make changes because it does not work as you intended. Most of us start the same way: we test a few prompts, the results look reasonable, we vibe-check, and move on.
