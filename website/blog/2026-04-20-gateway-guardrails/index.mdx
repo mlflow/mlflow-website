@@ -1,0 +1,126 @@
+---
+title: "Enforce Content Policies at the Gateway with AI Gateway Guardrails"
+description: MLflow AI Gateway now supports configurable guardrails that use LLM judges to block or sanitize harmful content, PII, and custom policy violations before they reach your users or your models.
+slug: gateway-guardrails
+authors: [tomu-hirata]
+tags: [mlflow, genai, ai-gateway, governance, safety, guardrails]
+thumbnail: /img/blog/gateway-guardrails-thumbnail.png
+image: /img/blog/gateway-guardrails-thumbnail.png
+---
+
+<video
+  src={require("./guardrails.mp4").default}
+  autoPlay
+  muted
+  controls
+  playsInline
+  width="100%"
+/>
+
+As GenAI applications move into production, the question shifts from _can we build this?_ to _can we trust what comes out of it?_ LLMs are powerful but unpredictable: they can produce harmful content, leak personally identifiable information, or violate organizational policies in ways that are hard to anticipate and even harder to catch after the fact. Bolting safety checks onto individual applications means duplicated logic, inconsistent enforcement, and gaps wherever new services bypass the rules.
+
+MLflow AI Gateway now supports **guardrails**: configurable content policies enforced at the gateway layer, before requests reach your LLM or before responses reach your users. Because guardrails run in the gateway, they apply consistently across every application that routes through it, with no changes to application code required.
+
+{/* truncate */}
+
+## How Guardrails Work
+
+Each guardrail uses an **LLM judge** (any endpoint already configured in your gateway) to evaluate incoming requests or outgoing responses against a set of natural-language instructions. When the judge determines that content violates the policy, the gateway either **blocks** the request entirely or **sanitizes** (redacts) the offending content before allowing it through.
+
+The pipeline looks like this:
+
+```text
+Request  →  Before Guardrails  →  LLM  →  After Guardrails  →  Response
+```
+
+**Before guardrails** screen the incoming request. They're well-suited for catching prompt injection, PII in user input, or off-topic queries before they consume any tokens.
+
+**After guardrails** evaluate the LLM's response before it reaches the caller. Use them for toxicity filtering, detecting PII in generated output, or enforcing brand and tone requirements.
+
+Multiple guardrails on the same endpoint execute in order. If any guardrail blocks a request, subsequent guardrails in the same stage are skipped.
+
+## Built-in Types
+
+Three built-in guardrail types come with pre-loaded instructions so you can get started quickly. Because the instructions are plain text, you can edit them at any time to tighten or loosen the policy, add domain-specific context, or handle edge cases unique to your use case — no code changes required, just update the prompt:
+
+| Type                 | Description                                                          | Default Stage                      |
+| -------------------- | -------------------------------------------------------------------- | ---------------------------------- |
+| **Safety**           | Detects harmful, offensive, or toxic content                         | After (screens LLM responses)      |
+| **PII Detection**    | Detects names, emails, phone numbers, and other personal information | Before (screens incoming requests) |
+| **Custom Guardrail** | Blank slate: write your own name and instructions                    | Your choice                        |
+
+Selecting a built-in type pre-populates the name and instructions in the creation wizard. From there, you can refine the prompt to match your organization's specific policies — for example, restricting a PII guardrail to only flag medical record numbers, or tuning a safety guardrail to allow certain technical terminology that a generic classifier would otherwise flag.
+
+## Creating a Guardrail
+
+Guardrails are configured per endpoint. Navigate to **AI Gateway > Endpoints**, open an endpoint, and select the **Guardrails** tab.
+
+![Guardrails tab showing empty state](./guardrails-tab-empty.png)
+
+Click **Create Guardrail** to open the wizard. The first step asks you to choose a type:
+
+![Create Guardrail modal showing type picker with Safety, PII Detection, and Custom options](./guardrails-create-type-picker.png)
+
+The second step lets you configure every aspect of the guardrail:
+
+![Create Guardrail configuration step showing Name, Stage, Instructions, Guardrail Model, and Action fields](./guardrails-create-config.png)
+
+**Name:** a descriptive label shown in the guardrails table and included in error responses when a guardrail blocks a request.
+
+**Stage:** Before or After. Switching stages automatically updates the content variable references in the instructions editor (`{{ inputs }}` ↔ `{{ outputs }}`), keeping them correct without manual edits.
+
+**Instructions:** natural-language prompt for the LLM judge. Reference `{{ inputs }}` for the incoming request and `{{ outputs }}` for the LLM response. The instructions must include at least one content variable. Here's an example for a custom toxicity check on the After stage:
+
+```text
+You are a toxicity detector. Review the LLM response below for any harmful,
+offensive, or hateful language. Reply with a JSON object:
+
+{
+  "rationale": "Brief explanation of your decision.",
+  "result": "yes if the content is safe, no if it is harmful"
+}
+
+<response>{{ outputs }}</response>
+```
+
+**Guardrail Model:** the AI Gateway endpoint that runs the judge. Any endpoint in your gateway can serve as the judge, so you can use a cheaper, faster model for policy enforcement and reserve your primary model for the actual workload. The current endpoint is excluded from the list to prevent circular dependencies.
+
+**Action:** what happens when the judge returns `"no"`:
+
+- **Block**: the request is rejected with an HTTP 400 response. The response body includes the guardrail name and the judge's rationale so callers know exactly why.
+- **Sanitize**: flagged content is redacted or masked, then the cleaned request or response continues through the pipeline.
+
+Click **Create Guardrail** to save. The guardrail is active immediately for all traffic through the endpoint.
+
+## What Blocking Looks Like
+
+When a guardrail's action is set to Block and the judge flags a violation, callers receive an HTTP 400 with a structured error body containing the guardrail name and the judge's rationale: actionable context that clients can log, surface to users, or use to trigger alternative handling.
+
+<img
+  src={require("./guardrails-reject.png").default}
+  alt="Query endpoint dialog showing a PII Detection guardrail blocking a request containing a phone number, returning a 400 Bad Request with a detailed rationale"
+  style={{ maxWidth: "80%", width: "100%", margin: "0 auto", display: "block" }}
+/>
+
+## Managing Guardrails
+
+Clicking any row in the guardrails table opens a detail panel where you can update the stage, instructions, guardrail model, or action. Updates are saved atomically: changes register as a new scorer version and replace the guardrail on the endpoint without dropping any in-flight requests.
+
+To delete a single guardrail, open its detail panel and click **Delete**. To remove multiple guardrails at once, select their checkboxes in the table and use the **Delete** button in the toolbar.
+
+## Getting Started
+
+Guardrails are included with MLflow and available through the AI Gateway UI:
+
+```bash
+pip install 'mlflow[genai]'
+mlflow server
+```
+
+Then open the MLflow UI, navigate to **AI Gateway > Endpoints**, and add guardrails to any unified endpoint. For full configuration details, see the [Guardrails documentation](https://mlflow.org/docs/latest/genai/governance/ai-gateway/guardrails/).
+
+---
+
+Guardrails are the latest addition to MLflow AI Gateway's governance layer, joining [budget policies](/blog/gateway-budget-alerts-limits) and [usage tracking](/blog/mlflow-ai-gateway) to give teams complete visibility and control over their LLM traffic. If you run into any issues or have feedback, please file a report on [MLflow's GitHub Issues](https://github.com/mlflow/mlflow/issues).
+
+⭐ [Star us on GitHub](https://github.com/mlflow/mlflow) — show your support for the project!
