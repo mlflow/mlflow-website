@@ -6,8 +6,7 @@ import path from "path";
 // Match mlflow.org URLs, stopping at characters that are markdown/JSX
 // delimiters rather than part of the URL. GitHub links are excluded because
 // their rate limiting (429) makes CI flaky.
-const TARGET_PATTERN =
-  /https?:\/\/(www\.)?mlflow\.org[^\s)"'>\]`]*/g;
+const TARGET_PATTERN = /https?:\/\/(www\.)?mlflow\.org[^\s)"'>\]`]*/g;
 
 function getFiles(
   dir: string,
