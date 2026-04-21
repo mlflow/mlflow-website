@@ -32,7 +32,7 @@ client = openai.OpenAI()
 @mlflow.trace
 def answer_question(question: str) -> str:
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-5.4-mini",
         messages=[
             {
                 "role": "system",
@@ -196,7 +196,7 @@ def has_required_sections(outputs, expectations) -> Feedback:
     )
 ```
 
-For evaluation criteria that require nuanced judgment, write a scorer that calls an LLM directly. This scorer asks GPT-4o-mini to rate the medical accuracy and tone of responses.
+For evaluation criteria that require nuanced judgment, write a scorer that calls an LLM directly. This scorer asks GPT-5.4-mini to rate the medical accuracy and tone of responses.
 
 ```python
 import json
@@ -221,7 +221,7 @@ Return JSON with this exact format:
 }}
 """
     response = openai.OpenAI().chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-5.4-mini",
         messages=[
             {"role": "user", "content": prompt}
         ],
@@ -236,7 +236,7 @@ Return JSON with this exact format:
         rationale=result["rationale"],
         source=AssessmentSource(
             source_type="LLM_JUDGE",
-            source_id="openai:/gpt-4o-mini",
+            source_id="openai:/gpt-5.4-mini",
         ),
     )
 ```

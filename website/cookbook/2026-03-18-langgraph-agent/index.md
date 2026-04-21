@@ -137,7 +137,7 @@ Use LangGraph's `create_react_agent` to wire the tools into a ReAct-style agent 
 from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
 
-llm = ChatOpenAI(model="gpt-4o-mini")
+llm = ChatOpenAI(model="gpt-5.4-mini")
 
 tools = [get_flight_price, get_weather, search_hotels]
 

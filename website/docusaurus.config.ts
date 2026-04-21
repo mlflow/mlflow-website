@@ -13,8 +13,12 @@ const config: Config = {
   // tagline: 'Dinosaurs are cool',
   favicon: "img/mlflow-favicon.ico",
 
+  // ensure trailing slash is present in the sitemap, this fixes some URLs like
+  // https://mlflow.org/releases/3.3.0 which are broken without a slash
+  trailingSlash: true,
+
   // Set the production url of your site here
-  url: "http://mlflow.org",
+  url: "https://mlflow.org",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl,
@@ -88,6 +92,9 @@ const config: Config = {
           trackingID: "AW-16857946923",
           anonymizeIP: true,
         },
+        sitemap: {
+          filename: "sitemap-website.xml",
+        },
       } satisfies Preset.Options,
     ],
   ],
@@ -146,6 +153,7 @@ const config: Config = {
         blogTitle: "Cookbook",
         blogDescription:
           "Practical guides and code examples for MLflow features.",
+        postsPerPage: "ALL",
         onUntruncatedBlogPosts: "ignore",
         showReadingTime: true,
       },
