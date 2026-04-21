@@ -72,7 +72,7 @@ export default function Home(): JSX.Element {
             "@type": "Organization",
             name: "MLflow",
             url: "https://mlflow.org",
-            logo: "https://mlflow.org/img/mlflow-logo.svg",
+            logo: "https://mlflow.org/img/mlflow-black.svg",
             sameAs: [
               "https://github.com/mlflow/mlflow",
               "https://www.linkedin.com/company/mlflow-org",
