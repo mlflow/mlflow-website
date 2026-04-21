@@ -8,6 +8,8 @@ thumbnail: /img/blog/gateway-guardrails-thumbnail.png
 image: /img/blog/gateway-guardrails-thumbnail.png
 ---
 
+import { BlogImage } from "@site/src/components/BlogImage/BlogImage";
+
 <video
   src={require("./guardrails.mp4").default}
   autoPlay
@@ -25,7 +27,7 @@ MLflow AI Gateway now supports **guardrails**: configurable content policies enf
 
 ## How Guardrails Work
 
-Each guardrail uses an **LLM judge** (any endpoint already configured in your gateway) to evaluate incoming requests or outgoing responses against a set of natural-language instructions. When the judge determines that content violates the policy, the gateway either **blocks** the request entirely or **sanitizes** (redacts) the offending content before allowing it through.
+Each guardrail evaluates incoming requests or outgoing responses against a set of natural-language instructions. When the guardrail determines that content violates the policy, the gateway either **blocks** the request entirely or **sanitizes** (redacts) the offending content before allowing it through.
 
 The pipeline looks like this:
 
@@ -55,33 +57,36 @@ Selecting a built-in type pre-populates the name and instructions in the creatio
 
 Guardrails are configured per endpoint. Navigate to **AI Gateway > Endpoints**, open an endpoint, and select the **Guardrails** tab.
 
-<img
+<BlogImage
   src={require("./guardrails-tab-empty.png").default}
   alt="Guardrails tab showing empty state"
-  style={{ maxWidth: "80%", width: "100%", margin: "0 auto", display: "block" }}
+  width="80%"
+  center
 />
 
 Click **Create Guardrail** to open the wizard. The first step asks you to choose a type:
 
-<img
+<BlogImage
   src={require("./guardrails-create-type-picker.png").default}
   alt="Create Guardrail modal showing type picker with Safety, PII Detection, and Custom options"
-  style={{ maxWidth: "80%", width: "100%", margin: "0 auto", display: "block" }}
+  width="80%"
+  center
 />
 
 The second step lets you configure every aspect of the guardrail:
 
-<img
+<BlogImage
   src={require("./guardrails-create-config.png").default}
   alt="Create Guardrail configuration step showing Name, Stage, Instructions, Guardrail Model, and Action fields"
-  style={{ maxWidth: "80%", width: "100%", margin: "0 auto", display: "block" }}
+  width="80%"
+  center
 />
 
 **Name:** a descriptive label shown in the guardrails table and included in error responses when a guardrail blocks a request.
 
 **Stage:** Before or After. Switching stages automatically updates the content variable references in the instructions editor (`{{ inputs }}` ↔ `{{ outputs }}`), keeping them correct without manual edits.
 
-**Instructions:** natural-language prompt for the LLM judge. Reference `{{ inputs }}` for the incoming request and `{{ outputs }}` for the LLM response. The instructions must include at least one content variable. Here's an example for a custom toxicity check on the After stage:
+**Instructions:** natural-language instructions describing what to look for and how to respond. Reference `{{ inputs }}` for the incoming request and `{{ outputs }}` for the LLM response. The instructions must include at least one content variable. Here's an example for a custom toxicity check on the After stage:
 
 ```text
 You are a toxicity detector. Review the LLM response below for any harmful,
@@ -95,23 +100,24 @@ offensive, or hateful language. Reply with a JSON object:
 <response>{{ outputs }}</response>
 ```
 
-**Guardrail Model:** the AI Gateway endpoint that runs the judge. Any endpoint in your gateway can serve as the judge, so you can use a cheaper, faster model for policy enforcement and reserve your primary model for the actual workload. The current endpoint is excluded from the list to prevent circular dependencies.
+**Guardrail Model:** the AI Gateway endpoint used to evaluate the guardrail. You can use a cheaper, faster model for policy enforcement and reserve your primary model for the actual workload. The current endpoint is excluded from the list to prevent circular dependencies.
 
-**Action:** what happens when the judge returns `"no"`:
+**Action:** what happens when the guardrail triggers:
 
-- **Block**: the request is rejected with an HTTP 400 response. The response body includes the guardrail name and the judge's rationale so callers know exactly why.
+- **Block**: the request is rejected with an HTTP 400 response. The response body includes the guardrail name and the rationale so callers know exactly why.
 - **Sanitize**: flagged content is redacted or masked, then the cleaned request or response continues through the pipeline.
 
 Click **Create Guardrail** to save. The guardrail is active immediately for all traffic through the endpoint.
 
 ## What Blocking Looks Like
 
-When a guardrail's action is set to Block and the judge flags a violation, callers receive an HTTP 400 with a structured error body containing the guardrail name and the judge's rationale: actionable context that clients can log, surface to users, or use to trigger alternative handling.
+When a guardrail's action is set to Block and a violation is detected, callers receive an HTTP 400 with a structured error body containing the guardrail name and the rationale: actionable context that clients can log, surface to users, or use to trigger alternative handling.
 
-<img
+<BlogImage
   src={require("./guardrails-reject.png").default}
   alt="Query endpoint dialog showing a PII Detection guardrail blocking a request containing a phone number, returning a 400 Bad Request with a detailed rationale"
-  style={{ maxWidth: "80%", width: "100%", margin: "0 auto", display: "block" }}
+  width="80%"
+  center
 />
 
 ## Managing Guardrails
