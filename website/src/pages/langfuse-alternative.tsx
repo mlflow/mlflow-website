@@ -979,8 +979,10 @@ result = mlflow.genai.optimize_prompts(
           </p>
           <p>
             <strong>MLflow</strong> offers a built-in{" "}
-            <Link to={`${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/`}>AI Gateway</Link> for
-            governing LLM access across your organization. It provides a
+            <Link to={`${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/`}>
+              AI Gateway
+            </Link>{" "}
+            for governing LLM access across your organization. It provides a
             standard endpoint that routes requests to any supported provider
             (OpenAI, Anthropic, AWS Bedrock, Azure OpenAI, Google Gemini, and
             more), with built-in{" "}
