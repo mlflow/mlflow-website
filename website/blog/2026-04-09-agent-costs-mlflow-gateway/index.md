@@ -40,13 +40,13 @@ Here's the cost breakdown for a single ticket — ticket T001, an order status q
 
 ![Cost breakdown for ticket T001 showing four LLM calls with model, token counts, and cost per component](single_ticket_breakdown.png)
 
-Four LLM calls, four different cost contributions. The orchestrator routing is cheap ($0.0007), but the synthesizer and guardrail together account for over 70% of the total. Now multiply that across every ticket, every day.
+Four LLM calls, four different cost contributions. The orchestrator routing is cheap ($0.0009), but the synthesizer and guardrail together account for over 80% of the total. Now multiply that across every ticket, every day.
 
 Here's what that looks like at 500 tickets per day across 20 sample tickets:
 
 ![Aggregate cost summary for 20 tickets showing per-component costs and daily projections](cost_summary.png)
 
-At ~$6.25/day with 500 tickets, the math feels manageable. But scale to 10,000 tickets per day and it's **~$125/day — roughly $3,750/month**. If context windows bloat or retry rates spike during provider outages, costs can easily double.
+At \~$9.40/day with 500 tickets, the math feels manageable. But scale to 10,000 tickets per day and it's **\~$188/day — roughly $5,650/month**. If context windows bloat or retry rates spike during provider outages, costs can easily double.
 
 The problem isn't that any single call is expensive. It's that agent costs are **multiplicative**, not additive, and this multiplicative call pattern is one of the most consistently reported causes of production cost shock in multi-agent systems.
 
@@ -75,46 +75,18 @@ pip install 'mlflow[genai]'
 mlflow server
 ```
 
-In your gateway configuration, define an endpoint for each role in the agent:
+Open the gateway UI at `http://localhost:5000/#/gateway`. Under **API Keys**, register your provider credential once. Then under **Endpoints**, click **Create Endpoint** for each role in the agent, give it a name, pick a provider and model, and attach the API key. SupportBot uses four:
 
-```yaml
-endpoints:
-  - name: orchestrator
-    endpoint_type: llm/v1/chat
-    model:
-      name: databricks-gpt-5-4
-      provider: openai
-      config:
-        openai_api_base: $HOST/serving-endpoints
-        openai_api_key: $TOKEN
+| Endpoint | Model | Role in the agent |
+|---|---|---|
+| `orchestrator` | GPT-5.1 | Routes tickets to the right sub-agent |
+| `sub-agent-light` | Claude Haiku 4.5 | For FAQ / status lookups |
+| `sub-agent-strong` | GPT-5.1 | Reasoning-heavy refund / escalation flows |
+| `embeddings` | `bge-large-en` | Retrieval for the knowledge base |
 
-  - name: sub-agent-light
-    endpoint_type: llm/v1/chat
-    model:
-      name: databricks-claude-haiku-4-5
-      provider: openai
-      config:
-        openai_api_base: $HOST/serving-endpoints
-        openai_api_key: $TOKEN
+![Create Endpoint form in the MLflow AI Gateway UI, configuring the sub-agent-light endpoint with the Databricks provider and the databricks-claude-haiku-4-5 model](create_endpoint.png)
 
-  - name: sub-agent-strong
-    endpoint_type: llm/v1/chat
-    model:
-      name: databricks-gpt-5-4
-      provider: openai
-      config:
-        openai_api_base: $HOST/serving-endpoints
-        openai_api_key: $TOKEN
-
-  - name: embeddings
-    endpoint_type: llm/v1/embeddings
-    model:
-      name: databricks-gte-large-en
-      provider: openai
-      config:
-        openai_api_base: $HOST/serving-endpoints
-        openai_api_key: $TOKEN
-```
+Each endpoint gets its own URL path and can be independently routed, rate-limited, and budgeted. See [Create & manage endpoints](https://mlflow.org/docs/latest/genai/governance/ai-gateway/endpoints/create-and-manage/) for the full walkthrough.
 
 On the agent side, the change is minimal — swap `base_url` to point at the gateway:
 
@@ -125,7 +97,7 @@ from openai import OpenAI
 # client = OpenAI(base_url=f"{HOST}/serving-endpoints", api_key=TOKEN)
 
 # After: routing through MLflow AI Gateway
-client = OpenAI(base_url="http://localhost:5000/v1", api_key="")
+client = OpenAI(base_url="http://localhost:5000/gateway/mlflow/v1", api_key="")
 ```
 
 Your agent code stays the same. The gateway handles the rest: credential management, request routing, and automatic tracing of every call.
@@ -145,7 +117,7 @@ Now when SupportBot resolves a ticket, you can see the full [trace](https://www.
 
 ![MLflow trace breakdown showing the full span hierarchy for a single ticket with latency per component](trace_breakdown.png)
 
-The trace shows the full span hierarchy: `process_ticket` → `route_query` → `refund_agent` → `synthesizer` → `guardrail`, each with its own latency and token count. One customer question, four LLM calls, ~14 seconds end-to-end.
+The trace shows the full span hierarchy: `process_ticket` → `route_query` → `refund_agent` → `synthesizer` → `guardrail`, each with its own latency and token count. One customer question, four LLM calls, \~14 seconds end-to-end.
 
 Traces revealed which components were consuming the most tokens, making it clear where to optimize.
 
@@ -153,40 +125,20 @@ Traces revealed which components were consuming the most tokens, making it clear
 
 Visibility tells you what's happening. Budget policies tell the system what to do about it. MLflow AI Gateway supports threshold-based budget policies with two actions: `ALERT` (fire a webhook, traffic keeps flowing) and `REJECT` (fire a webhook and return HTTP 429 to block new requests).
 
-Here's the budget configuration we settled on:
+In the gateway UI under **AI Gateway > Budgets**, click **Create budget policy** and set a budget amount, reset period (daily / weekly / monthly), and an action (`ALERT` or `REJECT`). Register a Slack webhook under **Budget alert webhooks** so ALERT policies land in your on-call channel. Here's the layered policy we settled on for SupportBot:
 
-```yaml
-budget_policies:
-  # Early warning: alert at 60% of daily budget
-  - threshold_dollars: 90
-    time_window: DAYS
-    action: ALERT
-    scope: GLOBAL
-    webhook_url: https://hooks.slack.com/services/T.../B.../xxx
+| Policy | Budget | Reset | Action |
+|---|---|---|---|
+| Early warning — daily | $90 (60% of cap) | Daily | ALERT → Slack |
+| Safety net — daily | $150 | Daily | REJECT (HTTP 429) |
+| Per-team — monthly | $3,000 | Monthly | ALERT → Slack |
+| Per-team — monthly hard limit | $5,000 | Monthly | REJECT (HTTP 429) |
 
-  # Safety net: hard reject at $150/day
-  - threshold_dollars: 150
-    time_window: DAYS
-    action: REJECT
-    scope: GLOBAL
+![Create Budget Policy dialog in the MLflow AI Gateway UI, configuring a $90 daily ALERT policy](create_budget_policy.png)
 
-  # Per-team monthly alert
-  - threshold_dollars: 3000
-    time_window: MONTHS
-    action: ALERT
-    scope: WORKSPACE
-    workspace: customer-support
-    webhook_url: https://hooks.slack.com/services/T.../B.../xxx
+The layered approach is intentional. The daily alert at $90 gives us time to investigate before anything breaks. The daily reject at $150 is the safety net — it prevents a retry storm or context bloat from turning a bad day into a catastrophic one. The monthly policies give us a longer-horizon ceiling so a slow drift doesn't go unnoticed.
 
-  # Per-team monthly hard limit
-  - threshold_dollars: 5000
-    time_window: MONTHS
-    action: REJECT
-    scope: WORKSPACE
-    workspace: customer-support
-```
-
-The layered approach is intentional. The daily alert at $90 gives us time to investigate before anything breaks. The daily reject at $150 is the safety net — it prevents a retry storm or context bloat from turning a bad day into a catastrophic one. The monthly workspace-scoped policies let us set per-team budgets so the customer support agent can't crowd out other workloads.
+By default the gateway tracks spend in-process. See [Budget alerts & limits](https://mlflow.org/docs/latest/genai/governance/ai-gateway/budget-alerts-limits/) for the full reference.
 
 Here's what happens at different traffic levels with these thresholds in place:
 
@@ -196,35 +148,27 @@ When the $90 alert fires, a Slack notification lands in our `#agent-ops-alerts` 
 
 **Watch for retry loops.** Budget policies cap total spend, but they won't save you from a spike that burns through your daily limit in minutes. Set per-minute or per-hour rate limits at the gateway level separately from your daily budget. If your trace view shows a sudden jump in error rate combined with high request velocity, that's a retry storm, sub-agents hammering a failing provider endpoint. At minimum, every LLM call in your agent should use exponential backoff with jitter. Without it, a transient provider error can cascade into hundreds of wasted calls that drain your budget before the alert even fires.
 
-When the $150 reject policy fires, new requests get an HTTP 429 response. The agent needs to handle this gracefully not with a single catch-all, but with a decision tree:
+When the $150 reject policy fires, new requests get an HTTP 429 response. The agent needs to handle this gracefully.
+
+**Put retries and model fallback in the gateway.** For each endpoint, the gateway has a **Priority 2 (Fallback)** section where you list alternate models to try in order when the primary errors or rate-limits. For `orchestrator`, we add Claude Haiku 4.5 as a cost-optimized fallback so a transient GPT-5.1 outage automatically shifts traffic to the cheaper model without any client changes. See [Traffic routing & fallbacks](https://mlflow.org/docs/latest/genai/governance/ai-gateway/traffic-routing-fallbacks/) for the full configuration.
+
+That leaves the client to decide what the *user* sees when every model option is exhausted. 
 
 ```python
 from openai import OpenAI, RateLimitError
 
-gateway = OpenAI(base_url="http://localhost:5000/v1", api_key="")
+gateway = OpenAI(base_url="http://localhost:5000/gateway/mlflow/v1", api_key="")
 
-def call_with_fallback(messages, model="databricks-gpt-5-4",
-                       fallback_model="databricks-claude-haiku-4-5"):
-    # Tier 1: Try the primary model with exponential backoff
-    for attempt in range(3):
-        try:
-            return gateway.chat.completions.create(model=model, messages=messages)
-        except RateLimitError:
-            wait = (2 ** attempt) + random.uniform(0, 1)
-            time.sleep(wait)
-
-    # Tier 2: Try a cheaper fallback model
+def call_orchestrator(messages):
     try:
-        return gateway.chat.completions.create(model=fallback_model, messages=messages)
+        # Retries and model fallback are handled by the gateway
+        return gateway.chat.completions.create(model="orchestrator", messages=messages)
     except RateLimitError:
-        pass
-
-    # Tier 3: Queue non-urgent tickets, hand off urgent ones
-    if is_urgent(messages):
-        return {"role": "assistant",
-                "content": "I'm connecting you with a human agent now. "
-                           "Please hold — someone will be with you shortly."}
-    else:
+        # Every fallback exhausted — hand off to humans or queue
+        if is_urgent(messages):
+            return {"role": "assistant",
+                    "content": "I'm connecting you with a human agent now. "
+                               "Please hold — someone will be with you shortly."}
         enqueue_for_later(messages)
         return {"role": "assistant",
                 "content": "We're experiencing high demand. Your request has been "
@@ -233,30 +177,13 @@ def call_with_fallback(messages, model="databricks-gpt-5-4",
 
 ## Step 4: Optimize with Model Routing, Caching, and Validation
 
-With visibility into costs and guardrails in place, the last step is optimization. Not every query needs the most powerful (and expensive) model. Simple FAQ lookups and order status checks work just fine on Claude Haiku 4.5, while complex refund reasoning genuinely benefits from GPT-5-4.
+With visibility into costs and guardrails in place, the last step is optimization. Not every query needs the most powerful (and expensive) model. Simple FAQ lookups and order status checks work just fine on Claude Haiku 4.5, while complex refund reasoning genuinely benefits from GPT-5.1.
 
-MLflow AI Gateway's traffic splitting lets you test this hypothesis without rewriting agent code:
-
-```yaml
-endpoints:
-  - name: orchestrator
-    endpoint_type: llm/v1/chat
-    model:
-      name: databricks-gpt-5-4
-      provider: openai
-      config:
-        openai_api_base: $HOST/serving-endpoints
-        openai_api_key: $TOKEN
-    traffic:
-      - destination: databricks-gpt-5-4
-        percentage: 70
-      - destination: databricks-claude-haiku-4-5
-        percentage: 30
-```
+MLflow AI Gateway's traffic splitting lets you test this hypothesis without rewriting agent code. On the `orchestrator` endpoint, open **Priority 1 (Traffic Split)**, click **Add Model**, and assign weights that sum to 100% (e.g. 70% GPT-5.1 and 30% Claude Haiku 4.5). The gateway updates with zero downtime, so you can dial the split up or down as evaluation results come in.
 
 We started by routing 30% of orchestrator traffic to Claude Haiku 4.5 and monitored quality through MLflow's evaluation traces. When we confirmed no degradation on routing accuracy, we shifted to 50/50, then 70% Haiku. The orchestrator's job, classifying which sub-agent to call, turned out to be well within Claude Haiku 4.5's capabilities.
 
-**Caching as a complementary lever.** Exact-match caching and semantic caching (matching queries that are paraphrases of each other) can eliminate redundant LLM calls entirely — particularly for the embedding and FAQ-retrieval paths where customers often ask near-identical questions. The key is to ensure cached responses still appear in your MLflow traces with metadata like `cache_hit=true` and `cost=0`, so your dashboards and cost-per-ticket metrics stay accurate. Caching won't replace intelligent model routing, but it compounds the savings: route to a cheaper model *and* avoid the call entirely when you've seen the question before.
+**Caching as a complementary lever.** Exact match caching and semantic caching (matching queries that are paraphrases of each other) can eliminate redundant LLM calls entirely, particularly for the embedding and FAQ-retrieval paths where customers often ask near-identical questions. The key is to ensure cached responses still appear in your MLflow traces with metadata like `cache_hit=true` and `cost=0`, so your dashboards and cost-per-ticket metrics stay accurate. Caching won't replace intelligent model routing, but it compounds the savings: route to a cheaper model *and* avoid the call entirely when you've seen the question before.
 
 **Validate before you commit.** Traffic splitting without measurement is just guessing. Before shifting majority traffic to a cheaper model, run a held-out evaluation: take a sample of recent routing decisions, replay them through the candidate model, and measure routing accuracy. We set a threshold of >95% accuracy — if the cheaper model couldn't match that on our evaluation set, we didn't shift further. MLflow's evaluation traces make this straightforward: log the original decision alongside the candidate's output and compare programmatically.
 
