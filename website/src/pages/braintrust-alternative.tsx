@@ -640,7 +640,7 @@ export default function BraintrustAlternative() {
             models that enables teams to debug, evaluate, monitor, and optimize
             production-quality AI applications while controlling costs and
             managing access to models and data. MLflow is 100% open source under
-            the Apache 2.0 license and governed by the{" "}
+            the Apache 2.0 license and{" "}
             <strong>
               backed by the{" "}
               <Link href="https://www.linuxfoundation.org/">
