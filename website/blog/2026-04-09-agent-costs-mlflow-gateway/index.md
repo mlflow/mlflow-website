@@ -4,6 +4,7 @@ slug: agent-costs-mlflow-gateway
 tags: [mlflow, genai, ai-gateway, agents, cost-optimization]
 authors: [kyra-wulffert]
 thumbnail: /img/blog/agent-costs-thumbnail.png
+image: /img/blog/agent-costs-thumbnail.png
 ---
 
 The hardest part of controlling agent costs isn't setting a budget, it's knowing which part of your agent is driving up costs before you invest in the wrong optimization.
@@ -54,13 +55,13 @@ The problem isn't that any single call is expensive. It's that agent costs are *
 
 Before your agent handles its first production ticket, make sure you have these five points in place. Each one maps to a later section in this post, think of this as the minimum viable cost infrastructure:
 
-| # | Checkpoint | Why It Matters |
-|---|-----------|---------------|
-| 1 | Route all LLM calls through a gateway | Single control plane for credentials, traffic, and cost tracking |
-| 2 | Enable autologging and tracing from day one | You can't optimize what you can't measure |
-| 3 | Set at least one budget alert policy | Catches runaway spend before it becomes a crisis |
-| 4 | Instrument cache hit/miss tracking | Ensures dashboards stay accurate when caching is added later |
-| 5 | Define "cost per resolved ticket" as your north-star metric | Ties LLM spend to business outcomes, not raw API calls |
+| #   | Checkpoint                                                  | Why It Matters                                                   |
+| --- | ----------------------------------------------------------- | ---------------------------------------------------------------- |
+| 1   | Route all LLM calls through a gateway                       | Single control plane for credentials, traffic, and cost tracking |
+| 2   | Enable autologging and tracing from day one                 | You can't optimize what you can't measure                        |
+| 3   | Set at least one budget alert policy                        | Catches runaway spend before it becomes a crisis                 |
+| 4   | Instrument cache hit/miss tracking                          | Ensures dashboards stay accurate when caching is added later     |
+| 5   | Define "cost per resolved ticket" as your north-star metric | Ties LLM spend to business outcomes, not raw API calls           |
 
 If you're already in production without these, that's fine, every step below is retrofittable. But if you're still building, this is the cheapest time to wire them in.
 
@@ -77,12 +78,12 @@ mlflow server
 
 Open the gateway UI at `http://localhost:5000/#/gateway`. Under **API Keys**, register your provider credential once. Then under **Endpoints**, click **Create Endpoint** for each role in the agent, give it a name, pick a provider and model, and attach the API key. SupportBot uses four:
 
-| Endpoint | Model | Role in the agent |
-|---|---|---|
-| `orchestrator` | GPT-5.1 | Routes tickets to the right sub-agent |
-| `sub-agent-light` | Claude Haiku 4.5 | For FAQ / status lookups |
-| `sub-agent-strong` | GPT-5.1 | Reasoning-heavy refund / escalation flows |
-| `embeddings` | `bge-large-en` | Retrieval for the knowledge base |
+| Endpoint           | Model            | Role in the agent                         |
+| ------------------ | ---------------- | ----------------------------------------- |
+| `orchestrator`     | GPT-5.1          | Routes tickets to the right sub-agent     |
+| `sub-agent-light`  | Claude Haiku 4.5 | For FAQ / status lookups                  |
+| `sub-agent-strong` | GPT-5.1          | Reasoning-heavy refund / escalation flows |
+| `embeddings`       | `bge-large-en`   | Retrieval for the knowledge base          |
 
 ![Create Endpoint form in the MLflow AI Gateway UI, configuring the sub-agent-light endpoint with the Databricks provider and the databricks-claude-haiku-4-5 model](create_endpoint.png)
 
@@ -127,12 +128,12 @@ Visibility tells you what's happening. Budget policies tell the system what to d
 
 In the gateway UI under **AI Gateway > Budgets**, click **Create budget policy** and set a budget amount, reset period (daily / weekly / monthly), and an action (`ALERT` or `REJECT`). Register a Slack webhook under **Budget alert webhooks** so ALERT policies land in your on-call channel. Here's the layered policy we settled on for SupportBot:
 
-| Policy | Budget | Reset | Action |
-|---|---|---|---|
-| Early warning — daily | $90 (60% of cap) | Daily | ALERT → Slack |
-| Safety net — daily | $150 | Daily | REJECT (HTTP 429) |
-| Per-team — monthly | $3,000 | Monthly | ALERT → Slack |
-| Per-team — monthly hard limit | $5,000 | Monthly | REJECT (HTTP 429) |
+| Policy                        | Budget           | Reset   | Action            |
+| ----------------------------- | ---------------- | ------- | ----------------- |
+| Early warning — daily         | $90 (60% of cap) | Daily   | ALERT → Slack     |
+| Safety net — daily            | $150             | Daily   | REJECT (HTTP 429) |
+| Per-team — monthly            | $3,000           | Monthly | ALERT → Slack     |
+| Per-team — monthly hard limit | $5,000           | Monthly | REJECT (HTTP 429) |
 
 ![Create Budget Policy dialog in the MLflow AI Gateway UI, configuring a $90 daily ALERT policy](create_budget_policy.png)
 
@@ -152,7 +153,7 @@ When the $150 reject policy fires, new requests get an HTTP 429 response. The ag
 
 **Put retries and model fallback in the gateway.** For each endpoint, the gateway has a **Priority 2 (Fallback)** section where you list alternate models to try in order when the primary errors or rate-limits. For `orchestrator`, we add Claude Haiku 4.5 as a cost-optimized fallback so a transient GPT-5.1 outage automatically shifts traffic to the cheaper model without any client changes. See [Traffic routing & fallbacks](https://mlflow.org/docs/latest/genai/governance/ai-gateway/traffic-routing-fallbacks/) for the full configuration.
 
-That leaves the client to decide what the *user* sees when every model option is exhausted. 
+That leaves the client to decide what the _user_ sees when every model option is exhausted.
 
 ```python
 from openai import OpenAI, RateLimitError
@@ -183,7 +184,7 @@ MLflow AI Gateway's traffic splitting lets you test this hypothesis without rewr
 
 We started by routing 30% of orchestrator traffic to Claude Haiku 4.5 and monitored quality through MLflow's evaluation traces. When we confirmed no degradation on routing accuracy, we shifted to 50/50, then 70% Haiku. The orchestrator's job, classifying which sub-agent to call, turned out to be well within Claude Haiku 4.5's capabilities.
 
-**Caching as a complementary lever.** Exact match caching and semantic caching (matching queries that are paraphrases of each other) can eliminate redundant LLM calls entirely, particularly for the embedding and FAQ-retrieval paths where customers often ask near-identical questions. The key is to ensure cached responses still appear in your MLflow traces with metadata like `cache_hit=true` and `cost=0`, so your dashboards and cost-per-ticket metrics stay accurate. Caching won't replace intelligent model routing, but it compounds the savings: route to a cheaper model *and* avoid the call entirely when you've seen the question before.
+**Caching as a complementary lever.** Exact match caching and semantic caching (matching queries that are paraphrases of each other) can eliminate redundant LLM calls entirely, particularly for the embedding and FAQ-retrieval paths where customers often ask near-identical questions. The key is to ensure cached responses still appear in your MLflow traces with metadata like `cache_hit=true` and `cost=0`, so your dashboards and cost-per-ticket metrics stay accurate. Caching won't replace intelligent model routing, but it compounds the savings: route to a cheaper model _and_ avoid the call entirely when you've seen the question before.
 
 **Validate before you commit.** Traffic splitting without measurement is just guessing. Before shifting majority traffic to a cheaper model, run a held-out evaluation: take a sample of recent routing decisions, replay them through the candidate model, and measure routing accuracy. We set a threshold of >95% accuracy — if the cheaper model couldn't match that on our evaluation set, we didn't shift further. MLflow's evaluation traces make this straightforward: log the original decision alongside the candidate's output and compare programmatically.
 
@@ -198,6 +199,7 @@ We started by routing 30% of orchestrator traffic to Claude Haiku 4.5 and monito
 4. **MLflow's gateway turns cost control from reactive firefighting into a continuous operational loop.** Visibility feeds optimization, optimization changes the cost profile, and budget policies catch anything unexpected, all through a single control plane.
 
 For more on MLflow AI Gateway, see:
+
 - [Introducing MLflow AI Gateway](https://mlflow.org/blog/mlflow-ai-gateway)
 - [Control LLM Spend with Budget Alerts and Limits](https://mlflow.org/blog/gateway-budget-alerts-limits)
 - [Your Agents Need an AI Platform](https://mlflow.org/blog/agents-need-ai-platform)
