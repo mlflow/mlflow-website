@@ -1,0 +1,152 @@
+---
+title: "Tracking and Debugging AI Safety Evaluations with Inspect AI and MLflow"
+description: Bring MLflow experiment tracking and execution tracing to Inspect AI evaluations with the inspect-mlflow package.
+slug: inspect-mlflow-integration
+authors: [debu-sinha]
+tags: [genai, tracing, evaluation, inspect-ai, agents]
+thumbnail: /img/blog/inspect-mlflow-thumbnail.png
+image: /img/blog/inspect-mlflow-thumbnail.png
+---
+
+We're excited to announce the [`inspect-mlflow`](https://pypi.org/project/inspect-mlflow/) integration, which brings MLflow tracking and tracing to [Inspect AI](https://inspect.aisi.org.uk/) evaluations.
+
+AI safety evaluation frameworks produce log files. When a sample fails or a model scores differently across versions, debugging means opening JSON and reading through message histories, tool calls, and scoring events by hand. There's no experiment tracking across runs, no visual span tree showing what the model did at each step, and no way to compare two evaluations side by side.
+
+`inspect-mlflow` fixes this. Install the package, set two environment variables, and every evaluation automatically logs hierarchical runs with metrics, execution traces with span-level visibility, and artifacts. No code changes needed.
+
+{/* truncate */}
+
+## What Gets Tracked
+
+The tracking hook creates a parent MLflow run for each evaluation, with a nested child run for each task. Every task run captures the model name, dataset, solver configuration, and generation parameters as MLflow parameters. Per-sample scores log as step metrics so you can see accuracy trends across the dataset. Token usage is aggregated per model, and event counts capture total model calls and tool invocations.
+
+At the end of each task, the hook writes structured artifact tables under `inspect/`, per-sample results, and the full evaluation log. The screenshot below shows a task run with 17 logged metrics including accuracy, token usage, and event counts:
+
+<img
+  src={require("./screenshot-tracking.png").default}
+  alt="MLflow task run showing 17 metrics and parameters from an Inspect AI evaluation"
+  style={{
+    maxWidth: "800px",
+    width: "100%",
+    margin: "0 auto",
+    display: "block",
+  }}
+/>
+
+Eval scores also log as MLflow trace assessments, so they appear directly in the Traces table alongside execution time and status. This makes it possible to sort and filter traces by evaluation outcome. The "match" column below shows the average score (1.0) and per-trace assessment count (3 samples):
+
+<img
+  src={require("./screenshot-assessments.png").default}
+  alt="MLflow Traces table showing inspect/match assessment column with average score 1.0"
+  style={{
+    maxWidth: "800px",
+    width: "100%",
+    margin: "0 auto",
+    display: "block",
+  }}
+/>
+
+## Debugging with Execution Traces
+
+Setting `MLFLOW_INSPECT_TRACING=true` activates the tracing hook, which maps every evaluation event to an [MLflow trace span](https://mlflow.org/docs/latest/tracing.html). The span tree mirrors the eval hierarchy, so you can drill into any sample and see exactly what the model did at each step. The span tree below shows a full evaluation with three samples, each containing solver and scorer spans:
+
+<img
+  src={require("./screenshot-tracing.png").default}
+  alt="MLflow trace span tree showing full evaluation hierarchy with solver and scorer spans"
+  style={{
+    maxWidth: "800px",
+    width: "100%",
+    margin: "0 auto",
+    display: "block",
+  }}
+/>
+
+Clicking any span opens its inputs and outputs. The LLM span below shows a model call that consumed 23 tokens and returned "2 + 2 equals 4.":
+
+<img
+  src={require("./screenshot-llm-detail.png").default}
+  alt="LLM span detail showing model name, token counts, and response text"
+  style={{
+    maxWidth: "800px",
+    width: "100%",
+    margin: "0 auto",
+    display: "block",
+  }}
+/>
+
+The tracing hook handles tool-using agents the same way. Define a tool, add it to your solver, and each tool invocation appears as a TOOL span with the function name, arguments, and returned result. The code below is a standard Inspect AI evaluation. With `MLFLOW_TRACKING_URI` and `MLFLOW_INSPECT_TRACING` set, all runs and traces log to MLflow automatically:
+
+```python
+from inspect_ai import Task, eval
+from inspect_ai.dataset import Sample
+from inspect_ai.scorer import match
+from inspect_ai.solver import generate, use_tools
+from inspect_ai.tool import tool
+
+@tool
+def calculator():
+    """Perform arithmetic calculations."""
+    async def run(expression: str) -> str:
+        """Evaluate a math expression.
+
+        Args:
+            expression: e.g. "47 * 89"
+        """
+        return str(eval(expression, {"__builtins__": {}}))
+    return run
+
+task = Task(
+    dataset=[
+        Sample(input="Use the calculator to compute 47 * 89.", target="4183"),
+        Sample(input="Use the calculator to compute 1024 / 16.", target="64"),
+    ],
+    solver=[use_tools([calculator()]), generate()],
+    scorer=match(),
+)
+
+logs = eval(task, model="openai/gpt-4o-mini")
+```
+
+## Beyond Tracking
+
+The package also includes a [Scout import](https://meridianlabs-ai.github.io/inspect_scout/db_importing.html#mlflow) for analyzing agent transcripts with [Inspect Scout](https://meridianlabs-ai.github.io/inspect_scout/), and a `compare_evals()` function that aligns samples across two evaluation logs and runs significance tests. See the [documentation](https://inspect-mlflow.readthedocs.io) for details on both.
+
+## How It Works
+
+Inspect AI fires lifecycle hooks during evaluation. The tracking and tracing hooks capture those events and write them to MLflow:
+
+<img
+  src={require("./architecture-diagram.png").default}
+  alt="inspect-mlflow architecture: Inspect AI hooks flow through tracking and tracing hooks to MLflow server and Scout"
+  style={{
+    maxWidth: "800px",
+    width: "100%",
+    margin: "0 auto",
+    display: "block",
+  }}
+/>
+
+## Getting Started
+
+Install the package and point it at an MLflow server:
+
+```bash
+pip install 'inspect-mlflow' 'mlflow>=3.0'
+export MLFLOW_TRACKING_URI="http://localhost:5000"
+export MLFLOW_INSPECT_TRACING="true"
+inspect eval my_task.py --model openai/gpt-4o
+```
+
+See the [package documentation](https://inspect-mlflow.readthedocs.io) for configuration options and examples.
+
+## Resources
+
+- [MLflow Tracing Documentation](https://mlflow.org/docs/latest/tracing.html)
+- [MLflow Evaluation & Monitoring](https://mlflow.org/docs/latest/genai/eval-monitor/)
+- [inspect-mlflow on PyPI](https://pypi.org/project/inspect-mlflow/)
+- [inspect-mlflow documentation](https://inspect-mlflow.readthedocs.io)
+- [Inspect AI Extensions page](https://inspect.aisi.org.uk/extensions.html)
+
+## Provenance
+
+I (Debu Sinha) built the `inspect-mlflow` package. The underlying hooks were developed across four PRs to the Inspect AI repository, reviewed and merged by JJ Allaire. Farnaz Kohankhaki (Vector Institute and National Research Council of Canada) contributed autolog support and structured artifact tables. The package is listed on the [Inspect AI Extensions page](https://inspect.aisi.org.uk/extensions.html).
