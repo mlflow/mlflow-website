@@ -55,16 +55,16 @@ response = client.chat.completions.create(
 
 MLflow recognizes 8 multimodal data patterns across providers:
 
-| Pattern | Provider | Content Type |
-|---|---|---|
-| Data URIs (`data:image/png;base64,...`) | All | Images, audio |
-| `input_audio` | OpenAI | Audio input |
-| `b64_json` | OpenAI | Generated images |
-| Audio output (`audio.data`) | OpenAI | Audio response |
-| Anthropic image blocks | Anthropic | Images |
-| Bedrock image format | AWS Bedrock | Images |
-| Gemini `inline_data` | Google Gemini | Images, audio |
-| Responses API `image_generation_call` | OpenAI | Generated images |
+| Pattern                                 | Provider      | Content Type     |
+| --------------------------------------- | ------------- | ---------------- |
+| Data URIs (`data:image/png;base64,...`) | All           | Images, audio    |
+| `input_audio`                           | OpenAI        | Audio input      |
+| `b64_json`                              | OpenAI        | Generated images |
+| Audio output (`audio.data`)             | OpenAI        | Audio response   |
+| Anthropic image blocks                  | Anthropic     | Images           |
+| Bedrock image format                    | AWS Bedrock   | Images           |
+| Gemini `inline_data`                    | Google Gemini | Images, audio    |
+| Responses API `image_generation_call`   | OpenAI        | Generated images |
 
 ## Manual Attachments for Custom Content
 
