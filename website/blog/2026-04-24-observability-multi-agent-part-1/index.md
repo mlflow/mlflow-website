@@ -55,7 +55,7 @@ The unit of analysis shifts from the prompt to the state transition. To understa
 To solve these problems, we first need to see what's going on with the system. This means implementing tracing that captures not just individual tool calls but the full nested, connected graph of agent interactions.
 
 ![nested_traces_in_mlflow_ui](./nested_traces_in_mlflow_ui.png)
-*Figure 1. Nested traces in MLflow UI.*
+_Figure 1. Nested traces in MLflow UI._
 
 In a standard LLM call, you have a start and an end. In a multi-agent workflow, you have nested spans and branching logic. [MLflow Tracing](https://mlflow.org/docs/latest/genai/tracing/) allows us to reconstruct the graph by capturing the parent-child relationship between the Orchestrator and Workers. This transforms a black-box execution into a navigable map of state transitions.
 
@@ -118,7 +118,7 @@ def validate_report_numbers_against_sources(
     *source_texts: str,
 ) -> str:
     # Function definition
-    ... 
+    ...
 ```
 
 The `@mlflow.trace()` decorator allows you to create a span for any function. This simple approach allows us to capture unique relationships between functions, record exceptions, or custom parameters, as well as capture the cascading financial miscalculation alluded to above.
@@ -128,7 +128,7 @@ The `@mlflow.trace()` decorator allows you to create a span for any function. Th
 Traces tell you what happened. Metrics tell you whether it was acceptable. By combining MLflow's autolog() for LLMs (e.g., `mlflow.openai.autolog()`) with custom attributes, you can transform simple traces into a verifiable audit trail. Once you have full tracing in place, the next step is deciding which numbers actually matter — because in a multi-agent system, a successful response can hide a costly execution. The system might return the right answer after 15 recursive calls, 10 retries on a flaky API, and two minutes of an agent waiting for a response that nearly never came.
 
 ![exploring_metrics_in_mlflow_ui](./exploring_metrics_in_mlflow_ui.png)
-*Figure 2. Exploring metrics in MLflow UI.*
+_Figure 2. Exploring metrics in MLflow UI._
 
 We can aggregate the necessary metrics into three critical pillars:
 
@@ -138,7 +138,7 @@ Every time your orchestrator delegates a task, it makes a decision. That decisio
 
 A few examples of relevant metrics are:
 
-- **Successful delegation rate**: Did the supervisor choose a correct agent or tool, or did it get confused by the inaccurate descriptions? 
+- **Successful delegation rate**: Did the supervisor choose a correct agent or tool, or did it get confused by the inaccurate descriptions?
 - **Delegation Latency**: How long it took a supervisor to decide which agent/tool to call
 - **Redundancy and loop detection**: Did the supervisor choose the efficient path
 
@@ -149,24 +149,24 @@ import mlflow
 import time
 
 delegation_counts: dict[str, int] = {}
-def track_routing(step_output) -> None:                                                                                                                                 
-      agent_name = step_output.agent                                                                                                                                      
+def track_routing(step_output) -> None:
+      agent_name = step_output.agent
       delegation_counts[agent_name] = delegation_counts.get(agent_name, 0) + 1
       span = mlflow.get_current_active_span()
 
-      if span:                                                                                                                                                            
+      if span:
           span.set_attributes({
               f"routing.{agent_name}.call_count": delegation_counts[agent_name],
-              "routing.total_delegations": sum(delegation_counts.values()), 
+              "routing.total_delegations": sum(delegation_counts.values()),
               # step_callback counts steps per agent, not supervisor delegations;
               # > 3 gives room for a normal reasoning + tool + retry cycle
               "routing.loop_detected": any(v > 3 for v in delegation_counts.values()),
           })
       # Log state handoff after each agent completes
-      next_input = crew_state.get_state("current_input") or ""                                                                                                            
+      next_input = crew_state.get_state("current_input") or ""
       log_state_handoff(
           from_agent=agent_name,
-          to_agent="next",  # CrewAI doesn't expose next agent here, use state 
+          to_agent="next",  # CrewAI doesn't expose next agent here, use state
           output=str(step_output.result),
           next_input=next_input,
 )
@@ -178,7 +178,7 @@ As we saw with the cascading error example, the biggest risk in a multi-agent sy
 
 These metrics help to evaluate the consistency and memory state:
 
-- **Grounding accuracy**: Score comparing the agent's input against the global state to see if the agent's hallucination occurred in the previous agent. 
+- **Grounding accuracy**: Score comparing the agent's input against the global state to see if the agent's hallucination occurred in the previous agent.
 - **Concurrency**: The number of agents attempting to access or mutate the same element within the same execution window.
 - **Context handoff efficiency**: Are agents sharing the entire context or only an essential part?
 
@@ -236,7 +236,7 @@ To prevent these resource drains and inefficiencies, you must capture:
 
 - **Token Attribution**: the cost per node, call, path, or task;
 - **Per-Node Latency and Bottleneck Detection**: metrics like span duration vs. queue time allow for the detection of bottlenecks and poorly optimized tool/database calls
-- **Rate Limit and Throughput Volatility**: number of API calls, frequency of specific errors (like 429) to identify hotspots; 
+- **Rate Limit and Throughput Volatility**: number of API calls, frequency of specific errors (like 429) to identify hotspots;
 - **Task depth**: to identify if agents are going into an infinite loop
 
 To capture custom multi-agent metrics, you can wrap your multi-agent system execution in the following way:
@@ -275,7 +275,7 @@ def run_crew_with_metrics(crew: Crew) -> CrewOutput:
 
 ### Multi-service observability
 
-In some cases, multi-agent systems can span multiple services connected via HTTP requests. Ideally, we want a unified view of traces for this system, rather than having to monitor two sides independently and stitch traces together in the notebook. MLflow supports OTEL, which enables instrumentation and monitoring for applications split across multiple services. Check more details [here](https://mlflow.org/docs/latest/genai/tracing/app-instrumentation/distributed-tracing/). 
+In some cases, multi-agent systems can span multiple services connected via HTTP requests. Ideally, we want a unified view of traces for this system, rather than having to monitor two sides independently and stitch traces together in the notebook. MLflow supports OTEL, which enables instrumentation and monitoring for applications split across multiple services. Check more details [here](https://mlflow.org/docs/latest/genai/tracing/app-instrumentation/distributed-tracing/).
 
 While MLflow provides a specialized view for LLM-specific spans, multi-agent systems don't live in a vacuum. They rely on databases, authentication services, and third-party APIs. By leveraging [MLflow’s OpenTelemetry (OTEL)](https://mlflow.org/docs/latest/genai/tracing/opentelemetry/) support, you ensure that your agentic traces aren't stuck in a silo:
 
