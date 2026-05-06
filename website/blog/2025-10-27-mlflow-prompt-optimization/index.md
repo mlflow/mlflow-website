@@ -390,7 +390,7 @@ The combination of OpenAI's Agent framework for execution and MLflow's optimizat
 - [OpenAI Agent Framework](https://github.com/openai/openai-agents-python)
 - [HotpotQA Dataset](https://hotpotqa.github.io/)
 - [Building and Managing LLM Systems with MLflow](https://mlflow.org/blog/mlflow-prompt-evaluate)
-- [LLM as Judge](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/)
+- [LLM as Judge](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/predefined)
 
 ---
 

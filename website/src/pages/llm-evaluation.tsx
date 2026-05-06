@@ -34,11 +34,11 @@ const faqs: {
     question: "What is an LLM judge?",
     answer: (
       <>
-        An LLM judge is a language model used to automatically evaluate the
-        outputs of an agent or LLM application. Instead of relying solely on
-        human review (which is slow and expensive), LLM judges can assess
-        thousands of responses for qualities like correctness, relevance,
-        safety, and helpfulness.{" "}
+        An <Link href="/llm-as-a-judge">LLM judge</Link> is a language model
+        used to automatically evaluate the outputs of an agent or LLM
+        application. Instead of relying solely on human review (which is slow
+        and expensive), LLM judges can assess thousands of responses for
+        qualities like correctness, relevance, safety, and helpfulness.{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/"}>
           MLflow provides built-in judges
         </Link>{" "}
@@ -1802,6 +1802,11 @@ results = mlflow.genai.evaluate(
             </li>
             <li>
               <Link href="/ai-monitoring">AI Monitoring FAQ</Link>
+            </li>
+            <li>
+              <Link href="/top-5-agent-evaluation-frameworks">
+                Top 5 Agent Evaluation Tools Comparison
+              </Link>
             </li>
             <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>

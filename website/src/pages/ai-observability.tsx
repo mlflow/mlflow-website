@@ -73,8 +73,20 @@ const faqs: {
   },
   {
     question: "How does MLflow compare to other AI observability tools?",
-    answer:
-      "Unlike proprietary tools that lock you into a vendor's ecosystem, MLflow provides a complete, open source observability stack with no vendor lock-in. It supports any LLM or agent authoring framework, is OpenTelemetry compatible, and is trusted by thousands of organizations worldwide. MLflow is also available on Databricks, AWS, and other platforms.",
+    answer: (
+      <>
+        Unlike proprietary tools that lock you into a vendor's ecosystem, MLflow
+        provides a complete, open source observability stack with no vendor
+        lock-in. For teams evaluating specific competitors, see this{" "}
+        <Link href="/arize-phoenix-alternative">
+          Arize Phoenix alternative comparison
+        </Link>
+        . MLflow supports any LLM or agent authoring framework, is OpenTelemetry
+        compatible, and is trusted by thousands of organizations worldwide.
+      </>
+    ),
+    answerText:
+      "Unlike proprietary tools that lock you into a vendor's ecosystem, MLflow provides a complete, open source observability stack with no vendor lock-in. For teams evaluating specific competitors, see the Arize Phoenix alternative comparison. MLflow supports any LLM or agent authoring framework, is OpenTelemetry compatible, and is trusted by thousands of organizations worldwide.",
   },
   {
     question: "Does MLflow support OpenTelemetry?",
@@ -1197,6 +1209,11 @@ const result = await generateText({
             </li>
             <li>
               <Link href="/ai-monitoring">AI Monitoring FAQ</Link>
+            </li>
+            <li>
+              <Link href="/top-5-agent-observability-tools">
+                Top 5 Agent Observability Tools Comparison
+              </Link>
             </li>
             <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>

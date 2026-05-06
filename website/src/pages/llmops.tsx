@@ -543,10 +543,11 @@ export default function LLMOps() {
 
           <p>
             LLMOps platforms provide the tooling to address these challenges:
-            tracing for debugging, evaluation with LLM judges for quality
-            assurance, prompt registries for version control, AI gateways for
-            governed model access, and production monitoring for catching
-            regressions.
+            tracing for debugging,{" "}
+            <Link href="/llm-as-a-judge">LLM-as-a-judge evaluation</Link> for
+            quality assurance, prompt registries for version control, AI
+            gateways for governed model access, and production monitoring for
+            catching regressions.
           </p>
 
           <div

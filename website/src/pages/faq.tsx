@@ -1098,6 +1098,13 @@ export default function FAQ() {
                 LLM judges and scorers, as well as custom evaluators.
               </p>
             </Link>
+            <Link href="/llm-as-a-judge" className="learn-more-card">
+              <h3>LLM-as-a-Judge</h3>
+              <p>
+                Use language models to evaluate quality across correctness,
+                safety, groundedness, and custom criteria.
+              </p>
+            </Link>
             <Link href="/ai-gateway" className="learn-more-card">
               <h3>AI Gateway</h3>
               <p>
