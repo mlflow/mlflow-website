@@ -14,7 +14,7 @@ import { Section } from "../components/Section/Section";
 import { StickyFeaturesGrid } from "../components/ProductTabs/StickyFeaturesGrid";
 import type { Feature } from "../components/ProductTabs/features";
 import Link from "@docusaurus/Link";
-import { MLFLOW_DOCS_URL, MLFLOW_TRY_DEMO_URL} from "../constants";
+import { MLFLOW_DOCS_URL, MLFLOW_TRY_DEMO_URL } from "../constants";
 import Head from "@docusaurus/Head";
 import clsx from "clsx";
 import { motion, AnimatePresence } from "motion/react";

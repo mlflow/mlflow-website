@@ -1,7 +1,4 @@
-import {
-  MLFLOW_ML_DOCS_URL,
-  MLFLOW_TRY_DEMO_URL,
-} from "@site/src/constants";
+import { MLFLOW_ML_DOCS_URL, MLFLOW_TRY_DEMO_URL } from "@site/src/constants";
 import Head from "@docusaurus/Head";
 import Link from "@docusaurus/Link";
 import {
