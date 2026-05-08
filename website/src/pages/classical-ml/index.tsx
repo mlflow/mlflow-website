@@ -1,4 +1,4 @@
-import { MLFLOW_ML_DOCS_URL } from "@site/src/constants";
+import { MLFLOW_ML_DOCS_URL, MLFLOW_TRY_DEMO_URL } from "@site/src/constants";
 import Head from "@docusaurus/Head";
 import Link from "@docusaurus/Link";
 import {
@@ -83,14 +83,14 @@ export default function ClassicalML(): JSX.Element {
           actions={
             <div className="flex flex-col items-center gap-4">
               <div className="flex flex-wrap justify-center items-center gap-4">
-                <Link to="#get-started">
+                <Link to={MLFLOW_TRY_DEMO_URL}>
                   <Button variant="primary" size="medium">
-                    Get Started
+                    Try Demo
                   </Button>
                 </Link>
-                <Link to={MLFLOW_ML_DOCS_URL}>
+                <Link to="#get-started">
                   <Button variant="outline" size="medium">
-                    View Docs
+                    Get Started
                   </Button>
                 </Link>
               </div>

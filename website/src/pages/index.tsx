@@ -14,7 +14,7 @@ import {
   TrustPills,
 } from "../components";
 import Link from "@docusaurus/Link";
-import { MLFLOW_DOCS_URL } from "../constants";
+import { MLFLOW_TRY_DEMO_URL } from "../constants";
 import Head from "@docusaurus/Head";
 
 const SEO_TITLE = "MLflow - Open Source AI Platform for Agents, LLMs & Models";
@@ -107,12 +107,12 @@ export default function Home(): JSX.Element {
             </>
           }
           primaryCTA={{
-            label: "Get Started",
-            href: `#get-started`,
+            label: "Try Demo",
+            href: MLFLOW_TRY_DEMO_URL,
           }}
           secondaryCTA={{
-            label: "View Docs",
-            href: MLFLOW_DOCS_URL,
+            label: "Get Started",
+            href: `#get-started`,
           }}
         >
           <TrustPills />

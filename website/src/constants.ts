@@ -1,5 +1,6 @@
 export const MOBILE_LAYOUT_BREAKPOINT = 996;
 export const MLFLOW_DOCS_URL = "https://mlflow.org/docs/latest/";
+export const MLFLOW_TRY_DEMO_URL = "https://demo.mlflow.org/";
 export const MLFLOW_GENAI_DOCS_URL = "https://mlflow.org/docs/latest/genai/";
 export const MLFLOW_ML_DOCS_URL = "https://mlflow.org/docs/latest/ml/";
 export const MLFLOW_DBX_TRIAL_URL =

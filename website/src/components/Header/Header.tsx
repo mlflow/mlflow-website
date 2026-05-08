@@ -37,7 +37,7 @@ const GitHubStarsBadge = () => {
 };
 
 import "./Header.module.css";
-import { MLFLOW_DOCS_URL } from "@site/src/constants";
+import { MLFLOW_DOCS_URL, MLFLOW_TRY_DEMO_URL } from "@site/src/constants";
 import { cva } from "class-variance-authority";
 
 const MD_BREAKPOINT = 640;
@@ -176,8 +176,13 @@ export const Header = () => {
           <div className="flex flex-row items-center gap-3 md:order-2 md:gap-4 rtl:space-x-reverse grow justify-end basis-0">
             <GitHubStarsBadge />
             <Link href={getStartedHref} className="hidden md:block">
+              <Button variant="outline" size="small">
+                Get Started
+              </Button>
+            </Link>
+            <Link href={MLFLOW_TRY_DEMO_URL} className="hidden md:block">
               <Button variant="primary" size="small">
-                Get started
+                Try Demo
               </Button>
             </Link>
             <button
@@ -323,10 +328,15 @@ export const Header = () => {
             >
               <HeaderMenuItem label="Resources" hasDropdown />
             </li>
-            <li className="w-full md:w-auto md:hidden">
+            <li className="w-full md:w-auto md:hidden flex flex-col gap-2">
               <Link href={getStartedHref}>
+                <Button variant="outline" size="small" width="full">
+                  Get Started
+                </Button>
+              </Link>
+              <Link href={MLFLOW_TRY_DEMO_URL}>
                 <Button variant="primary" size="small" width="full">
-                  Get started
+                  Try Demo
                 </Button>
               </Link>
             </li>

@@ -14,7 +14,7 @@ import { Section } from "../components/Section/Section";
 import { StickyFeaturesGrid } from "../components/ProductTabs/StickyFeaturesGrid";
 import type { Feature } from "../components/ProductTabs/features";
 import Link from "@docusaurus/Link";
-import { MLFLOW_DOCS_URL } from "../constants";
+import { MLFLOW_DOCS_URL, MLFLOW_TRY_DEMO_URL } from "../constants";
 import Head from "@docusaurus/Head";
 import clsx from "clsx";
 import { motion, AnimatePresence } from "motion/react";
@@ -539,12 +539,12 @@ export default function ChinesePage(): JSX.Element {
             </>
           }
           primaryCTA={{
-            label: "开始使用",
-            href: "#get-started",
+            label: "试用演示",
+            href: MLFLOW_TRY_DEMO_URL,
           }}
           secondaryCTA={{
-            label: "查看文档",
-            href: MLFLOW_DOCS_URL,
+            label: "开始使用",
+            href: "#get-started",
           }}
         >
           <TrustPills />
