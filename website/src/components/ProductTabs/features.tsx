@@ -24,6 +24,7 @@ export type Feature = {
   imageZoom?: number;
   imagePosition?: string;
   quickstartLink?: string;
+  tryDemoLink?: string;
   codeSnippet: string;
   codeLanguage?: "python" | "typescript";
   fullBleedImage?: boolean;
@@ -71,6 +72,8 @@ const llmAgentFeatures: Feature[] = [
     imageSrc: TracingTabImg,
     imageZoom: 160,
     quickstartLink: "https://mlflow.org/docs/latest/genai/tracing/quickstart/",
+    tryDemoLink:
+      "https://demo.mlflow.org/#/experiments/1/traces?startTimeLabel=CUSTOM&startTime=2026-04-17T16%3A47%3A15.258Z&endTime=2026-04-24T21%3A20%3A50.781Z",
     codeSnippet: `import mlflow
 import openai
 
@@ -125,6 +128,8 @@ response = client.chat.completions.create(
     ],
     quickstartLink:
       "https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/",
+    tryDemoLink:
+      "https://demo.mlflow.org/#/experiments/1/runs/d690ad8bb7a546c5a74b79691bb32b27/evaluations",
     codeSnippet: `import mlflow
 from mlflow.genai.scorers import Correctness
 
@@ -168,6 +173,8 @@ results = mlflow.genai.evaluate(
     imageSrc: PromptTabImg,
     imageZoom: 150,
     quickstartLink: "https://mlflow.org/docs/latest/genai/prompt-registry/",
+    tryDemoLink:
+      "https://demo.mlflow.org/#/experiments/1/prompts/mlflow-demo.prompts.code-reviewer?promptVersion=4",
     codeSnippet: `import mlflow
 
 # Register a prompt template

@@ -23,8 +23,16 @@ const interpolateColor = (color1: string, color2: string, factor: number) => {
   return `rgb(${r}, ${g}, ${b})`;
 };
 
-/** QuickstartLink component with animated glow effect. */
-const QuickstartLink = ({ href }: { href: string }) => (
+/** Animated pill link with a glow effect, used for Quickstart and Try Demo. */
+const GlowLink = ({
+  href,
+  label,
+  gradient,
+}: {
+  href: string;
+  label: string;
+  gradient: string;
+}) => (
   <motion.a
     href={href}
     target="_blank"
@@ -35,8 +43,7 @@ const QuickstartLink = ({ href }: { href: string }) => (
     <motion.span
       className="absolute inset-0 rounded-md -z-10"
       style={{
-        background:
-          "linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(168, 85, 247, 0.3))",
+        background: gradient,
         filter: "blur(8px)",
       }}
       animate={{
@@ -49,7 +56,7 @@ const QuickstartLink = ({ href }: { href: string }) => (
         ease: "easeInOut",
       }}
     />
-    <span className="relative z-10 text-white px-3 py-1">Quickstart</span>
+    <span className="relative z-10 text-white px-3 py-1">{label}</span>
     <motion.span
       className="relative z-10 text-white pr-2"
       variants={{
@@ -59,6 +66,22 @@ const QuickstartLink = ({ href }: { href: string }) => (
       →
     </motion.span>
   </motion.a>
+);
+
+const QuickstartLink = ({ href }: { href: string }) => (
+  <GlowLink
+    href={href}
+    label="Quickstart"
+    gradient="linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(168, 85, 247, 0.3))"
+  />
+);
+
+const TryDemoLink = ({ href }: { href: string }) => (
+  <GlowLink
+    href={href}
+    label="Try Demo"
+    gradient="linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(6, 182, 212, 0.3))"
+  />
 );
 
 /** Left‑side text panel – sticks while scrolling. */
@@ -83,9 +106,15 @@ const FeatureTextSection = ({
         <p className="leading-relaxed" style={{ color: descColor }}>
           {feature.description}
         </p>
-        {feature.quickstartLink && (
-          <div style={{ opacity: visibility }}>
-            <QuickstartLink href={feature.quickstartLink} />
+        {(feature.quickstartLink || feature.tryDemoLink) && (
+          <div
+            className="flex flex-col items-start gap-5"
+            style={{ opacity: visibility }}
+          >
+            {feature.quickstartLink && (
+              <QuickstartLink href={feature.quickstartLink} />
+            )}
+            {feature.tryDemoLink && <TryDemoLink href={feature.tryDemoLink} />}
           </div>
         )}
       </div>
