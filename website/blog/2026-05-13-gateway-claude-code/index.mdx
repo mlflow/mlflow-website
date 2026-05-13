@@ -1,0 +1,146 @@
+---
+title: "Route Claude Code Through MLflow AI Gateway"
+description: Learn how to route Claude Code through MLflow AI Gateway to get full observability, budget controls, and guardrails across all your coding agent sessions — with no changes to how you use Claude Code.
+slug: gateway-claude-code
+authors: [tomu-hirata]
+tags: [mlflow, genai, ai-gateway, governance, claude-code, observability]
+thumbnail: /img/blog/gateway-claude-code-thumbnail.png
+image: /img/blog/gateway-claude-code-thumbnail.png
+---
+
+import { BlogImage } from "@site/src/components/BlogImage/BlogImage";
+
+<video
+  src={require("./claude-code-gateway-demo.mp4").default}
+  autoPlay
+  muted
+  controls
+  playsInline
+  width="100%"
+/>
+
+AI coding agents like Claude Code are becoming a standard part of the development workflow. An agent working through a complex task — understanding a codebase, writing tests, fixing bugs — can make dozens or hundreds of LLM calls in a single session. That level of autonomy is powerful, but it introduces questions that don't come up with one-shot prompts: _How much is this costing? What are the agents actually sending to the model? Can we enforce content policies across every session?_
+
+MLflow AI Gateway answers all three. Starting in MLflow 3.12, you can route Claude Code through the gateway in two environment variables, and every session immediately gains full request tracing, budget enforcement, and guardrails — without touching your application code.
+
+{/* truncate */}
+
+## How It Works
+
+MLflow AI Gateway sits between Claude Code and the Anthropic API. When Claude Code sends a request, the gateway inspects the `User-Agent` header, recognizes it as Claude Code, and forwards the request to Anthropic using the developer's own credentials. From Claude Code's perspective, nothing changes — it authenticates the same way it always has. From the gateway's perspective, every request is a traceable, governable event.
+
+```text
+Claude Code  →  MLflow AI Gateway  →  Anthropic API
+                      ↓
+              Traces · Budgets · Guardrails
+```
+
+This passthrough design means you get centralized visibility without centralized key management: each developer keeps their own Anthropic credentials, and the gateway adds governance on top.
+
+## Setting Up the Integration
+
+The setup takes three steps: start an MLflow server, create an endpoint, and set two environment variables.
+
+### Step 1: Start the MLflow Server
+
+```bash
+pip install mlflow
+mlflow server --port 5000
+```
+
+### Step 2: Create an Anthropic Endpoint
+
+Open the MLflow UI at `http://localhost:5000/#/gateway` and navigate to **AI Gateway**. Click **Create Endpoint** and configure it:
+
+- **Provider:** Anthropic
+- **Model:** `claude-opus-4-6` (or whichever model your team uses)
+- **Endpoint name:** something memorable, like `my-claude-endpoint`
+- **API key:** any placeholder value — the gateway forwards developer credentials, so this field is not used for authentication
+
+<BlogImage
+  src={require("./endpoint-create.png").default}
+  alt="Create Endpoint dialog in the MLflow UI configured for the Anthropic provider"
+  width="80%"
+  center
+/>
+
+### Step 3: Point Claude Code at the Gateway
+
+Set two environment variables in your shell:
+
+```bash
+export ANTHROPIC_BASE_URL="http://localhost:5000/gateway/anthropic/v1"
+export ANTHROPIC_MODEL="my-claude-endpoint"
+```
+
+That's it. Run `claude` as usual. Alternatively, pass the endpoint name inline without changing your environment:
+
+```bash
+claude --model my-claude-endpoint
+```
+
+All requests will now flow through the gateway.
+
+## Observability: Every Request as a Trace
+
+The most immediate benefit is visibility. Every call Claude Code makes — regardless of session length or how many turns the agent takes — is automatically captured as an MLflow trace. No instrumentation, no SDK imports, no code changes.
+
+Open the **Traces** tab in the MLflow UI to see a timeline of all requests: prompts, responses, token counts, and latency, organized by session.
+
+<BlogImage
+  src={require("./traces-overview.png").default}
+  alt="MLflow Traces tab showing a list of Claude Code requests with token counts and latency"
+  width="80%"
+  center
+/>
+
+Click into any trace for a detailed view of exactly what was sent and received:
+
+<BlogImage
+  src={require("./traces-detail.png").default}
+  alt="Detailed MLflow trace showing the full request and response for a single Claude Code call"
+  width="80%"
+  center
+/>
+
+This level of detail is particularly useful for understanding what a long-running agent session actually did — which subtasks consumed the most tokens, where latency spikes occurred, and how prompts evolved across turns.
+
+## Budget Controls: Keep Spending in Check
+
+Coding agents are designed to work autonomously, which makes them easy to forget about and expensive to over-run. MLflow AI Gateway's budget policies let you set spending thresholds globally or per workspace, with configurable alerts and hard limits.
+
+When a session approaches a threshold, the gateway sends an alert. When it hits the hard limit, further requests are rejected before they reach the model — stopping runaway costs at the source rather than after the bill arrives.
+
+See the [budget policies documentation](/blog/gateway-budget-alerts-limits) for configuration details.
+
+## Guardrails: Enforce Policies Across Every Session
+
+Because every Claude Code request passes through the gateway, guardrails apply uniformly — no per-application configuration needed. Before requests reach Anthropic, guardrails can screen for prompt injection or restricted topics. After responses come back, they can filter toxic content or redact PII before the agent sees the output.
+
+For example, a PII guardrail on the Before stage will block any request containing personal data like email addresses or phone numbers, and return a structured error with the rationale so the caller knows exactly why it was blocked.
+
+<BlogImage
+  src={require("./guardrails-block.png").default}
+  alt="MLflow AI Gateway blocking a Claude Code request that triggered a PII guardrail, returning a 400 with a detailed rationale"
+  width="80%"
+  center
+/>
+
+See the [guardrails blog post](/blog/gateway-guardrails) for a full walkthrough of guardrail types, configuration, and the block vs. sanitize actions.
+
+## Getting Started
+
+Everything described here ships with MLflow and is available today:
+
+```bash
+pip install mlflow
+mlflow server --port 5000
+```
+
+Then open the MLflow UI, create an Anthropic endpoint under **AI Gateway**, and set the two environment variables. Full setup instructions are in the [AI Gateway documentation for Claude Code](https://mlflow.org/docs/latest/genai/governance/ai-gateway/coding-agents/claude-code/).
+
+---
+
+Routing Claude Code through MLflow AI Gateway is the fastest way to add observability and governance to autonomous coding sessions. It joins [guardrails](/blog/gateway-guardrails) and [budget policies](/blog/gateway-budget-alerts-limits) as part of the governance layer built into MLflow AI Gateway. If you run into issues or have feedback, please file a report on [MLflow's GitHub Issues](https://github.com/mlflow/mlflow/issues).
+
+⭐ [Star us on GitHub](https://github.com/mlflow/mlflow) — show your support for the project!
