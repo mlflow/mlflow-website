@@ -159,6 +159,19 @@ const config: Config = {
       },
     ],
     [
+      "@docusaurus/plugin-content-blog",
+      {
+        id: "articles",
+        routeBasePath: "articles",
+        path: "./article",
+        blogSidebarTitle: "All articles",
+        blogSidebarCount: "ALL",
+        blogTitle: "Articles",
+        onUntruncatedBlogPosts: "ignore",
+        showReadingTime: true,
+      },
+    ],
+    [
       // This plugin is always inactive in development and only active in production because it works on the build output.
       // Run `npm run build` and then `npm run serve` for testing.
       "@docusaurus/plugin-client-redirects",
