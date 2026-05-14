@@ -68,6 +68,31 @@ function buildFrontmatter(article) {
   return lines.join("\n");
 }
 
+// Replicate github-slugger's algorithm, which Docusaurus uses for heading IDs.
+function githubSlug(text) {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/<[^>]*>/g, "")
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-");
+}
+
+function sanitizeMarkdown(md) {
+  // Fix internal anchor links to match Docusaurus heading IDs (github-slugger).
+  // The API returns URL-encoded anchors (e.g. %3A for colon, %2C for comma)
+  // that don't match the slugs Docusaurus generates from headings.
+  md = md.replace(/\]\(#([^)]+)\)/g, (match, anchor) => {
+    const decoded = decodeURIComponent(anchor);
+    return `](#${githubSlug(decoded)})`;
+  });
+
+  // Remove the leading H1 that duplicates the frontmatter title
+  md = md.replace(/^# .+\n+/, "");
+
+  return md;
+}
+
 function datePrefixFromArticle(article) {
   if (article.created_at) {
     return article.created_at.split("T")[0];
@@ -105,7 +130,7 @@ async function main() {
     fs.mkdirSync(dirPath, { recursive: true });
 
     const frontmatter = buildFrontmatter(article);
-    const content = article.content_markdown || "";
+    const content = sanitizeMarkdown(article.content_markdown || "");
     const fileContent = `${frontmatter}\n\n${content}\n`;
 
     fs.writeFileSync(path.join(dirPath, "index.md"), fileContent, "utf8");
