@@ -21,10 +21,18 @@ jobs:
         with:
           node-version: 20
 
+      - name: Install dependencies
+        working-directory: website
+        run: npm ci
+
       - name: Fetch articles from BabyLoveGrowth
         env:
           BABYLOVEGROWTH_API_KEY: ${{ secrets.BABYLOVEGROWTH_API_KEY }}
         run: node .github/scripts/fetch-articles.js
+
+      - name: Format fetched articles
+        working-directory: website
+        run: npm run fmt
 
       - name: Create PR if changed
         env:
