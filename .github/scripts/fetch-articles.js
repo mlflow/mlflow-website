@@ -22,16 +22,27 @@ function loadApiKey() {
 }
 
 async function apiFetch(endpoint, apiKey) {
-  const res = await fetch(`${API_BASE}${endpoint}`, {
-    headers: {
-      "X-API-Key": apiKey,
-      "Content-Type": "application/json",
-    },
-  });
-  if (!res.ok) {
-    throw new Error(`API request failed: ${res.status} ${res.statusText}`);
+  const maxRetries = 5;
+  for (let attempt = 0; ; attempt++) {
+    const res = await fetch(`${API_BASE}${endpoint}`, {
+      headers: {
+        "X-API-Key": apiKey,
+        "Content-Type": "application/json",
+      },
+    });
+    if (res.status === 429) {
+      if (attempt >= maxRetries) {
+        throw new Error(`Rate limited on ${endpoint} after ${maxRetries} retries`);
+      }
+      console.warn(`Rate limited on ${endpoint}, retrying in 3s (attempt ${attempt + 1}/${maxRetries})...`);
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      continue;
+    }
+    if (!res.ok) {
+      throw new Error(`API request failed: ${res.status} ${res.statusText}`);
+    }
+    return res.json();
   }
-  return res.json();
 }
 
 function getExistingArticleIds() {
