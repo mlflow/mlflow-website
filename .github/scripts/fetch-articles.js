@@ -34,8 +34,9 @@ async function apiFetch(endpoint, apiKey) {
       if (attempt >= maxRetries) {
         throw new Error(`Rate limited on ${endpoint} after ${maxRetries} retries`);
       }
-      console.warn(`Rate limited on ${endpoint}, retrying in 3s (attempt ${attempt + 1}/${maxRetries})...`);
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      const retryAfter = Math.max(0, Number(res.headers.get("Retry-After")) || 3);
+      console.warn(`Rate limited on ${endpoint}, retrying in ${retryAfter}s (attempt ${attempt + 1}/${maxRetries})...`);
+      await new Promise((resolve) => setTimeout(resolve, retryAfter * 1000));
       continue;
     }
     if (!res.ok) {
