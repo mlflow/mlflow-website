@@ -1,0 +1,167 @@
+---
+title: "MLflow 3.13.0 Highlights: Role-Based Access Control, Trace Archival, Coding Agents, and Hermes Agent Support"
+sidebar_label: MLflow 3.13.0
+slug: 3.13.0
+authors: [mlflow-maintainers]
+---
+
+MLflow 3.13.0 is a major release for running AI observability at scale, focused on access control, the lifecycle of your trace data, and richer support for agents. Highlights include a full Role-Based Access Control system with a new Admin UI, automatic trace archival, one-click onboarding for coding agents, new engines for MLflow Assistant, span log levels, an official Helm chart for Kubernetes, and Hermes Agent support.
+
+## 1. **Role-Based Access Control and Admin UI**
+
+<img
+  src="/img/releases/3.13.0/rbac-framed.png"
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+/>
+
+Sharing a self-hosted MLflow server across a team used to mean granting permissions one resource at a time, with no central place to manage them. A new **Role-Based Access Control (RBAC)** system replaces that: define **roles** as reusable bundles of permissions, assign them to users, and let workspace-level grants express both membership and admin authority. A user's effective access is the union of their roles, and experiments, models, prompts, scorers, and AI Gateway endpoints are all covered.
+
+A new web **Admin UI** makes this manageable without touching REST endpoints, with a self-service `/account` page for viewing your roles and changing your password, and Platform Admin pages for managing users, roles, and grants. Just start `mlflow server` with authentication enabled.
+
+[Learn more about Role-Based Access Control](https://mlflow.org/docs/latest/self-hosting/security/role-based-access-control)
+
+## 2. **Trace Retention and Auto Archival**
+
+<img
+  src="/img/releases/3.13.0/archival-framed.png"
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+/>
+
+On a long-running tracking server, trace span data piles up in your SQL backend and eventually slows it down. Trace archival keeps it in check: a background pass automatically moves traces older than your retention window out of SQL and into cheap object storage such as S3, while keeping every trace fully readable in the UI and through the APIs. Retention is policy-driven, resolving from server to workspace to experiment.
+
+Enable it by pointing the server at a YAML config:
+
+```yaml
+trace_archival:
+  enabled: true
+  location: s3://my-bucket/trace-archive
+  retention: 7d
+  interval_seconds: 60
+```
+
+Workspace managers and experiment owners can then tighten retention from the UI or CLI, and the effective cutoff shows up as an "Archive after" badge on each trace.
+
+[Learn more about Trace Archival](https://mlflow.org/docs/latest/genai/tracing/observe-with-traces/archive-traces)
+
+## 3. **One-Click Observability and Governance for Coding Agents**
+
+<video
+  controls
+  autoplay
+  muted
+  loop
+  playsinline
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+>
+  <source
+    src={require("/img/releases/3.13.0/coding-agent-framed.mp4").default}
+    type="video/mp4"
+  />
+</video>
+
+Putting a coding agent like Claude Code, OpenAI Codex, or Gemini CLI under observability and governance used to require wiring up a gateway endpoint by hand. The AI Gateway QuickStart now does it in one click: pick your agent and MLflow provisions a pre-configured endpoint (no API key needed, since the agent brings its own credentials) and hands you a ready-to-paste starter snippet. From then on, every request the agent makes is captured as a trace and subject to usage tracking, budgets, and guardrails.
+
+```bash
+export ANTHROPIC_BASE_URL="http://localhost:5000/gateway/proxy/my-claude-endpoint" && claude
+```
+
+[Learn more about coding agents in the AI Gateway](https://mlflow.org/docs/latest/genai/governance/ai-gateway/coding-agents/)
+
+## 4. **New Engines for MLflow Assistant**
+
+<img
+  src="/img/releases/3.13.0/assistant-engines.png"
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+/>
+
+MLflow Assistant launched in 3.9.0 tied to Claude Code. You can now choose the engine that powers it: run the Assistant on a local **Ollama** model, the **OpenAI Codex CLI**, or any MLflow AI Gateway endpoint, all selectable from the setup wizard. That means you can keep everything on your own machine with Ollama, or reuse a provider you already route through the Gateway.
+
+_Thanks to community contributor [@SuperSonnix71](https://github.com/SuperSonnix71) for contributing the Ollama and OpenAI Codex engines!_
+
+[Learn more about MLflow Assistant](https://mlflow.org/docs/latest/genai/getting-started/try-assistant/)
+
+## 5. **Helm Chart for Kubernetes Deployment**
+
+<img
+  src="/img/releases/3.13.0/helm-deploy.png"
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+/>
+
+Deploying MLflow on Kubernetes used to mean writing and maintaining your own manifests. An official, production-ready **Helm chart** now does it for you, with TLS, persistent storage, Ingress, Prometheus metrics, a restrictive NetworkPolicy, RBAC, and optional `mlflow gc` garbage collection built in. Download the chart and install it (requires Kubernetes 1.23+ and Helm 3.8+):
+
+```bash
+helm install mlflow ./charts \
+  --namespace mlflow \
+  --create-namespace \
+  --set storage.enabled=true \
+  --set mlflow.backendStoreUri="sqlite:////mlflow/mlflow.db" \
+  --set mlflow.artifactsDestination="/mlflow/artifacts"
+```
+
+[Learn more about the Kubernetes Helm deployment](https://mlflow.org/docs/latest/self-hosting/kubernetes-helm)
+
+## 6. **Hermes Agent Support**
+
+<img
+  src="/img/releases/3.13.0/hermes-framed.png"
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+/>
+
+Agent observability now reaches beyond coding agents to long-running autonomous runtimes. [Hermes Agent](https://github.com/NousResearch/hermes-agent) from Nous Research integrates on two surfaces: route its model calls through the **AI Gateway** for centralized usage tracking, budgets, and guardrails, and capture full end-to-end traces, including LLM calls, tool invocations, and long-running sessions, through **MLflow Tracing** over OpenTelemetry.
+
+To route Hermes through the Gateway, create an endpoint and run `hermes setup model`; for tracing, install the community [`hermes-otel`](https://github.com/briancaffey/hermes-otel) plugin to export OTLP traces to your MLflow server.
+
+[Learn more about Hermes Agent and the AI Gateway](https://mlflow.org/docs/latest/genai/governance/ai-gateway/coding-agents/hermes-agent)
+
+## 7. **Log Levels for Trace Spans**
+
+<img
+  src="/img/releases/3.13.0/span-log-levels-spaced.png"
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+/>
+
+A busy trace can bury the spans you care about under chain plumbing and parser calls. Spans now carry Python-`logging`-style severity levels (`DEBUG` through `CRITICAL`), assigned automatically from the span type, so LLM, tool, and retriever calls surface as `INFO` while internal steps stay `DEBUG`, and any span that raises is promoted to `ERROR`. In the trace explorer, a new **Minimum log level** slider hides everything below the threshold, with no code changes required. You can also set a level explicitly:
+
+```python
+import mlflow
+
+with mlflow.start_span("plumbing", log_level="DEBUG") as span:
+    ...
+```
+
+_Thanks to community contributor [@rrtheonlyone](https://github.com/rrtheonlyone) for contributing this feature!_
+
+[Learn more about span log levels](https://mlflow.org/docs/latest/genai/tracing/app-instrumentation/logging)
+
+## Full Changelog
+
+For a comprehensive list of changes, see the [release change log](https://github.com/mlflow/mlflow/releases/tag/v3.13.0).
+
+## What's Next
+
+### Get Started
+
+Upgrade to try these new features:
+
+```bash
+pip install mlflow==3.13.0
+```
+
+### Share Your Feedback
+
+We'd love to hear about your experience with these new features:
+
+- [GitHub Issues](https://github.com/mlflow/mlflow/issues) - Report bugs or request features
+- [MLflow Roadmap](https://github.com/mlflow/mlflow/discussions/19855) - See what's coming next and share your ideas
+- ⭐ [Star us on GitHub](https://github.com/mlflow/mlflow) - Show your support for the project
+
+### Learn More
+
+- Check out the [MLflow documentation](https://mlflow.org/docs/latest) for detailed guides
