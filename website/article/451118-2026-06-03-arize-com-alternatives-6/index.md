@@ -1,6 +1,6 @@
 ---
-title: "Top 6 arize.com Alternatives Software 2026"
-description: "Discover 6 arize.com alternatives and choose the best software for AI observability, monitoring, and lifecycle management in 2026."
+title: "Top 6 Arize Alternatives Software 2026"
+description: "Discover 6 Arize alternatives and choose the best software for AI observability, monitoring, and lifecycle management in 2026."
 slug: arize-com-alternatives-6
 tags:
   [
