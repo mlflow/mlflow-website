@@ -1,6 +1,6 @@
 ---
-title: "Top 6 smith.langchain.com Alternatives for 2026"
-description: "Explore 6 smith.langchain.com alternatives to help your team choose the best solution for building and deploying AI agents and language models."
+title: "Top 6 LangSmith Alternatives for 2026"
+description: "Explore 6 LangSmith alternatives to help your team choose the best solution for building and deploying AI agents and language models."
 slug: smith-langchain-com-alternatives-6
 tags:
   [
