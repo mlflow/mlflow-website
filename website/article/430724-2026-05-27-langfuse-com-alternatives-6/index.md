@@ -1,6 +1,6 @@
 ---
-title: "Top 6 langfuse.com Alternatives For 2026"
-description: "Discover 6 effective langfuse.com alternatives to help you choose the best solution for your AI agent deployment and lifecycle management."
+title: "Top 6 Langfuse Alternatives For 2026"
+description: "Discover 6 effective Langfuse alternatives to help you choose the best solution for your AI agent deployment and lifecycle management."
 slug: langfuse-com-alternatives-6
 tags:
   [
