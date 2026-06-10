@@ -8,13 +8,12 @@ import DownIcon from "@site/static/img/chevron-down-small.svg";
 import { cn, getStartedLinkForPage } from "../../utils";
 import { useGitHubStars } from "../../hooks/useGitHubStars";
 
-import { Star, X } from "lucide-react";
+import { Star } from "lucide-react";
 import { Button } from "../Button/Button";
 import { HeaderMenuItem } from "../HeaderMenuItem/HeaderMenuItem";
 import { HeaderProductsSubmenu } from "../HeaderProductsSubmenu/HeaderProductsSubmenu";
 import { HeaderDocsSubmenu } from "../HeaderDocsSubmenu/HeaderDocsSubmenu";
 import { HeaderResourcesSubmenu } from "../HeaderResourcesSubmenu/HeaderResourcesSubmenu";
-import { CopyButton } from "../CodeSnippet/CopyButton";
 
 const GitHubStarsBadge = () => {
   const stars = useGitHubStars();
@@ -43,8 +42,6 @@ import { cva } from "class-variance-authority";
 
 const MD_BREAKPOINT = 640;
 
-const BANNER_DISMISSED_KEY = "mlflow-agent-setup-banner-dismissed";
-
 const navStyles = cva(
   "fixed w-full z-20 top-0 start-0 bg-black/20 border-b border-[#F7F8F8]/8 backdrop-blur-[20px] overflow-y-auto",
   {
@@ -59,7 +56,6 @@ const navStyles = cva(
 
 export const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isBannerVisible, setIsBannerVisible] = useState(true);
   const [isProductItemHovered, setIsProductItemHovered] = useState(false);
   const [isProductSubmenuOpen, setIsProductSubmenuOpen] = useState(false);
   const [isDocsItemHovered, setIsDocsItemHovered] = useState(false);
@@ -145,17 +141,6 @@ export const Header = () => {
     }
   };
 
-  useEffect(() => {
-    if (localStorage.getItem(BANNER_DISMISSED_KEY) === "true") {
-      setIsBannerVisible(false);
-    }
-  }, []);
-
-  const dismissBanner = () => {
-    setIsBannerVisible(false);
-    localStorage.setItem(BANNER_DISMISSED_KEY, "true");
-  };
-
   useLayoutEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= MD_BREAKPOINT) {
@@ -179,34 +164,6 @@ export const Header = () => {
 
   return (
     <nav className={navStyles({ isOpen })}>
-      {/* Announcement banner for `mlflow agent setup`. Hidden on mobile
-          because the copy wraps poorly at narrow widths; dismissal is
-          remembered in localStorage. */}
-      {isBannerVisible && (
-        <div className="relative hidden md:flex items-center justify-center gap-2 w-full bg-gradient-to-r from-[#1e1b4b] to-[#4c1d95] text-white text-center text-sm px-6 py-2">
-          <span>
-            ✨ New: Let your coding agent set up MLflow tracing for you:{" "}
-            <code className="rounded bg-black/25 px-1.5 py-0.5 font-mono">
-              uvx mlflow@latest agent setup
-            </code>
-          </span>
-          <CopyButton code="uvx mlflow@latest agent setup" />
-          <Link
-            href="https://mlflow.org/docs/latest/genai/tracing/quickstart/"
-            className="underline font-medium text-white hover:text-white/80"
-          >
-            Learn more
-          </Link>
-          <button
-            type="button"
-            onClick={dismissBanner}
-            aria-label="Dismiss banner"
-            className="absolute right-3 p-1 rounded text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
       <div className="flex flex-wrap items-center mx-auto px-6 lg:px-20 py-2 max-w-container">
         <div className="md:contents flex flex-row justify-between w-full sticky top-[8px]">
           <Link
