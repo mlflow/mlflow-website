@@ -167,7 +167,7 @@ export const Header = () => {
     <nav className={navStyles({ isOpen })}>
       <div className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-[#0194e2] to-[#7a3bff] text-white text-center text-sm px-6 py-2">
         <span>
-          ✨ New: Let your coding agent set up MLflow for you:{" "}
+          ✨ New: Let your coding agent set up MLflow tracing for you:{" "}
           <code className="rounded bg-black/25 px-1.5 py-0.5 font-mono">
             uvx mlflow agent setup
           </code>
