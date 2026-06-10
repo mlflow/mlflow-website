@@ -184,10 +184,10 @@ export const Header = () => {
           <span>
             ✨ New: Let your coding agent set up MLflow tracing for you:{" "}
             <code className="rounded bg-black/25 px-1.5 py-0.5 font-mono">
-              uvx mlflow agent setup
+              uvx mlflow@latest agent setup
             </code>
           </span>
-          <CopyButton code="uvx mlflow agent setup" />
+          <CopyButton code="uvx mlflow@latest agent setup" />
           <Link
             href="https://mlflow.org/docs/latest/genai/tracing/quickstart/"
             className="underline font-medium text-white hover:text-white/80"
