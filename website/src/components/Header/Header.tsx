@@ -179,6 +179,9 @@ export const Header = () => {
 
   return (
     <nav className={navStyles({ isOpen })}>
+      {/* Announcement banner for `mlflow agent setup`. Hidden on mobile
+          because the copy wraps poorly at narrow widths; dismissal is
+          remembered in localStorage. */}
       {isBannerVisible && (
         <div className="relative hidden md:flex items-center justify-center gap-2 w-full bg-gradient-to-r from-[#1e1b4b] to-[#4c1d95] text-white text-center text-sm px-6 py-2">
           <span>
