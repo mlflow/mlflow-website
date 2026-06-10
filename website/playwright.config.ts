@@ -17,7 +17,7 @@ const config: PlaywrightTestConfig = {
     // Use production build to enable them.
     command: "npm run build && npm run serve",
     port: 3000,
-    timeout: 30 * 1000, // 30 seconds
+    timeout: 60 * 1000, // 1 minute
   },
 };
 
