@@ -180,7 +180,7 @@ export const Header = () => {
   return (
     <nav className={navStyles({ isOpen })}>
       {isBannerVisible && (
-        <div className="relative flex items-center justify-center gap-2 w-full bg-gradient-to-r from-[#1e1b4b] to-[#4c1d95] text-white text-center text-sm px-6 py-2">
+        <div className="relative hidden md:flex items-center justify-center gap-2 w-full bg-gradient-to-r from-[#1e1b4b] to-[#4c1d95] text-white text-center text-sm px-6 py-2">
           <span>
             ✨ New: Let your coding agent set up MLflow tracing for you:{" "}
             <code className="rounded bg-black/25 px-1.5 py-0.5 font-mono">
