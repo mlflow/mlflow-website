@@ -38,7 +38,7 @@ const GitHubStarsBadge = () => {
 };
 
 import "./Header.module.css";
-import { MLFLOW_DOCS_URL, MLFLOW_TRY_DEMO_URL } from "@site/src/constants";
+import { MLFLOW_TRY_DEMO_URL } from "@site/src/constants";
 import { cva } from "class-variance-authority";
 
 const MD_BREAKPOINT = 640;
@@ -174,7 +174,7 @@ export const Header = () => {
         </span>
         <CopyButton code="uvx mlflow agent setup" />
         <Link
-          href={MLFLOW_DOCS_URL}
+          href="https://mlflow.org/docs/latest/genai/tracing/quickstart/"
           className="underline font-medium text-white hover:text-white/80"
         >
           Learn more
