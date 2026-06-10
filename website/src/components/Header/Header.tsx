@@ -14,6 +14,7 @@ import { HeaderMenuItem } from "../HeaderMenuItem/HeaderMenuItem";
 import { HeaderProductsSubmenu } from "../HeaderProductsSubmenu/HeaderProductsSubmenu";
 import { HeaderDocsSubmenu } from "../HeaderDocsSubmenu/HeaderDocsSubmenu";
 import { HeaderResourcesSubmenu } from "../HeaderResourcesSubmenu/HeaderResourcesSubmenu";
+import { CopyButton } from "../CodeSnippet/CopyButton";
 
 const GitHubStarsBadge = () => {
   const stars = useGitHubStars();
@@ -164,6 +165,21 @@ export const Header = () => {
 
   return (
     <nav className={navStyles({ isOpen })}>
+      <div className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-[#0194e2] to-[#7a3bff] text-white text-center text-sm px-6 py-2">
+        <span>
+          ✨ New: Let your coding agent set up MLflow for you:{" "}
+          <code className="rounded bg-black/25 px-1.5 py-0.5 font-mono">
+            uvx mlflow agent setup
+          </code>
+        </span>
+        <CopyButton code="uvx mlflow agent setup" />
+        <Link
+          href={MLFLOW_DOCS_URL}
+          className="underline font-medium text-white hover:text-white/80"
+        >
+          Learn more
+        </Link>
+      </div>
       <div className="flex flex-wrap items-center mx-auto px-6 lg:px-20 py-2 max-w-container">
         <div className="md:contents flex flex-row justify-between w-full sticky top-[8px]">
           <Link
