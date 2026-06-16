@@ -1,0 +1,158 @@
+---
+title: "MLflow 3.14.0 Highlights: One-Line Agent Onboarding, Human Review Queues, Pytest Integration, and the LLM Playground"
+sidebar_label: MLflow 3.14.0
+slug: 3.14.0
+authors: [mlflow-maintainers]
+---
+
+MLflow 3.14.0 is a major release focused on closing the GenAI development loop, from getting an app instrumented in the first place to reviewing, testing, and iterating on it. Highlights include one-command observability onboarding with `mlflow agent setup`, durable low-latency tracing for Claude Code, human Review Queues for collecting structured feedback on traces, a revamped evaluation dataset UI, a pytest integration that gates GenAI quality in CI, and an in-browser LLM Playground.
+
+## 1. **One-Command Onboarding with `mlflow agent setup`**
+
+<img
+  src="/img/releases/3.14.0/agent-setup-framed.png"
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+/>
+
+Adding MLflow Tracing to an existing app used to be a multi-step chore: install the SDK with the project's package manager, pick where traces should go, set the tracking URI, and drop `mlflow.autolog()` into the real entry point without scattering it across modules. The new `mlflow agent setup` command collapses all of that into a single line. Run it from inside your project's Git repo and it auto-detects an installed coding agent (Claude Code, OpenAI Codex, or OpenCode), installs a curated set of MLflow skills into that agent's skills directory, asks where you want traces to land, and then launches the agent with a task prompt that instruments the repo and verifies a trace was emitted end to end.
+
+Because the heavy lifting is delegated to your agent rather than a rigid script, the flow adapts to whatever package manager and entry point your repo uses. The backend prompt covers the setups people actually use: a fresh local tracking server, a Databricks workspace, or an existing server URL.
+
+```bash
+# Run inside your repo: your coding agent instruments it for MLflow Tracing
+uvx mlflow@latest agent setup
+```
+
+[Learn more in the Tracing Quickstart](https://mlflow.org/docs/latest/genai/tracing/quickstart/)
+
+## 2. **Durable, Low-Latency Tracing for Claude Code**
+
+<img
+  src="/img/releases/3.14.0/claude-code-tracing-framed.png"
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+/>
+
+Instrumenting a long-running coding agent like Claude Code forces a bad trade-off: block the agent's exit on a backend upload, which is slow, or fire-and-forget, which loses traces when the session ends or crashes. MLflow 3.14.0 resolves this with a write-ahead-log (WAL) architecture for the TypeScript SDK. Each completed trace is serialized to a local WAL record and handed to a long-lived background daemon that fsyncs it to disk before acknowledging, so the agent's hook only waits on local disk latency, not the network. The daemon owns the upload pipeline, with retries, exponential backoff, and a dead-letter file, and replays any records already on disk even if the agent crashed mid-session.
+
+Enable it by setting `MLFLOW_ENABLE_ASYNC_TRACE_LOGGING`, and point Claude Code tracing at a Databricks Unity Catalog location with `MLFLOW_TRACE_LOCATION` when you want traces to land there. Spans are captured as OTLP protobuf at write time, so they populate the DB-backed span metrics in the Experiment Overview.
+
+[Learn more about Claude Code tracing](https://mlflow.org/docs/latest/genai/tracing/integrations/listing/claude_code)
+
+## 3. **Human Review Queues for Traces**
+
+<img
+  src="/img/releases/3.14.0/review-queue-framed.png"
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+/>
+
+Collecting human feedback on GenAI traces used to be ad-hoc: spreadsheets, side channels, and no shared sense of what had already been reviewed. Review Queues turn that into a structured, in-UI workflow. You define a set of review questions once as a label schema (Pass/Fail, categorical, numeric, or free text), bundle traces into a named queue scoped to an experiment, assign reviewers, and let them work through the queue trace by trace in a focused review page. Shared status means the first reviewer to finish a trace clears it for the whole team.
+
+Crucially, a Review Queue never stores answers off to the side: each answer is written straight back onto the trace, with feedback questions logging assessments and expectation questions logging ground truth. That makes review output immediately usable for evaluation, for aligning an LLM judge, or for building a dataset. The whole workflow is also scriptable through the `mlflow.genai.review_queues` and `mlflow.genai.label_schemas` SDKs.
+
+```python
+from mlflow.genai.label_schemas import create_label_schema, InputPassFail
+from mlflow.genai.review_queues import create_review_queue, add_items_to_review_queue
+
+# Define a question once, then reuse it across queues
+schema = create_label_schema(
+    name="correctness",
+    type="feedback",
+    input=InputPassFail(positive_label="Correct", negative_label="Incorrect"),
+    instruction="Is the answer factually correct and consistent with policy?",
+)
+
+# Create a queue, assign reviewers, and attach traces
+queue = create_review_queue(
+    name="Support quality review",
+    queue_type="custom",
+    schema_ids=[schema.schema_id],
+    users=["alice@acme.com", "bob@acme.com"],
+)
+add_items_to_review_queue(queue.queue_id, item_ids=["tr-abc123", "tr-def456"])
+```
+
+[Learn more about Review Queues](https://mlflow.org/docs/latest/genai/assessments/review-queues)
+
+## 4. **Revamped Evaluation Dataset UI**
+
+<img
+  src="/img/releases/3.14.0/dataset-ui-framed.png"
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+/>
+
+Evaluation datasets are living collections of test cases that grow from production traces and hand-curated golden examples, but inspecting and maintaining them used to mean dropping into the Python SDK. MLflow 3.14.0 ships a fully revamped evaluation dataset experience in the UI. From an experiment's Datasets tab you get a searchable, sortable list of datasets, and clicking one opens a dedicated detail page with a paginated records table.
+
+On the detail page, each record opens in a side panel where inputs and expectations are edited as validated JSON, with an unsaved-changes guard so you do not lose work. You can add records inline, multi-select and bulk-delete, choose which columns to show, and for any record that originated from a trace, jump straight to the trace explorer to see where the test case came from. Combined with the existing "Add to evaluation dataset" action on the Traces tab, the whole build-and-maintain loop now lives in the UI.
+
+```python
+import mlflow
+from mlflow.genai.datasets import create_dataset
+
+dataset = create_dataset(name="support_golden_set", experiment_id="0")
+dataset.merge_records([
+    {
+        "inputs": {"question": "Can I return an item after 45 days?"},
+        "expectations": {"expected_facts": "The standard return window is 30 days."},
+    },
+])
+```
+
+[Learn more about evaluation datasets](https://mlflow.org/docs/latest/genai/datasets/)
+
+## 5. **Pytest Integration for GenAI Regression Tests**
+
+<img
+  src="/img/releases/3.14.0/pytest-framed.png"
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+/>
+
+Regression-testing GenAI quality used to fall outside the workflow developers already trust for everything else: write a test, run it in CI, block the PR if it fails. MLflow 3.14.0 closes that gap. Mark a test with `@mlflow.test`, run scorers (built-in LLM judges or custom code-based ones) against your agent's output with `mlflow.genai.evaluate()`, and assert that they pass with a single line: `assert result.passed, result.reason`. When it fails, `result.reason` names the failing scorers and their rationales right in the pytest output.
+
+The integration slots into existing pytest and CI setups with no custom run-management code. An opt-in plugin opens one MLflow run per pytest session, so every test case is grouped under a single browsable record that renders in the Evaluation runs view with a per-case pass/fail column. The recommended loop is to grow the suite from real failures: each time the agent misbehaves, capture that case as a `@mlflow.test` so the same issue can never silently return.
+
+[Learn more about regression testing](https://mlflow.org/docs/latest/genai/eval-monitor/regression-testing)
+
+## 6. **LLM Playground**
+
+<img
+  src="/img/releases/3.14.0/playground-framed.png"
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+/>
+
+Iterating on a prompt used to mean editing code and re-running it, or jumping out to a separate vendor playground that knew nothing about your registered prompts. MLflow 3.14.0 adds an in-browser LLM Playground, wired to the same MLflow AI Gateway endpoints and Prompt Registry versions you already govern. Open it from an experiment, pick a chat endpoint, and compose a multi-turn conversation with system, user, and assistant messages.
+
+A settings drawer lets you tune temperature, max tokens, top-p, penalties, and stop sequences; supply tool definitions; and constrain output to plain text or a strict JSON schema. Messages support `{{ variable }}` placeholders you fill in at submit time, and "Load prompt from registry" drops any registered version straight into the conversation, applying its stored model config automatically.
+
+[Learn more about the LLM Playground](https://mlflow.org/docs/latest/genai/prompt-registry/playground)
+
+## Full Changelog
+
+For a comprehensive list of changes, see the [release change log](https://github.com/mlflow/mlflow/releases/tag/v3.14.0).
+
+## What's Next
+
+### Get Started
+
+Upgrade to try these new features:
+
+```bash
+pip install mlflow==3.14.0
+```
+
+### Share Your Feedback
+
+We'd love to hear about your experience with these new features:
+
+- [GitHub Issues](https://github.com/mlflow/mlflow/issues) - Report bugs or request features
+- [MLflow Roadmap](https://github.com/mlflow/mlflow/discussions/19855) - See what's coming next and share your ideas
+- ⭐ [Star us on GitHub](https://github.com/mlflow/mlflow) - Show your support for the project
+
+### Learn More
+
+- Check out the [MLflow documentation](https://mlflow.org/docs/latest) for detailed guides
