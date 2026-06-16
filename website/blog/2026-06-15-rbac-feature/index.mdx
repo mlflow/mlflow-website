@@ -35,6 +35,7 @@ Before MLflow's permissions model got its update, every permission grant needed 
 **Reusability of roles:** Create the "prompt editor" role once. Then assign that role to whoever needs to edit your prompts. If you hire someone new, or somebody leaves the team, all you need to do is add/remove that user to the "prompt editor" role. You won't have to go into each one of the dozens of different prompt roles you've made for your teams.
 
 **Tomorrow's resources are automatically covered today:** Roles are associated with a resource_pattern, which will determine which resources are accessible to those who have that role. For instance, you can assign the (prompt, *, EDIT) role to whoever should be able to edit prompts. This grants the user editing abilities for all of your current and future prompts! This wildcard will be resolved within that specific role's workspace (meaning your prompt edit access won't bleed into another team's prompt library). Your access automatically stays up to date.
+> **Note:** In the UI, the wildcard `*` is exposed as `all`.
 
 **Four intuitive permission levels:**
 
@@ -185,7 +186,11 @@ When a user tries to access a resource, MLflow resolves their effective permissi
 
 1. **Platform Admin:** If `is_admin = true`, access is granted immediately.
 2. **Role-derived grants:** All roles the user holds in the current workspace contribute. Matching grants combine via a *max* operation: `MANAGE > EDIT > USE > READ`. A `(workspace, *, MANAGE)` grant confers management of everything in that workspace.
-3. **Default permission floor:** Defaults to `READ`. Applied as a floor when no role grant matches a specific resource. In multi-workspace mode, this floor only applies in workspaces where `grant_default_workspace_access` is enabled — otherwise, users with no explicit grant receive `NO_PERMISSIONS` for resources in named workspaces.
+3. **Default permission floor:**
+- **Without `--enable-workspaces`:** The default permission floor is `READ` and it is applied as a floor when no role grant matches a specific resource. 
+- **With `--enable-workspaces`:** In multi-workspace mode, we still need to grant a user (WORKSAPCE, *, USE) to confer workspace membership (see [RBAC permission resolution docs](https://mlflow.org/docs/latest/self-hosting/security/role-based-access-control/#permission-resolution).) With this, the user will get the ability to create resources in addition to the `default_permission` which could be set to either:
+    - `READ` (default)
+    - `NO_PERMISSION`: In this case, getting access to the workspace only allows creating resources but does not grant visibility into existing ones.
 
 > **Important:** In RBAC, there is no explicit way to deny a permission. If you want to restrict access, you would need to grant more narrowly rather than adding exceptions.
 
