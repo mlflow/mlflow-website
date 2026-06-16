@@ -91,6 +91,17 @@ function githubSlug(text) {
 }
 
 function sanitizeMarkdown(md) {
+  // Strip <scratchpad> blocks (internal authoring notes from the API).
+  // Handles both explicit </scratchpad> closing and unclosed blocks that end
+  // at a <markdown section> tag or end of content.
+  md = md.replace(
+    /<scratchpad>[\s\S]*?(<\/scratchpad>|(?=<markdown[\s>]))/gi,
+    "",
+  );
+
+  // Remove <markdown section> / </markdown section> wrapper tags
+  md = md.replace(/<\/?markdown[^>]*>/gi, "");
+
   // Fix internal anchor links to match Docusaurus heading IDs (github-slugger).
   // The API returns URL-encoded anchors (e.g. %3A for colon, %2C for comma)
   // that don't match the slugs Docusaurus generates from headings.
