@@ -20,7 +20,7 @@ Adding MLflow Tracing to an existing app used to be a multi-step chore: install 
 Because the heavy lifting is delegated to your agent rather than a rigid script, the flow adapts to whatever package manager and entry point your repo uses. The backend prompt covers the setups people actually use: a fresh local tracking server, a Databricks workspace, or an existing server URL.
 
 ```bash
-# Run inside your repo: your coding agent instruments it for MLflow Tracing
+# Run inside your project: your coding agent instruments it for MLflow Tracing
 uvx mlflow@latest agent setup
 ```
 
@@ -51,28 +51,6 @@ Enable it by setting `MLFLOW_ENABLE_ASYNC_TRACE_LOGGING`, and point Claude Code 
 Collecting human feedback on GenAI traces used to be ad-hoc: spreadsheets, side channels, and no shared sense of what had already been reviewed. Review Queues turn that into a structured, in-UI workflow. You define a set of review questions once as a label schema (Pass/Fail, categorical, numeric, or free text), bundle traces into a named queue scoped to an experiment, assign reviewers, and let them work through the queue trace by trace in a focused review page. Shared status means the first reviewer to finish a trace clears it for the whole team.
 
 Crucially, a Review Queue never stores answers off to the side: each answer is written straight back onto the trace, with feedback questions logging assessments and expectation questions logging ground truth. That makes review output immediately usable for evaluation, for aligning an LLM judge, or for building a dataset. The whole workflow is also scriptable through the `mlflow.genai.review_queues` and `mlflow.genai.label_schemas` SDKs.
-
-```python
-from mlflow.genai.label_schemas import create_label_schema, InputPassFail
-from mlflow.genai.review_queues import create_review_queue, add_items_to_review_queue
-
-# Define a question once, then reuse it across queues
-schema = create_label_schema(
-    name="correctness",
-    type="feedback",
-    input=InputPassFail(positive_label="Correct", negative_label="Incorrect"),
-    instruction="Is the answer factually correct and consistent with policy?",
-)
-
-# Create a queue, assign reviewers, and attach traces
-queue = create_review_queue(
-    name="Support quality review",
-    queue_type="custom",
-    schema_ids=[schema.schema_id],
-    users=["alice@acme.com", "bob@acme.com"],
-)
-add_items_to_review_queue(queue.queue_id, item_ids=["tr-abc123", "tr-def456"])
-```
 
 [Learn more about Review Queues](https://mlflow.org/docs/latest/genai/assessments/review-queues)
 
