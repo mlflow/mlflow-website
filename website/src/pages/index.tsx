@@ -114,6 +114,12 @@ export default function Home(): JSX.Element {
             label: "Get Started",
             href: `#get-started`,
           }}
+          command={{
+            code: "uvx mlflow@latest agent setup",
+            caption: (
+              <>✨ New: let your coding agent set up MLflow tracing for you</>
+            ),
+          }}
         >
           <TrustPills />
         </HeroSection>
