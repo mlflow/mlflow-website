@@ -15,7 +15,7 @@ MLflow 3.14.0 is a major release focused on closing the GenAI development loop, 
   style={{ display: "block", marginBottom: 24 }}
 />
 
-Getting an app onto MLflow observability should not mean reading setup guides and wiring things together by hand. The new `mlflow agent setup` command does it all in a single line: it installs MLflow, sets up tracing, and hands your favorite coding agent a curated set of MLflow skills so the agent instruments your app for you. Run it from inside your project, choose which coding agent to drive it (Claude Code, OpenAI Codex, or OpenCode) and where traces should land (a fresh local server, a Databricks workspace, or an existing one), and the agent adds tracing to your real entry point and verifies a trace end to end.
+Getting an app onto MLflow observability should not mean reading setup guides and wiring things together by hand. The new `mlflow agent setup` command does it all in a single line: it installs a curated set of MLflow skills and launches your favorite coding agent, which installs MLflow, sets up tracing, and instruments your app for you. Run it from inside your project, choose which coding agent to drive it (Claude Code, OpenAI Codex, or OpenCode) and where traces should land (a fresh local server, a Databricks workspace, or an existing one), and the agent adds tracing to your real entry point and verifies a trace end to end.
 
 Because the actual instrumentation is delegated to your coding agent rather than a rigid script, it adapts to whatever package manager, framework, and entry point your project uses.
 
@@ -62,9 +62,9 @@ When you want more structure, create a custom queue with a specific set of revie
   style={{ display: "block", marginBottom: 24 }}
 />
 
-Evaluation datasets are living collections of test cases that grow from production traces and hand-curated golden examples, but inspecting and maintaining them used to mean dropping into the Python SDK. MLflow 3.14.0 ships a fully revamped evaluation dataset experience in the UI. From an experiment's Datasets tab you get a searchable, sortable list of datasets, and clicking one opens a dedicated detail page with a paginated records table.
+Evaluation datasets are living collections of test cases that grow from production traces and hand-curated golden examples, but inspecting and maintaining them used to mean dropping into the Python SDK. MLflow 3.14.0 ships a fully revamped evaluation dataset experience in the UI. From an experiment's Datasets tab you get a searchable list of datasets, and clicking one opens a dedicated detail page with a sortable, paginated records table.
 
-On the detail page, each record opens in a side panel where inputs and expectations are edited as validated JSON, with an unsaved-changes guard so you do not lose work. You can add records inline, multi-select and bulk-delete, choose which columns to show, and for any record that originated from a trace, jump straight to the trace explorer to see where the test case came from. Combined with the existing "Add to evaluation dataset" action on the Traces tab, the whole build-and-maintain loop now lives in the UI.
+On the detail page, each record opens in a side panel where inputs and expectations are edited as validated JSON, with an unsaved-changes guard so you do not lose work. You can add records inline, multi-select and bulk-delete, choose which columns to show, and for any record that originated from a trace, open it in an in-page trace explorer to see where the test case came from. Combined with the existing "Add to evaluation dataset" action on the Traces tab, the whole build-and-maintain loop now lives in the UI.
 
 [Learn more about evaluation datasets](https://mlflow.org/docs/latest/genai/datasets/)
 
@@ -78,7 +78,7 @@ On the detail page, each record opens in a side panel where inputs and expectati
 
 If you already evaluate your agent with `mlflow.genai.evaluate()` and scorers, regression testing in MLflow 3.14.0 asks you to learn nothing new: add the `@mlflow.test` decorator to a plain pytest function, run your existing scorers, and assert on the result with `assert result.passed, result.reason`. When it fails, the failing scorers and their judge rationales show up right in the pytest output.
 
-Because it is a native pytest marker, your regression suite plugs into the whole pytest ecosystem: parametrize a test across many cases, fan it out across workers with `pytest-xdist`, and run it in CI like any other test. Every run is captured to MLflow, and the Evaluation runs UI shows your test history and the detailed per-assertion judge results at a glance. The recommended loop is to grow the suite from real failures: each time the agent misbehaves, capture that case as a `@mlflow.test` so the same issue can never silently return.
+Because it is just a decorator on an ordinary pytest function, your regression suite plugs into the whole pytest ecosystem: parametrize a test across many cases, fan it out across workers with `pytest-xdist`, and run it in CI like any other test. Every run is captured to MLflow, and the Evaluation runs UI shows your test history and the detailed per-assertion judge results at a glance. The recommended loop is to grow the suite from real failures: each time the agent misbehaves, capture that case as a `@mlflow.test` so the same issue can never silently return.
 
 ```python
 import mlflow
@@ -105,7 +105,7 @@ def test_answers_concisely(agent):
   style={{ display: "block", marginBottom: 24 }}
 />
 
-Iterating on a prompt used to mean editing code and re-running it, or jumping out to a separate vendor playground that knew nothing about your registered prompts. MLflow 3.14.0 adds an in-browser LLM Playground, wired to the same MLflow AI Gateway endpoints and Prompt Registry versions you already govern. Open it from an experiment, pick a chat endpoint, and compose a multi-turn conversation with system, user, and assistant messages.
+Iterating on a prompt used to mean editing code and re-running it, or jumping out to a separate vendor playground that knew nothing about your registered prompts. MLflow 3.14.0 adds an in-browser LLM Playground, wired to the same MLflow AI Gateway endpoints and Prompt Registry versions you already govern. Open it from an experiment, pick a model endpoint, and compose a multi-turn conversation with system, user, and assistant messages.
 
 A settings drawer lets you tune temperature, max tokens, top-p, penalties, and stop sequences; supply tool definitions; and constrain output to plain text or a strict JSON schema. Messages support `{{ variable }}` placeholders you fill in at submit time, and "Load prompt from registry" drops any registered version straight into the conversation, applying its stored model config automatically.
 
