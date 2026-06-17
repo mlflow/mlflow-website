@@ -15,9 +15,9 @@ MLflow 3.14.0 is a major release focused on closing the GenAI development loop, 
   style={{ display: "block", marginBottom: 24 }}
 />
 
-Adding MLflow Tracing to an existing app used to be a multi-step chore: install the SDK with the project's package manager, pick where traces should go, set the tracking URI, and drop `mlflow.autolog()` into the real entry point without scattering it across modules. The new `mlflow agent setup` command collapses all of that into a single line. Run it from inside your project's Git repo and it auto-detects an installed coding agent (Claude Code, OpenAI Codex, or OpenCode), installs a curated set of MLflow skills into that agent's skills directory, asks where you want traces to land, and then launches the agent with a task prompt that instruments the repo and verifies a trace was emitted end to end.
+Getting an app onto MLflow observability should not mean reading setup guides and wiring things together by hand. The new `mlflow agent setup` command does it all in a single line: it installs MLflow, sets up tracing, and hands your favorite coding agent a curated set of MLflow skills so the agent instruments your app for you. Run it from inside your project, choose which coding agent to drive it (Claude Code, OpenAI Codex, or OpenCode) and where traces should land (a fresh local server, a Databricks workspace, or an existing one), and the agent adds tracing to your real entry point and verifies a trace end to end.
 
-Because the heavy lifting is delegated to your agent rather than a rigid script, the flow adapts to whatever package manager and entry point your repo uses. The backend prompt covers the setups people actually use: a fresh local tracking server, a Databricks workspace, or an existing server URL.
+Because the actual instrumentation is delegated to your coding agent rather than a rigid script, it adapts to whatever package manager, framework, and entry point your project uses.
 
 ```bash
 # Run inside your project: your coding agent instruments it for MLflow Tracing
@@ -34,9 +34,9 @@ uvx mlflow@latest agent setup
   style={{ display: "block", marginBottom: 24 }}
 />
 
-Instrumenting a long-running coding agent like Claude Code forces a bad trade-off: block the agent's exit on a backend upload, which is slow, or fire-and-forget, which loses traces when the session ends or crashes. MLflow 3.14.0 resolves this with a write-ahead-log (WAL) architecture for the TypeScript SDK. Each completed trace is serialized to a local WAL record and handed to a long-lived background daemon that fsyncs it to disk before acknowledging, so the agent's hook only waits on local disk latency, not the network. The daemon owns the upload pipeline, with retries, exponential backoff, and a dead-letter file, and replays any records already on disk even if the agent crashed mid-session.
+Rolling out Claude Code tracing to a whole team should be something you can switch on for everyone and stop thinking about. MLflow 3.14.0 makes it durable and low-overhead so organizations can adopt it with confidence: tracing never slows down the developer's Claude Code session, it will not overwhelm your central tracking server under load, and it does not lose traces when a network blip or a crash interrupts a session.
 
-Enable it by setting `MLFLOW_ENABLE_ASYNC_TRACE_LOGGING`, and point Claude Code tracing at a Databricks Unity Catalog location with `MLFLOW_TRACE_LOCATION` when you want traces to land there. Spans are captured as OTLP protobuf at write time, so they populate the DB-backed span metrics in the Experiment Overview.
+It achieves this with a write-ahead-log: each trace is written to local disk and uploaded by a background daemon that retries on failure, so the agent never blocks on the network and any traces already on disk are replayed even if the session exited unexpectedly. You can also send Claude Code traces to a Databricks Unity Catalog location with `MLFLOW_TRACE_LOCATION`.
 
 [Learn more about Claude Code tracing](https://mlflow.org/docs/latest/genai/tracing/integrations/listing/claude_code)
 
@@ -48,9 +48,9 @@ Enable it by setting `MLFLOW_ENABLE_ASYNC_TRACE_LOGGING`, and point Claude Code 
   style={{ display: "block", marginBottom: 24 }}
 />
 
-Collecting human feedback on GenAI traces used to be ad-hoc: spreadsheets, side channels, and no shared sense of what had already been reviewed. Review Queues turn that into a structured, in-UI workflow. You define a set of review questions once as a label schema (Pass/Fail, categorical, numeric, or free text), bundle traces into a named queue scoped to an experiment, assign reviewers, and let them work through the queue trace by trace in a focused review page. Shared status means the first reviewer to finish a trace clears it for the whole team.
+Collecting human feedback on GenAI traces used to be ad-hoc: spreadsheets, side channels, and no shared sense of what had already been reviewed. Review Queues turn that into a structured, in-UI workflow, and the quickest path needs no setup at all. From the trace table, select the traces you want a second opinion on and assign them directly to teammates, who find them waiting in their personal review queue. Each reviewer opens a focused review page, works through their traces one at a time, and because status is shared, the first person to finish a trace clears it for the whole team.
 
-Crucially, a Review Queue never stores answers off to the side: each answer is written straight back onto the trace, with feedback questions logging assessments and expectation questions logging ground truth. That makes review output immediately usable for evaluation, for aligning an LLM judge, or for building a dataset. The whole workflow is also scriptable through the `mlflow.genai.review_queues` and `mlflow.genai.label_schemas` SDKs.
+When you want more structure, create a custom queue with a specific set of review questions (Pass/Fail, categorical, numeric, or free text). Either way, answers are never stored off to the side: each one is written straight back onto the trace, with feedback questions logging assessments and expectation questions logging ground truth. That makes review output immediately usable for evaluation, for aligning an LLM judge, or for building a dataset. The whole workflow is also scriptable through the `mlflow.genai.review_queues` SDK.
 
 [Learn more about Review Queues](https://mlflow.org/docs/latest/genai/assessments/review-queues)
 
@@ -66,32 +66,34 @@ Evaluation datasets are living collections of test cases that grow from producti
 
 On the detail page, each record opens in a side panel where inputs and expectations are edited as validated JSON, with an unsaved-changes guard so you do not lose work. You can add records inline, multi-select and bulk-delete, choose which columns to show, and for any record that originated from a trace, jump straight to the trace explorer to see where the test case came from. Combined with the existing "Add to evaluation dataset" action on the Traces tab, the whole build-and-maintain loop now lives in the UI.
 
-```python
-import mlflow
-from mlflow.genai.datasets import create_dataset
-
-dataset = create_dataset(name="support_golden_set", experiment_id="0")
-dataset.merge_records([
-    {
-        "inputs": {"question": "Can I return an item after 45 days?"},
-        "expectations": {"expected_facts": "The standard return window is 30 days."},
-    },
-])
-```
-
 [Learn more about evaluation datasets](https://mlflow.org/docs/latest/genai/datasets/)
 
 ## 5. **Pytest Integration for GenAI Regression Tests**
 
 <img
-  src="/img/releases/3.14.0/pytest-framed.png"
+  src="/img/releases/3.14.0/pytest-result-framed.png"
   width="100%"
   style={{ display: "block", marginBottom: 24 }}
 />
 
-Regression-testing GenAI quality used to fall outside the workflow developers already trust for everything else: write a test, run it in CI, block the PR if it fails. MLflow 3.14.0 closes that gap. Mark a test with `@mlflow.test`, run scorers (built-in LLM judges or custom code-based ones) against your agent's output with `mlflow.genai.evaluate()`, and assert that they pass with a single line: `assert result.passed, result.reason`. When it fails, `result.reason` names the failing scorers and their rationales right in the pytest output.
+If you already evaluate your agent with `mlflow.genai.evaluate()` and scorers, regression testing in MLflow 3.14.0 asks you to learn nothing new: add the `@mlflow.test` decorator to a plain pytest function, run your existing scorers, and assert on the result with `assert result.passed, result.reason`. When it fails, the failing scorers and their judge rationales show up right in the pytest output.
 
-The integration slots into existing pytest and CI setups with no custom run-management code. An opt-in plugin opens one MLflow run per pytest session, so every test case is grouped under a single browsable record that renders in the Evaluation runs view with a per-case pass/fail column. The recommended loop is to grow the suite from real failures: each time the agent misbehaves, capture that case as a `@mlflow.test` so the same issue can never silently return.
+Because it is a native pytest marker, your regression suite plugs into the whole pytest ecosystem: parametrize a test across many cases, fan it out across workers with `pytest-xdist`, and run it in CI like any other test. Every run is captured to MLflow, and the Evaluation runs UI shows your test history and the detailed per-assertion judge results at a glance. The recommended loop is to grow the suite from real failures: each time the agent misbehaves, capture that case as a `@mlflow.test` so the same issue can never silently return.
+
+```python
+import mlflow
+from mlflow.genai.scorers import Guidelines
+
+
+@mlflow.test
+def test_answers_concisely(agent):
+    result = mlflow.genai.evaluate(
+        predict_fn=agent,
+        data=[{"inputs": {"question": "What are your hours?"}}],
+        scorers=[Guidelines(name="concise", guidelines="Answer in one sentence.")],
+    )
+    assert result.passed, result.reason
+```
 
 [Learn more about regression testing](https://mlflow.org/docs/latest/genai/eval-monitor/regression-testing)
 
