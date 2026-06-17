@@ -37,7 +37,7 @@ const GitHubStarsBadge = () => {
 };
 
 import "./Header.module.css";
-import { MLFLOW_DOCS_URL, MLFLOW_TRY_DEMO_URL } from "@site/src/constants";
+import { MLFLOW_TRY_DEMO_URL } from "@site/src/constants";
 import { cva } from "class-variance-authority";
 
 const MD_BREAKPOINT = 640;

@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { motion } from "motion/react";
 import Link from "@docusaurus/Link";
 import { Button } from "../Button/Button";
+import { CopyButton } from "../CodeSnippet/CopyButton";
 
 type Props = {
   title: ReactNode;
@@ -15,6 +16,10 @@ type Props = {
     href: string;
     icon?: ReactNode;
   };
+  command?: {
+    code: string;
+    caption?: ReactNode;
+  };
   children?: ReactNode;
 };
 
@@ -23,6 +28,7 @@ export function HeroSection({
   subtitle,
   primaryCTA,
   secondaryCTA,
+  command,
   children,
 }: Props) {
   return (
@@ -71,6 +77,26 @@ export function HeroSection({
             </Link>
           )}
         </motion.div>
+
+        {/* Copyable command snippet */}
+        {command && (
+          <motion.div
+            className="flex flex-col items-center gap-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.25 }}
+          >
+            {command.caption && (
+              <span className="text-sm text-white/60">{command.caption}</span>
+            )}
+            <div className="flex items-center gap-3 rounded-xl border border-white/20 bg-black/40 pl-4 pr-2 py-2 font-mono text-sm text-white">
+              <span className="text-white/50 select-none">$</span>
+              <span>{command.code}</span>
+              <CopyButton code={command.code} />
+            </div>
+          </motion.div>
+        )}
+
         {children && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
