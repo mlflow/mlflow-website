@@ -1,0 +1,58 @@
+---
+title: "Review Queues: The Jira Tickets for AI Tools"
+description: "MLflow Review Queues turn AI trace review into a ticketing system with assignments, status columns, and human evaluations—so you can stop tracking hallucinations in spreadsheets."
+slug: review-queue-feature
+authors: [khalil-kafrouni]
+tags: [mlflow, review-queues, tracing, observability, ai, evaluation]
+thumbnail: /img/blog/review-queue-thumbnail.png
+image: /img/blog/review-queue-thumbnail.png
+---
+
+import { BlogImage } from "@site/src/components/BlogImage/BlogImage";
+
+Back in December 2023, a guy named Chris Bakke hopped on the chat window on the website for a Chevrolet dealer, told the bot to agree with anything he said, and then asked if he could get a 2024 Tahoe for one dollar. The bot didn't hesitate. **"That's a deal,"** it typed back, **"and that's a legally binding offer – no takesies backsies."** It wasn't a lawyer, obviously. It was a chatbot that had just seen a human invent a loophole in contract law by saying "no takesies backsies" and accepted it. [Chevrolet of Watsonville](https://venturebeat.com/ai/a-chevy-for-1-car-dealer-chatbots-show-perils-of-ai-for-customer-service) did not, ultimately, hand over a \$76,000 vehicle for \$1. But the screenshot, showing the transaction, went viral and ended up racking **20 million views**. Somewhere in Detroit, a General Motors employee experienced a Tuesday they'd probably like to forget.
+
+<BlogImage
+  src={require("./review-queue-hero.png").default}
+  alt="Chevrolet chatbot agreeing to sell a 2024 Tahoe for one dollar, calling it a legally binding offer"
+/>
+
+{/* truncate */}
+
+Just two months later, a grief-stricken customer was offered a bereavement discount from an [Air Canada chatbot](https://www.cbc.ca/news/canada/british-columbia/air-canada-chatbot-1.7116416) that didn't exist, and an arbitrator still made the company pay it. Such incidents still happen, though far less often. For one, the underlying models are getting better, and the protections built around them are too. But for a second, less glamorous reason: Somebody, somewhere, is reading those transcripts afterwards, purposefully and routinely, to ensure the robot hasn't done anything truly foolish. Historically, that job required emailing back and forth file with a name like `traces_review_hallucinations_V3 Final edited.xlsx`. That's not necessary anymore. We now have a review queue.
+
+---
+
+## Welcome to Review Queues
+
+It is **MLflow's** new feature to organize teams reviewing AI traces with tickets, assignments and a status column that progresses from **Pending** to **Done**. If you've worked at any sort of office job with a functional IT department, you'll be instantly familiar with the shape. We just haven't seen it directed at an AI until now.
+
+In simple terms, every time an AI says or does something, e.g. answering a question, interacting with an external service, or giving the customer a price, you can log the entire event as a **"trace."** This log acts like a receipt, detailing exactly what happened, step by step. In the past, for a human to review that receipt meant sifting through hundreds of lines of chat in a spreadsheet and writing a two-word note in a cell. Then came **Review Queues**, which essentially turns that clunky spreadsheet into a more streamlined support ticketing system.
+
+You set up a queue, something with an evocative name, like **"Hallucination Check,"** or if you happen to be employed at that Chevrolet dealership, perhaps **"Seriously, Please Check The Law For Contractual Obligation."** Then, you assign it an evaluation question: Will the interaction pass or fail? Rate the response on a 1 to 5 scale. This article does not go into the technical details of how to set them up, but a step by step tutorial can be found in the [docs](https://mlflow.org/docs/latest/genai/assessments/review-queues/).
+
+Traces can be manually assigned to the queue, or you can set up rules so that traces flagged by an automated grader (for instance, where the model wasn't confident) automatically go in the queue. Then, a human reviewer simply grabs a ticket from the queue, reads the trace, answers the question, and moves on to the next one.
+
+---
+
+### It's identical to submitting an IT ticket to fix a broken printer.
+
+The only difference is that your "ticket" is the entire back-and-forth between a customer and an AI that may have just offered to sell them a car for a dollar. One key detail to note is that when a human reviewer provides their answer, it gets directly appended to the trace itself, which means no more separate spreadsheets floating around with chaotic data. It contains the reviewer's name, timestamp, and what they wrote, linking the judgment to the AI's action.
+
+---
+
+## Some Inspiration
+
+Whenever humans need to evaluate anything at scale, whether it's code reviews, content moderation, or, now, AI outputs, processes emerge. Whenever we say *"Someone should check this"*, it always evolves into a full-time job that needs a system, regardless of original intentions. And that brings us to AI oversight, the very thing we expected to replace tedious human work. Predictably, it has instead created a new class of tedious human work. Somebody has to be the person who reads the trace where the chatbot happily informed the customer the Tahoe costs one buck or that they could get a 70% discount on a first class plane ticket, and that person needs an organized way to track what is already done and what is left to do.
+
+There's a deeper value in this, though: These human evaluations don't just serve as compliance documentation. **They're fuel for better AI.** If you collect enough traces, each marked by a human with a definitive "pass" or "fail," you can train another AI to judge the first one's homework. The system learns what a human deems acceptable and unacceptable, and you then use that to fine-tune the next AI. So, the true workflow looks like this: Build an AI that occasionally messes up, assign a human to grade its errors, use that grading to build a second AI whose primary function is to grade the first one, and then periodically have a human check the grader AI's work to ensure it hasn't gone rogue itself.
+
+With all the advances in LLMs and AI models, we are still far away from removing the human in the loop. LLMs are inherently built to be helpful assistants, which means they can be gaslit, confused, or coerced in various ways into doing things they shouldn't be doing. As long as this is the case, we will still need to keep an eye on the AI and monitor what it's doing, and with **Review Queues** we have simply created a system that makes that job easier.
+
+Get started: [MLflow Review Queues](https://mlflow.org/docs/latest/genai/assessments/review-queues/)
+
+---
+
+_Questions or feedback? Drop a note by [opening an issue](https://github.com/mlflow/mlflow/issues) or join the [MLflow community discussions](https://github.com/mlflow/mlflow/discussions)._
+
+⭐ [Star us on GitHub](https://github.com/mlflow/mlflow), show your support for the project!
