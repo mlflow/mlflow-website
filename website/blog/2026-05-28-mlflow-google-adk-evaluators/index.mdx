@@ -1,6 +1,6 @@
 ---
 title: "Agent Evaluation in MLflow with Google ADK"
-description: Use Google ADK's trajectory, ROUGE, and LLM-judge evaluators as MLflow scorers for end-to-end agent evaluation.
+description: Use Google ADK's trajectory, response-match, and LLM-judge evaluators as MLflow scorers for end-to-end agent evaluation.
 slug: mlflow-google-adk-evaluators
 authors: [debu-sinha]
 tags: [genai, evaluation, agents, google-adk, scorers]
@@ -10,9 +10,9 @@ image: /img/blog/mlflow-google-adk-thumbnail.png
 
 MLflow's [evaluation framework](https://mlflow.org/docs/latest/genai/eval-monitor/) now wraps the [Google Agent Development Kit (ADK)](https://google.github.io/adk-docs/) evaluator suite as third-party scorers. The integration covers five ADK evaluators (`ToolTrajectory`, `ResponseMatch`, `ResponseEvaluation`, `Safety`, `Hallucination`) so agent evaluations can use ADK's built-in metrics inside any `mlflow.genai.evaluate()` run.
 
-Agent evaluation isn't shaped like RAG evaluation. A wrong tool call early in a trajectory can produce a correct-looking final response. A fluent answer can still skip a required step. Scoring an agent means asking three questions about the full trace: did the agent call the right tools in the right order, did the final response match what the user needed, and did the model hallucinate. ADK's evaluator suite was built for this shape.
+Agent evaluation isn't shaped like RAG evaluation. A wrong tool call early in a trajectory can produce a correct-looking final response. A fluent answer can still skip a required step.
 
-The five scorers split into deterministic checks (tool trajectory matching and ROUGE-based response similarity) and LLM-judge checks (response quality, safety, factual grounding). Deterministic scorers run in microseconds and have no API cost. `ResponseEvaluation` and `Hallucination` call `gemini-2.5-flash` by default and return judge rationale alongside the score. `Safety` is the exception: it routes through Vertex AI's prebuilt SAFETY metric, which manages its own model selection. All five run against the same MLflow trace, so a single evaluation can layer cheap structural checks under more expensive judge calls.
+ADK's evaluator suite was built to answer three questions about the full trace: did the agent call the right tools in the right order, did the final response match what the user needed, and did the model hallucinate. The provided scorers include both deterministic (e.g., tool trajectory matching, response matching based on ROUGE) and LLM-judge checks (e.g., safety and hallucination scores). All five run against the same MLflow trace, so a single evaluation can layer cheap structural checks under more expensive judge calls.
 
 {/* truncate */}
 
@@ -32,7 +32,7 @@ The deterministic scorers (`ToolTrajectory`, `ResponseMatch`) read actual tool c
 
 ## Evaluating an Agent
 
-The example below runs trajectory matching, ROUGE response similarity, and an LLM-judge response evaluation against a flight-booking agent. The agent emits a trace through `mlflow.start_span()` calls, and the scorers consume the trace directly without re-running the agent.
+The example below runs trajectory matching, ROUGE response similarity, and an LLM-judge response evaluation against a flight-booking agent, scoring recorded interactions without re-running the agent.
 
 ```python
 import mlflow
@@ -83,13 +83,14 @@ results = mlflow.genai.evaluate(
         ToolTrajectory(match_type="EXACT", threshold=0.5),
         ResponseMatch(threshold=0.5),
         ResponseEvaluation(threshold=0.6),
+        # Safety and Hallucination slot into this same list when needed.
+        # Safety also needs Google Cloud credentials (Vertex AI) on top of
+        # GEMINI_API_KEY because it delegates to a managed Vertex AI metric.
     ],
 )
 ```
 
 The second row exercises a multi-tool trajectory. The agent has to call `search_flights` first and `sort_by_price` second. `ToolTrajectory` scores 1.0 when the call sequence matches under the selected `match_type` (`EXACT`, `IN_ORDER`, or `ANY_ORDER`) and 0.0 when it doesn't. `ResponseMatch` returns a ROUGE-1 F-measure independent of tool calls. `ResponseEvaluation` asks the judge whether the final response matches semantically. Results land in the same MLflow evaluation UI as any other scorer, so trajectory failures, lexical mismatches, and judge disagreements are visible side-by-side.
-
-`Safety` and `Hallucination` slot into the same `evaluate()` call when the workload needs them. `Hallucination` doesn't require any reference and is useful for catching fabricated facts in free-form responses. `Safety` requires Google Cloud project credentials (Vertex AI service account or `gcloud auth application-default login`) on top of a `GEMINI_API_KEY`, because the underlying evaluator delegates to a managed Vertex AI metric.
 
 ## How It Works
 
@@ -97,7 +98,7 @@ The integration follows the same scorer pattern as MLflow's other third-party in
 
 <img
   src={require("./architecture-diagram.png").default}
-  alt="Architecture diagram of the Google ADK scorer pipeline. Inputs, outputs, expectations, and trace flow through map_scorer_inputs_to_invocation, then split between deterministic evaluators (TrajectoryEvaluator, RougeEvaluator) and LLM-judge evaluators (FinalResponseMatchV2, SafetyEvaluatorV1, HallucinationsV1), and converge back into an MLflow Feedback object."
+  alt="Architecture diagram of the Google ADK scorer pipeline. Inputs, outputs, expectations, and trace flow through an input-mapping step, then split between deterministic evaluators (TrajectoryEvaluator, RougeEvaluator) and LLM-judge evaluators (FinalResponseMatchV2, SafetyEvaluatorV1, HallucinationsV1), and converge back into an MLflow Feedback object."
   style={{
     maxWidth: "800px",
     width: "100%",
