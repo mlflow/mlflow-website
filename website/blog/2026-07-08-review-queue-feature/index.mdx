@@ -1,6 +1,6 @@
 ---
-title: "Review Queues: The Jira Tickets for AI Tools"
-description: "MLflow Review Queues turn AI trace review into a ticketing system with assignments, status columns, and human evaluations—so you can stop tracking hallucinations in spreadsheets."
+title: "Review Queues: The Human Step Towards Better AI"
+description: "MLflow Review Queues turn AI trace review into a ticketing system with assignments, status, and human evaluations — so you can stop tracking degradations and misbehavior in spreadsheets."
 slug: review-queue-feature
 authors: [khalil-kafrouni]
 tags: [mlflow, review-queues, tracing, observability, ai, evaluation]
@@ -10,34 +10,33 @@ image: /img/blog/review-queue-thumbnail.jpeg
 
 import { BlogImage } from "@site/src/components/BlogImage/BlogImage";
 
-Back in December 2023, a guy named Chris Bakke hopped on the chat window on the website for a Chevrolet dealer, told the bot to agree with anything he said, and then asked if he could get a 2024 Tahoe for one dollar. The bot didn't hesitate. **"That's a deal,"** it typed back, **"and that's a legally binding offer – no takesies backsies."** It wasn't a lawyer, obviously. It was a chatbot that had just seen a human invent a loophole in contract law by saying "no takesies backsies" and accepted it. [Chevrolet of Watsonville](https://venturebeat.com/ai/a-chevy-for-1-car-dealer-chatbots-show-perils-of-ai-for-customer-service) did not, ultimately, hand over a \$76,000 vehicle for \$1. But the screenshot, showing the transaction, went viral and ended up racking **20 million views**. Somewhere in Detroit, a General Motors employee experienced a Tuesday they'd probably like to forget.
-
 <BlogImage
-  src={require("./review-queue-hero.png").default}
-  alt="Chevrolet chatbot agreeing to sell a 2024 Tahoe for one dollar, calling it a legally binding offer"
+  src={require("./review-queue-ui.png").default}
+  alt="MLflow Review Queues UI showing an AI Safety Standards Review queue with traces awaiting human review"
 />
+
+> **TL;DR:** We have released review queues for AI traces. These are shared inboxes waiting for a human-in-the-loop to evaluate them on whatever criteria the team decides. Instead of passing documents and excel sheets back and forth, this streamlines the AI review process and facilitates the creation of a strong dataset of successes and failures that you can use to retrain your agents in the future.
+
+Back in December 2023, a guy named Chris Bakke hopped on the chat window on the website for a Chevrolet dealer, told the bot to agree with anything he said, and then asked if he could get a 2024 Tahoe for one dollar. The bot didn't hesitate. **"That's a deal,"** it typed back, **"and that's a legally binding offer – no takesies backsies."** It wasn't a lawyer, obviously. It was a chatbot that had just seen a human invent a loophole in contract law by saying "no takesies backsies" and accepted it. [Chevrolet of Watsonville](https://venturebeat.com/ai/a-chevy-for-1-car-dealer-chatbots-show-perils-of-ai-for-customer-service) did not, ultimately, hand over a \$76,000 vehicle for \$1. But the screenshot, showing the transaction, went viral and ended up racking **20 million views**. Somewhere in Detroit, a General Motors employee experienced a Tuesday they'd probably like to forget.
 
 {/* truncate */}
 
-Just two months later, a grief-stricken customer was offered a bereavement discount from an [Air Canada chatbot](https://www.cbc.ca/news/canada/british-columbia/air-canada-chatbot-1.7116416) that didn't exist, and an arbitrator still made the company pay it. Such incidents still happen, though far less often. For one, the underlying models are getting better, and the protections built around them are too. But for a second, less glamorous reason: Somebody, somewhere, is reading those transcripts afterwards, purposefully and routinely, to ensure the robot hasn't done anything truly foolish. Historically, that job required emailing back and forth file with a name like `traces_review_hallucinations_V3 Final edited.xlsx`. That's not necessary anymore. We now have a review queue.
+Just two months later, a grief-stricken customer was offered a bereavement discount from an [Air Canada chatbot](https://www.cbc.ca/news/canada/british-columbia/air-canada-chatbot-1.7116416) that didn't exist, and an arbitrator still made the company pay it. Such incidents still happen, though far less often. For one, the underlying models are getting better, and the protections built around them are too. But for a second, less glamorous reason: Somebody, somewhere, is reading those transcripts afterwards, purposefully and routinely, to ensure the robot hasn't done anything truly foolish. Historically, that job required emailing back and forth file with a name like `traces_review_hallucinations_V3 Final edited.xlsx`. That's not necessary anymore. We now have a review queue that allows this job to be streamlined. It also allows for the creation of a dataset that later on feeds the future iterations of your agents so that they know what works and what doesn't.
 
 ---
 
-## Welcome to Review Queues
-
-It is **MLflow's** new feature to organize teams reviewing AI traces with tickets, assignments and a status column that progresses from **Pending** to **Done**. If you've worked at any sort of office job with a functional IT department, you'll be instantly familiar with the shape. We just haven't seen it directed at an AI until now.
+## What Are Review Queues?
 
 In simple terms, every time an AI says or does something, e.g. answering a question, interacting with an external service, or giving the customer a price, you can log the entire event as a **"trace."** This log acts like a receipt, detailing exactly what happened, step by step. In the past, for a human to review that receipt meant sifting through hundreds of lines of chat in a spreadsheet and writing a two-word note in a cell. Then came **Review Queues**, which essentially turns that clunky spreadsheet into a more streamlined support ticketing system.
 
 You set up a queue, something with an evocative name, like **"Hallucination Check,"** or if you happen to be employed at that Chevrolet dealership, perhaps **"Seriously, Please Check The Law For Contractual Obligation."** Then, you assign it an evaluation question: Will the interaction pass or fail? Rate the response on a 1 to 5 scale. This article does not go into the technical details of how to set them up, but a step by step tutorial can be found in the [docs](https://mlflow.org/docs/latest/genai/assessments/review-queues/).
 
-Traces can be manually assigned to the queue, or you can set up rules so that traces flagged by an automated grader (for instance, where the model wasn't confident) automatically go in the queue. Then, a human reviewer simply grabs a ticket from the queue, reads the trace, answers the question, and moves on to the next one.
+<BlogImage
+  src={require("./review-queue-trace.png").default}
+  alt="MLflow review screen showing a human reviewer scoring an AI safety trace with pass/fail criteria and ratings"
+/>
 
----
-
-### It's identical to submitting an IT ticket to fix a broken printer.
-
-The only difference is that your "ticket" is the entire back-and-forth between a customer and an AI that may have just offered to sell them a car for a dollar. One key detail to note is that when a human reviewer provides their answer, it gets directly appended to the trace itself, which means no more separate spreadsheets floating around with chaotic data. It contains the reviewer's name, timestamp, and what they wrote, linking the judgment to the AI's action.
+Traces can be manually assigned to the queue, or you can set up rules so that traces flagged by an automated grader (for instance, where the model wasn't confident) automatically go in the queue. Then, a human reviewer simply grabs a ticket from the queue, reads the trace, answers the question, and moves on to the next one. Over time, those judgments add up and their value goes beyond a simple checklist, they become a curated dataset of real failure modes and edge cases you can use to fine tune your agents.
 
 ---
 
