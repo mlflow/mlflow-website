@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
 import { motion } from "motion/react";
 import Link from "@docusaurus/Link";
+import { MLFLOW_TRY_DEMO_URL } from "@site/src/constants";
+import { reportTryDemo } from "@site/src/utils/siteEvents";
 import { Button } from "../Button/Button";
 import { CopyButton } from "../CodeSnippet/CopyButton";
 
@@ -22,6 +24,10 @@ type Props = {
   };
   children?: ReactNode;
 };
+
+function isTryDemoHref(href: string): boolean {
+  return href.startsWith(MLFLOW_TRY_DEMO_URL.replace(/\/$/, ""));
+}
 
 export function HeroSection({
   title,
@@ -61,7 +67,10 @@ export function HeroSection({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <Link to={primaryCTA.href}>
+          <Link
+            to={primaryCTA.href}
+            onClick={isTryDemoHref(primaryCTA.href) ? reportTryDemo : undefined}
+          >
             <Button variant="primary" size="medium">
               {primaryCTA.label}
             </Button>

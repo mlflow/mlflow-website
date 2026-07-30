@@ -5,6 +5,7 @@ import {
   useScroll,
   useMotionValueEvent,
 } from "motion/react";
+import { reportTryDemo } from "@site/src/utils/siteEvents";
 import { FeatureMediaCard } from "./FeatureMediaCard";
 import type { Feature } from "./features";
 
@@ -28,10 +29,12 @@ const GlowLink = ({
   href,
   label,
   gradient,
+  onClick,
 }: {
   href: string;
   label: string;
   gradient: string;
+  onClick?: () => void;
 }) => (
   <motion.a
     href={href}
@@ -39,6 +42,7 @@ const GlowLink = ({
     rel="noreferrer noopener"
     className="relative inline-flex items-center gap-1 text-sm font-medium w-fit"
     whileHover="hover"
+    onClick={onClick}
   >
     <motion.span
       className="absolute inset-0 rounded-md -z-10"
@@ -81,6 +85,7 @@ const TryDemoLink = ({ href }: { href: string }) => (
     href={href}
     label="Try Demo"
     gradient="linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(6, 182, 212, 0.3))"
+    onClick={reportTryDemo}
   />
 );
 
