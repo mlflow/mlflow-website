@@ -38,6 +38,7 @@ const GitHubStarsBadge = () => {
 
 import "./Header.module.css";
 import { MLFLOW_TRY_DEMO_URL } from "@site/src/constants";
+import { reportTryDemo } from "@site/src/utils/siteEvents";
 import { cva } from "class-variance-authority";
 
 const MD_BREAKPOINT = 640;
@@ -180,7 +181,11 @@ export const Header = () => {
                 Get Started
               </Button>
             </Link>
-            <Link href={MLFLOW_TRY_DEMO_URL} className="hidden md:block">
+            <Link
+              href={MLFLOW_TRY_DEMO_URL}
+              className="hidden md:block"
+              onClick={reportTryDemo}
+            >
               <Button variant="primary" size="small">
                 Try Demo
               </Button>
@@ -334,7 +339,7 @@ export const Header = () => {
                   Get Started
                 </Button>
               </Link>
-              <Link href={MLFLOW_TRY_DEMO_URL}>
+              <Link href={MLFLOW_TRY_DEMO_URL} onClick={reportTryDemo}>
                 <Button variant="primary" size="small" width="full">
                   Try Demo
                 </Button>
