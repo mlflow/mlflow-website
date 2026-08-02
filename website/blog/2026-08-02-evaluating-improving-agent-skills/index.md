@@ -127,13 +127,13 @@ Every skill should have a dedicated evaluation dataset representing realistic sc
 
 For our refund skill:
 
-| Customer Request | Expected Outcome |
-| --- | --- |
-| Refund after 5 days | Approve |
-| Refund after 45 days | Reject |
-| Wrong product delivered | Escalate |
-| Digital purchase | Follow digital policy |
-| Missing receipt | Request documentation |
+| Customer Request        | Expected Outcome      |
+| ----------------------- | --------------------- |
+| Refund after 5 days     | Approve               |
+| Refund after 45 days    | Reject                |
+| Wrong product delivered | Escalate              |
+| Digital purchase        | Follow digital policy |
+| Missing receipt         | Request documentation |
 
 ### Scorers
 
@@ -275,9 +275,9 @@ Tracing tells you why.
 
 Imagine your evaluation report shows:
 
-| Metric | Score |
-| --- | --- |
-| Correct Tool Selection | 43% |
+| Metric                 | Score |
+| ---------------------- | ----- |
+| Correct Tool Selection | 43%   |
 
 ![Evaluation report showing Correct Tool Selection at 43% before the fix](./eval-report-before.png)
 
@@ -299,9 +299,9 @@ Always verify customer identity before accessing order data.
 
 Re-running evaluation yields:
 
-| Metric | Before | After |
-| --- | --- | --- |
-| Correct Tool Selection | 43% | 98% |
+| Metric                 | Before | After |
+| ---------------------- | ------ | ----- |
+| Correct Tool Selection | 43%    | 98%   |
 
 ![Evaluation report showing Correct Tool Selection improving from 43% to 98% after the fix](./eval-report-after.png)
 
