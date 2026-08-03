@@ -12,8 +12,7 @@ defaults:
     shell: bash --noprofile --norc -exo pipefail {0}
 
 jobs:
-  # check that only maintainers have 
-  # contributed commits to this PR
+  # check that PR author is a maintainer
   check-maintainer:
     runs-on: ubuntu-latest
     if: ${{ github.event.pull_request.head.repo.full_name == 'mlflow/mlflow-website' }}
@@ -22,16 +21,10 @@ jobs:
       - uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
-            const { data: commits } = await github.rest.pulls.listCommits({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number,
-            })
-
-            const committers = commits.map(commit => commit.author.login);
+            const author = context.payload.pull_request.user?.login?.replace(/\[bot\]$/, "");
             const { isMLflowMaintainer } = require(".github/workflows/is-mlflow-maintainer.js");
-            const allMaintainers = committers.every(isMLflowMaintainer)
-            if (!allMaintainers) {
+            const isMaintainer = author && isMLflowMaintainer(author);
+            if (!isMaintainer) {
               core.setFailed("Only MLflow maintainers can trigger this workflow");
             }
 
