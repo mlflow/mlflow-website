@@ -28,9 +28,14 @@ jobs:
               pull_number: context.payload.pull_request.number,
             })
 
-            const committers = commits.map(commit => commit.author.login);
+            const committers = commits.map((commit) => {
+              const login = commit.author?.login;
+              return login?.replace(/\[bot\]$/, "");
+            });
             const { isMLflowMaintainer } = require(".github/workflows/is-mlflow-maintainer.js");
-            const allMaintainers = committers.every(isMLflowMaintainer)
+            const allMaintainers = committers.every((committer) => {
+              return committer && isMLflowMaintainer(committer);
+            })
             if (!allMaintainers) {
               core.setFailed("Only MLflow maintainers can trigger this workflow");
             }
