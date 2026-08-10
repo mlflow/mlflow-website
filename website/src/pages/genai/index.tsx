@@ -19,6 +19,7 @@ import {
   MLFLOW_GENAI_DOCS_URL,
   MLFLOW_TRY_DEMO_URL,
 } from "@site/src/constants";
+import { reportTryDemo } from "@site/src/utils/siteEvents";
 import { TrustPills } from "../../components/TrustPills/TrustPills";
 import type { EcosystemItem } from "../../components/EcosystemList/EcosystemList";
 
@@ -343,7 +344,7 @@ export default function GenAi(): JSX.Element {
           actions={
             <div className="flex flex-col items-center gap-4">
               <div className="flex flex-wrap justify-center items-center gap-4">
-                <Link to={MLFLOW_TRY_DEMO_URL}>
+                <Link to={MLFLOW_TRY_DEMO_URL} onClick={reportTryDemo}>
                   <Button variant="primary" size="medium">
                     Try Demo
                   </Button>
