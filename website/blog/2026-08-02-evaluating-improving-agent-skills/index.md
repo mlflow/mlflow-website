@@ -11,25 +11,15 @@ date: 2026-08-02
 
 How to build measurable, testable, and continuously improving AI agent capabilities.
 
-Agents are becoming increasingly capable of solving complex tasks by combining reasoning, tools, memory, and structured workflows. As these systems evolve, one pattern has emerged across frameworks such as LangGraph, OpenAI Agents SDK, Claude Code, CrewAI, Cortex, OpenClaw and Hermes: agents are built from reusable skills.
+Agents are becoming increasingly capable of solving complex tasks by combining reasoning, tools, memory, and structured workflows. Across frameworks such as LangGraph, OpenAI Agents SDK, Claude Code, CrewAI, Cortex, OpenClaw, and Hermes, a common pattern has emerged: agents are built from reusable skills. These skills encapsulate specific capabilities—such as retrieving information, generating SQL, validating invoices, planning multi-step tasks, or interacting with APIs—making agents easier to develop and maintain. But this modular approach introduces an important question: how do you know whether a skill is actually improving?
 
 <!-- truncate -->
 
-A skill encapsulates a specific capability, such as retrieving information from a knowledge base, generating SQL, validating invoices, planning multi-step tasks, or interacting with APIs. Rather than encoding all behavior in a single prompt, developers compose agents from these reusable building blocks. While this modular approach makes agents easier to develop and maintain, it also introduces a new challenge: how do you know whether a skill is actually improving?
-
-Many teams still evaluate skills manually by running a few prompts and checking whether the responses "look good." That process doesn't scale, is difficult to reproduce, and often misses subtle regressions. Instead, skills should be treated like software components: versioned, tested, measured, and continuously improved.
-
-In this blog, we'll explore how MLflow enables evaluation-driven development for agent skills using traces, datasets, custom evaluators, and experiment tracking.
+Many teams still evaluate skills manually by running a few prompts and checking whether the responses "look good," but this approach is difficult to reproduce, doesn't scale, and can miss subtle regressions. Instead, skills should be treated like software components: versioned, tested, measured, and continuously improved. In this blog, we'll explore how MLflow enables evaluation-driven development for agent skills using traces, datasets, custom evaluators, and experiment tracking.
 
 ## What Is an Agent Skill?
 
-A skill is a reusable capability that an agent can invoke to complete part of a task. For example, a skill might retrieve documents from a vector database, generate SQL queries, call external APIs, validate receipts, plan execution steps, or review generated code.
-
-Rather than embedding all instructions inside a monolithic system prompt, developers create focused skills that can evolve independently.
-
-For example, consider a customer support agent.
-
-Instead of writing one large prompt containing every policy, we might define a reusable refund skill:
+A skill is a reusable capability that an agent can invoke to complete part of a task, such as retrieving documents from a vector database, generating SQL queries, calling external APIs, validating receipts, planning execution steps, or reviewing generated code. Rather than embedding all instructions inside a monolithic system prompt, developers can create focused skills that evolve independently. For example, instead of building a customer support agent around one large prompt containing every policy, we might define a reusable refund skill.
 
 ```yaml
 name: refund-evaluation
@@ -46,9 +36,7 @@ This skill can now be reused across multiple agents while remaining independentl
 
 ## The Problem: Skills Drift Over Time
 
-Skills rarely stay static.
-
-As production feedback arrives, developers continuously modify skills.
+Skills rarely stay static, and as production feedback arrives, developers continuously modify them.
 
 Version 1:
 
@@ -77,9 +65,9 @@ Traditional LLM evaluation focuses on whether the final answer is correct, but f
 
 Skill evaluation should measure behaviors, not just outputs. This is where traces become essential. Traces capture each step the agent takes, making it possible to verify that the skill selected the correct tools, invoked APIs in the expected order, followed business policies, generated an efficient execution plan, completed required validation steps, and cited retrieved evidence where appropriate.
 
-![Answer-only evaluation checks the final response, while behavioral evaluation inspects each step in the trace](./behavioral-metrics.png)
-
 These behavioral metrics provide much richer insight into skill quality than answer accuracy alone.
+
+![Answer-only evaluation checks the final response, while behavioral evaluation inspects each step in the trace](./behavioral-metrics.png)
 
 ## Building an Evaluation Dataset
 
@@ -128,19 +116,13 @@ Ignores the final answer entirely. Reads the execution trace to confirm the expe
 correct_tool_selection = verify_customer ran AND search_order ran AND both happened before generate_response
 ```
 
-Unlike benchmark datasets, evaluation datasets evolve with production.
+Unlike benchmark datasets, evaluation datasets evolve with production, so whenever users discover failure cases, add them to the dataset to prevent future regressions.
 
 ![Evaluation datasets grow over time as new failure cases are added](./evaluation-dataset.png)
 
-Whenever users discover failure cases, add them to the dataset to prevent future regressions.
-
 ## Going Beyond Built-In Metrics
 
-General-purpose metrics such as correctness are useful, but production systems often require domain-specific evaluation.
-
-Suppose every refund must verify customer identity before accessing order history.
-
-We can encode that expectation directly as a custom evaluator.
+General-purpose metrics such as correctness are useful, but production systems often require domain-specific evaluation. For example, if every refund must verify customer identity before accessing order history, we can encode that expectation directly as a custom evaluator.
 
 ```python
 from mlflow.genai import scorer
@@ -184,11 +166,7 @@ Now every evaluation run automatically checks whether identity verification occu
 
 ## Running Skill Evaluations with MLflow
 
-#### Implementing run_agent
-
-The predict_fn can wrap any agent implementation, regardless of the framework. Its job is simply to execute the skill for a single evaluation example and return the result in a structured format.
-
-For example, if your refund skill is implemented as a Python function:
+The predict_fn can wrap any agent implementation, regardless of the framework. Its job is simply to execute the skill for a single evaluation example and return the result in a structured format. For example, if your refund skill is implemented as a Python function:
 
 ```python
 def run_agent(customer_message, order_id=None):
@@ -203,7 +181,7 @@ def run_agent(customer_message, order_id=None):
     }
 ```
 
-Once the dataset exists, evaluating a skill becomes straightforward.
+Once the dataset exists, evaluating a skill becomes straightforward, and instead of manually inspecting dozens of conversations, MLflow automatically computes evaluation metrics across the entire dataset, so improvements become measurable.
 
 ```python
 import mlflow
@@ -219,10 +197,6 @@ results = mlflow.genai.evaluate(
 )
 ```
 
-Instead of manually inspecting dozens of conversations, MLflow automatically computes evaluation metrics across the entire dataset.
-
-Now improvements become measurable.
-
 ## Using Traces to Understand Failures
 
 Evaluation tells you that something failed, while tracing tells you why.
@@ -237,9 +211,9 @@ Notice anything missing? The workflow skipped Verify Customer Identity, meaning 
 
 Re-running evaluation yields:
 
-![Evaluation report showing Correct Tool Selection improving from 43% to 98% after the fix](./eval-report-after.png)
-
 A small change to the skill instructions resulted in a substantial improvement in agent behavior, with the Correct Tool Selection score increasing from 43% to 98%.
+
+![Evaluation report showing Correct Tool Selection improving from 43% to 98% after the fix](./eval-report-after.png)
 
 ## Why MLflow for Skill Evaluation
 
@@ -253,13 +227,7 @@ MLflow brings these capabilities together in one platform:
 - Datasets enable regression testing with representative scenarios.
 - Prompt and Artifact Versioning helps teams manage the evolution of skills over time.
 
-Together, these capabilities enable an evaluation-driven development process where every skill change is measurable, reproducible, and backed by data.
-
-Reusable skills are quickly becoming the fundamental building blocks of modern AI agents. As organizations build larger agent ecosystems, the ability to evaluate and improve these skills systematically will become just as important as evaluating models themselves.
-
-Rather than asking whether an agent "seems to work," engineering teams should identify which skill failed, understand why it failed, compare performance across versions, detect regressions introduced by changes, and validate improvements with objective evaluation data.
-
-By combining tracing, datasets, custom evaluators, and experiment tracking, MLflow provides the foundation for answering these questions. Treating skills as measurable, versioned, and continuously improving components helps teams build more reliable, maintainable, and trustworthy AI agents.
+Together, these capabilities enable an evaluation-driven development process where every skill change is measurable, reproducible, and backed by data. As reusable skills become fundamental building blocks of modern AI agents, systematically evaluating and improving them becomes increasingly important. Rather than asking whether an agent simply "seems to work," teams can identify which skills fail, understand why, compare versions, detect regressions, and validate improvements with objective data. By combining tracing, datasets, custom evaluators, and experiment tracking, MLflow helps teams treat skills as measurable, versioned, and continuously improving components, resulting in more reliable, maintainable, and trustworthy AI agents.
 
 If this is useful, give us a ⭐ on [GitHub](https://github.com/mlflow/mlflow).
 
