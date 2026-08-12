@@ -73,7 +73,7 @@ The updated instructions appear better, but appearances can be misleading. Dupli
 
 ## Why Evaluating Final Answers Isn't Enough
 
-Traditional LLM evaluation focuses on the final response by asking a simple question: Was the answer correct? For agent skills, however, that's only part of the story. A refund agent may produce the correct answer while skipping customer identity verification before issuing a refund, resulting in a workflow that violates company policy. Similarly, a retrieval skill might return the correct answer while unnecessarily calling five external tools, increasing both latency and cost.
+Traditional LLM evaluation focuses on whether the final answer is correct, but for agent skills, the process also matters. A refund agent may give the correct refund while skipping identity verification, or a retrieval skill may return the right answer while making unnecessary tool calls that increase latency and cost.
 
 Skill evaluation should measure behaviors, not just outputs. This is where traces become essential. Traces capture each step the agent takes, making it possible to verify that the skill selected the correct tools, invoked APIs in the expected order, followed business policies, generated an efficient execution plan, completed required validation steps, and cited retrieved evidence where appropriate.
 
