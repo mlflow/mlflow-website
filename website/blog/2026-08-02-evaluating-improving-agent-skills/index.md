@@ -11,7 +11,7 @@ date: 2026-08-02
 
 How to build measurable, testable, and continuously improving AI agent capabilities.
 
-Agents are becoming increasingly capable of solving complex tasks by combining reasoning, tools, memory, and structured workflows. Across frameworks such as LangGraph, OpenAI Agents SDK, Claude Code, CrewAI, Cortex, OpenClaw, and Hermes, a common pattern has emerged: agents are built from reusable skills. These skills encapsulate specific capabilities—such as retrieving information, generating SQL, validating invoices, planning multi-step tasks, or interacting with APIs—making agents easier to develop and maintain. But this modular approach introduces an important question: how do you know whether a skill is actually improving?
+Agents are becoming increasingly capable of solving complex tasks by combining reasoning, tools, memory, and structured workflows. Across frameworks such as LangGraph, OpenAI Agents SDK, Claude Code, CrewAI, Cortex, OpenClaw, and Hermes, a common pattern has emerged: agents are built from reusable skills. These skills encapsulate specific capabilities, such as retrieving information, generating SQL, validating invoices, planning multi-step tasks, or interacting with APIs, making agents easier to develop and maintain. But this modular approach introduces an important question: how do you know whether a skill is actually improving?
 
 <!-- truncate -->
 
@@ -19,12 +19,15 @@ Many teams still evaluate skills manually by running a few prompts and checking 
 
 ## What Is an Agent Skill?
 
-A skill is a reusable capability that an agent can invoke to complete part of a task, such as retrieving documents from a vector database, generating SQL queries, calling external APIs, validating receipts, planning execution steps, or reviewing generated code. Rather than embedding all instructions inside a monolithic system prompt, developers can create focused skills that evolve independently. For example, instead of building a customer support agent around one large prompt containing every policy, we might define a reusable refund skill.
+A [skill](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) is a reusable capability that an agent can invoke to complete part of a task, such as retrieving documents from a vector database, generating SQL queries, calling external APIs, validating receipts, planning execution steps, or reviewing generated code. Rather than embedding all instructions inside a monolithic system prompt, developers can create focused skills that evolve independently. For example, instead of building a customer support agent around one large prompt containing every policy, we might define a reusable refund skill.
 
 ```yaml
+---
 name: refund-evaluation
 description: Use this skill to evaluate whether a customer is eligible for a refund according to the applicable refund policy.
+---
 ## Responsibilities
+
 - Validate purchase date
 - Verify order status
 - Apply refund policy
@@ -41,20 +44,24 @@ Skills rarely stay static, and as production feedback arrives, developers contin
 Version 1:
 
 ```yaml
+---
 name: refund-evaluation
 description: Use this skill to evaluate whether a customer is eligible for a refund according to the applicable refund policy.
+---
 Validate receipts for refund.
 ```
 
 Version 2:
 
 ```yaml
+---
 name: refund-evaluation
 description: Use this skill to evaluate whether a customer is eligible for a refund according to the applicable refund policy.
-• Ignore duplicate uploads
-• Accept PDF receipts
-• Reject blurry images
-• Handle foreign currencies
+---
+- Ignore duplicate uploads
+- Accept PDF receipts
+- Reject blurry images
+- Handle foreign currencies
 ```
 
 The updated instructions appear better, but appearances can be misleading. Duplicate detection may have improved while blurry receipt detection became less reliable, or latency may have increased because the skill now performs additional reasoning. Without structured evaluation, these regressions often go unnoticed until users report them.
@@ -83,14 +90,20 @@ For our refund skill:
 | Digital purchase        | Follow digital policy |
 | Missing receipt         | Request documentation |
 
-### Scorers
+Unlike benchmark datasets, evaluation datasets evolve with production, so whenever users discover failure cases, add them to the dataset to prevent future regressions.
+
+![Evaluation datasets grow over time as new failure cases are added](./evaluation-dataset.png)
+
+## Scorers
 
 **1. Correctness: Output-based**
 
 Compares the skill's final response against Expected Outcome (Using Expectations / Ground Truth). Doesn't look inside the trace just the answer.
 
 ```python
-correctness = (decision == expected_outcome)
+from mlflow.entities import Feedback
+from mlflow.genai import scorer
+
 
 @scorer
 def correctness(outputs, expectations) -> Feedback:
@@ -110,59 +123,24 @@ Checks whether the skill honored the business rule for that scenario. It reads t
 
 **3. Correct_tool_selection: Trace-based**
 
-Ignores the final answer entirely. Reads the execution trace to confirm the expected tools ran, in the right order, before the response.
+Reads the execution trace to confirm the expected tools ran, in the right order, before the response. This scorer does not evaluate the final answer but rather the intermediate steps that agent went through. Because the trace records every span, the scorer can require that identity verification happened before the refund decision:
 
 ```python
-correct_tool_selection = verify_customer ran AND search_order ran AND both happened before generate_response
-```
-
-Unlike benchmark datasets, evaluation datasets evolve with production, so whenever users discover failure cases, add them to the dataset to prevent future regressions.
-
-![Evaluation datasets grow over time as new failure cases are added](./evaluation-dataset.png)
-
-## Going Beyond Built-In Metrics
-
-General-purpose metrics such as correctness are useful, but production systems often require domain-specific evaluation. For example, if every refund must verify customer identity before accessing order history, we can encode that expectation directly as a custom evaluator.
-
-```python
+from mlflow.entities import Feedback, Trace
 from mlflow.genai import scorer
 
+
 @scorer
-def correct_tool_selection(outputs, trace: Trace) -> Feedback:
-    """Expected tools ran, in order, before the refund decision."""
-    steps = _ordered_steps(trace)
-    order = [step.name for step in steps]
+def correct_tool_selection(trace: Trace) -> Feedback:
+    """verify_identity must run before decide_and_respond."""
+    verify = trace.search_spans(name="verify_identity")
+    decide = trace.search_spans(name="decide_and_respond")
 
-    decide_spans = trace.search_spans(name="decide_and_respond")
-    decide_start = decide_spans[0].start_time_ns if decide_spans else None
-
-    called_before = [
-        step.name
-        for step in steps
-        if step.name in EXPECTED_TOOLS
-        and (decide_start is None or step.start_time_ns < decide_start)
-    ]
-    tools = called_before == EXPECTED_TOOLS
-
-    decision = _decision(outputs, trace)
-    verify_spans = trace.search_spans(name="verify_identity")
-    verification = decision not in REFUND_DECISIONS or (
-        decide_start is not None
-        and verify_spans
-        and verify_spans[0].start_time_ns < decide_start
-        and _obj(verify_spans[0].outputs).get("verified")
-    )
-
-    return Feedback(
-        value=tools and verification,
-        rationale=(
-            f"order={order}; tools={tools}; "
-            f"verification={verification}"
-        ),
-    )
+    ok = bool(verify and decide and verify[0].start_time_ns < decide[0].start_time_ns)
+    return Feedback(value=ok, rationale="verified before the decision" if ok else "verification missing")
 ```
 
-Now every evaluation run automatically checks whether identity verification occurred. As skills become more sophisticated, you can add evaluators for tool selection, API sequencing, citation completeness, planning quality, cost efficiency, safety compliance, hallucination detection, approval workflows, and retry behavior after failures. Together, these evaluators measure how the skill behaves—not merely what it outputs.
+Every evaluation run now checks that the workflow was followed, not just that the answer was right. The same pattern extends to other behaviors: API sequencing, citation completeness, planning quality, cost efficiency, and retry behavior after failures.
 
 ## Running Skill Evaluations with MLflow
 
@@ -225,7 +203,6 @@ MLflow brings these capabilities together in one platform:
 - Evaluation measures outputs and behaviors using built-in and custom scorers.
 - Experiment Tracking records every run for reproducibility and comparison.
 - Datasets enable regression testing with representative scenarios.
-- Prompt and Artifact Versioning helps teams manage the evolution of skills over time.
 
 Together, these capabilities enable an evaluation-driven development process where every skill change is measurable, reproducible, and backed by data. As reusable skills become fundamental building blocks of modern AI agents, systematically evaluating and improving them becomes increasingly important. Rather than asking whether an agent simply "seems to work," teams can identify which skills fail, understand why, compare versions, detect regressions, and validate improvements with objective data. By combining tracing, datasets, custom evaluators, and experiment tracking, MLflow helps teams treat skills as measurable, versioned, and continuously improving components, resulting in more reliable, maintainable, and trustworthy AI agents.
 
