@@ -110,7 +110,86 @@ def deregister_mcp_server(name: str) -> None:
 
 The registry catalogs any MCP server via its `server.json` (name, version, and one or more `remotes`). When you register with `tools` left unset, MLflow performs **live auto-discovery**: it connects to the first `remotes[]` URL and snapshots the server's tool list into the `MCPServerVersion`.
 
-To make discovery real, first stand up a custom server -- an **orders-analytics** tool, a common reason teams build a custom MCP server: letting an assistant query their data. It wraps a small in-memory SQLite orders table and exposes `run_sql(query)` and `top_products(limit)`. The server lives in `utils/orders_analytics_mcp.py`; here we launch it as a subprocess and wait for its port.
+To make discovery real, first stand up a custom server -- an **orders-analytics** tool, a common reason teams build a custom MCP server: letting an assistant query their data. It wraps a small in-memory SQLite orders table and exposes `run_sql(query)` and `top_products(limit)`. Save it as `utils/orders_analytics_mcp.py`:
+
+```python
+"""A minimal orders-analytics MCP server for the MLflow MCP Registry cookbook.
+
+Wraps a small in-memory SQLite `orders` table and exposes two tools over
+streamable-http so the registry can auto-discover them.
+
+Run directly:  python utils/orders_analytics_mcp.py
+"""
+
+import sqlite3
+import threading
+
+from fastmcp import FastMCP
+
+# Must match CUSTOM_HOST / CUSTOM_PORT in the cookbook.
+HOST, PORT = "127.0.0.1", 8123
+
+# Seed a tiny in-memory orders table once, shared across tool calls.
+_conn = sqlite3.connect(":memory:", check_same_thread=False)
+_conn.row_factory = sqlite3.Row
+_lock = threading.Lock()
+_conn.executescript(
+    """
+    CREATE TABLE orders (
+        order_id   INTEGER PRIMARY KEY AUTOINCREMENT,
+        product    TEXT    NOT NULL,
+        units      INTEGER NOT NULL,
+        unit_price REAL    NOT NULL
+    );
+    INSERT INTO orders (product, units, unit_price) VALUES
+        ('Aurora Standing Desk',    4, 480.0),
+        ('Volt 27in Monitor',       6, 310.0),
+        ('Nimbus Office Chair',     5, 220.0),
+        ('Pulse Wireless Keyboard', 8,  95.0),
+        ('Halo Desk Lamp',          7,  60.0);
+    """
+)
+
+mcp = FastMCP("orders-analytics")
+
+
+@mcp.tool
+def run_sql(query: str) -> list[dict]:
+    """Run a read-only SQL query against the `orders` table.
+
+    Columns: order_id, product, units, unit_price. Only SELECT is allowed.
+    """
+    if not query.lstrip().lower().startswith("select"):
+        raise ValueError("only SELECT queries are allowed")
+    with _lock:
+        rows = _conn.execute(query).fetchall()
+    return [dict(row) for row in rows]
+
+
+@mcp.tool
+def top_products(limit: int = 5) -> list[dict]:
+    """Return the highest-revenue products, with total units and revenue."""
+    with _lock:
+        rows = _conn.execute(
+            """
+            SELECT product,
+                   SUM(units)                        AS units,
+                   ROUND(SUM(units * unit_price), 2) AS revenue
+            FROM orders
+            GROUP BY product
+            ORDER BY revenue DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+    return [dict(row) for row in rows]
+
+
+if __name__ == "__main__":
+    mcp.run(transport="streamable-http", host=HOST, port=PORT)
+```
+
+Launch it as a subprocess and wait for its port:
 
 ```python
 import subprocess
