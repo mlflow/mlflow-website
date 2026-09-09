@@ -89,7 +89,7 @@ The open-source community and enterprise backing together create an ecosystem th
 
 ## 2. Confident AI
 
-[Confident AI](https://www.confident-ai.com) is an evaluation-first observability platform for production AI applications. It scores live traces with single-turn and multi-turn quality metrics, while custom workflows classify and surface issues, route traces into annotation queues, and turn production data into evaluation datasets. Tracking across agent and prompt versions helps teams connect regressions to specific changes and detect drift or anomalous behavior.
+Confident AI is an evaluation-first observability platform for production AI applications. It scores live traces with single-turn and multi-turn quality metrics, while custom workflows classify and surface issues, route traces into annotation queues, and turn production data into evaluation datasets. Tracking across agent and prompt versions helps teams connect regressions to specific changes and detect drift or anomalous behavior.
 
 ## 3. LangSmith
 

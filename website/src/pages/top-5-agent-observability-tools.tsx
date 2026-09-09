@@ -15,6 +15,7 @@ import LangfuseTracingUI from "@site/static/img/langfuse-alternative/langfuse-tr
 import LangsmithTracingUI from "@site/static/img/langsmith-alternative/langsmith-tracing-ui.png";
 import ArizePhoenixUI from "@site/static/img/arize-phoenix-alternative/arize-phoenix-ui.png";
 import BraintrustTraceUI from "@site/static/img/top-5-observability/braintrust-trace-view.png";
+import ConfidentAITraceUI from "@site/static/img/top-5-observability/confident-ai-trace-view.png";
 
 /* ───────── data ───────── */
 
@@ -981,6 +982,12 @@ export default function Top6AgentObservabilityTools() {
             Custom workflows surface and classify issues, route traces for
             annotation, and turn production data into evaluation datasets.
           </p>
+          <div className="screenshot-wrap">
+            <img
+              src={ConfidentAITraceUI}
+              alt="Confident AI trace view showing classifications, quality metrics, and trace list"
+            />
+          </div>
 
           <h4 style={{ color: "black" }}>
             Evaluation-Driven Production Monitoring
