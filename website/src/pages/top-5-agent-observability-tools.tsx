@@ -978,13 +978,8 @@ export default function Top6AgentObservabilityTools() {
             is an evaluation-first observability platform built for production
             AI applications. It scores live traces with built-in quality metrics
             and monitors performance across agents, prompts, and use cases.
-          </p>
-          <p>
-            Custom workflows automatically surface and classify issues, route
-            traces into annotation queues, and turn production data into
-            evaluation datasets. This gives engineering, product, QA, and domain
-            experts a direct path from identifying a failure to reviewing it and
-            testing a fix.
+            Custom workflows surface and classify issues, route traces for
+            annotation, and turn production data into evaluation datasets.
           </p>
 
           <h4 style={{ color: "black" }}>
