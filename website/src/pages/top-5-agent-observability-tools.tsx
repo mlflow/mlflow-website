@@ -18,75 +18,97 @@ import BraintrustTraceUI from "@site/static/img/top-5-observability/braintrust-t
 
 /* ───────── data ───────── */
 
-const quickComparisonRows: [string, string, string, string, string, string][] =
+const quickComparisonRows: [
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+][] = [
   [
-    [
-      "Capability",
-      "MLflow",
-      "Langfuse",
-      "LangSmith",
-      "Arize Phoenix",
-      "Braintrust",
-    ],
-    ["Open Source", "✔️", "✔️", "No", "Partial (ELv2)", "No"],
-    [
-      "License",
-      "Apache 2.0 (Linux Foundation)",
-      "MIT (ClickHouse Inc.)",
-      "Proprietary",
-      "Elastic License 2.0 (ELv2)",
-      "Proprietary",
-    ],
-    ["PyPI Downloads", "30M+/mo", "15M+/mo", "65M+/mo ¹", "1M+/mo", "3M+/mo"],
-    [
-      "Integration",
-      "60+ frameworks via OpenTelemetry",
-      "60+ frameworks via OpenTelemetry",
-      "LangChain-native + OpenTelemetry",
-      "40+ via OpenInference + OpenTelemetry",
-      "50+ frameworks",
-    ],
-    [
-      "OpenTelemetry",
-      "✔️",
-      "Partial (ingest)",
-      "Partial (ingest)",
-      "✔️",
-      "Partial (ingest)",
-    ],
-    ["Governance\n(AI Gateway)", "✔️", "No", "No", "No", "✔️"],
-    [
-      "Self-Hosting",
-      "Simple",
-      "Complex (5+ services + ClickHouse)",
-      "Enterprise-only",
-      "Simple",
-      "Not available",
-    ],
-    [
-      "Production Scale",
-      "✔️ (self-hosted, scales with your infra)",
-      "✔️ (ClickHouse-based)",
-      "✔️ (managed SaaS)",
-      "Single-node OSS; managed SaaS for scale",
-      "✔️ (managed SaaS)",
-    ],
-    [
-      "Data Retention",
-      "Unlimited",
-      "30 days (free) to 3 years (pro)",
-      "14 days (free); 400 days (paid add-on)",
-      "7 days (free); 15 days (pro)",
-      "14 days (starter); 30 days (pro)",
-    ],
-  ];
+    "Capability",
+    "MLflow",
+    "Confident AI",
+    "Langfuse",
+    "LangSmith",
+    "Arize Phoenix",
+    "Braintrust",
+  ],
+  ["Open Source", "✔️", "No", "✔️", "No", "Partial (ELv2)", "No"],
+  [
+    "License",
+    "Apache 2.0 (Linux Foundation)",
+    "Proprietary",
+    "MIT (ClickHouse Inc.)",
+    "Proprietary",
+    "Elastic License 2.0 (ELv2)",
+    "Proprietary",
+  ],
+  [
+    "PyPI Downloads",
+    "30M+/mo",
+    "N/A (platform)",
+    "15M+/mo",
+    "65M+/mo ¹",
+    "1M+/mo",
+    "3M+/mo",
+  ],
+  [
+    "Integration",
+    "60+ frameworks via OpenTelemetry",
+    "Python, TypeScript + OpenTelemetry",
+    "60+ frameworks via OpenTelemetry",
+    "LangChain-native + OpenTelemetry",
+    "40+ via OpenInference + OpenTelemetry",
+    "50+ frameworks",
+  ],
+  [
+    "OpenTelemetry",
+    "✔️",
+    "✔️ (ingest)",
+    "Partial (ingest)",
+    "Partial (ingest)",
+    "✔️",
+    "Partial (ingest)",
+  ],
+  ["Governance\n(AI Gateway)", "✔️", "No", "No", "No", "No", "✔️"],
+  [
+    "Self-Hosting",
+    "Simple",
+    "Enterprise-only",
+    "Complex (5+ services + ClickHouse)",
+    "Enterprise-only",
+    "Simple",
+    "Not available",
+  ],
+  [
+    "Production Scale",
+    "✔️ (self-hosted, scales with your infra)",
+    "✔️ (managed SaaS)",
+    "✔️ (ClickHouse-based)",
+    "✔️ (managed SaaS)",
+    "Single-node OSS; managed SaaS for scale",
+    "✔️ (managed SaaS)",
+  ],
+  [
+    "Data Retention",
+    "Unlimited",
+    "Plan-dependent",
+    "30 days (free) to 3 years (pro)",
+    "14 days (free); 400 days (paid add-on)",
+    "7 days (free); 15 days (pro)",
+    "14 days (starter); 30 days (pro)",
+  ],
+];
 
 /* ───────── components ───────── */
 
 function QuickComparisonTable({
   rows,
 }: {
-  rows: [string, string, string, string, string, string][];
+  rows: [string, string, string, string, string, string, string][];
 }) {
   const [header, ...body] = rows;
   return (
@@ -181,14 +203,14 @@ function SingleCodeBlock({ code }: { code: string }) {
 
 /* ───────── page ───────── */
 
-export default function Top5AgentObservabilityTools() {
+export default function Top6AgentObservabilityTools() {
   return (
     <>
       <Head>
-        <title>Top 5 LLM and Agent Observability Tools in 2026 | MLflow</title>
+        <title>Top 6 LLM and Agent Observability Tools in 2026 | MLflow</title>
         <meta
           name="description"
-          content="Compare the best agent observability tools for tracing, evaluation, and monitoring AI agents in production. See how MLflow, Langfuse, LangSmith, Arize Phoenix, and Braintrust stack up."
+          content="Compare the best agent observability tools for tracing, evaluation, and monitoring AI agents in production. See how MLflow, Confident AI, Langfuse, LangSmith, Arize Phoenix, and Braintrust stack up."
         />
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
@@ -643,13 +665,13 @@ export default function Top5AgentObservabilityTools() {
         <Header />
 
         <div className="article-container">
-          <h1>Top 5 Agent Observability Tools in 2026</h1>
+          <h1>Top 6 Agent Observability Tools in 2026</h1>
           <p className="subtitle">
             AI agents are quickly becoming the default architecture for
             production LLM applications. Multi-step reasoning, tool use,
             planning, and autonomous decision-making introduce complexity that
             makes traditional logging woefully inadequate. In this guide, we
-            compare the top five agent observability tools and help you choose
+            compare the top six agent observability tools and help you choose
             the right one for your team.
           </p>
 
@@ -674,6 +696,9 @@ export default function Top5AgentObservabilityTools() {
                 LangSmith
               </Link>{" "}
               for teams fully committed to LangChain,{" "}
+              <Link to="https://www.confident-ai.com">Confident AI</Link> for
+              evaluation-driven production monitoring and custom annotation
+              workflows, and{" "}
               <Link to="https://www.braintrust.dev">Braintrust</Link> for fast
               prototyping with non-technical stakeholders.
             </p>
@@ -942,9 +967,99 @@ export default function Top5AgentObservabilityTools() {
             </details>
           </div>
 
-          {/* ───── 2. Langfuse ───── */}
-          <h2 id="langfuse" data-toc="2. Langfuse">
-            2. Langfuse - Tracing for ClickHouse Experts
+          {/* ───── 2. Confident AI ───── */}
+          <h2 id="confident-ai" data-toc="2. Confident AI">
+            2. Confident AI - Evaluation-Driven Production Monitoring
+          </h2>
+          <p>
+            <strong>
+              <Link to="https://www.confident-ai.com">Confident AI</Link>
+            </strong>{" "}
+            is an evaluation-first observability platform built for production
+            AI applications. It scores live traces with built-in quality
+            metrics, automatically surfaces issues, and tracks performance
+            across prompts and use cases to detect regressions, drift, and
+            anomalies.
+          </p>
+          <p>
+            Production traces can become evaluation datasets and structured
+            annotation queues, while custom workflows route detected issues to
+            the right reviewers. This gives engineering, product, QA, and domain
+            experts a direct path from identifying a failure to annotating it
+            and testing a fix.
+          </p>
+
+          <h4 style={{ color: "black" }}>
+            Evaluation-Driven Production Monitoring
+          </h4>
+          <p>
+            Single-turn and multi-turn metrics score live traces and surface
+            quality degradation that latency and error monitoring can miss.
+            Teams can alert on score changes and compare performance across
+            prompt versions and use cases.
+          </p>
+
+          <h4 style={{ color: "black" }}>Custom Annotation Workflows</h4>
+          <p>
+            Configurable queues route production traces to product managers, QA
+            teams, and domain experts for structured review. Their annotations
+            feed evaluation datasets and help align automated metrics with human
+            judgment.
+          </p>
+
+          <h4 style={{ color: "black" }}>Proprietary Managed Platform</h4>
+          <p>
+            Confident AI is a proprietary managed service. It supports Python,
+            TypeScript, and language-agnostic OpenTelemetry ingestion, but
+            self-hosting is reserved for Enterprise customers.
+          </p>
+
+          <ProsConsTable
+            pros={[
+              "Automatically evaluates production traces and surfaces quality regressions",
+              "Custom annotation workflows connect domain experts with engineering",
+              "Production traces flow into datasets for continuous regression testing",
+            ]}
+            cons={[
+              "Proprietary platform rather than an open source observability stack",
+              "Self-hosting is limited to the Enterprise plan",
+              "Free usage is constrained by project, test-run, and storage limits",
+            ]}
+          />
+
+          <div className="best-for">
+            <strong>Best for:</strong> Production teams that need
+            evaluation-driven monitoring, custom annotation workflows, and
+            automatic detection of quality regressions and anomalies.
+          </div>
+
+          <div className="product-faq">
+            <details>
+              <summary>
+                How does Confident AI surface production issues?
+              </summary>
+              <p>
+                It evaluates live traces with quality metrics and can alert
+                teams when scores degrade across prompts or use cases.
+              </p>
+            </details>
+            <details>
+              <summary>Who can participate in annotation workflows?</summary>
+              <p>
+                Engineering, product, QA, and domain experts can review and
+                label traces through structured queues, with the feedback
+                flowing into evaluation datasets.
+              </p>
+            </details>
+            <details>
+              <summary>Can Confident AI be self-hosted?</summary>
+              <p>Self-hosting is available on the Enterprise plan.</p>
+            </details>
+          </div>
+
+          {/* ───── 3. Langfuse ───── */}
+          <h2 id="langfuse" data-toc="3. Langfuse">
+            3. Langfuse - Tracing for ClickHouse Experts
           </h2>
           <p>
             <strong>
@@ -1049,9 +1164,9 @@ export default function Top5AgentObservabilityTools() {
             </details>
           </div>
 
-          {/* ───── 3. LangSmith ───── */}
-          <h2 id="langsmith" data-toc="3. LangSmith">
-            3. LangSmith - LangChain's Own Observability Platform
+          {/* ───── 4. LangSmith ───── */}
+          <h2 id="langsmith" data-toc="4. LangSmith">
+            4. LangSmith - LangChain's Own Observability Platform
           </h2>
           <p>
             <strong>
@@ -1155,9 +1270,9 @@ export default function Top5AgentObservabilityTools() {
             </details>
           </div>
 
-          {/* ───── 4. Arize Phoenix ───── */}
-          <h2 id="arize-phoenix" data-toc="4. Arize Phoenix">
-            4. Arize Phoenix: ML Monitoring Meets Observability
+          {/* ───── 5. Arize Phoenix ───── */}
+          <h2 id="arize-phoenix" data-toc="5. Arize Phoenix">
+            5. Arize Phoenix: ML Monitoring Meets Observability
           </h2>
           <p>
             <strong>
@@ -1273,9 +1388,9 @@ export default function Top5AgentObservabilityTools() {
             </details>
           </div>
 
-          {/* ───── 5. Braintrust ───── */}
-          <h2 id="braintrust" data-toc="5. Braintrust">
-            5. Braintrust: Quick Analytics for Non-Technical Users
+          {/* ───── 6. Braintrust ───── */}
+          <h2 id="braintrust" data-toc="6. Braintrust">
+            6. Braintrust: Quick Analytics for Non-Technical Users
           </h2>
           <p>
             <strong>
@@ -1385,7 +1500,7 @@ export default function Top5AgentObservabilityTools() {
             How to Choose the Right Tool
           </h2>
           <p>
-            All five tools on this list can capture traces. The difference lies
+            All six tools on this list can capture traces. The difference lies
             in what happens after you collect that data, and how much control
             you retain over it. Before picking a tool, consider these criteria:
           </p>
@@ -1451,7 +1566,9 @@ export default function Top5AgentObservabilityTools() {
             proprietary and pricing scales with volume.{" "}
             <strong>Braintrust</strong> suits fast prototyping with
             non-technical stakeholders, but it is a proprietary SaaS with no
-            self-hosting option.
+            self-hosting option. <strong>Confident AI</strong> is worth
+            considering when production quality monitoring, custom annotation
+            workflows, and regression detection are the priority.
           </p>
 
           {/* Global FAQ */}

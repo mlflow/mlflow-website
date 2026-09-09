@@ -25,15 +25,16 @@ Choosing the right observability platform for your LLM deployments has become on
 - [Key takeaways](#key-takeaways)
 - [What to look for in top LLM observability tools in 2026](#what-to-look-for-in-top-llm-observability-tools-in-2026)
 - [1. MLflow](#1-mlflow)
-- [2. LangSmith](#2-langsmith)
-- [3. Arize Phoenix](#3-arize-phoenix)
-- [4. Langfuse](#4-langfuse)
-- [5. Helicone](#5-helicone)
-- [6. AgentOps](#6-agentops)
-- [7. TruLens](#7-trulens)
-- [8. Braintrust](#8-braintrust)
-- [9. Portkey](#9-portkey)
-- [10. Comet Opik](#10-comet-opik)
+- [2. Confident AI](#2-confident-ai)
+- [3. LangSmith](#3-langsmith)
+- [4. Arize Phoenix](#4-arize-phoenix)
+- [5. Langfuse](#5-langfuse)
+- [6. Helicone](#6-helicone)
+- [7. AgentOps](#7-agentops)
+- [8. TruLens](#8-trulens)
+- [9. Braintrust](#9-braintrust)
+- [10. Portkey](#10-portkey)
+- [11. Comet Opik](#11-comet-opik)
 - [Head-to-head comparison of top tools](#head-to-head-comparison-of-top-tools)
 - [How to choose the right LLM observability tool for your team](#how-to-choose-the-right-llm-observability-tool-for-your-team)
 - [My honest take on where LLM observability is heading](#my-honest-take-on-where-llm-observability-is-heading)
@@ -86,56 +87,63 @@ Key capabilities that matter in production:
 
 The open-source community and enterprise backing together create an ecosystem that no single-purpose tool can match. For teams managing complex GenAI workflows at scale, MLflow is the most complete solution available.
 
-## 2. LangSmith
+## 2. Confident AI
+
+[Confident AI](https://www.confident-ai.com) is an evaluation-first observability platform built for production AI applications. It scores live traces with built-in single-turn and multi-turn quality metrics, automatically surfaces issues, and tracks performance across prompt versions and use cases to detect regressions, drift, and anomalies.
+
+Production traces can become evaluation datasets and structured annotation queues, while custom workflows route detected issues to the right reviewers. This gives engineering, product, QA, and domain experts a direct path from identifying a failure to annotating it and testing a fix. The platform supports Python, TypeScript, and language-agnostic OpenTelemetry ingestion; it is proprietary, and self-hosting requires an Enterprise plan.
+
+## 3. LangSmith
 
 LangSmith is the natural choice for teams already deep in the LangChain ecosystem. It provides tight integration with LangChain primitives and offers a polished UI for trace inspection, dataset management, and evaluation runs. The platform excels at prompt playground workflows where you want to iterate quickly and compare outputs across model versions. Its main limitation is that it is most useful within the LangChain world. Teams running heterogeneous agent stacks with custom orchestration will find the integration surface narrower than MLflow's.
 
-## 3. Arize Phoenix
+## 4. Arize Phoenix
 
 Arize Phoenix targets teams doing serious retrieval-augmented generation work. Its RAG debugging features are among the best available, with built-in support for embedding drift detection, retrieval relevance scoring, and document-level attribution. If your primary challenge is understanding why your retrieval pipeline is returning poor context rather than why your agent is misbehaving, Phoenix deserves a close look. It also offers a local open-source mode, which makes it accessible for teams that cannot send traces to a third-party cloud.
 
-## 4. Langfuse
+## 5. Langfuse
 
 Langfuse has positioned itself as the self-hosted analytics platform for teams with strict data residency requirements. Version 4 introduced OpenTelemetry-based tracing for local LLMs without requiring mocks or monkey-patching, which is a meaningful improvement for teams running Ollama or other local inference setups. The platform covers session tracking, cost analytics, and user-level feedback collection. Its open-source license and Docker-based deployment make it a strong fit for European enterprises navigating GDPR constraints.
 
-## 5. Helicone
+## 6. Helicone
 
 Helicone takes a deliberately lightweight approach. It operates as a proxy layer in front of your LLM API calls, which means instrumentation is a single endpoint change rather than an SDK integration. This makes it exceptionally fast to deploy. You get request logging, cost tracking, rate limiting, and caching out of the box. For teams that need basic 2026 LLM performance tracking without the overhead of a full observability platform, Helicone covers the fundamentals well. It is not designed for deep agent reasoning analysis, but for straightforward API monitoring it is hard to beat for speed of setup.
 
-## 6. AgentOps
+## 7. AgentOps
 
 AgentOps focuses specifically on autonomous AI agent monitoring, which makes it one of the more specialized tools on this list. It tracks agent session lifecycles, records every tool call and decision point, and provides replay capabilities for multi-agent workflows. The platform also includes cost attribution at the agent level, so you can identify which agents in a multi-agent system are consuming disproportionate resources. Teams building with CrewAI or AutoGen will find native integrations that reduce instrumentation time significantly.
 
-## 7. TruLens
+## 8. TruLens
 
 TruLens is evaluation-first by design. Rather than prioritizing real-time monitoring, it focuses on structured feedback collection and quality scoring across LLM pipelines. Its TruLens Eval framework supports groundedness, context relevance, and answer relevance metrics out of the box. For teams that need to run systematic quality audits on RAG pipelines before and after model updates, TruLens provides a rigorous framework. It pairs well with MLflow when you want evaluation results stored alongside your experiment tracking data.
 
-## 8. Braintrust
+## 9. Braintrust
 
 Braintrust occupies a similar evaluation-focused niche but adds a collaborative dataset management layer. Teams can curate golden datasets, run evals against them on a schedule, and track score regressions over time in a shared workspace. The platform is particularly strong for teams where product managers and domain experts need to participate in quality review alongside engineers. Its scoring interface is accessible enough for non-technical stakeholders while still exposing the raw trace data that engineers need.
 
-## 9. Portkey
+## 10. Portkey
 
 Portkey functions as an AI gateway with observability layered on top. It supports multi-provider routing, fallback logic, and load balancing across OpenAI, Anthropic, Cohere, and others, all with unified logging. For teams managing [AI networking challenges in decentralized systems](https://pilotprotocol.network/blog/ai-networking-challenges-decentralized-systems), Portkey's provider-agnostic architecture reduces the complexity of monitoring calls across multiple LLM backends. It is particularly useful in cost optimization scenarios where you want to route requests to cheaper models for lower-stakes tasks automatically.
 
-## 10. Comet Opik
+## 11. Comet Opik
 
 Comet's LLM observability offering, Opik, extends the company's existing experiment tracking heritage into the GenAI space. It supports trace logging, prompt management, and evaluation scoring with a familiar interface for teams already using Comet for traditional ML experiments. The integration story is strongest for teams that want a single platform spanning classical ML model tracking and LLM observability without maintaining two separate systems.
 
 ## Head-to-head comparison of top tools
 
-| Tool          | Open Source | Best For                    | Prompt Versioning | Agent Tracing     | Pricing Model     |
-| ------------- | ----------- | --------------------------- | ----------------- | ----------------- | ----------------- |
-| MLflow        | Yes         | End-to-end GenAI lifecycle  | Yes               | Deep, with replay | Free / Enterprise |
-| LangSmith     | No          | LangChain-native teams      | Yes               | Good              | Usage-based SaaS  |
-| Arize Phoenix | Yes (local) | RAG debugging               | Limited           | Moderate          | Free / Cloud SaaS |
-| Langfuse      | Yes         | Self-hosted analytics       | Yes               | Moderate          | Free / Cloud SaaS |
-| Helicone      | No          | Lightweight API monitoring  | No                | Minimal           | Usage-based SaaS  |
-| AgentOps      | No          | Autonomous agent sessions   | Limited           | Strong            | Usage-based SaaS  |
-| TruLens       | Yes         | Evaluation auditing         | No                | Moderate          | Free              |
-| Braintrust    | No          | Collaborative eval datasets | Limited           | Moderate          | Usage-based SaaS  |
-| Portkey       | No          | Multi-provider gateway      | No                | Minimal           | Usage-based SaaS  |
-| Comet Opik    | Partial     | ML + LLM unified tracking   | Yes               | Moderate          | Free / Enterprise |
+| Tool          | Open Source | Best For                     | Prompt Versioning | Agent Tracing     | Pricing Model     |
+| ------------- | ----------- | ---------------------------- | ----------------- | ----------------- | ----------------- |
+| MLflow        | Yes         | End-to-end GenAI lifecycle   | Yes               | Deep, with replay | Free / Enterprise |
+| Confident AI  | No          | Evaluation-driven monitoring | Yes               | Deep              | Free / SaaS       |
+| LangSmith     | No          | LangChain-native teams       | Yes               | Good              | Usage-based SaaS  |
+| Arize Phoenix | Yes (local) | RAG debugging                | Limited           | Moderate          | Free / Cloud SaaS |
+| Langfuse      | Yes         | Self-hosted analytics        | Yes               | Moderate          | Free / Cloud SaaS |
+| Helicone      | No          | Lightweight API monitoring   | No                | Minimal           | Usage-based SaaS  |
+| AgentOps      | No          | Autonomous agent sessions    | Limited           | Strong            | Usage-based SaaS  |
+| TruLens       | Yes         | Evaluation auditing          | No                | Moderate          | Free              |
+| Braintrust    | No          | Collaborative eval datasets  | Limited           | Moderate          | Usage-based SaaS  |
+| Portkey       | No          | Multi-provider gateway       | No                | Minimal           | Usage-based SaaS  |
+| Comet Opik    | Partial     | ML + LLM unified tracking    | Yes               | Moderate          | Free / Enterprise |
 
 The table makes one pattern clear: MLflow is the only tool that combines open-source licensing, deep agent tracing with replay, prompt versioning, and automated evaluation in a single platform. Every other tool either specializes in one dimension or requires a commercial SaaS dependency.
 
@@ -178,7 +186,7 @@ MLflow's LLM and agent observability features cover distributed tracing, prompt 
 
 ### What are the top LLM observability tools in 2026?
 
-MLflow leads the field for end-to-end GenAI lifecycle management, followed by LangSmith for LangChain teams, Arize Phoenix for RAG debugging, Langfuse for self-hosted analytics, and AgentOps for autonomous agent monitoring.
+MLflow leads the field for end-to-end GenAI lifecycle management, followed by Confident AI for evaluation-driven production monitoring, LangSmith for LangChain teams, Arize Phoenix for RAG debugging, Langfuse for self-hosted analytics, and AgentOps for autonomous agent monitoring.
 
 ### How do I monitor LLM outputs in production?
 
