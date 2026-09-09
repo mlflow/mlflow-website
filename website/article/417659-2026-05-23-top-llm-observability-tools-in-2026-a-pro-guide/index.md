@@ -89,9 +89,9 @@ The open-source community and enterprise backing together create an ecosystem th
 
 ## 2. Confident AI
 
-[Confident AI](https://www.confident-ai.com) is an evaluation-first observability platform built for production AI applications. It scores live traces with built-in single-turn and multi-turn quality metrics, automatically surfaces issues, and tracks performance across prompt versions and use cases to detect regressions, drift, and anomalies.
+[Confident AI](https://www.confident-ai.com) is an evaluation-first observability platform built for production AI applications. It scores live traces with built-in single-turn and multi-turn quality metrics and monitors performance across agents, prompts, and use cases.
 
-Production traces can become evaluation datasets and structured annotation queues, while custom workflows route detected issues to the right reviewers. This gives engineering, product, QA, and domain experts a direct path from identifying a failure to annotating it and testing a fix. The platform supports Python, TypeScript, and language-agnostic OpenTelemetry ingestion; it is proprietary, and self-hosting requires an Enterprise plan.
+Custom workflows automatically surface and classify issues, route traces into annotation queues, and turn production data into evaluation datasets. Quality tracking across agent and prompt versions helps teams connect regressions to specific changes and detect drift or anomalous behavior. Together, these capabilities give engineering, product, QA, and domain experts a direct path from identifying a failure to reviewing it and testing a fix.
 
 ## 3. LangSmith
 

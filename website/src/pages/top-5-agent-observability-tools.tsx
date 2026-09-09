@@ -976,17 +976,15 @@ export default function Top6AgentObservabilityTools() {
               <Link to="https://www.confident-ai.com">Confident AI</Link>
             </strong>{" "}
             is an evaluation-first observability platform built for production
-            AI applications. It scores live traces with built-in quality
-            metrics, automatically surfaces issues, and tracks performance
-            across prompts and use cases to detect regressions, drift, and
-            anomalies.
+            AI applications. It scores live traces with built-in quality metrics
+            and monitors performance across agents, prompts, and use cases.
           </p>
           <p>
-            Production traces can become evaluation datasets and structured
-            annotation queues, while custom workflows route detected issues to
-            the right reviewers. This gives engineering, product, QA, and domain
-            experts a direct path from identifying a failure to annotating it
-            and testing a fix.
+            Custom workflows automatically surface and classify issues, route
+            traces into annotation queues, and turn production data into
+            evaluation datasets. This gives engineering, product, QA, and domain
+            experts a direct path from identifying a failure to reviewing it and
+            testing a fix.
           </p>
 
           <h4 style={{ color: "black" }}>
@@ -999,25 +997,29 @@ export default function Top6AgentObservabilityTools() {
             prompt versions and use cases.
           </p>
 
-          <h4 style={{ color: "black" }}>Custom Annotation Workflows</h4>
+          <h4 style={{ color: "black" }}>Custom Quality Workflows</h4>
           <p>
-            Configurable queues route production traces to product managers, QA
-            teams, and domain experts for structured review. Their annotations
-            feed evaluation datasets and help align automated metrics with human
+            Configurable workflows classify and automatically surface quality
+            issues, then route the relevant traces to product managers, QA
+            teams, and domain experts for annotation. Their feedback flows into
+            evaluation datasets and helps align automated metrics with human
             judgment.
           </p>
 
-          <h4 style={{ color: "black" }}>Proprietary Managed Platform</h4>
+          <h4 style={{ color: "black" }}>
+            Agent Versioning, Drift, and Anomaly Detection
+          </h4>
           <p>
-            Confident AI is a proprietary managed service. It supports Python,
-            TypeScript, and language-agnostic OpenTelemetry ingestion, but
-            self-hosting is reserved for Enterprise customers.
+            Quality is tracked across agent and prompt versions as well as
+            individual use cases. This makes it easier to identify which change
+            introduced a regression and detect drift or anomalous behavior in
+            production.
           </p>
 
           <ProsConsTable
             pros={[
-              "Automatically evaluates production traces and surfaces quality regressions",
-              "Custom annotation workflows connect domain experts with engineering",
+              "Custom workflows classify and surface issues, then route traces for annotation",
+              "Tracks agent versions to detect regressions, drift, and anomalies",
               "Production traces flow into datasets for continuous regression testing",
             ]}
             cons={[
@@ -1029,8 +1031,8 @@ export default function Top6AgentObservabilityTools() {
 
           <div className="best-for">
             <strong>Best for:</strong> Production teams that need
-            evaluation-driven monitoring, custom annotation workflows, and
-            automatic detection of quality regressions and anomalies.
+            evaluation-driven monitoring, custom quality workflows, and
+            version-level detection of regressions, drift, and anomalies.
           </div>
 
           <div className="product-faq">
@@ -1039,8 +1041,8 @@ export default function Top6AgentObservabilityTools() {
                 How does Confident AI surface production issues?
               </summary>
               <p>
-                It evaluates live traces with quality metrics and can alert
-                teams when scores degrade across prompts or use cases.
+                Custom workflows evaluate live traces, classify and surface
+                issues, and route the affected traces to annotation queues.
               </p>
             </details>
             <details>
@@ -1052,8 +1054,12 @@ export default function Top6AgentObservabilityTools() {
               </p>
             </details>
             <details>
-              <summary>Can Confident AI be self-hosted?</summary>
-              <p>Self-hosting is available on the Enterprise plan.</p>
+              <summary>How does Confident AI track regressions?</summary>
+              <p>
+                It tracks quality across agent and prompt versions, making it
+                easier to connect regressions, drift, and anomalies to a
+                specific change or use case.
+              </p>
             </details>
           </div>
 
