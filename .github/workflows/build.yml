@@ -23,21 +23,11 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Resolve MLflow release branch
-        id: mlflow-release
-        run: |
-          branch=$(curl -fLsS --retry 3 --connect-timeout 15 --max-time 120 \
-            https://raw.githubusercontent.com/mlflow/mlflow-legacy-website/master/docs/versions.json | jq -er '
-            .versions | map(select(test("^[0-9]+[.][0-9]+[.][0-9]+$"))) | first |
-            split(".") | "branch-\(.[0]).\(.[1])"
-          ')
-          echo "branch=$branch" >> "$GITHUB_OUTPUT"
-
       - name: Checkout MLflow setup wizard
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: mlflow/mlflow
-          ref: ${{ steps.mlflow-release.outputs.branch }}
+          ref: master
           sparse-checkout: mlflow/agent/setup/setup.sh
           sparse-checkout-cone-mode: false
           path: mlflow-source
