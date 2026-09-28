@@ -32,10 +32,17 @@ async function apiFetch(endpoint, apiKey) {
     });
     if (res.status === 429) {
       if (attempt >= maxRetries) {
-        throw new Error(`Rate limited on ${endpoint} after ${maxRetries} retries`);
+        throw new Error(
+          `Rate limited on ${endpoint} after ${maxRetries} retries`,
+        );
       }
-      const retryAfter = Math.max(0, Number(res.headers.get("Retry-After")) || 3);
-      console.warn(`Rate limited on ${endpoint}, retrying in ${retryAfter}s (attempt ${attempt + 1}/${maxRetries})...`);
+      const retryAfter = Math.max(
+        0,
+        Number(res.headers.get("Retry-After")) || 3,
+      );
+      console.warn(
+        `Rate limited on ${endpoint}, retrying in ${retryAfter}s (attempt ${attempt + 1}/${maxRetries})...`,
+      );
       await new Promise((resolve) => setTimeout(resolve, retryAfter * 1000));
       continue;
     }
@@ -90,6 +97,48 @@ function githubSlug(text) {
     .replace(/\s+/g, "-");
 }
 
+function getHeadingSlugs(md) {
+  const slugs = new Set();
+  const counts = new Map();
+  let inCodeBlock = false;
+
+  for (const line of md.split("\n")) {
+    if (/^\s*```/.test(line)) {
+      inCodeBlock = !inCodeBlock;
+      continue;
+    }
+    if (inCodeBlock) continue;
+
+    const match = line.match(/^(#{2,6})\s+(.+?)\s*#*\s*$/);
+    if (!match) continue;
+
+    const baseSlug = githubSlug(match[2]);
+    const count = counts.get(baseSlug) || 0;
+    counts.set(baseSlug, count + 1);
+    slugs.add(count === 0 ? baseSlug : `${baseSlug}-${count}`);
+  }
+
+  return slugs;
+}
+
+function removeBrokenSamePageAnchorLinks(md) {
+  const headingSlugs = getHeadingSlugs(md);
+  const normalizeAnchor = (anchor) => githubSlug(decodeURIComponent(anchor));
+
+  md = md.replace(
+    /^(\s*[-*]\s*)\[([^\]]+)\]\(#([^)]+)\)\s*$/gm,
+    (match, bullet, text, anchor) => {
+      const slug = normalizeAnchor(anchor);
+      return headingSlugs.has(slug) ? `${bullet}[${text}](#${slug})` : "";
+    },
+  );
+
+  return md.replace(/\[([^\]]+)\]\(#([^)]+)\)/g, (match, text, anchor) => {
+    const slug = normalizeAnchor(anchor);
+    return headingSlugs.has(slug) ? `[${text}](#${slug})` : text;
+  });
+}
+
 function sanitizeMarkdown(md) {
   // Strip <scratchpad> blocks (internal authoring notes from the API).
   // Handles both explicit </scratchpad> closing and unclosed blocks that end
@@ -99,7 +148,7 @@ function sanitizeMarkdown(md) {
     "",
   );
 
-  // Remove <markdown section> / </markdown section> wrapper tags
+  // Remove <markdown section> / </markdown section> wrapper tags.
   md = md.replace(/<\/?markdown[^>]*>/gi, "");
 
   // Fix internal anchor links to match Docusaurus heading IDs (github-slugger).
@@ -112,6 +161,11 @@ function sanitizeMarkdown(md) {
 
   // Remove the leading H1 that duplicates the frontmatter title
   md = md.replace(/^# .+\n+/, "");
+
+  // Drop same-page links that point to headings that are not present in the
+  // generated article. Stale entries in API-provided tables of contents break
+  // Docusaurus article and tag pages because excerpts preserve those links.
+  md = removeBrokenSamePageAnchorLinks(md);
 
   return md;
 }
@@ -142,7 +196,9 @@ async function main() {
   fs.mkdirSync(ARTICLE_DIR, { recursive: true });
 
   for (const summary of newArticles) {
-    console.log(`Fetching full content for: ${summary.title} (id=${summary.id})`);
+    console.log(
+      `Fetching full content for: ${summary.title} (id=${summary.id})`,
+    );
     const article = await apiFetch(`/v1/articles/${summary.id}`, apiKey);
 
     const datePrefix = datePrefixFromArticle(article);
