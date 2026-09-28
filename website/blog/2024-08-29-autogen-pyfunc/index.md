@@ -22,12 +22,12 @@ AutoGen is an open-source programming framework designed for building agent-base
 
 ## Setup
 
-First, let's install the required dependencies. Note that pyautogen requires `python>=3.9`.
+First, let's install the required dependencies. Note that ag2 requires `python>=3.9`.
 
 ### Environment Setup
 
 ```shell
-%pip install pyautogen mlflow -U -q
+%pip install ag2 mlflow -U -q
 ```
 
 We must also get API credentials to use an LLM. For this tutorial, we'll be using OpenAI. Note that a great way to securely pass tokens to your interactive python environment is via the [getpass](https://docs.python.org/3/library/getpass.html) package.
