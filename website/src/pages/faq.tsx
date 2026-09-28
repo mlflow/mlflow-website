@@ -1133,6 +1133,13 @@ export default function FAQ() {
                 AI agents and LLM applications in production.
               </p>
             </Link>
+            <Link href="/agent-optimization" className="learn-more-card">
+              <h3>Agent Optimization</h3>
+              <p>
+                Debug, evaluate, and optimize AI agents for quality, cost, and
+                latency with tracing, evaluation, and prompt optimization.
+              </p>
+            </Link>
             <Link href="/genai" className="learn-more-card">
               <h3>MLflow for LLMs & Agents</h3>
               <p>
