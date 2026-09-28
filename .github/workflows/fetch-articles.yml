@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
   pull-requests: write
 
 jobs:
@@ -65,3 +66,17 @@ jobs:
             --head "$BRANCH")
           echo "Created PR: $PR_URL"
           gh pr merge "$PR_URL" --auto --squash
+
+      - name: Alert on sync failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue create \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "BabyLoveGrowth article sync failed in Fetch Articles #${{ github.run_number }}" \
+            --body "@joshuawong-db BabyLoveGrowth article sync failed before it could create or update a PR.
+
+          Workflow: Fetch Articles
+          Run: $RUN_URL"
