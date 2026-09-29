@@ -1,6 +1,6 @@
 ---
 title: "Can Jev replace your LLM judge? Part 2: Testing harder answers"
-description: "Test Jev on 72 English and Japanese answers, inspect the mistakes, and use MLflow to evaluate a judge on your own data."
+description: "Test Jev for judging agent answers, inspect the performance and mistakes with MLflow."
 slug: jev-llm-judge-part-2
 authors: [takaaki-yayoi]
 tags: [genai, evaluation, judges, llm]
@@ -8,27 +8,22 @@ thumbnail: /img/blog/jev-llm-judge-part-2-thumbnail.png
 image: /img/blog/jev-llm-judge-part-2-thumbnail.png
 ---
 
-In [Part 1](/blog/jev-llm-judge/), we compared Jev with GPT, Claude, and DeepSeek as judges for MLflow QA answers. Jev matched all 30 human labels, with the lowest measured latency and estimated cost in that test. We wanted to see whether it would still catch errors in answers that were almost right.
+In [Part 1](/blog/jev-llm-judge/), we compared Jev with GPT, Claude, and DeepSeek as judges for MLflow QA answers. Jev matched all 30 human labels, with the lowest measured latency and estimated cost in that test. However, the test setup might have been too easy for frontier models, so we wanted to see whether it would still catch errors in answers that are harder to distinguish.
 
 ## Recap: What is Jev?
 
-[Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) is TypeSafe's model for structured decisions. We give it a question, the relevant documentation, and a candidate answer; it returns a probability that the answer is correct, without a written rationale. In Part 1, we used that probability to turn each decision into a pass or fail.
+[Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) is TypeSafe's model for structured decisions. We give it a question, the relevant documentation, and a candidate answer; it returns a probability that the answer is correct, but without a text unlike ordinal LLMs. This characteristics matches pretty well with the [LLM-as-a-judge](https://mlflow.org/llm-as-a-judge) use case, therefore, we measured its performance and efficiency with a small dataset in the previous blog, where Jev demonstrated compatible accuracy as frontier models with much less cost and latency.
 
-## A harder test set
+## Challenging Jev with a harder test set
 
-We built a dataset of **72 English and Japanese answers**, including ones that use the right API but explain it incorrectly, and compared Jev with GPT-OSS-120B from a Databricks notebook.
+While the experiment shows that Jev is a solid candidate for LLM judge tasks, it is still too early to conclude that is simply better than frontier models. To collect more data points, we built a dataset of **72 hard answers** with more borderline answers, for example, an answer that uses the right API but explain it incorrectly. These hard samples are often the ones that are important to evaluate and catch before production.
 
-We asked whether each answer was factually and technically correct given a documentation excerpt. A probability of at least 0.5 counted as “correct.”
 
-We used `typesafe/jev-1.13` through OpenRouter and `databricks-gpt-oss-120b` through the Databricks Foundation Model API, running from Databricks Free Edition. Both judges received the same correctness criterion.
+In this experiment, we compared `typesafe/jev-1.13` against `gpt-oss-120b`. Both judges received the same correctness criterion, we asked whether each answer was factually and technically correct given a documentation excerpt. For Jev, a probability of at least 0.5 counted as “correct.” The incorrect answers included wrong API names, reversed source and target roles, missing permissions, and correct statements followed by a false qualification. For three questions, we also paraphrased the correct answers to check whether different wording would cause a rejection.
 
-An initial set of 32 straightforward examples barely separated them: Jev scored 31/32 and GPT-OSS scored 32/32. The next set used **12 questions, three candidate answers per question, and two languages**. That gave 24 correct answers and 48 deliberately incorrect ones, each labeled against the supplied documentation.
+## Result
 
-The incorrect answers included wrong API names, reversed source and target roles, missing permissions, and correct statements followed by a false qualification. For three questions, we also paraphrased the correct answers to check whether different wording would cause a rejection.
-
-## The mistakes Jev missed
-
-We ran the full dataset twice. Jev agreed with human labels on 64/72 answers in each run; GPT-OSS-120B agreed on all 72.
+We ran the full dataset twice. Jev agreed with human labels on 64/72 answers in each run. GPT-OSS-120B agreed on all 72.
 
 <a
   href={require("./judge-performance.png").default}
@@ -45,31 +40,25 @@ We ran the full dataset twice. Jev agreed with human labels on 64/72 answers in 
   />
 </a>
 
-_Agreement was the same in both runs. Latency combines 144 judgments per model across the two runs._
-
-Jev scored 32/36 in each language in both runs. It accepted every correct answer, including the paraphrases, and caught errors such as a wrong retention period or a reversed yes/no conclusion.
-
-The harder cases were **mostly correct answers with one material error**. Here are three examples from the dataset, translated into English:
+Jev scored 32/36 in each language in both runs. It accepted every correct answer, including the paraphrases, and caught errors such as a wrong retention period or a reversed yes/no conclusion. However, it misclassified **almost correct answers with one material error**. Here are three examples from the dataset where Jev incorrectly classified as "correct".
 
 **A correct clause with its meaning reversed**
 
 > Use `WHEN NOT MATCHED THEN INSERT`. It applies to target rows that have no matching source row.
 
-The clause is right, but the explanation reverses the roles: it inserts source rows that have no match in the target. Jev accepted the English version in both runs.
+The clause is right, but the explanation reverses the roles. It inserts source rows that have no match in the target
 
 **A missing permission**
 
 > `CREATE SECRET` and `USE SCHEMA` on `main.default` are sufficient.
 
-For a user who does not own the schema, this omits the required `USE CATALOG` permission. Jev accepted both language versions in both runs.
+For a user who does not own the schema, this omits the required `USE CATALOG` permission.
 
 **A correct explanation followed by a wrong command**
 
 > With deletion vectors enabled, DELETE does not immediately rewrite the files. The rows are physically removed later by running `VACUUM ... APPLY (PURGE)`.
 
-The opening is correct, but the command is wrong: the purge operation uses `REORG TABLE ... APPLY (PURGE)`. Jev accepted both language versions in both runs.
-
-The total number of errors stayed at eight, but their identities changed slightly. For example, Jev missed the Japanese MERGE error only in the first run and a Japanese answer containing `/Volume` instead of `/Volumes` only in the second. Repeated calls on the same inputs also produced verdict changes near the 0.5 threshold.
+The opening is correct, but the command is wrong. The purge operation uses `REORG TABLE ... APPLY (PURGE)`.
 
 ## Speed and cost
 
@@ -79,30 +68,26 @@ Jev's median latency was **0.20 seconds**, compared with **1.44 seconds** for GP
 
 _Two runs, with 144 measurements per judge. Black lines mark the medians. Labels translated from the original chart._
 
-Jev's estimated inference cost was **about $0.020 per 1,000 judgments**, excluding credit-purchase fees. We did not calculate GPT-OSS cost for this experiment.
+Jev's estimated inference cost was **about $0.020 per 1,000 judgments**, excluding credit-purchase fees. GPT-OSS produced an average of 224 output tokens per judgment, including reasoning.
 
-GPT-OSS produced an average of 224 output tokens per judgment, including reasoning. This differs from Part 1, which disabled extended reasoning and requested short verdicts. These timings describe this configuration; endpoint load and network conditions also affect latency.
+## Solution: Send uncertain judgments to another model
 
-## Send uncertain judgments to another model
+Based on the above result, Jev still has some gaps to classify hard samples. However, its cost/latency advantage is still appearling. How can we get that without compromising the judge quality? One solution is to use **possibility** from Jev output.
 
-Could Jev's probabilities help decide which answers need another check?
-
-In the two benchmark runs, every false acceptance had a probability of roughly 0.5–0.8, while every correct answer scored at least 0.91. We calculated what would have happened if judgments in the **0.2–0.8 range** had been sent to GPT-OSS instead.
+In the two benchmark runs, every false acceptance had a probability of roughly 0.5–0.8, while every correct answer scored at least 0.91. We calculated what would have happened if judgments in the **0.2–0.8 range** had been sent to GPT-OSS as a secondary judge. Less than 20% of judgements need this fallback, but it corrects all observed errors. This allows us to scale LLM judges into thousands of samples while taking advantage of more expensive models when needed.
 
 | Run | Judgments sent to GPT-OSS | Agreement after routing |
 | --- | ------------------------: | ----------------------: |
 | 1   |                     12/72 |            72/72 (100%) |
 | 2   |                     13/72 |            72/72 (100%) |
 
-Fewer than one in five judgments would have been sent to GPT-OSS, correcting all observed errors. A similar approach is discussed in [JEV-as-a-Judge: Accept When Confident, Escalate When Unsure](https://arxiv.org/abs/2609.26550).
-
-**This was a retrospective calculation.** We chose the range after inspecting this dataset, and a missed error returned 0.82 in an additional repeated call. The range needs testing on fresh labeled examples before using it in production; the combined system's latency and cost were not measured here.
+A similar approach is discussed in [JEV-as-a-Judge: Accept When Confident, Escalate When Unsure](https://arxiv.org/abs/2609.26550).
 
 ## Run Jev with `make_judge`
 
 :::info Sneak peek: unreleased MLflow 3.17
 
-MLflow 3.17 has not been released yet. The upcoming release will let [`make_judge`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/make-judge/) call Jev through the `typesafe:/` model URI. The example below is a preview; it will not run with the current stable MLflow release.
+The native `make_judge` integration below is coming soon in MLflow 3.17. The version support using Jev for built-in judges and custom judge through the `typesafe:/` model URI.
 
 :::
 
@@ -138,8 +123,6 @@ result = mlflow.genai.evaluate(data=eval_data, scorers=[jev_correctness])
 ```
 
 MLflow records Jev's true/false verdict as `jev_correctness` and its probability in the feedback metadata under `typesafe.probability`. Keep human labels separate from the inputs sent to the judge, then compare the verdicts with those labels to measure agreement.
-
-The benchmark above used `typesafe/jev-1.13` through OpenRouter. This example calls TypeSafe's native `jev-latest` model, so rerun quality, latency, and cost measurements before comparing its results with the benchmark.
 
 ## Try it on your answers
 
