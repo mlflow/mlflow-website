@@ -1,6 +1,6 @@
 ---
 title: "Can Jev replace your LLM judge? Part 2: Testing harder answers"
-description: "Test Jev for judging agent answers, inspect the performance and mistakes with MLflow."
+description: "Test Jev on difficult answers, inspect its mistakes, and run it as an MLflow judge."
 slug: jev-llm-judge-part-2
 authors: [takaaki-yayoi]
 tags: [genai, evaluation, judges, llm]
@@ -8,18 +8,17 @@ thumbnail: /img/blog/jev-llm-judge-part-2-thumbnail.png
 image: /img/blog/jev-llm-judge-part-2-thumbnail.png
 ---
 
-In [Part 1](/blog/jev-llm-judge/), we compared Jev with GPT, Claude, and DeepSeek as judges for MLflow QA answers. Jev matched all 30 human labels, with the lowest measured latency and estimated cost in that test. However, the test setup might have been too easy for frontier models, so we wanted to see whether it would still catch errors in answers that are harder to distinguish.
+In [Part 1](/blog/jev-llm-judge/), we compared Jev with GPT, Claude, and DeepSeek as judges for MLflow QA answers. Jev matched all 30 human labels, with the lowest measured latency and estimated cost in that test. We wanted to see whether it would still catch errors in answers that were almost right.
 
 ## Recap: What is Jev?
 
-[Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) is TypeSafe's model for structured decisions. We give it a question, the relevant documentation, and a candidate answer; it returns a probability that the answer is correct, but without a text unlike ordinal LLMs. This characteristics matches pretty well with the [LLM-as-a-judge](https://mlflow.org/llm-as-a-judge) use case, therefore, we measured its performance and efficiency with a small dataset in the previous blog, where Jev demonstrated compatible accuracy as frontier models with much less cost and latency.
+[Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) is TypeSafe's model for structured decisions. Given a question, relevant documentation, and a candidate answer, it returns the probability that the answer is correct, without a written explanation. In Part 1, we used that probability to turn each decision into a pass or fail.
 
 ## Challenging Jev with a harder test set
 
-While the experiment shows that Jev is a solid candidate for LLM judge tasks, it is still too early to conclude that is simply better than frontier models. To collect more data points, we built a dataset of **72 hard answers** with more borderline answers, for example, an answer that uses the right API but explain it incorrectly. These hard samples are often the ones that are important to evaluate and catch before production.
+We built a dataset of **72 harder answers in English and Japanese**, including responses that name the right API but explain it incorrectly.
 
-
-In this experiment, we compared `typesafe/jev-1.13` against `gpt-oss-120b`. Both judges received the same correctness criterion, we asked whether each answer was factually and technically correct given a documentation excerpt. For Jev, a probability of at least 0.5 counted as “correct.” The incorrect answers included wrong API names, reversed source and target roles, missing permissions, and correct statements followed by a false qualification. For three questions, we also paraphrased the correct answers to check whether different wording would cause a rejection.
+We compared `typesafe/jev-1.13` with `gpt-oss-120b` using the same criterion: was each answer factually and technically correct given a documentation excerpt? For Jev, a probability of at least 0.5 counted as “correct.” The incorrect answers included wrong API names, reversed source and target roles, missing permissions, and correct statements followed by a false qualification. For three questions, we also paraphrased the correct answers to see whether different wording would cause a rejection.
 
 ## Result
 
@@ -40,13 +39,13 @@ We ran the full dataset twice. Jev agreed with human labels on 64/72 answers in 
   />
 </a>
 
-Jev scored 32/36 in each language in both runs. It accepted every correct answer, including the paraphrases, and caught errors such as a wrong retention period or a reversed yes/no conclusion. However, it misclassified **almost correct answers with one material error**. Here are three examples from the dataset where Jev incorrectly classified as "correct".
+Jev scored 32/36 in each language in both runs. It accepted every correct answer, including the paraphrases, and caught errors such as a wrong retention period or a reversed yes/no conclusion. Its mistakes were **almost correct answers with one material error**. Here are three incorrect answers Jev accepted:
 
 **A correct clause with its meaning reversed**
 
 > Use `WHEN NOT MATCHED THEN INSERT`. It applies to target rows that have no matching source row.
 
-The clause is right, but the explanation reverses the roles. It inserts source rows that have no match in the target
+The clause is right, but the explanation reverses the roles. It inserts source rows that have no match in the target.
 
 **A missing permission**
 
@@ -70,11 +69,11 @@ _Two runs, with 144 measurements per judge. Black lines mark the medians. Labels
 
 Jev's estimated inference cost was **about $0.020 per 1,000 judgments**, excluding credit-purchase fees. GPT-OSS produced an average of 224 output tokens per judgment, including reasoning.
 
-## Solution: Send uncertain judgments to another model
+## Send uncertain judgments to another model
 
-Based on the above result, Jev still has some gaps to classify hard samples. However, its cost/latency advantage is still appearling. How can we get that without compromising the judge quality? One solution is to use **possibility** from Jev output.
+Jev missed some harder answers, but its speed and cost are still appealing. Could its probabilities tell us which judgments need a second check?
 
-In the two benchmark runs, every false acceptance had a probability of roughly 0.5–0.8, while every correct answer scored at least 0.91. We calculated what would have happened if judgments in the **0.2–0.8 range** had been sent to GPT-OSS as a secondary judge. Less than 20% of judgements need this fallback, but it corrects all observed errors. This allows us to scale LLM judges into thousands of samples while taking advantage of more expensive models when needed.
+In the two benchmark runs, every false acceptance had a probability of roughly 0.5–0.8, while every correct answer scored at least 0.91. We calculated what would have happened if judgments in the **0.2–0.8 range** had been sent to GPT-OSS for a second opinion. Fewer than 20% of judgments would have needed that second check, and the combined verdicts would have matched all human labels in this dataset.
 
 | Run | Judgments sent to GPT-OSS | Agreement after routing |
 | --- | ------------------------: | ----------------------: |
@@ -85,9 +84,9 @@ A similar approach is discussed in [JEV-as-a-Judge: Accept When Confident, Escal
 
 ## Run Jev with `make_judge`
 
-:::info Sneak peek: unreleased MLflow 3.17
+:::info Sneak peek: MLflow 3.17
 
-The native `make_judge` integration below is coming soon in MLflow 3.17. The version support using Jev for built-in judges and custom judge through the `typesafe:/` model URI.
+MLflow 3.17 has not been released yet. It will support Jev in built-in scorers and custom judges through the `typesafe:/` model URI. The example below previews that integration and will not run on the current stable release.
 
 :::
 
