@@ -98,92 +98,25 @@ Fewer than one in five judgments would have been sent to GPT-OSS, correcting all
 
 **This was a retrospective calculation.** We chose the range after inspecting this dataset, and a missed error returned 0.82 in an additional repeated call. The range needs testing on fresh labeled examples before using it in production; the combined system's latency and cost were not measured here.
 
-## Run Jev as an MLflow scorer
+## Run Jev with `make_judge`
 
-Here is a minimal integration example for a Databricks notebook with `mlflow` and `requests` installed. It uses one labeled row to show how to record both Jev's verdict and its agreement with a human label; it does not reproduce the full benchmark.
-
-Create an OpenRouter API key, add credits, and store the key in a [Unity Catalog secret](https://docs.databricks.com/aws/en/security/secrets/unity-catalog-secrets). On serverless compute, reading it requires environment version 4 or later. Replace the catalog, schema, and secret name below with your own:
-
-```python
-key = dbutils.secrets.get(
-    catalog="workspace", schema="jev_judge", key="openrouter_api_key"
-).strip()
-```
-
-Jev uses OpenRouter's [Decisions API](https://openrouter.ai/docs/guides/community/jev-tutorial). Send the question, documentation, and candidate answer as `state`, then define a Noul (yes/no) question:
-
-```python
-from time import perf_counter
-
-import requests
-
-CRITERION = (
-    "Is the candidate answer factually and technically correct for the question, "
-    "using the supplied documentation excerpt and respecting any version specified "
-    "in the question?"
-)
-
-
-def jev_judge(question, context, answer):
-    payload = {
-        "model": "typesafe/jev-1.13",
-        "state": {"question": question, "context": context, "answer": answer},
-        "questions": {
-            "correct": {
-                "type": "noul",
-                "instructions": CRITERION,
-                "criteria": {
-                    "true": "The answer is correct and consistent with the documentation excerpt.",
-                    "false": "The answer is wrong, contradicts the excerpt, or ignores a version constraint in the question.",
-                },
-            }
-        },
-    }
-    started = perf_counter()
-    response = requests.post(
-        "https://openrouter.ai/api/alpha/decisions",
-        headers={"Authorization": f"Bearer {key}"},
-        json=payload,
-        timeout=60,
-    )
-    response.raise_for_status()
-    body = response.json()
-    probability = body["answers"]["correct"]["noul"]
-    return {
-        "pred": "correct" if probability >= 0.5 else "incorrect",
-        "p_correct": probability,
-        "latency_ms": (perf_counter() - started) * 1000,
-        "cost_usd": body["usage"]["cost"],
-    }
-```
-
-Wrap that call in an MLflow [custom scorer](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/custom/). Jev provides no written rationale, so keep its probability alongside the verdict:
+MLflow 3.17 supports Jev directly through [`make_judge`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/make-judge/). Set `TYPESAFE_API_KEY` in your environment, then define the same correctness check as a boolean judge:
 
 ```python
 import mlflow
-from mlflow.entities import Feedback
-from mlflow.genai.scorers import scorer
+from mlflow.genai.judges import make_judge
 
-
-@scorer
-def evaluate_jev(inputs, outputs, expectations):
-    result = jev_judge(inputs["question"], inputs["context"], outputs)
-    return [
-        Feedback(
-            name="jev_correctness",
-            value=result["pred"] == "correct",
-            metadata={
-                "p_correct": str(result["p_correct"]),
-                "latency_ms": str(result["latency_ms"]),
-                "cost_usd": str(result["cost_usd"]),
-            },
-        ),
-        Feedback(
-            name="jev_agreement",
-            value=result["pred"] == expectations["human_label"],
-        ),
-    ]
-
+jev_correctness = make_judge(
+    name="jev_correctness",
+    model="typesafe:/jev-latest",
+    instructions=(
+        "Is the answer in {{ outputs }} factually and technically correct for "
+        "the question and documentation in {{ inputs }}? Respect any version "
+        "specified in the question. Mark it incorrect if any material claim "
+        "or instruction is wrong."
+    ),
+    feedback_value_type=bool,
+)
 
 eval_data = [
     {
@@ -192,20 +125,15 @@ eval_data = [
             "context": "The default retention period for VACUUM is 7 days.",
         },
         "outputs": "The default retention period is 30 days.",
-        "expectations": {"human_label": "incorrect"},
     }
 ]
 
-result = mlflow.genai.evaluate(data=eval_data, scorers=[evaluate_jev])
+result = mlflow.genai.evaluate(data=eval_data, scorers=[jev_correctness])
 ```
 
-`jev_correctness` records whether Jev accepted the answer. `jev_agreement` records whether that decision matches the human label. The label is used only for comparison and is never sent to Jev. Add more labeled rows to inspect disagreements and probabilities in the MLflow evaluation results.
+MLflow records Jev's true/false verdict as `jev_correctness` and its probability in the feedback metadata under `typesafe.probability`. Keep human labels separate from the inputs sent to the judge, then compare the verdicts with those labels to measure agreement.
 
-:::info Preview: MLflow 3.17
-
-You will also be able to create a Jev judge with [`make_judge`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/make-judge/) by setting `model="typesafe:/jev-latest"`. It returns the verdict and probability through MLflow's judge API. The custom scorer above also records per-call latency and cost for this comparison.
-
-:::
+The benchmark above used `typesafe/jev-1.13` through OpenRouter. This example calls TypeSafe's native `jev-latest` model, so rerun quality, latency, and cost measurements before comparing its results with the benchmark.
 
 ## Try it on your answers
 
