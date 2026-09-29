@@ -1,6 +1,6 @@
 ---
 title: "Can Jev replace your LLM judge? Part 2: Testing harder answers"
-description: "Test Jev and GPT-OSS-120B on 72 English and Japanese answers, inspect the mistakes, and use MLflow to evaluate a judge on your own data."
+description: "Test Jev on 72 English and Japanese answers, inspect the mistakes, and use MLflow to evaluate a judge on your own data."
 slug: jev-llm-judge-part-2
 authors: [takaaki-yayoi]
 tags: [genai, evaluation, judges, llm]
@@ -8,23 +8,25 @@ thumbnail: /img/blog/jev-llm-judge-part-2-thumbnail.png
 image: /img/blog/jev-llm-judge-part-2-thumbnail.png
 ---
 
-In [Part 1](/blog/jev-llm-judge/), Jev matched human labels on all 30 MLflow QA examples, with lower latency and estimated cost than the other judges tested. I wanted to see where it would make mistakes. What happens when an answer uses the right API but explains it incorrectly, or gives the right instructions with one required permission missing?
+## Recap: What is Jev?
 
-I built a harder dataset of **72 English and Japanese answers** and compared Jev with GPT-OSS-120B from a Databricks notebook. Jev agreed with human labels on **64/72 examples (88.9%)** in both runs, at a median latency of **0.20 seconds**. Every mistake was an incorrect answer that Jev accepted.
+Jev is TypeSafe's model for structured decisions. Given information to assess and a yes/no question, it returns a probability, but no written rationale. In [Part 1](/blog/jev-llm-judge/), we compared it with GPT, Claude, and DeepSeek on 30 human-labeled MLflow QA answers. Jev matched all 30 labels, with lower latency and estimated cost than the other judges tested.
+
+Here we test harder answers: ones that use the right API but explain it incorrectly, or give the right instructions while omitting a required permission. We built a dataset of **72 English and Japanese answers** and compared Jev with GPT-OSS-120B from a Databricks notebook. Jev agreed with human labels on **64/72 examples (88.9%)** in both runs, at a median latency of **0.20 seconds**. Every mistake was an incorrect answer that Jev accepted.
 
 ## A harder test set
 
-Jev returns structured decisions and probabilities, without a written rationale. For this experiment, I asked whether each answer was factually and technically correct given a documentation excerpt. A probability of at least 0.5 counted as “correct.”
+We asked whether each answer was factually and technically correct given a documentation excerpt. A probability of at least 0.5 counted as “correct.”
 
-I used `typesafe/jev-1.13` through OpenRouter and `databricks-gpt-oss-120b` through the Databricks Foundation Model API, running from Databricks Free Edition. Both judges received the same correctness criterion.
+We used `typesafe/jev-1.13` through OpenRouter and `databricks-gpt-oss-120b` through the Databricks Foundation Model API, running from Databricks Free Edition. Both judges received the same correctness criterion.
 
 An initial set of 32 straightforward examples barely separated them: Jev scored 31/32 and GPT-OSS scored 32/32. The next set used **12 questions, three candidate answers per question, and two languages**. That gave 24 correct answers and 48 deliberately incorrect ones, each labeled against the supplied documentation.
 
-The incorrect answers included wrong API names, reversed source and target roles, missing permissions, and correct statements followed by a false qualification. For three questions, I also paraphrased the correct answers to check whether different wording would cause a rejection.
+The incorrect answers included wrong API names, reversed source and target roles, missing permissions, and correct statements followed by a false qualification. For three questions, we also paraphrased the correct answers to check whether different wording would cause a rejection.
 
 ## The mistakes Jev missed
 
-I ran the full dataset twice. Jev agreed with human labels on 64/72 answers in each run; GPT-OSS-120B agreed on all 72.
+We ran the full dataset twice. Jev agreed with human labels on 64/72 answers in each run; GPT-OSS-120B agreed on all 72.
 
 <a
   href={require("./judge-performance.png").default}
@@ -75,7 +77,7 @@ Jev's median latency was **0.20 seconds**, compared with **1.44 seconds** for GP
 
 _Two runs, with 144 measurements per judge. Black lines mark the medians. Labels translated from the original chart._
 
-Jev's estimated inference cost was **about $0.020 per 1,000 judgments**, excluding credit-purchase fees. I did not calculate GPT-OSS cost for this experiment.
+Jev's estimated inference cost was **about $0.020 per 1,000 judgments**, excluding credit-purchase fees. We did not calculate GPT-OSS cost for this experiment.
 
 GPT-OSS produced an average of 224 output tokens per judgment, including reasoning. This differs from Part 1, which disabled extended reasoning and requested short verdicts. These timings describe this configuration; endpoint load and network conditions also affect latency.
 
@@ -83,7 +85,7 @@ GPT-OSS produced an average of 224 output tokens per judgment, including reasoni
 
 Could Jev's probabilities help decide which answers need another check?
 
-In the two benchmark runs, every false acceptance had a probability of roughly 0.5–0.8, while every correct answer scored at least 0.91. I calculated what would have happened if judgments in the **0.2–0.8 range** had been sent to GPT-OSS instead.
+In the two benchmark runs, every false acceptance had a probability of roughly 0.5–0.8, while every correct answer scored at least 0.91. We calculated what would have happened if judgments in the **0.2–0.8 range** had been sent to GPT-OSS instead.
 
 | Run | Judgments sent to GPT-OSS | Agreement after routing |
 | --- | ------------------------: | ----------------------: |
@@ -92,7 +94,7 @@ In the two benchmark runs, every false acceptance had a probability of roughly 0
 
 Fewer than one in five judgments would have been sent to GPT-OSS, correcting all observed errors. A similar approach is discussed in [JEV-as-a-Judge: Accept When Confident, Escalate When Unsure](https://arxiv.org/abs/2609.26550).
 
-**This was a retrospective calculation.** I chose the range after inspecting this dataset, and a missed error returned 0.82 in an additional repeated call. The range needs testing on fresh labeled examples before using it in production; the combined system's latency and cost were not measured here.
+**This was a retrospective calculation.** We chose the range after inspecting this dataset, and a missed error returned 0.82 in an additional repeated call. The range needs testing on fresh labeled examples before using it in production; the combined system's latency and cost were not measured here.
 
 ## Run Jev as an MLflow scorer
 
@@ -197,12 +199,14 @@ result = mlflow.genai.evaluate(data=eval_data, scorers=[evaluate_jev])
 
 `jev_correctness` records whether Jev accepted the answer. `jev_agreement` records whether that decision matches the human label. The label is used only for comparison and is never sent to Jev. Add more labeled rows to inspect disagreements and probabilities in the MLflow evaluation results.
 
+:::info Preview: MLflow 3.17
+
+You will also be able to create a Jev judge with [`make_judge`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/make-judge/) by setting `model="typesafe:/jev-latest"`. It returns the verdict and probability through MLflow's judge API. The custom scorer above also records per-call latency and cost for this comparison.
+
+:::
+
 ## Try it on your answers
 
 Jev was fast and inexpensive in this test, but its mistakes matter: an answer can sound right and still give a user the wrong command or incomplete permissions. Include those cases in your judge evaluation.
 
 Start with your existing correctness criterion and a small labeled dataset. Run Jev alongside your current judge, inspect the false acceptances, and test any routing threshold on new examples. The [MLflow evaluation quickstart](https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/) can help you set up the comparison.
-
----
-
-_Adapted with the author's permission from [Takaaki Yayoi's original Japanese article](https://qiita.com/taka_yayoi/items/3cc901e872209835491a)._
