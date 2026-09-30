@@ -16,7 +16,7 @@ In [Part 1](/blog/jev-llm-judge/), we compared Jev with GPT, Claude, and DeepSee
 
 ## Challenging Jev with a harder test set
 
-We built a dataset of **72 harder answers in English and Japanese**, including responses that name the right API but explain it incorrectly.
+We built 12 questions, each with one correct answer and two subtly incorrect ones, in both English and Japanese (**72 answers total**). Some answers named the right API but explained it incorrectly.
 
 We compared `typesafe/jev-1.13` with `gpt-oss-120b` using the same criterion: was each answer factually and technically correct given a documentation excerpt? For Jev, a probability of at least 0.5 counted as “correct.” The incorrect answers included wrong API names, reversed source and target roles, missing permissions, and correct statements followed by a false qualification. For three questions, we also paraphrased the correct answers to see whether different wording would cause a rejection.
 
@@ -39,25 +39,27 @@ We ran the full dataset twice. Jev agreed with human labels on 64/72 answers in 
   />
 </a>
 
-Jev scored 32/36 in each language in both runs. It accepted every correct answer, including the paraphrases, and caught errors such as a wrong retention period or a reversed yes/no conclusion. Its mistakes were **almost correct answers with one material error**. Here are three incorrect answers Jev accepted:
+Jev scored 32/36 in each language in both runs. It accepted every correct answer, including the paraphrases, and caught errors such as a wrong retention period or a reversed yes/no conclusion. Its mistakes were **almost correct answers with one material error**. Here are three incorrect answers Jev accepted, quoted from the English test set:
 
 **A correct clause with its meaning reversed**
 
-> Use `WHEN NOT MATCHED THEN INSERT`. It applies to target rows that have no matching source row.
+> Use `WHEN NOT MATCHED THEN INSERT`. It applies to target rows that have no matching row in the source.
 
 The clause is right, but the explanation reverses the roles. It inserts source rows that have no match in the target.
 
 **A missing permission**
 
-> `CREATE SECRET` and `USE SCHEMA` on `main.default` are sufficient.
+> `CREATE SECRET` and `USE SCHEMA` on `main.default` are enough.
 
 For a user who does not own the schema, this omits the required `USE CATALOG` permission.
 
 **A correct explanation followed by a wrong command**
 
-> With deletion vectors enabled, DELETE does not immediately rewrite the files. The rows are physically removed later by running `VACUUM ... APPLY (PURGE)`.
+Question: Does a `DELETE` on a table with deletion vectors immediately rewrite the Parquet files?
 
-The opening is correct, but the command is wrong. The purge operation uses `REORG TABLE ... APPLY (PURGE)`.
+> No. The rows are physically removed later when you run `VACUUM ... APPLY (PURGE)`.
+
+The “No” is correct, but the command is wrong. According to the documentation excerpt, rows are physically removed when files are rewritten, for example by `OPTIMIZE` or `REORG TABLE ... APPLY (PURGE)`.
 
 ## Speed and cost
 
@@ -79,6 +81,8 @@ In the two benchmark runs, every false acceptance had a probability of roughly 0
 | --- | ------------------------: | ----------------------: |
 | 1   |                     12/72 |            72/72 (100%) |
 | 2   |                     13/72 |            72/72 (100%) |
+
+This range was chosen after looking at the same data, so treat it as a starting point rather than a rule. In repeated calls on the same inputs, one false acceptance scored 0.82 and would have fallen outside the range.
 
 A similar approach is discussed in [JEV-as-a-Judge: Accept When Confident, Escalate When Unsure](https://arxiv.org/abs/2609.26550).
 
@@ -122,6 +126,8 @@ result = mlflow.genai.evaluate(data=eval_data, scorers=[jev_correctness])
 ```
 
 MLflow records Jev's true/false verdict as `jev_correctness` and its probability in the feedback metadata under `typesafe.probability`. Keep human labels separate from the inputs sent to the judge, then compare the verdicts with those labels to measure agreement.
+
+The benchmark used `typesafe/jev-1.13`; the `make_judge` example uses `typesafe:/jev-latest` and slightly different instructions, so its results may differ.
 
 ## Try it on your answers
 
