@@ -65,6 +65,25 @@ function getExistingArticleIds() {
   return ids;
 }
 
+// Collect slugs already published on disk. The API occasionally emits two
+// distinct articles with the same slug, which produces duplicate Docusaurus
+// routes and non-deterministic routing (one article silently shadows another).
+function getExistingSlugs() {
+  if (!fs.existsSync(ARTICLE_DIR)) return new Set();
+  const entries = fs.readdirSync(ARTICLE_DIR, { withFileTypes: true });
+  const slugs = new Set();
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const indexPath = path.join(ARTICLE_DIR, entry.name, "index.md");
+    if (!fs.existsSync(indexPath)) continue;
+    const match = fs
+      .readFileSync(indexPath, "utf8")
+      .match(/^slug:\s*(.+)\s*$/m);
+    if (match) slugs.add(match[1].trim());
+  }
+  return slugs;
+}
+
 function buildFrontmatter(article) {
   const lines = ["---"];
   lines.push(`title: ${JSON.stringify(article.title)}`);
@@ -139,6 +158,21 @@ function removeBrokenSamePageAnchorLinks(md) {
   });
 }
 
+// MDX treats `<` as the start of a JSX tag, so bare `<` in prose (e.g. "<0.40",
+// "< 5ms") breaks the build with "Unexpected character before name". Escape any
+// `<` that can't begin a valid tag/comment, leaving fenced code blocks and
+// inline code spans untouched (code legitimately contains `<`, e.g. `a < b`).
+function escapeStrayAngleBrackets(md) {
+  const segments = md.split(/(```[\s\S]*?```|`[^`\n]*`)/g);
+  return segments
+    .map((seg, i) => {
+      // Odd indices are the captured code segments — leave them as-is.
+      if (i % 2 === 1) return seg;
+      return seg.replace(/<(?![A-Za-z/!$_])/g, "&lt;");
+    })
+    .join("");
+}
+
 function sanitizeMarkdown(md) {
   // Strip <scratchpad> blocks (internal authoring notes from the API).
   // Handles both explicit </scratchpad> closing and unclosed blocks that end
@@ -167,6 +201,9 @@ function sanitizeMarkdown(md) {
   // Docusaurus article and tag pages because excerpts preserve those links.
   md = removeBrokenSamePageAnchorLinks(md);
 
+  // Escape stray `<` last, so earlier tag-based cleanups still see real tags.
+  md = escapeStrayAngleBrackets(md);
+
   return md;
 }
 
@@ -185,6 +222,7 @@ async function main() {
   console.log(`Found ${articles.length} articles in latest batch`);
 
   const existingIds = getExistingArticleIds();
+  const usedSlugs = getExistingSlugs();
   const newArticles = articles.filter((a) => !existingIds.has(a.id));
 
   if (newArticles.length === 0) {
@@ -202,7 +240,15 @@ async function main() {
     const article = await apiFetch(`/v1/articles/${summary.id}`, apiKey);
 
     const datePrefix = datePrefixFromArticle(article);
-    const slug = article.slug || `article-${article.id}`;
+    let slug = article.slug || `article-${article.id}`;
+    // Disambiguate slugs that collide with an already-published article so each
+    // article keeps a unique route instead of shadowing an existing one.
+    if (usedSlugs.has(slug)) {
+      slug = `${slug}-${article.id}`;
+      console.warn(`Slug collision for "${article.slug}", using "${slug}"`);
+    }
+    usedSlugs.add(slug);
+    article.slug = slug;
     const dirName = `${article.id}-${datePrefix}-${slug}`;
     const dirPath = path.join(ARTICLE_DIR, dirName);
 
