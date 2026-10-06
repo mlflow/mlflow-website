@@ -12,25 +12,11 @@ defaults:
     shell: bash --noprofile --norc -exo pipefail {0}
 
 jobs:
-  # check that PR author is a maintainer
-  check-maintainer:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.head.repo.full_name == 'mlflow/mlflow-website' }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-        with:
-          script: |
-            const author = context.payload.pull_request.user?.login?.replace(/\[bot\]$/, "");
-            const { isMLflowMaintainer } = require(".github/workflows/is-mlflow-maintainer.js");
-            const isMaintainer = author && isMLflowMaintainer(author);
-            if (!isMaintainer) {
-              core.setFailed("Only MLflow maintainers can trigger this workflow");
-            }
-
   format:
     runs-on: ubuntu-latest
-    needs: check-maintainer
+    if: >-
+      github.event.pull_request.head.repo.full_name == 'mlflow/mlflow-website'
+      && contains(fromJson('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.pull_request.author_association)
     outputs:
       reformatted: ${{ steps.patch.outputs.reformatted }}
     steps:
@@ -66,7 +52,7 @@ jobs:
 
   push:
     runs-on: ubuntu-latest
-    needs: [check-maintainer, format]
+    needs: format
     if: ${{ needs.format.outputs.reformatted == 'true' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
