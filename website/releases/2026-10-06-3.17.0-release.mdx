@@ -7,20 +7,46 @@ authors: [mlflow-maintainers]
 
 MLflow 3.17.0 brings typed decisions into evaluation and tracing, finer control over access to shared resources, and faster analytics for large trace datasets. This release also improves evaluation result attribution and saved Assistant conversations on shared servers.
 
-## 1. **Jev Decisions Across Evaluation, Gateway, and Tracing**
+## 1. **Jev Decisions Across Evaluation, Tracing, and Gateway**
+
+### Evaluate Answers with Jev Judges
 
 <img
-  src="/img/releases/3.17.0/jev-decisions-final.png"
-  alt="The MLflow trace explorer showing Jev questions, typed answers, and decision probabilities."
+  src="/img/releases/3.17.0/jev-eval-final.png"
+  alt="A custom Jev judge using typesafe:/jev-latest, with its answer-correctness assessment displayed in MLflow."
   width="100%"
   style={{ display: "block", marginBottom: 24 }}
 />
 
-Evaluate answers with typed verdicts and inspect the probabilities behind them. TypeSafe's Jev models now work with built-in scorers and custom judges, using `typesafe:/jev-latest` directly or a `gateway:/` endpoint for centrally managed credentials and evaluation from the UI. Boolean and categorical judges record their results as MLflow assessments, with probability information in the assessment metadata.
-
-Automatic tracing captures TypeSafe calls in Python and TypeScript. Enable `mlflow.typesafe.autolog()` or wrap a TypeScript client with `tracedTypeSafe()` to record the questions, structured answers, usage, and errors. The trace explorer presents each answer alongside its probability or confidence. AI Gateway also supports native System One requests through TypeSafe and OpenRouter Jev decision endpoints.
+TypeSafe's Jev System One models offer a fast, low-cost option for yes/no and finite-category evaluation. Use `model="typesafe:/jev-latest"` with built-in scorers or custom judges in `mlflow.genai.evaluate()`. Results are recorded as MLflow assessments, with probabilities and category distributions in the metadata so you can identify close calls. Pin a versioned model ID when comparing results across evaluation runs.
 
 [Learn more about Jev judges](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/typesafe/)
+
+### Inspect System One Decisions in Traces
+
+<img
+  src="/img/releases/3.17.0/jev-trace-final.png"
+  alt="The MLflow trace viewer showing System One input state, questions, structured answers, and a category probability distribution."
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+/>
+
+Follow each decision from its inputs to its result. Enable `mlflow.typesafe.autolog()` to trace synchronous and asynchronous TypeSafe calls, capturing state, questions, structured answers, latency, errors, and token usage when reported by the SDK. The trace viewer presents selected answers alongside their probability distributions and confidence, helping you investigate unexpected decisions. JavaScript and TypeScript applications can use `tracedTypeSafe()` for the same visibility.
+
+[Learn more about TypeSafe tracing](https://mlflow.org/docs/latest/genai/tracing/integrations/listing/typesafe/)
+
+### Govern Jev Access Through AI Gateway
+
+<img
+  src="/img/releases/3.17.0/jev-gateway-final.png"
+  alt="The AI Gateway model selector listing TypeSafe Jev evaluation models with jev-latest selected."
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+/>
+
+Manage Jev access centrally instead of distributing provider API keys to every application. Create a TypeSafe System One endpoint in AI Gateway to keep credentials on the server and manage access, usage tracking, and budgets in one place. Configure fallbacks to compatible System One models, including OpenRouter Jev decision models, to handle provider errors or rate limits. Judges can use a `gateway:/` endpoint from the SDK or the evaluation UI, while endpoint configuration changes stay in the Gateway.
+
+[Learn more about TypeSafe in AI Gateway](https://mlflow.org/docs/latest/genai/governance/ai-gateway/endpoints/model-providers/#typesafe)
 
 ## 2. **Fine-Grained Permissions for Shared Resources**
 
