@@ -7,9 +7,7 @@ authors: [mlflow-maintainers]
 
 MLflow 3.17.0 brings typed decisions into evaluation and tracing, finer control over access to shared resources, and faster analytics for large trace datasets. This release also improves evaluation result attribution and saved Assistant conversations on shared servers.
 
-## 1. **Jev Decisions Across Evaluation, Tracing, and Gateway**
-
-### Evaluate Answers with Jev Judges
+## 1. **Faster LLM-as-a-Judge with Jev, TypeSafe's System One models**
 
 <img
   src="/img/releases/3.17.0/jev-eval-final.png"
@@ -18,11 +16,13 @@ MLflow 3.17.0 brings typed decisions into evaluation and tracing, finer control 
   style={{ display: "block", marginBottom: 24 }}
 />
 
-TypeSafe's Jev System One models offer a fast, low-cost option for yes/no and finite-category evaluation. Use `model="typesafe:/jev-latest"` with built-in scorers or custom judges in `mlflow.genai.evaluate()`. Results are recorded as MLflow assessments, with probabilities and category distributions in the metadata so you can identify close calls. Pin a versioned model ID when comparing results across evaluation runs.
+Large evaluation runs can become slow and expensive when every yes/no check calls a general-purpose LLM. MLflow now supports TypeSafe's Jev models as judges. For yes/no or finite-category checks, set `model="typesafe:/jev-latest"` and use the judge in your existing `mlflow.genai.evaluate()` workflow.
 
-[Learn more about Jev judges](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/typesafe/)
+Jev returns a structured decision, which MLflow records as an assessment. The probability or category distribution is saved in assessment metadata, so you can identify close calls when reviewing results. Jev gives teams a faster, lower-cost option for frequent checks; a versioned model ID keeps comparisons consistent across runs.
 
-### Inspect System One Decisions in Traces
+[Learn more about TypeSafe judge models](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/typesafe/)
+
+## 2. **Observability for System One models in MLflow Tracing**
 
 <img
   src="/img/releases/3.17.0/jev-trace-final.png"
@@ -31,11 +31,13 @@ TypeSafe's Jev System One models offer a fast, low-cost option for yes/no and fi
   style={{ display: "block", marginBottom: 24 }}
 />
 
-Follow each decision from its inputs to its result. Enable `mlflow.typesafe.autolog()` to trace synchronous and asynchronous TypeSafe calls, capturing state, questions, structured answers, latency, errors, and token usage when reported by the SDK. The trace viewer presents selected answers alongside their probability distributions and confidence, helping you investigate unexpected decisions. JavaScript and TypeScript applications can use `tracedTypeSafe()` for the same visibility.
+A Jev decision can determine what an agent does next. With `mlflow.typesafe.autolog()`, MLflow traces synchronous and asynchronous System One calls, capturing the state and questions sent to the model, structured answers, latency, errors, and token usage when available.
 
-[Learn more about TypeSafe tracing](https://mlflow.org/docs/latest/genai/tracing/integrations/listing/typesafe/)
+The trace viewer presents each TypeSafe answer with its selected value and probability details. You can inspect a close decision alongside the question and state that produced it, without digging through the raw response. This makes it easier to understand unexpected agent behavior and compare decisions across runs.
 
-### Govern Jev Access Through AI Gateway
+[Learn more about tracing TypeSafe AI](https://mlflow.org/docs/latest/genai/tracing/integrations/listing/typesafe/)
+
+## 3. **Govern Jev model access through MLflow AI Gateway**
 
 <img
   src="/img/releases/3.17.0/jev-gateway-final.png"
@@ -44,11 +46,13 @@ Follow each decision from its inputs to its result. Enable `mlflow.typesafe.auto
   style={{ display: "block", marginBottom: 24 }}
 />
 
-Manage Jev access centrally instead of distributing provider API keys to every application. Create a TypeSafe System One endpoint in AI Gateway to keep credentials on the server and manage access, usage tracking, and budgets in one place. Configure fallbacks to compatible System One models, including OpenRouter Jev decision models, to handle provider errors or rate limits. Judges can use a `gateway:/` endpoint from the SDK or the evaluation UI, while endpoint configuration changes stay in the Gateway.
+MLflow AI Gateway now supports TypeSafe System One calls. Create an endpoint for a Jev model, keep the TypeSafe API key on the server, and send structured questions using the endpoint name. You can change the configured Jev model without changing each application that calls it.
 
-[Learn more about TypeSafe in AI Gateway](https://mlflow.org/docs/latest/genai/governance/ai-gateway/endpoints/model-providers/#typesafe)
+Gateway tracks usage, supports budgets, and can fall back to a compatible Jev model from another provider, such as OpenRouter, after upstream errors or rate limits. Each endpoint gives you one place to manage access and monitor use for its API.
 
-## 2. **Fine-Grained Permissions for Shared Resources**
+[Learn more about the TypeSafe Gateway provider](https://mlflow.org/docs/latest/genai/governance/ai-gateway/endpoints/model-providers/#typesafe)
+
+## 4. **Fine-Grained Permissions for Shared Resources**
 
 <img
   src="/img/releases/3.17.0/resource-permissions-final.png"
@@ -63,7 +67,7 @@ The new `DENY` permission makes exceptions to broader grants explicit. For examp
 
 [Learn more about resource permissions](https://mlflow.org/docs/latest/self-hosting/security/role-based-access-control/#sub-resource-tiers)
 
-## 3. **Faster Analytics for Large Trace Datasets**
+## 5. **Faster Analytics for Large Trace Datasets**
 
 <img
   src="/img/releases/3.17.0/trace-analytics-final.png"
@@ -78,7 +82,7 @@ Administrators can enable rollups with `MLFLOW_SQL_TRACE_ROLLUPS_ENABLED=true` a
 
 [Learn more about trace analytics rollups](https://mlflow.org/docs/latest/self-hosting/architecture/backend-store/#trace-analytics-daily-rollups)
 
-## 4. **Clearer Evaluation Results**
+## 6. **Clearer Evaluation Results**
 
 <img
   src="/img/releases/3.17.0/evaluation-dataset-id-final.png"
@@ -95,7 +99,7 @@ _Thanks to community contributor [@janald99](https://github.com/janald99) for th
 
 [Learn more about evaluation datasets](https://mlflow.org/docs/latest/genai/datasets/)
 
-## 5. **Assistant Improvements for Shared Servers**
+## 7. **Assistant Improvements for Shared Servers**
 
 Saved Assistant conversations are now scoped to the signed-in user. Switching accounts resets the active session and unfinished prompt, so the next person using the same browser starts with their own conversation. Experimental sandbox deployments also align the fallback container's Python and released MLflow versions with the server.
 
