@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Head from "@docusaurus/Head";
 import Link from "@docusaurus/Link";
 import { Highlight } from "prism-react-renderer";
@@ -13,6 +13,12 @@ import LitellmUI from "@site/static/img/litellm-alternative/litellm-ui.png";
 import MlflowEvalUI from "@site/static/img/litellm-alternative/mlflow-eval-ui.png";
 import MlflowGatewayUI from "@site/static/img/litellm-alternative/mlflow-gateway-ui.png";
 
+const SEO_TITLE =
+  "MLflow AI Gateway: The Open-Source LiteLLM Alternative | MLflow vs LiteLLM";
+const SEO_DESCRIPTION =
+  "Compare MLflow and LiteLLM for AI Gateway, LLM tracing, and evaluation. Learn why teams choose MLflow for enterprise-grade security, complete platform capabilities, and Linux Foundation governance.";
+const CANONICAL_URL = "https://mlflow.org/litellm-alternative";
+
 const tracingExamples: { label: string; mlflow: string; litellm: string }[] = [
   {
     label: "Gateway Tracing",
@@ -20,8 +26,9 @@ const tracingExamples: { label: string; mlflow: string; litellm: string }[] = [
 # in the MLflow AI Gateway UI. Done.
 #
 # Every gateway request is automatically
-# traced with latency, token usage, cost,
-# and error details. No code changes.
+# traced with latency, token usage, and
+# errors (cost too, once model pricing is
+# set). No code changes.
 from openai import OpenAI
 
 client = OpenAI(base_url="http://localhost:5000/gateway/v1")
@@ -183,16 +190,156 @@ function CodeTabs({
 }
 
 export default function LitellmAlternative() {
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+
+  const faqs: { question: string; answer: ReactNode; answerText: string }[] = [
+    {
+      question: "What is the best open-source LiteLLM alternative?",
+      answer: (
+        <>
+          <Link to="/">MLflow AI Gateway</Link> is a leading open-source
+          alternative to LiteLLM. It provides the same OpenAI-compatible
+          multi-provider routing, rate limiting, cost tracking, and fallbacks,
+          plus native tracing and evaluation, under the Apache 2.0 license and
+          Linux Foundation governance.
+        </>
+      ),
+      answerText:
+        "MLflow AI Gateway is a leading open-source alternative to LiteLLM. It provides the same OpenAI-compatible multi-provider routing, rate limiting, cost tracking, and fallbacks, plus native tracing and evaluation, under the Apache 2.0 license and Linux Foundation governance.",
+    },
+    {
+      question: "Is MLflow AI Gateway a good alternative to LiteLLM?",
+      answer: (
+        <>
+          Yes. MLflow AI Gateway matches LiteLLM&apos;s core gateway features
+          and adds built-in observability, evaluation, and prompt management in
+          one platform, with enterprise-grade security and roughly half the
+          latency overhead in our benchmark.
+        </>
+      ),
+      answerText:
+        "Yes. MLflow AI Gateway matches LiteLLM's core gateway features and adds built-in observability, evaluation, and prompt management in one platform, with enterprise-grade security and roughly half the latency overhead in our benchmark.",
+    },
+    {
+      question: "Is MLflow AI Gateway faster than LiteLLM?",
+      answer: (
+        <>
+          Yes. In our benchmark (50 ms simulated provider delay, 4 workers, 50
+          concurrent users), MLflow AI Gateway added about half the latency
+          overhead of LiteLLM (28.6 ms vs 56.7 ms at P50) and delivered 67%
+          higher throughput (598 vs 358 requests per second).
+        </>
+      ),
+      answerText:
+        "Yes. In our benchmark (50 ms simulated provider delay, 4 workers, 50 concurrent users), MLflow AI Gateway added about half the latency overhead of LiteLLM (28.6 ms vs 56.7 ms at P50) and delivered 67% higher throughput (598 vs 358 requests per second).",
+    },
+    {
+      question: "Does MLflow AI Gateway support LLM tracing and observability?",
+      answer: (
+        <>
+          Yes. MLflow AI Gateway captures every request as a{" "}
+          <Link
+            to={`${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/usage-tracking/`}
+          >
+            trace
+          </Link>{" "}
+          automatically when usage tracking is enabled &mdash; latency, token
+          usage, and errors &mdash; with no code changes (cost too, once model
+          pricing is configured). It also supports{" "}
+          <Link
+            to={`${MLFLOW_GENAI_DOCS_URL}tracing/app-instrumentation/distributed-tracing/`}
+          >
+            W3C distributed tracing
+          </Link>{" "}
+          to link client-side agent traces to gateway traces. LiteLLM has no
+          built-in tracing and requires an external tool such as Datadog or
+          Langfuse.
+        </>
+      ),
+      answerText:
+        "Yes. MLflow AI Gateway captures every request as a trace automatically when usage tracking is enabled - latency, token usage, and errors - with no code changes (cost too, once model pricing is configured). It also supports W3C distributed tracing to link client-side agent traces to gateway traces. LiteLLM has no built-in tracing and requires an external tool such as Datadog or Langfuse.",
+    },
+    {
+      question: "Is MLflow AI Gateway open source and free to self-host?",
+      answer: (
+        <>
+          Yes. MLflow is open source under the Apache 2.0 license and governed
+          by the Linux Foundation, with the same core MLflow functionality
+          whether you self-host or use a managed offering. You can self-host the
+          AI Gateway at no cost.
+        </>
+      ),
+      answerText:
+        "Yes. MLflow is open source under the Apache 2.0 license and governed by the Linux Foundation, with the same core MLflow functionality whether you self-host or use a managed offering. You can self-host the AI Gateway at no cost.",
+    },
+    {
+      question: "How many LLM providers does MLflow AI Gateway support?",
+      answer: (
+        <>
+          MLflow AI Gateway supports access to{" "}
+          <Link to="https://mlflow.org/genai/ai-gateway">
+            over 50 model providers
+          </Link>
+          , including OpenAI, Anthropic, Google, Azure, and AWS Bedrock, through
+          a single OpenAI-compatible API.
+        </>
+      ),
+      answerText:
+        "MLflow AI Gateway supports access to over 50 model providers, including OpenAI, Anthropic, Google, Azure, and AWS Bedrock, through a single OpenAI-compatible API.",
+    },
+    {
+      question: "Can MLflow AI Gateway replace the LiteLLM proxy?",
+      answer: (
+        <>
+          For most teams, yes. MLflow AI Gateway offers OpenAI-compatible
+          multi-provider routing, rate limiting, cost tracking, and fallbacks
+          like LiteLLM. LiteLLM may still fit teams that need its 100+ provider
+          coverage or long-tail providers only it supports.
+        </>
+      ),
+      answerText:
+        "For most teams, yes. MLflow AI Gateway offers OpenAI-compatible multi-provider routing, rate limiting, cost tracking, and fallbacks like LiteLLM. LiteLLM may still fit teams that need its 100+ provider coverage or long-tail providers only it supports.",
+    },
+    {
+      question: "Which is more secure, MLflow or LiteLLM?",
+      answer: (
+        <>
+          MLflow benefits from a dedicated security team at Databricks, nearly a
+          decade of enterprise hardening, and Linux Foundation governance. In
+          March 2026, LiteLLM experienced a supply-chain incident in which
+          compromised packages were briefly published to PyPI. Both are open
+          source, so evaluate each project&apos;s security practices and
+          governance for your needs.
+        </>
+      ),
+      answerText:
+        "MLflow benefits from a dedicated security team at Databricks, nearly a decade of enterprise hardening, and Linux Foundation governance. In March 2026, LiteLLM experienced a supply-chain incident in which compromised packages were briefly published to PyPI. Both are open source, so evaluate each project's security practices and governance for your needs.",
+    },
+  ];
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answerText,
+      },
+    })),
+  };
+
   return (
     <>
       <Head>
-        <title>
-          Open Source LiteLLM AI Gateway Alternative? MLflow vs LiteLLM | MLflow
-        </title>
-        <meta
-          name="description"
-          content="Compare MLflow and LiteLLM for AI Gateway, LLM tracing, and evaluation. Learn why teams choose MLflow for enterprise-grade security, complete platform capabilities, and Linux Foundation governance."
-        />
+        <title>{SEO_TITLE}</title>
+        <meta name="description" content={SEO_DESCRIPTION} />
+        <meta property="og:title" content={SEO_TITLE} />
+        <meta property="og:description" content={SEO_DESCRIPTION} />
+        <meta property="og:type" content="article" />
+        <link rel="canonical" href={CANONICAL_URL} />
+        <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
 
@@ -509,6 +656,51 @@ export default function LitellmAlternative() {
             background: #f9fafb;
           }
 
+          /* FAQ */
+          .faq-list {
+            margin: 32px 0 40px;
+          }
+          .faq-item {
+            border-bottom: 1px solid #e5e7eb;
+          }
+          .faq-question {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            background: none;
+            border: none;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            cursor: pointer;
+            text-align: left;
+          }
+          .faq-chevron {
+            transition: transform 0.2s ease;
+            color: #6b7280;
+            font-size: 16px;
+            margin-left: 24px;
+          }
+          .faq-chevron.open {
+            transform: rotate(180deg);
+          }
+          .article-container .faq-answer {
+            padding-bottom: 20px;
+            color: #3d3d3d;
+            line-height: 1.7;
+            margin: 0;
+          }
+          .faq-answer a {
+            font-weight: 600;
+            color: #0194e2 !important;
+            text-decoration: none;
+          }
+          .faq-answer a:hover {
+            text-decoration: underline;
+          }
+
           /* Sidebar TOC */
           .article-sidebar {
             position: fixed;
@@ -584,8 +776,14 @@ export default function LitellmAlternative() {
         <Header />
 
         <div className="article-container">
-          <h1>Open Source LiteLLM AI Gateway Alternative? LiteLLM vs MLflow</h1>
+          <h1>MLflow AI Gateway: The Open-Source LiteLLM Alternative</h1>
           <p className="subtitle">
+            <strong>
+              Short answer: MLflow AI Gateway is a secure, Linux
+              Foundation&ndash;governed open-source alternative to LiteLLM that
+              adds native tracing, evaluation, and roughly half the gateway
+              latency overhead.
+            </strong>{" "}
             This article is for teams looking for a secure, enterprise-ready,
             open-source alternative to LiteLLM. We compare the two across
             governance, security, performance, tracing, and complete AI platform
@@ -612,7 +810,7 @@ export default function LitellmAlternative() {
           </p>
 
           {/* What is MLflow? */}
-          <h2>What is MLflow?</h2>
+          <h2>What Is MLflow AI Gateway?</h2>
           <div className="screenshot-wrap">
             <img src={MlflowGatewayUI} alt="MLflow gateway UI" />
           </div>
@@ -629,7 +827,9 @@ export default function LitellmAlternative() {
           </p>
 
           {/* TL;DR */}
-          <h2 id="quick-comparison">Quick Comparison</h2>
+          <h2 id="quick-comparison" data-toc="Quick Comparison">
+            MLflow AI Gateway vs LiteLLM at a Glance
+          </h2>
           <div className="tldr-grid">
             <div className="tldr-card highlight">
               <h3>
@@ -673,7 +873,16 @@ export default function LitellmAlternative() {
           </div>
 
           {/* Open Source */}
-          <h2 id="open-source-governance">Open Source</h2>
+          <h2 id="open-source-governance" data-toc="Open Source">
+            Is MLflow AI Gateway Open Source?
+          </h2>
+          <p>
+            <strong>
+              Yes. MLflow is open source under the Apache 2.0 license and
+              governed by the Linux Foundation, with the same core MLflow
+              functionality whether you self-host or use a managed offering.
+            </strong>
+          </p>
           <p>
             <strong>LiteLLM</strong> is open source under the MIT license,
             maintained by{" "}
@@ -698,15 +907,22 @@ export default function LitellmAlternative() {
             </strong>
             , the premier open source software foundation who also owns Linux,
             Kubernetes, and Pytorch. MLflow has been powering production AI
-            since 2018 and maintains full feature parity between its open source
-            release and managed offerings. With over 30 million monthly
+            since 2018 and offers the same core MLflow functionality whether you
+            self-host or use a managed offering. With over 30 million monthly
             downloads and thousands of enterprise users, MLflow is one of the
             most widely deployed AI platforms.
           </p>
 
           {/* Security & Reliability */}
-          <h2 id="security-reliability">Security &amp; Reliability</h2>
+          <h2 id="security-reliability" data-toc="Security & Reliability">
+            Which AI Gateway Is More Secure &mdash; MLflow or LiteLLM?
+          </h2>
           <p>
+            <strong>
+              Both gateways are open source and can be deployed securely, but
+              MLflow brings a dedicated security team at Databricks, nearly a
+              decade of enterprise hardening, and Linux Foundation governance.
+            </strong>{" "}
             For teams deploying AI in production, the security and reliability
             of the tools in their stack are not optional. When an AI gateway
             sits between your applications and LLM providers, it becomes a
@@ -736,7 +952,9 @@ export default function LitellmAlternative() {
           </p>
 
           {/* AI Gateway */}
-          <h2 id="ai-gateway">AI Gateway Capabilities</h2>
+          <h2 id="ai-gateway" data-toc="AI Gateway">
+            MLflow AI Gateway vs LiteLLM: Gateway Capabilities
+          </h2>
           <p>
             Both MLflow and LiteLLM offer AI Gateway capabilities for routing
             requests to multiple LLM providers, managing costs, and enforcing
@@ -762,8 +980,10 @@ export default function LitellmAlternative() {
           </p>
           <p>
             <strong>MLflow</strong> offers a built-in{" "}
-            <Link to={`${MLFLOW_GENAI_DOCS_URL}gateway/`}>AI Gateway</Link> with
-            similar routing, rate limiting, cost tracking, and fallback
+            <Link to={`${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/`}>
+              AI Gateway
+            </Link>{" "}
+            with similar routing, rate limiting, cost tracking, and fallback
             capabilities, but with a critical advantage:{" "}
             <strong>
               native integration with tracing, evaluation, and prompt management
@@ -776,8 +996,15 @@ export default function LitellmAlternative() {
           <ComparisonTable rows={gatewayFeatures} />
 
           {/* Performance */}
-          <h2 id="performance">Performance</h2>
+          <h2 id="performance" data-toc="Performance">
+            Is MLflow AI Gateway Faster Than LiteLLM?
+          </h2>
           <p>
+            <strong>
+              Yes. In our benchmark, MLflow AI Gateway added roughly half the
+              latency overhead of LiteLLM (28.6 ms vs 56.7 ms at P50) and
+              delivered 67% higher throughput.
+            </strong>{" "}
             For production AI applications, gateway performance directly impacts
             user experience. Every millisecond of overhead added by the gateway
             is multiplied across millions of requests.
@@ -834,8 +1061,16 @@ export default function LitellmAlternative() {
           </div>
 
           {/* Tracing & Observability */}
-          <h2 id="tracing-observability">Observability & Monitoring</h2>
+          <h2 id="tracing-observability" data-toc="Observability">
+            Does MLflow AI Gateway Include Built-in Tracing?
+          </h2>
           <p>
+            <strong>
+              Yes &mdash; MLflow AI Gateway captures every request as a trace
+              automatically when usage tracking is enabled, with no external
+              tool required. LiteLLM has no built-in tracing and depends on an
+              external callback such as Datadog or Langfuse.
+            </strong>{" "}
             Tracing is essential for understanding how AI applications behave in
             production. For gateway deployments, teams need visibility into
             every request flowing through the system, including latency, token
@@ -853,13 +1088,15 @@ export default function LitellmAlternative() {
           <p>
             <strong>MLflow</strong>'s AI Gateway provides{" "}
             <strong>native tracing out of the box</strong>. When{" "}
-            <Link to={`${MLFLOW_GENAI_DOCS_URL}gateway/usage-tracking/`}>
+            <Link
+              to={`${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/usage-tracking/`}
+            >
               usage tracking
             </Link>{" "}
             is enabled on an endpoint, every gateway request is automatically
-            logged as a trace with full detail: latency, token consumption,
-            cost, and errors, with no code changes required. MLflow also
-            supports{" "}
+            logged as a trace with full detail: latency, token consumption, and
+            errors, with no code changes required (and cost once model pricing
+            is configured). MLflow also supports{" "}
             <strong>
               <Link
                 to={`${MLFLOW_GENAI_DOCS_URL}tracing/app-instrumentation/distributed-tracing/`}
@@ -883,7 +1120,9 @@ export default function LitellmAlternative() {
           <CodeTabs tabs={tracingExamples} />
 
           {/* Complete AI Platform */}
-          <h2 id="ai-platform">Beyond a Gateway: Complete AI Platform</h2>
+          <h2 id="ai-platform" data-toc="AI Platform">
+            Beyond a Gateway: MLflow as a Complete AI Platform
+          </h2>
           <p>
             A gateway is only one piece of a production AI stack. Teams also
             need observability, evaluation, prompt management, and model
@@ -940,7 +1179,7 @@ export default function LitellmAlternative() {
           </div>
 
           {/* Summary */}
-          <h2>Summary</h2>
+          <h2>Should You Choose MLflow AI Gateway or LiteLLM?</h2>
           <p>
             <strong>
               Choose <Link href="https://www.litellm.ai/">LiteLLM</Link>
@@ -962,6 +1201,33 @@ export default function LitellmAlternative() {
             agents should choose MLflow.
           </p>
 
+          {/* FAQ */}
+          <h2 id="faq" data-toc="FAQ">
+            Frequently Asked Questions
+          </h2>
+          <div className="faq-list">
+            {faqs.map((faq, index) => (
+              <div key={index} className="faq-item">
+                <button
+                  className="faq-question"
+                  onClick={() =>
+                    setOpenFaqIndex(openFaqIndex === index ? null : index)
+                  }
+                >
+                  <span>{faq.question}</span>
+                  <span
+                    className={`faq-chevron ${openFaqIndex === index ? "open" : ""}`}
+                  >
+                    ▼
+                  </span>
+                </button>
+                {openFaqIndex === index && (
+                  <div className="faq-answer">{faq.answer}</div>
+                )}
+              </div>
+            ))}
+          </div>
+
           {/* Related Resources */}
           <h2>Related Resources</h2>
           <ul>
@@ -972,7 +1238,7 @@ export default function LitellmAlternative() {
               <Link to="/ai-platform">What is AI Platform?</Link>
             </li>
             <li>
-              <Link to={`${MLFLOW_GENAI_DOCS_URL}gateway/`}>
+              <Link to={`${MLFLOW_GENAI_DOCS_URL}governance/ai-gateway/`}>
                 MLflow AI Gateway Guide
               </Link>
             </li>

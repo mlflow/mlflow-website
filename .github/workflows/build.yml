@@ -23,6 +23,22 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      - name: Checkout MLflow setup wizard
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: mlflow/mlflow
+          ref: master
+          sparse-checkout: mlflow/agent/setup/setup.sh
+          sparse-checkout-cone-mode: false
+          path: mlflow-source
+          persist-credentials: false
+
+      - name: Stage MLflow setup wizard
+        run: |
+          mkdir -p website/static/wizard
+          cp mlflow-source/mlflow/agent/setup/setup.sh website/static/wizard/setup.sh
+          sh -n website/static/wizard/setup.sh
+
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 20
@@ -36,6 +52,9 @@ jobs:
         env:
           GTM_ID: ${{ secrets.GTM_ID }}
         run: npm run build
+
+      - name: Verify MLflow setup wizard
+        run: cmp website/static/wizard/setup.sh website/build/wizard/setup.sh
 
       - name: Set artifact name
         id: artifact

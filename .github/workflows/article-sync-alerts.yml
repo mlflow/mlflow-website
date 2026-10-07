@@ -1,0 +1,56 @@
+name: Article Sync Alerts
+
+on:
+  workflow_run:
+    workflows:
+      - Build
+      - CI
+      - E2E
+      - Link Checker
+    types:
+      - completed
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  alert:
+    if: >
+      github.event.workflow_run.conclusion == 'failure' &&
+      startsWith(github.event.workflow_run.head_branch, 'articles/sync-')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment on failed sync PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+          RUN_NUMBER: ${{ github.event.workflow_run.run_number }}
+        run: |
+          PR_JSON=$(gh pr list \
+            --repo "$GITHUB_REPOSITORY" \
+            --head "$BRANCH" \
+            --state all \
+            --json number,title,url \
+            --jq '.[0]')
+
+          if [ "$PR_JSON" = "null" ] || [ -z "$PR_JSON" ]; then
+            echo "No PR found for sync branch $BRANCH"
+            exit 1
+          fi
+
+          PR_NUMBER=$(echo "$PR_JSON" | jq -r '.number')
+          PR_TITLE=$(echo "$PR_JSON" | jq -r '.title')
+          PR_URL=$(echo "$PR_JSON" | jq -r '.url')
+
+          gh pr comment "$PR_NUMBER" \
+            --repo "$GITHUB_REPOSITORY" \
+            --body "@joshuawong-db A BabyLoveGrowth article sync PR check failed.
+
+          PR: #$PR_NUMBER $PR_TITLE
+          PR URL: $PR_URL
+          Workflow: $WORKFLOW_NAME
+          Run: $RUN_URL"

@@ -1,0 +1,184 @@
+---
+title: "Can Jev replace your LLM judge? Evaluating quality, cost, and latency"
+description: "Compare Jev with GPT, Claude, and DeepSeek as an LLM judge using MLflow across quality, cost, and latency."
+slug: jev-llm-judge
+authors: [yuki-watanabe]
+tags: [genai, evaluation, judges, llm]
+thumbnail: /img/blog/jev-llm-judge-comparison.png
+image: /img/blog/jev-llm-judge-comparison.png
+---
+
+LLM judges help you evaluate answers, compare prompts, and catch regressions. Every judgment also adds another model call. As your project grows, the cost and time spent judging become a headache.
+
+[Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev), a new model from TypeSafe, is built for structured decisions and claims faster and cheaper compared to normal LLMs respond in text, which makes it a candidate for LLM judge. We compared Jev with **GPT 5.6, Claude, and DeepSeek** on human-labeled technical QA examples, measuring human-judge agreement, cost, and latency.
+
+Can Jev distinguish correct MLflow answers from answers containing factual or API errors, and how does it compare with these LLM judges?
+
+## 1. What is Jev?
+
+Jev is a unique model that does not generate text. A conventional LLM generates its verdict token by token. Jev, by contrast, produces only structured outputs from a fixed set of options, along with decision probabilities. TypeSafe calls it a _System One_ model, borrowing the term from Daniel Kahneman's _Thinking, Fast and Slow_ for decisions made quickly rather than through deliberate reasoning. This narrower interface lets Jev respond with much lower latency, at the cost of general text generation. See [TypeSafe's launch post](https://typesafe.ai/blog/introducing-system-one-models-and-jev) for details.
+
+For example, give Jev a question about an MLflow API, a candidate answer, and the relevant documentation, then ask whether the answer is factually and technically correct using a question. Jev's [Noul question type](https://docs.typesafe.ai/primitives/noul) returns the probability of "yes," which your code can turn into a pass or fail. It also supports selecting a category with **Choice** and grading against ordered rubric levels with **Score**.
+
+## 2. Why Jev is a candidate for judging
+
+Many evaluations need a small decision about a large input. Does an answer use the right API? Does it respect the version in the user's question? Does an instruction contradict the supplied documentation?
+
+These tasks fit Jev's interface . You can also ask several independent questions about the same state in one request. Its [published price](https://docs.typesafe.ai/models) is $0.042 per million input tokens, with no charge for output tokens. That gives us a reason to test it for frequently repeated checks.
+
+One caveat is that LLM judges often produces **rationale** as well, because we want to understand why a particular answer is marked bad. Jev cannot support that, instead, can only produce probability alongside the classification output.
+
+## 3. Define an LLM judge with Jev
+
+We'll test Jev with the following LLM judge prompt: **is the answer factually and technically correct?**. MLflow [custom scorers](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/custom/) can call an any external model and return its assessment. We'll wrap a Jev call in a scorer, retaining the probability, latency, and estimated cost alongside its verdict.
+
+Install the packages and start an MLflow server:
+
+```bash
+uv add mlflow typesafe-sdk
+uv run mlflow server --host 127.0.0.1 --port 5000
+```
+
+In the terminal where you'll run Python, configure the connection and your TypeSafe API key. Use one evaluation worker so requests run sequentially:
+
+```bash
+export MLFLOW_TRACKING_URI="http://127.0.0.1:5000"
+export TYPESAFE_API_KEY="your-typesafe-api-key"
+```
+
+Then define the judge with the `@scorer` decorator and run it against the dataset. The following code also include benchmark instrumentation to measure cost and latency, which is not necessary for the judging itself.
+
+```python
+from time import perf_counter
+
+import mlflow
+from mlflow.entities import Feedback
+from mlflow.genai.scorers import scorer
+from typesafe_sdk import Noul, RetryPolicy, TypeSafeClient
+
+mlflow.set_experiment("jev-judge-comparison")
+client = TypeSafeClient(
+    model="jev-1.13.0", retry=RetryPolicy(max_retries=0), timeout=30
+)
+THRESHOLD = 0.5
+INPUT_USD_PER_MILLION = 0.042
+CRITERION = (
+    "Is the candidate answer factually and technically correct for the question, "
+    "using the supplied MLflow documentation and respecting any version specified "
+    "in the question? Answer yes if there is no material factual or API error. "
+    "Answer no if at least one claim or instruction is materially wrong or misleading. "
+    "Do not penalize style or harmless omissions. An omission is material when it "
+    "makes the requested technical answer misleading."
+)
+
+
+def judge_answer(question: str, context: str, answer: str) -> dict:
+    started = perf_counter()
+    response = client.system_one(
+        state={"question": question, "context": context, "answer": answer},
+        questions={"correct": Noul(instructions=CRITERION)},
+    )
+    latency_ms = (perf_counter() - started) * 1000
+    probability = response.nouls["correct"].noul
+    tokens = response.usage.input_tokens
+    cost = None if tokens is None else tokens * INPUT_USD_PER_MILLION / 1_000_000
+    return {
+        "prediction": "correct" if probability >= THRESHOLD else "incorrect",
+        "p_correct": probability,
+        "model": response.model,
+        "input_tokens": tokens,
+        "latency_ms": latency_ms,
+        "estimated_cost_usd": cost,
+    }
+
+
+@scorer
+def jev_correctness(inputs: dict) -> Feedback:
+    result = judge_answer(**inputs)
+    return Feedback(
+        value=result["prediction"] == "correct",
+        metadata={**result, "threshold": THRESHOLD},
+    )
+```
+
+`jev_correctness` evaluates a candidate answer stored with its question and documentation in `inputs`. It returns a Boolean assessment for use in MLflow evaluations. Next, we'll check how reliable those assessments are.
+
+## 4. Measure initial quality, cost, and latency
+
+We created **30 MLflow QA examples** covering tracing, evaluation, prompts, datasets, and assessments. Each contains a question, a candidate answer, and an excerpt from the official MLflow documentation. A human reviewer labeled the examples so we can measure human-judge alignment. After the label correction described below, the reference contains 15 answers labeled Correct, 15 Incorrect.
+
+Here is one of the incorrect answers for example:
+
+```python
+{
+    "inputs": {
+        "question": (
+            'My `@scorer` function is called `check_answer`, but it returns '
+            '`Feedback(name="answer_quality", value=True)`. '
+            'Which name appears as the metric?'
+        ),
+        "context": (
+            "1. If the scorer returns one or more `Feedback` objects, then "
+            "`Feedback.name` fields take precedence, if specified.\n"
+            "2. For primitive return values or unnamed `Feedback`s, the "
+            "function name (for the `@scorer` decorator) or the `Scorer.name` "
+            "field (for the `Scorer` class) are used."
+        ),
+    },
+    "outputs": (
+            "The metric is named `check_answer`, because decorated scorers "
+            "always use the Python function name. To show `answer_quality` "
+            "in the results, rename the function to that name."
+    ),
+    # This field is not passed to the Jev judge.
+    "expectations": {"human_correctness": "incorrect"},
+}
+```
+
+```python
+mlflow.genai.evaluate(data=data, scorers=[judge_answer])
+```
+
+We also tested GPT-5.6 Terra and Luna, Claude Sonnet 4.6, Claude Opus 4.8, and DeepSeek-V4.1-Flash (`deepseek-flash`) the same inputs and correctness criterion. We explicitly disabled extended reasoning and limited output to 128 tokens, testing a configuration intended for quick pass/fail checks. Here is the result from the benchmark.
+
+<a
+  href={require("./judge-comparison.png").default}
+  target="_blank"
+  rel="noopener noreferrer"
+  title="Open chart at full size"
+>
+  <img
+    src={require("./judge-comparison.png").default}
+    alt="Agreement with human labels, median latency, and estimated cost for Jev, GPT, Claude, and DeepSeek"
+    width={3687}
+    height={1228}
+    style={{ width: "100%", height: "auto" }}
+  />
+</a>
+
+_30 human-labeled QA examples. DeepSeek cost uses off-peak pricing._
+
+| Judge               | Agreement with human labels | Median latency | p95 latency | Estimated cost / 1,000 judgments |
+| ------------------- | --------------------------: | -------------: | ----------: | -------------------------------: |
+| Jev 1.13.0          |                30/30 (100%) |         369 ms |      411 ms |                          $0.0247 |
+| GPT-5.6 Terra       |                30/30 (100%) |       1,091 ms |    1,924 ms |                          $0.8960 |
+| GPT-5.6 Luna        |                30/30 (100%) |         947 ms |    1,435 ms |                          $0.0896 |
+| Claude Sonnet 4.6   |               27/30 (90.0%) |       1,610 ms |    3,546 ms |                          $1.6721 |
+| Claude Opus 4.8     |               28/30 (93.3%) |       1,966 ms |    9,279 ms |                          $3.7750 |
+| DeepSeek-V4.1-Flash |               29/30 (96.6%) |         910 ms |    1,188 ms |               $0.0624 (off-peak) |
+
+Jev, Terra, and Luna made identical decisions on all 30 examples. Jev had the lowest estimated cost and observed latency. Sonnet rejected one correct answer and accepted two incorrect answers. Opus also rejected an answer that correctly described session and tracing metadata. DeepSeek accepted one incorrect answer about output recording, same one as Claude mistook.
+
+## 5. Decide when to use Jev and when to defer
+
+For this dataset, Jev produced the compatible human-judge alignment score as Terra and Luna at lower cost and latency. Before adopting it, we still recommend collecting real answers and check the errors that matter to your application. Jev's probabilities also let you try sending uncertain cases to another evaluator.
+
+Also the limitation of the lack of rationale can be important for iterating on the judge result. For example, if you are iterating on the agent quality during development phase, using normal text-based models would still be better. However, when it comes to large scale evaluation like online production monitoring, Jev could be a great option to balance quality and cost. When Jev flagged some answers as bad, you can still run the same judge with more expensive LLMs to generate human-readable rationale.
+
+A binary Noul question also cannot abstain. When abstention matters, use a Choice question with an explicit `unsure` option, then route those cases to another judge or a human reviewer.
+
+## 6. Try it on your evaluation dataset
+
+Start with a criterion you already use, label a small set of answers, and run Jev alongside your current judge in MLflow. Inspect the disagreements as well as the cost and latency. Then test your choice on fresh examples before changing the evaluator that catches your regressions.
+
+See the [MLflow evaluation quickstart](https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/) and [custom scorer guide](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/custom/) to adapt the example. Share what you learn with the [MLflow community](https://mlflow.org/docs/latest/community/).

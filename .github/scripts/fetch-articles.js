@@ -32,10 +32,17 @@ async function apiFetch(endpoint, apiKey) {
     });
     if (res.status === 429) {
       if (attempt >= maxRetries) {
-        throw new Error(`Rate limited on ${endpoint} after ${maxRetries} retries`);
+        throw new Error(
+          `Rate limited on ${endpoint} after ${maxRetries} retries`,
+        );
       }
-      const retryAfter = Math.max(0, Number(res.headers.get("Retry-After")) || 3);
-      console.warn(`Rate limited on ${endpoint}, retrying in ${retryAfter}s (attempt ${attempt + 1}/${maxRetries})...`);
+      const retryAfter = Math.max(
+        0,
+        Number(res.headers.get("Retry-After")) || 3,
+      );
+      console.warn(
+        `Rate limited on ${endpoint}, retrying in ${retryAfter}s (attempt ${attempt + 1}/${maxRetries})...`,
+      );
       await new Promise((resolve) => setTimeout(resolve, retryAfter * 1000));
       continue;
     }
@@ -56,6 +63,25 @@ function getExistingArticleIds() {
     if (match) ids.add(Number(match[1]));
   }
   return ids;
+}
+
+// Collect slugs already published on disk. The API occasionally emits two
+// distinct articles with the same slug, which produces duplicate Docusaurus
+// routes and non-deterministic routing (one article silently shadows another).
+function getExistingSlugs() {
+  if (!fs.existsSync(ARTICLE_DIR)) return new Set();
+  const entries = fs.readdirSync(ARTICLE_DIR, { withFileTypes: true });
+  const slugs = new Set();
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const indexPath = path.join(ARTICLE_DIR, entry.name, "index.md");
+    if (!fs.existsSync(indexPath)) continue;
+    const match = fs
+      .readFileSync(indexPath, "utf8")
+      .match(/^slug:\s*(.+)\s*$/m);
+    if (match) slugs.add(match[1].trim());
+  }
+  return slugs;
 }
 
 function buildFrontmatter(article) {
@@ -90,6 +116,63 @@ function githubSlug(text) {
     .replace(/\s+/g, "-");
 }
 
+function getHeadingSlugs(md) {
+  const slugs = new Set();
+  const counts = new Map();
+  let inCodeBlock = false;
+
+  for (const line of md.split("\n")) {
+    if (/^\s*```/.test(line)) {
+      inCodeBlock = !inCodeBlock;
+      continue;
+    }
+    if (inCodeBlock) continue;
+
+    const match = line.match(/^(#{2,6})\s+(.+?)\s*#*\s*$/);
+    if (!match) continue;
+
+    const baseSlug = githubSlug(match[2]);
+    const count = counts.get(baseSlug) || 0;
+    counts.set(baseSlug, count + 1);
+    slugs.add(count === 0 ? baseSlug : `${baseSlug}-${count}`);
+  }
+
+  return slugs;
+}
+
+function removeBrokenSamePageAnchorLinks(md) {
+  const headingSlugs = getHeadingSlugs(md);
+  const normalizeAnchor = (anchor) => githubSlug(decodeURIComponent(anchor));
+
+  md = md.replace(
+    /^(\s*[-*]\s*)\[([^\]]+)\]\(#([^)]+)\)\s*$/gm,
+    (match, bullet, text, anchor) => {
+      const slug = normalizeAnchor(anchor);
+      return headingSlugs.has(slug) ? `${bullet}[${text}](#${slug})` : "";
+    },
+  );
+
+  return md.replace(/\[([^\]]+)\]\(#([^)]+)\)/g, (match, text, anchor) => {
+    const slug = normalizeAnchor(anchor);
+    return headingSlugs.has(slug) ? `[${text}](#${slug})` : text;
+  });
+}
+
+// MDX treats `<` as the start of a JSX tag, so bare `<` in prose (e.g. "<0.40",
+// "< 5ms") breaks the build with "Unexpected character before name". Escape any
+// `<` that can't begin a valid tag/comment, leaving fenced code blocks and
+// inline code spans untouched (code legitimately contains `<`, e.g. `a < b`).
+function escapeStrayAngleBrackets(md) {
+  const segments = md.split(/(```[\s\S]*?```|`[^`\n]*`)/g);
+  return segments
+    .map((seg, i) => {
+      // Odd indices are the captured code segments — leave them as-is.
+      if (i % 2 === 1) return seg;
+      return seg.replace(/<(?![A-Za-z/!$_])/g, "&lt;");
+    })
+    .join("");
+}
+
 function sanitizeMarkdown(md) {
   // Strip <scratchpad> blocks (internal authoring notes from the API).
   // Handles both explicit </scratchpad> closing and unclosed blocks that end
@@ -99,7 +182,7 @@ function sanitizeMarkdown(md) {
     "",
   );
 
-  // Remove <markdown section> / </markdown section> wrapper tags
+  // Remove <markdown section> / </markdown section> wrapper tags.
   md = md.replace(/<\/?markdown[^>]*>/gi, "");
 
   // Fix internal anchor links to match Docusaurus heading IDs (github-slugger).
@@ -112,6 +195,14 @@ function sanitizeMarkdown(md) {
 
   // Remove the leading H1 that duplicates the frontmatter title
   md = md.replace(/^# .+\n+/, "");
+
+  // Drop same-page links that point to headings that are not present in the
+  // generated article. Stale entries in API-provided tables of contents break
+  // Docusaurus article and tag pages because excerpts preserve those links.
+  md = removeBrokenSamePageAnchorLinks(md);
+
+  // Escape stray `<` last, so earlier tag-based cleanups still see real tags.
+  md = escapeStrayAngleBrackets(md);
 
   return md;
 }
@@ -131,6 +222,7 @@ async function main() {
   console.log(`Found ${articles.length} articles in latest batch`);
 
   const existingIds = getExistingArticleIds();
+  const usedSlugs = getExistingSlugs();
   const newArticles = articles.filter((a) => !existingIds.has(a.id));
 
   if (newArticles.length === 0) {
@@ -142,11 +234,21 @@ async function main() {
   fs.mkdirSync(ARTICLE_DIR, { recursive: true });
 
   for (const summary of newArticles) {
-    console.log(`Fetching full content for: ${summary.title} (id=${summary.id})`);
+    console.log(
+      `Fetching full content for: ${summary.title} (id=${summary.id})`,
+    );
     const article = await apiFetch(`/v1/articles/${summary.id}`, apiKey);
 
     const datePrefix = datePrefixFromArticle(article);
-    const slug = article.slug || `article-${article.id}`;
+    let slug = article.slug || `article-${article.id}`;
+    // Disambiguate slugs that collide with an already-published article so each
+    // article keeps a unique route instead of shadowing an existing one.
+    if (usedSlugs.has(slug)) {
+      slug = `${slug}-${article.id}`;
+      console.warn(`Slug collision for "${article.slug}", using "${slug}"`);
+    }
+    usedSlugs.add(slug);
+    article.slug = slug;
     const dirName = `${article.id}-${datePrefix}-${slug}`;
     const dirPath = path.join(ARTICLE_DIR, dirName);
 

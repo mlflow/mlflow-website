@@ -115,7 +115,7 @@ export default function Home(): JSX.Element {
             href: `#get-started`,
           }}
           command={{
-            code: "uvx mlflow@latest agent setup",
+            code: "curl -LsSf https://mlflow.org/wizard/setup.sh | sh",
             caption: (
               <>✨ New: let your coding agent set up MLflow tracing for you</>
             ),
