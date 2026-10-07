@@ -30,78 +30,48 @@ One caveat is that LLM judges often produces **rationale** as well, because we w
 
 ## 3. Define an LLM judge with Jev
 
-We'll test Jev with the following LLM judge prompt: **is the answer factually and technically correct?**. MLflow [custom scorers](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/custom/) can call an any external model and return its assessment. We'll wrap a Jev call in a scorer, retaining the probability, latency, and estimated cost alongside its verdict.
+We'll test Jev with the following LLM judge prompt: **is the answer factually and technically correct?** Starting with [MLflow 3.17.0](https://mlflow.org/releases/3.17.0/), you can use Jev directly with `make_judge` through the `typesafe:/` model URI. The [TypeSafe judge integration](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/typesafe/) supports Boolean and finite-category assessments and records decision probabilities in feedback metadata.
+
+MLflow also supports [automatic tracing of TypeSafe SDK calls](https://mlflow.org/docs/latest/genai/tracing/integrations/listing/typesafe/) with `mlflow.typesafe.autolog()` and [Jev endpoints in AI Gateway](https://mlflow.org/docs/latest/genai/governance/ai-gateway/endpoints/model-providers/#typesafe) for centrally managed credentials and usage tracking.
 
 Install the packages and start an MLflow server:
 
 ```bash
-uv add mlflow typesafe-sdk
+uv add "mlflow>=3.17.0" typesafe-sdk
 uv run mlflow server --host 127.0.0.1 --port 5000
 ```
 
-In the terminal where you'll run Python, configure the connection and your TypeSafe API key. Use one evaluation worker so requests run sequentially:
+In the terminal where you'll run Python, configure the connection and your TypeSafe API key:
 
 ```bash
 export MLFLOW_TRACKING_URI="http://127.0.0.1:5000"
 export TYPESAFE_API_KEY="your-typesafe-api-key"
 ```
 
-Then define the judge with the `@scorer` decorator and run it against the dataset. The following code also include benchmark instrumentation to measure cost and latency, which is not necessary for the judging itself.
+Then define the judge with `make_judge`. Pin the model version to match the benchmark; use `typesafe:/jev-latest` to try the latest Jev model.
 
 ```python
-from time import perf_counter
-
 import mlflow
-from mlflow.entities import Feedback
-from mlflow.genai.scorers import scorer
-from typesafe_sdk import Noul, RetryPolicy, TypeSafeClient
+from mlflow.genai.judges import make_judge
 
 mlflow.set_experiment("jev-judge-comparison")
-client = TypeSafeClient(
-    model="jev-1.13.0", retry=RetryPolicy(max_retries=0), timeout=30
+jev_correctness = make_judge(
+    name="jev_correctness",
+    model="typesafe:/jev-1.13.0",
+    instructions=(
+        "Is the candidate answer in {{ outputs }} factually and technically correct "
+        "for the question and MLflow documentation in {{ inputs }}, respecting any "
+        "version specified in the question? Answer yes or no. "
+        "Answer yes if there is no material factual or API error. "
+        "Answer no if at least one claim or instruction is materially wrong or misleading. "
+        "Do not penalize style or harmless omissions. An omission is material when it "
+        "makes the requested technical answer misleading."
+    ),
+    feedback_value_type=bool,
 )
-THRESHOLD = 0.5
-INPUT_USD_PER_MILLION = 0.042
-CRITERION = (
-    "Is the candidate answer factually and technically correct for the question, "
-    "using the supplied MLflow documentation and respecting any version specified "
-    "in the question? Answer yes if there is no material factual or API error. "
-    "Answer no if at least one claim or instruction is materially wrong or misleading. "
-    "Do not penalize style or harmless omissions. An omission is material when it "
-    "makes the requested technical answer misleading."
-)
-
-
-def judge_answer(question: str, context: str, answer: str) -> dict:
-    started = perf_counter()
-    response = client.system_one(
-        state={"question": question, "context": context, "answer": answer},
-        questions={"correct": Noul(instructions=CRITERION)},
-    )
-    latency_ms = (perf_counter() - started) * 1000
-    probability = response.nouls["correct"].noul
-    tokens = response.usage.input_tokens
-    cost = None if tokens is None else tokens * INPUT_USD_PER_MILLION / 1_000_000
-    return {
-        "prediction": "correct" if probability >= THRESHOLD else "incorrect",
-        "p_correct": probability,
-        "model": response.model,
-        "input_tokens": tokens,
-        "latency_ms": latency_ms,
-        "estimated_cost_usd": cost,
-    }
-
-
-@scorer
-def jev_correctness(inputs: dict) -> Feedback:
-    result = judge_answer(**inputs)
-    return Feedback(
-        value=result["prediction"] == "correct",
-        metadata={**result, "threshold": THRESHOLD},
-    )
 ```
 
-`jev_correctness` evaluates a candidate answer stored with its question and documentation in `inputs`. It returns a Boolean assessment for use in MLflow evaluations. Next, we'll check how reliable those assessments are.
+`jev_correctness` evaluates the candidate answer in `outputs` using the question and documentation in `inputs`. MLflow records a Boolean assessment and the probability under `typesafe.probability` in feedback metadata, using a threshold of 0.5. The benchmark below used direct TypeSafe SDK calls with separate latency and cost instrumentation; this example uses the same model version but adapts the prompt for `make_judge`, so results may differ.
 
 ## 4. Measure initial quality, cost, and latency
 
@@ -110,33 +80,35 @@ We created **30 MLflow QA examples** covering tracing, evaluation, prompts, data
 Here is one of the incorrect answers for example:
 
 ```python
-{
-    "inputs": {
-        "question": (
-            'My `@scorer` function is called `check_answer`, but it returns '
-            '`Feedback(name="answer_quality", value=True)`. '
-            'Which name appears as the metric?'
-        ),
-        "context": (
-            "1. If the scorer returns one or more `Feedback` objects, then "
-            "`Feedback.name` fields take precedence, if specified.\n"
-            "2. For primitive return values or unnamed `Feedback`s, the "
-            "function name (for the `@scorer` decorator) or the `Scorer.name` "
-            "field (for the `Scorer` class) are used."
-        ),
-    },
-    "outputs": (
+data = [
+    {
+        "inputs": {
+            "question": (
+                'My `@scorer` function is called `check_answer`, but it returns '
+                '`Feedback(name="answer_quality", value=True)`. '
+                'Which name appears as the metric?'
+            ),
+            "context": (
+                "1. If the scorer returns one or more `Feedback` objects, then "
+                "`Feedback.name` fields take precedence, if specified.\n"
+                "2. For primitive return values or unnamed `Feedback`s, the "
+                "function name (for the `@scorer` decorator) or the `Scorer.name` "
+                "field (for the `Scorer` class) are used."
+            ),
+        },
+        "outputs": (
             "The metric is named `check_answer`, because decorated scorers "
             "always use the Python function name. To show `answer_quality` "
             "in the results, rename the function to that name."
-    ),
-    # This field is not passed to the Jev judge.
-    "expectations": {"human_correctness": "incorrect"},
-}
+        ),
+        # This field is not passed to the Jev judge.
+        "expectations": {"human_correctness": "incorrect"},
+    }
+]
 ```
 
 ```python
-mlflow.genai.evaluate(data=data, scorers=[judge_answer])
+mlflow.genai.evaluate(data=data, scorers=[jev_correctness])
 ```
 
 We also tested GPT-5.6 Terra and Luna, Claude Sonnet 4.6, Claude Opus 4.8, and DeepSeek-V4.1-Flash (`deepseek-flash`) the same inputs and correctness criterion. We explicitly disabled extended reasoning and limited output to 128 tokens, testing a configuration intended for quick pass/fail checks. Here is the result from the benchmark.
