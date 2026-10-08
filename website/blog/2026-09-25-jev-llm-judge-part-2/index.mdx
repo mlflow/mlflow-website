@@ -88,13 +88,20 @@ A similar approach is discussed in [JEV-as-a-Judge: Accept When Confident, Escal
 
 ## Run Jev with `make_judge`
 
-:::info Sneak peek: MLflow 3.17
+:::info Available in MLflow 3.17.0
 
-MLflow 3.17 has not been released yet. It will support Jev in built-in scorers and custom judges through the `typesafe:/` model URI. The example below previews that integration and will not run on the current stable release.
+[MLflow 3.17.0](https://mlflow.org/releases/3.17.0/) supports Jev in built-in scorers and custom judges through the `typesafe:/` model URI. See the [TypeSafe judge guide](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/typesafe/) for Boolean and finite-category assessments. The release also adds [TypeSafe SDK tracing](https://mlflow.org/docs/latest/genai/tracing/integrations/listing/typesafe/) with `mlflow.typesafe.autolog()` and [Jev endpoints in AI Gateway](https://mlflow.org/docs/latest/genai/governance/ai-gateway/endpoints/model-providers/#typesafe).
 
 :::
 
-Set `TYPESAFE_API_KEY` in your environment, then define the same correctness check as a boolean judge:
+Install MLflow 3.17.0 or later and set `TYPESAFE_API_KEY` in your environment:
+
+```bash
+pip install "mlflow>=3.17.0"
+export TYPESAFE_API_KEY="your-typesafe-api-key"
+```
+
+Then define the same correctness check as a Boolean judge:
 
 ```python
 import mlflow
@@ -106,8 +113,8 @@ jev_correctness = make_judge(
     instructions=(
         "Is the answer in {{ outputs }} factually and technically correct for "
         "the question and documentation in {{ inputs }}? Respect any version "
-        "specified in the question. Mark it incorrect if any material claim "
-        "or instruction is wrong."
+        "specified in the question. Answer yes or no. Mark it incorrect if any "
+        "material claim or instruction is wrong."
     ),
     feedback_value_type=bool,
 )
