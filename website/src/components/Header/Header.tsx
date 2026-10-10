@@ -15,14 +15,20 @@ import { HeaderProductsSubmenu } from "../HeaderProductsSubmenu/HeaderProductsSu
 import { HeaderDocsSubmenu } from "../HeaderDocsSubmenu/HeaderDocsSubmenu";
 import { HeaderResourcesSubmenu } from "../HeaderResourcesSubmenu/HeaderResourcesSubmenu";
 
-const GitHubStarsBadge = () => {
+const GitHubStarsBadge = ({ className }: { className?: string }) => {
   const stars = useGitHubStars();
   return (
     <a
       href="https://github.com/mlflow/mlflow"
       target="_blank"
       rel="noreferrer noopener"
-      className="hidden md:flex items-center gap-1.5 rounded-xl bg-white/10 border border-white/20 px-4 py-2 text-[15px] text-white hover:bg-white/15 hover:border-white/30 transition-all"
+      aria-label={
+        stars ? `MLflow on GitHub, ${stars} stars` : "MLflow on GitHub"
+      }
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-xl bg-white/10 border border-white/20 px-3 py-2 text-[14px] text-white hover:bg-white/15 hover:border-white/30 transition-all",
+        className,
+      )}
     >
       <svg viewBox="0 0 48 48" fill="none" className="w-4 h-4">
         <path
@@ -41,7 +47,7 @@ import { MLFLOW_TRY_DEMO_URL } from "@site/src/constants";
 import { reportTryDemo } from "@site/src/utils/siteEvents";
 import { cva } from "class-variance-authority";
 
-const MD_BREAKPOINT = 640;
+const XL_BREAKPOINT = 1280;
 
 const navStyles = cva(
   "fixed w-full z-20 top-0 start-0 bg-black/20 border-b border-[#F7F8F8]/8 backdrop-blur-[20px] overflow-y-auto",
@@ -144,7 +150,7 @@ export const Header = () => {
 
   useLayoutEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= MD_BREAKPOINT) {
+      if (window.innerWidth >= XL_BREAKPOINT) {
         setIsOpen(false);
       }
     };
@@ -165,25 +171,25 @@ export const Header = () => {
 
   return (
     <nav className={navStyles({ isOpen })}>
-      <div className="flex flex-wrap items-center mx-auto px-6 lg:px-20 py-2 max-w-container">
-        <div className="md:contents flex flex-row justify-between w-full sticky top-[8px]">
+      <div className="flex flex-wrap items-center justify-between gap-x-6 mx-auto px-6 py-2 max-w-container xl:grid xl:grid-cols-[auto_minmax(0,1fr)_auto] xl:items-center xl:gap-x-12 xl:px-20">
+        <div className="flex flex-row justify-between w-full sticky top-[8px] xl:contents">
           <Link
             href="/"
-            className="flex items-center space-x-3 rtl:space-x-reverse grow basis-0"
+            className="flex items-center space-x-3 rtl:space-x-reverse xl:justify-self-start"
             aria-label="MLflow Home"
           >
             <Logo className="h-[36px]" aria-hidden="true" />
           </Link>
-          <div className="flex flex-row items-center gap-3 md:order-2 md:gap-4 rtl:space-x-reverse grow justify-end basis-0">
-            <GitHubStarsBadge />
-            <Link href={getStartedHref} className="hidden md:block">
+          <div className="flex flex-row items-center gap-2 xl:order-last xl:w-full xl:justify-end xl:justify-self-end rtl:space-x-reverse">
+            <GitHubStarsBadge className="hidden xl:inline-flex" />
+            <Link href={getStartedHref} className="hidden xl:block">
               <Button variant="outline" size="small">
                 Get Started
               </Button>
             </Link>
             <Link
               href={MLFLOW_TRY_DEMO_URL}
-              className="hidden md:block"
+              className="hidden xl:block"
               onClick={reportTryDemo}
             >
               <Button variant="primary" size="small">
@@ -193,7 +199,7 @@ export const Header = () => {
             <button
               data-collapse-toggle="navbar-sticky"
               type="button"
-              className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-white md:hidden focus:outline-none cursor-pointer"
+              className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-white xl:hidden focus:outline-none cursor-pointer"
               onClick={() => setIsOpen(!isOpen)}
             >
               <span className="sr-only">Open main menu</span>
@@ -217,12 +223,12 @@ export const Header = () => {
         </div>
         <div
           className={cn(
-            "items-center justify-between w-full md:flex md:w-auto md:order-1 mt-4 md:mt-0",
-            isOpen ? "flex" : "hidden md:flex",
+            "items-center justify-between w-full xl:flex xl:w-auto xl:justify-self-center mt-4 xl:mt-0",
+            isOpen ? "flex" : "hidden xl:flex",
           )}
         >
-          <ul className="flex flex-col font-medium md:flex-row gap-y-6 gap-x-4 lg:gap-x-10 w-full md:w-auto">
-            <li className="w-full md:w-auto md:hidden">
+          <ul className="flex flex-col font-medium xl:flex-row gap-y-6 xl:gap-x-8 w-full xl:w-auto">
+            <li className="w-full xl:w-auto xl:hidden">
               <button
                 type="button"
                 onClick={handleProductItemClick}
@@ -251,19 +257,19 @@ export const Header = () => {
               </div>
             </li>
             <li
-              className="w-full md:w-auto hidden md:block"
+              className="w-full xl:w-auto hidden xl:block"
               onMouseEnter={handleProductItemHover}
               onClick={toggleProductSubmenuHovered}
             >
               <HeaderMenuItem label="Components" hasDropdown />
             </li>
-            <li className="w-full md:w-auto">
+            <li className="w-full xl:w-auto">
               <HeaderMenuItem href="/releases" label="Releases" />
             </li>
-            <li className="w-full md:w-auto">
+            <li className="w-full xl:w-auto">
               <HeaderMenuItem href="/blog" label="Blog" />
             </li>
-            <li className="w-full md:w-auto md:hidden">
+            <li className="w-full xl:w-auto xl:hidden">
               <button
                 type="button"
                 onClick={handleDocsItemClick}
@@ -292,13 +298,13 @@ export const Header = () => {
               </div>
             </li>
             <li
-              className="w-full md:w-auto hidden md:block"
+              className="w-full xl:w-auto hidden xl:block"
               onMouseEnter={handleDocsItemHover}
               onClick={toggleDocsSubmenuHovered}
             >
               <HeaderMenuItem label="Docs" hasDropdown />
             </li>
-            <li className="w-full md:w-auto md:hidden">
+            <li className="w-full xl:w-auto xl:hidden">
               <button
                 type="button"
                 onClick={handleResourcesItemClick}
@@ -327,13 +333,14 @@ export const Header = () => {
               </div>
             </li>
             <li
-              className="w-full md:w-auto hidden md:block"
+              className="w-full xl:w-auto hidden xl:block"
               onMouseEnter={handleResourcesItemHover}
               onClick={toggleResourcesSubmenuHovered}
             >
               <HeaderMenuItem label="Resources" hasDropdown />
             </li>
-            <li className="w-full md:w-auto md:hidden flex flex-col gap-2">
+            <li className="w-full xl:w-auto xl:hidden flex flex-col gap-2 mt-4">
+              <GitHubStarsBadge className="w-full justify-center" />
               <Link href={getStartedHref}>
                 <Button variant="outline" size="small" width="full">
                   Get Started
