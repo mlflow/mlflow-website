@@ -20,6 +20,8 @@ An LLM evaluation platform tells you whether your LLM app or agent gives correct
 
 This guide compares six platforms on the features that matter for evaluation: judges, datasets, human review, production monitoring, and what happens after a failure is found.
 
+**How we ranked them:** by how much of the evaluation loop each platform covers in one tool, from finding failures to measuring and fixing them. This guide is published by the MLflow team, and every competitor description links to that platform's own documentation.
+
 ## Quick answer: what are the best LLM evaluation platforms in 2026?
 
 The best LLM evaluation platforms in 2026 are:
@@ -43,6 +45,7 @@ The best LLM evaluation platforms in 2026 are:
 - [6. W&B Weave](#6-wb-weave)
 - [How to choose an LLM evaluation platform](#how-to-choose-an-llm-evaluation-platform)
 - [FAQ](#faq)
+- [Get started with MLflow evaluation](#get-started-with-mlflow-evaluation)
 
 ## What to look for in an LLM evaluation platform
 
@@ -106,7 +109,7 @@ MLflow has no feature gating. Every feature in this section is in the open-sourc
 
 ## 2. LangSmith
 
-LangSmith is the evaluation and observability platform from LangChain. It is the natural choice for teams that build on LangChain and LangGraph, because it understands their runs and objects with no extra setup.
+LangSmith is the evaluation and observability platform from LangChain, and it is the natural choice for teams that build on LangChain and LangGraph. It runs offline evaluations on datasets and online evaluations on production traces, and it understands LangChain runs with no extra setup. Source: [LangSmith evaluation docs](https://docs.langchain.com/langsmith/evaluation).
 
 - **Best for:** teams whose agents run on LangChain or LangGraph.
 - **Key fact:** supports both offline evaluations on datasets and online evaluations on production traces.
@@ -120,7 +123,7 @@ LangSmith is the evaluation and observability platform from LangChain. It is the
 
 ## 3. Braintrust
 
-Braintrust is a hosted platform that connects datasets, experiments, scorers, and a prompt playground. Its experiment view makes it easy to compare prompt and model variants row by row.
+Braintrust is a hosted evaluation platform that connects datasets, experiments, scorers, and a prompt playground in one workflow for engineers and product managers. Its experiment view compares prompt and model variants row by row, and the same scorers can run on production traffic. Source: [Braintrust evaluation docs](https://www.braintrust.dev/docs/evaluate).
 
 - **Best for:** teams that want a polished, hosted experiment workflow, including product managers who review results.
 - **Key fact:** Loop, a built-in AI assistant, generates scorers and datasets from plain-language descriptions.
@@ -134,7 +137,7 @@ Braintrust is a hosted platform that connects datasets, experiments, scorers, an
 
 ## 4. Confident AI (DeepEval)
 
-Confident AI is the hosted platform behind DeepEval, a popular open-source evaluation library. DeepEval lets you write LLM tests that look like pytest unit tests.
+Confident AI is the hosted platform behind DeepEval, a popular open-source evaluation library. DeepEval lets you write LLM tests that look like pytest unit tests and run them in CI, and Confident AI stores the results, reports, and history for your team. Source: [DeepEval docs](https://deepeval.com/docs/getting-started).
 
 - **Best for:** engineers who want evaluation as code, inside their existing test suites and CI.
 - **Key fact:** DeepEval ships a large metric library, including G-Eval, a general LLM-as-a-judge metric for custom criteria.
@@ -148,7 +151,7 @@ Confident AI is the hosted platform behind DeepEval, a popular open-source evalu
 
 ## 5. Galileo
 
-Galileo is an enterprise platform for AI evaluation and agent reliability. It uses Luna, a family of small evaluation models, to score outputs with low latency.
+Galileo is an enterprise platform for AI evaluation and agent reliability. It uses Luna, a family of small evaluation models, to score outputs with low latency and at low cost, so teams can evaluate production traffic and enforce guardrails before answers reach users. Source: [Galileo docs](https://docs.galileo.ai/).
 
 - **Best for:** enterprises that need guardrails in the request path, which block bad outputs before users see them.
 - **Key fact:** Luna-2 evaluation models are built for fast, low-cost scoring, so you can evaluate a large share of production traffic.
@@ -162,7 +165,7 @@ Galileo is an enterprise platform for AI evaluation and agent reliability. It us
 
 ## 6. W&B Weave
 
-W&B Weave is the LLM evaluation and tracing toolkit from Weights & Biases. It fits well for teams that already track model training in W&B.
+W&B Weave is the LLM evaluation and tracing toolkit from Weights & Biases. It pairs datasets with scorers, versions every evaluation run, and compares results on leaderboards, so it fits well for teams that already track model training in W&B. Source: [Weave evaluation docs](https://docs.wandb.ai/weave/guides/core-types/evaluations).
 
 - **Best for:** teams that already use Weights & Biases for classic ML experiments.
 - **Key fact:** the Weave SDK is open source under Apache 2.0.
@@ -212,9 +215,17 @@ Use a platform that analyzes traces for you. MLflow's Automatic Issue Detection 
 
 Collect a small set of human labels, then align the judge to them. In MLflow, MemAlign and SIMBA tune a judge with human feedback. MemAlign needs fewer than 50 labeled examples.
 
+### What platform should I use for automated LLM evaluation in production?
+
+Use a platform that runs the same scorers on live traffic that you use in offline tests. MLflow runs [automatic evaluations](https://mlflow.org/docs/latest/genai/eval-monitor/automatic-evaluations/) on production traces with LLM judges and code scorers, and Automatic Issue Detection groups the failures it finds. It is free and open source.
+
 ### Can I request a feature for MLflow?
 
 Yes. Open a [feature request on GitHub](https://github.com/mlflow/mlflow/issues). MLflow is community-driven, and the maintainers review suggestions and feature requests from users.
+
+## Get started with MLflow evaluation
+
+Install MLflow with `pip install mlflow`, then follow the [evaluation quickstart](https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/) to run your first LLM judge in a few minutes.
 
 ## Coming next: Part 2
 
