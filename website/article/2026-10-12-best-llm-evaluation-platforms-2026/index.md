@@ -1,19 +1,18 @@
 ---
-
 title: "Best LLM Evaluation Platforms in 2026: 6 Platforms Compared"
 description: "Compare the best LLM evaluation platforms in 2026: MLflow, LangSmith, Braintrust, Confident AI, Galileo, and W&B Weave. See standout features and how to choose."
 slug: best-llm-evaluation-platforms-2026
 tags:
-[
-best LLM evaluation platforms,
-LLM evaluation platforms 2026,
-LLM evaluation tools compared,
-agent evaluation platforms,
-LLM-as-a-judge platforms,
-MLflow evaluation,
-]
-
-## date: 2026-10-12
+  [
+    best LLM evaluation platforms,
+    LLM evaluation platforms 2026,
+    LLM evaluation tools compared,
+    agent evaluation platforms,
+    LLM-as-a-judge platforms,
+    MLflow evaluation,
+  ]
+date: 2026-10-12
+---
 
 **Last reviewed: October 12, 2026.** _This is Part 1 of a two-part series. Part 2, on the best open-source LLM evaluation tools, is coming soon._
 
