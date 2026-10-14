@@ -71,11 +71,11 @@ Create an experiment for your traces (`mlflow experiments create -n claude-trace
 
 ## Step 2: Send Claude traces via OTLP
 
-Every product sends traces to the same place: the MLflow endpoint `http://<your-server>/v1/traces`, with the header `x-mlflow-experiment-id: <your experiment ID>`.
+Every product sends traces to the same place: the MLflow endpoint `http://<your-server>/v1/traces`, with the header `x-mlflow-experiment-id: <your experiment ID>`. The one exception is the Claude Platform UI, which takes your server's base URL and adds `/v1/traces` itself.
 
 ### Claude Platform UI: Messages API and Managed Agents
 
-In [Claude Platform](https://platform.claude.com/), open **OpenTelemetry → + Add destination** and choose **Custom**. Set the endpoint to `https://YOUR_MLFLOW_SERVER/v1/traces` and add the `x-mlflow-experiment-id` header with your experiment ID, along with any authentication headers.
+In [Claude Platform](https://platform.claude.com/), open **OpenTelemetry → + Add destination** and choose **Custom**. Set **OTLP endpoint URL** to your MLflow server's base URL, for example `https://mlflow.example.com`. Don't add `/v1/traces`. Then add the `x-mlflow-experiment-id` header with your experiment ID, along with any authentication headers.
 
 :::warning Use a remote MLflow server
 
@@ -158,9 +158,16 @@ const message = await client.messages.create({
 });
 ```
 
+The SDK exports metadata only by default; set this to include prompts and responses in the spans:
+
+```bash
+# Optional: include prompts and responses in the spans (metadata only by default).
+export ANTHROPIC_OPEN_TELEMETRY_TRACES_CONTENT_MODE=content
+```
+
 ### Claude Managed Agents
 
-Claude Managed Agents run on Anthropic's infrastructure. Set the OTLP trace endpoint to your MLflow server's `/v1/traces` URL and add the header `x-mlflow-experiment-id: <your experiment ID>`. If the traces are sent from Anthropic's side, the server needs a URL Anthropic can reach; turn on [MLflow authentication](https://mlflow.org/docs/latest/self-hosting/security/basic-http-auth/) before you expose it.
+Claude Managed Agents run on Anthropic's infrastructure, so their server-side traces are exported from the Claude Platform UI: follow [the Claude Platform UI setup above](#claude-platform-ui-messages-api-and-managed-agents). Anthropic sends the traces, so the server needs a URL Anthropic can reach; turn on [MLflow authentication](https://mlflow.org/docs/latest/self-hosting/security/basic-http-auth/) before you expose it.
 
 ### Claude Code
 
@@ -186,11 +193,11 @@ export OTEL_LOG_TOOL_DETAILS=1
 export OTEL_LOG_TOOL_CONTENT=1
 ```
 
-Launch `claude` and work normally; when the session ends, the trace lands in your MLflow experiment.
+Launch `claude` and work normally. Each prompt you submit is exported as its own trace within a few seconds.
 
 ### Claude Agent SDK
 
-The Claude Agent SDK (Python and TypeScript) runs the Claude Code CLI as a child process and passes configuration through to it, so it uses the Claude Code setup above: set those environment variables in the process that starts the SDK, and every SDK session produces the same traces.
+The Claude Agent SDK (Python and TypeScript) runs the Claude Code CLI as a child process and passes configuration through to it, so it uses the Claude Code setup above: set those environment variables in the process that starts the SDK, and each prompt produces a trace, as it does with the CLI.
 
 **Python:** the SDK merges its `env` option onto the inherited environment, so exporting the variables before running your script is enough:
 
@@ -248,7 +255,7 @@ Two SDK-specific caveats:
 
 ## Step 3: Inspect the traces in MLflow
 
-Open the experiment's **Traces** tab. Each agent run or request shows up as one trace, with token and cost totals on the row. Open a trace to see each model call and tool call as a step, with its inputs, outputs and token counts.
+Open the experiment's **Traces** tab. Each agent run or request shows up as one trace, with token and cost totals on the row. Open a trace to see each model call and tool call as a step, with its token counts.
 
 <BlogImage
   src={require("./claude-tool-span.png").default}
@@ -261,10 +268,10 @@ By default, Claude Code's model-request spans carry token counts but not the mod
 
 ```bash
 export ENABLE_BETA_TRACING_DETAILED=1
-export BETA_TRACING_ENDPOINT=http://127.0.0.1:5000/v1/traces
+export BETA_TRACING_ENDPOINT=http://127.0.0.1:5000
 ```
 
-adds `response.model_output` (the model's reply), `new_context` (the context snapshot), `tool_input` (tool inputs in full), and a few system-prompt attributes. The model's reply then appears as the model call's output:
+adds `response.model_output` (the model's reply), `new_context` (the context snapshot), `tool_input` (tool inputs in full), and a few system-prompt attributes. Keep the Step 2 variables set too: the experiment header still comes from `OTEL_EXPORTER_OTLP_TRACES_HEADERS`. The model's reply then appears as the model call's output:
 
 <BlogImage
   src={require("./claude-llm-span-detailed.png").default}
