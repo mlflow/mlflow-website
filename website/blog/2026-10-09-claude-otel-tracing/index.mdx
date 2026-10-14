@@ -41,6 +41,16 @@ Claude sends traces with OTLP over HTTP. In this tutorial they go to a local MLf
 +----------------+                         +---------------+            +------------+
 ```
 
+## SDK vs. Platform export
+
+For Messages API requests and Managed Agents sessions, you can use SDK export, Platform export, or both.
+
+**Platform export** sends traces directly from Anthropic to MLflow after an admin adds a destination in Claude Platform. It captures individual model runs, Managed Agents turns, and tools executed by the API, regardless of which client sends the requests.
+
+**SDK export** sends traces from your application. It captures SDK requests and tool-runner activity, and you can add your own spans for local operations. Configure its OpenTelemetry exporter and content mode in code; the Platform destination's content mode applies only to Platform exports.
+
+**Both together** connect client and server spans in one trace through W3C trace context. Send both sources to the same MLflow experiment to see application activity alongside Anthropic's server activity. For Claude Platform on AWS, API spans appear in separate traces. See [Anthropic's OpenTelemetry guide](https://platform.claude.com/docs/en/manage-claude/opentelemetry) for coverage and setup details.
+
 ## Prerequisites
 
 - **MLflow 3.17.1 or newer** on the server side (`pip install "mlflow>=3.17.1"`)
@@ -62,28 +72,14 @@ Every product sends traces to the same place: the MLflow endpoint `http://<your-
 
 ### Claude Platform UI: Messages API and Managed Agents
 
-You can also configure tracing for Messages API requests and Managed Agents sessions directly in Claude Platform. For this flow, Anthropic sends traces from its infrastructure, so use an HTTPS MLflow server that Anthropic can reach and enable [MLflow authentication](https://mlflow.org/docs/latest/self-hosting/security/basic-http-auth/) on that server.
+In [Claude Platform](https://platform.claude.com/), open **OpenTelemetry → + Add destination** and choose **Custom**. Set the endpoint to `https://YOUR_MLFLOW_SERVER/v1/traces` and add the `x-mlflow-experiment-id` header with your experiment ID. Use an HTTPS server Anthropic can reach and include its authentication headers.
 
-1. Open [Claude Platform](https://platform.claude.com/) and select **OpenTelemetry** in the sidebar.
-2. Click **+ Add destination**.
-3. Select **Custom** as the **Provider** to connect an OTLP-native backend such as MLflow.
-4. Fill in the destination fields:
-
-   | Field                 | Value                                                                                                                                                                                   |
-   | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-   | **Name** (optional)   | A name such as `MLflow OpenTelemetry Backend`                                                                                                                                           |
-   | **OTLP endpoint URL** | `https://YOUR_MLFLOW_SERVER/v1/traces`                                                                                                                                                  |
-   | **Request headers**   | Add `x-mlflow-experiment-id` as the header name and your experiment's numeric ID as its value. Add any authentication headers required by your MLflow deployment as additional headers. |
-
-5. Choose a **Content mode**. Select **Full content** to record message and tool content for deeper analysis and evaluation. Choose **Metadata only** if you only need statistics such as latency and token counts, without message or tool content.
-6. Select the **Workspaces** whose activity you want to export, then click **Add destination**.
+Choose **Full content** to record message and tool content for deeper analysis and evaluation, or **Metadata only** for statistics such as latency and token counts. Select your workspaces and click **Add destination**.
 
 <BlogImage
   src={require("./claude-platform-otel-destination.png").default}
   alt="Claude Platform's Add destination dialog with the Custom provider, an MLflow endpoint, the x-mlflow-experiment-id request header, and Full content selected"
 />
-
-For more details on destinations and content modes, see [Anthropic's OpenTelemetry guide](https://platform.claude.com/docs/en/manage-claude/opentelemetry).
 
 ### Claude SDKs and the Messages API
 
