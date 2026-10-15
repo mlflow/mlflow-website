@@ -136,7 +136,23 @@ These are **one-pass results on a small synthetic set**, not a general ranking o
 
 The corrected [Part 1 result](/blog/jev-llm-judge/) was **29/29 for Jev** and **28/29 for OpenAI Decisions**. Its original Jev calls sent `state` as structured data; our new pass sent the same canonical JSON text to every model. Jev made one different decision here. With one pass of each form, we cannot tell whether serialization or normal run-to-run variation caused it. The OpenAI call in Part 1 already used the canonical text and again scored 28/29. Part 1 estimated $0.0247 per 1,000 Jev judgments and $0.0459 for OpenAI Decisions, with observed medians of 369 ms and 172 ms. Those hosted calls were made on different dates, so the timings describe those runs, not a general speed ranking or the cost of serving an open model.
 
-[Part 2](/blog/jev-llm-judge-part-2/) used a different, harder bilingual set of 72 answers. Jev agreed with 64/72 labels in each of two runs and falsely accepted some nearly correct answers with a material error. The published Part 2 post does not include all 72 rows and labels, so we cannot run a matched OpenAI, OpenJev, or Laya comparison on it. A [separate SemIf-OpenJev follow-up](https://qiita.com/taka_yayoi/items/46809e081d97601bb190) reported 59/72 on those rows, but that Qwen-based project is **different from OpenJev 0.1** in the table above.
+[Part 2](/blog/jev-llm-judge-part-2/) used a different, harder bilingual set of 72 answers. Jev agreed with 64/72 labels in each of two runs and falsely accepted some nearly correct answers with a material error. The published Part 2 post does not include the full fixture or its original documentation excerpts, so we cannot rerun that study exactly. A [separate SemIf-OpenJev follow-up](https://qiita.com/taka_yayoi/items/46809e081d97601bb190) reported 59/72 on those rows, but that Qwen-based project is **different from OpenJev 0.1** in the table above.
+
+### Five hard examples from Part 2
+
+The [original Japanese Part 2 article](https://qiita.com/taka_yayoi/items/3cc901e872209835491a) displays five question-and-answer pairs. We sent those exact displayed pairs to all four models with newly sourced excerpts from the current Japanese Databricks docs. Each model received the same JSON text and the same correctness criterion. This is a **new five-case probe**, not a rerun of the 72-case study. The table shows the probability each model assigned to the answer being correct, rounded to three decimals. At 0.5 or above, we treated the answer as accepted.
+
+| Published example                       |   Jev | OpenAI Decisions | OpenJev |  Laya |
+| --------------------------------------- | ----: | ---------------: | ------: | ----: |
+| `MERGE`: source and target reversed      | 0.660 |            1.000 |   1.000 | 0.461 |
+| Secret creation privileges (unscored)   | 0.820 |            0.990 |   0.998 | 0.597 |
+| Deletion vectors: names `VACUUM` as purge | 0.770 |            0.950 |   0.917 | 0.573 |
+| Time travel: says date-only string fails | 0.500 |            0.150 |   0.673 | 0.624 |
+| `CHECK`: says other rows commit          | 0.150 |            0.000 |   0.001 | 0.659 |
+
+The author marked all five answers incorrect. We excluded the secret-creation example from scoring: its answer omits `USE CATALOG`, but [Databricks grants that privilege on `main` by default](https://docs.databricks.com/aws/ja/data-governance/unity-catalog/access-control/privileges-reference), so the answer can be sufficient in that context. Of the four clear errors, Jev and OpenJev accepted three each, OpenAI accepted two, and Laya accepted three. All four accepted the answer that confuses `REORG TABLE ... APPLY (PURGE)` with `VACUUM`. This small set contains only incorrect answers, so it cannot measure false rejections or overall accuracy.
+
+The [exact pairs, documentation excerpts, and source links](/data/decision-models-hard-cases.json), [per-case results and request hashes](/data/decision-models-hard-results.json), and [rerun script](/data/run-decision-models-hard-probe.py) are available alongside the 29-case benchmark. Laya's tokenizer check found no truncation on these five requests; its longest input used 354 of the checkpoint's 1,024 tokens.
 
 ## How to choose for your own judge
 
