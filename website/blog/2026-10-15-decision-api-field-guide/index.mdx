@@ -1,0 +1,102 @@
+---
+title: "A field guide to Decision APIs: Jev, OpenAI, OpenRouter, and open models"
+description: "Separate the model, request format, and serving route behind Jev, OpenAI Decisions, OpenRouter Decisions, and other decision models."
+slug: decision-api-field-guide
+authors: [yuki-watanabe]
+tags: [genai, evaluation, judges, llm]
+thumbnail: /img/blog/decision-api-field-guide.svg
+image: /img/blog/decision-api-field-guide.svg
+---
+
+Suppose you need one answer from a model: **Does this support ticket ask for a refund?** You can send that question to TypeSafe, OpenAI, OpenRouter, or an OpenJev server and get back a probability. The names sound like alternatives, but they describe different parts of the call. Jev is a model, System One and Decisions are request formats, and OpenRouter routes requests to models.
+
+## What each name refers to
+
+| Name                                                                                                                                 | What it provides                                                                          | Where a request goes                                          |
+| ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| [TypeSafe Jev](https://docs.typesafe.ai/models)                                                                                      | A hosted decision model, accessed through TypeSafe's System One API                       | TypeSafe's `POST /v1/systemone`, or a router that serves Jev  |
+| [OpenAI Decisions](https://developers.openai.com/api/reference/resources/decisions/methods/create)                                   | OpenAI's Decisions API and its `gpt-6-luna` decision model                                | OpenAI's `POST /v1/decisions`, or a router serving that model |
+| [OpenRouter Decisions](https://openrouter.ai/docs/api/api-reference/alphadecisions/submit-a-decisions-questions-and-answers-request) | A common request format and a catalog of models from multiple authors                     | OpenRouter's `POST /api/alpha/decisions`                      |
+| [OpenJev](https://github.com/razorback16/openjev)                                                                                    | An open-source server that uses DiffusionGemma for decisions and can serve other backends | Its server's `POST /v1/systemone` or `POST /v1/decisions`     |
+
+OpenRouter's [System One route](https://openrouter.ai/docs/api/api-reference/systemone/submit-a-system-one-request) at `/api/v1/systemone` also accepts TypeSafe SDK-shaped requests. The selected model ID determines the upstream model. For example, OpenRouter's [Jev listing](https://openrouter.ai/api/v1/models/typesafe/jev-1.14/endpoints) is served by TypeSafe, while its [GPT-6 Luna Decisions listing](https://openrouter.ai/api/v1/models/openai/gpt-6-luna-decisions/endpoints) is served by OpenAI.
+
+OpenJev's `openjev-0.1` route reads answer slots from DiffusionGemma. Its server also accepts OpenAI Decisions requests by translating them into its System One-shaped inference path, and it can serve Laya. Laya remains a separate model when accessed through OpenJev.
+
+## Two native request formats
+
+The same refund question shows the main wire difference. TypeSafe's [System One API](https://docs.typesafe.ai/api) takes a `state` and a map of named questions. A yes/no question has type `noul`; its answer gives the probability of yes.
+
+```json
+{
+  "model": "jev-latest",
+  "state": "I was charged twice. Please refund the extra charge.",
+  "questions": {
+    "refund": {
+      "type": "noul",
+      "instructions": "Is the customer asking for a refund?"
+    }
+  }
+}
+```
+
+Send that body to `POST https://api.typesafe.ai/v1/systemone`. OpenRouter accepts the same keyed-question shape at `/api/alpha/decisions` with an OpenRouter model ID such as `typesafe/jev-1.13`. Its `/api/v1/systemone` route accepts that shape too, including bare Jev IDs such as `jev-1.13`.
+
+OpenAI's native Decisions API instead takes `input` and an ordered array of questions. The equivalent yes/no type is `predicate`; its answer gives the probability of true.
+
+```json
+{
+  "model": "gpt-6-luna",
+  "input": "I was charged twice. Please refund the extra charge.",
+  "questions": [
+    {
+      "type": "predicate",
+      "name": "refund",
+      "instructions": "Is the customer asking for a refund?"
+    }
+  ]
+}
+```
+
+Send this body to `POST https://api.openai.com/v1/decisions`.
+
+Despite the shared "Decisions" name, OpenRouter's `/api/alpha/decisions` expects the System One-shaped `state` and keyed `questions`. An OpenAI Decisions client cannot switch to that route by changing only its base URL.
+
+|                      | System One-shaped request                         | OpenAI native Decisions request                          |
+| -------------------- | ------------------------------------------------- | -------------------------------------------------------- |
+| Evidence             | `state`: text or structured JSON                  | `input`: text or messages                                |
+| Question IDs         | Keys in a `questions` object                      | `name` fields in a `questions` array                     |
+| Yes/no type          | `noul`                                            | `predicate`                                              |
+| Answers              | Keyed by question ID                              | Array in question order; a question can return a refusal |
+| Other question types | `choice`, `score`; experimental `box` on Jev 1.14 | `choice`, `score`                                        |
+
+The types share names but can have different details. System One choice labels come from a criteria map; OpenAI choices can contain strings or booleans. TypeSafe's [experimental Box question](https://docs.typesafe.ai/primitives/box) locates an object in an image on Jev 1.14 and requires `TypeSafe-Danger-Zone-Images: true`. Check each model's supported question types and input modalities before switching its ID.
+
+The numbers need the same care. TypeSafe [describes Jev as trained for calibrated decisions](https://docs.typesafe.ai/concepts/system-one). OpenAI describes predicate probability as an estimate and [recommends choosing thresholds on labeled examples](https://developers.openai.com/api/docs/guides/decisions#interpret-the-answers). A `0.8` from one model should be tested separately from a `0.8` from another. API compatibility alone does not establish matching calibration.
+
+## Other approaches to decision models
+
+Other projects use different ways to produce a decision:
+
+| How it decides                                         | Projects                                                                                                      | Published interface                                                                                                         |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Encodes the state and predicts a label                 | [Laya](https://github.com/NandhaKishorM/laya), [Verdict](https://github.com/Heman10x-NGU/Verdict-open-jev)    | Laya has a System One-compatible server. Verdict documents a Python engine and is also available through OpenJev's adapter. |
+| Compares embeddings of the state and candidate actions | [CLM](https://github.com/Contrastive-LM/CLM)                                                                  | Its server exposes `/v1/systemone`.                                                                                         |
+| Reads token scores for candidate options               | [SemIf](https://github.com/TheoLeeCJ/SemIf-OpenJev), [JevK5](https://github.com/allebee/jevk5)                | SemIf is a toolkit; JevK5 provides a System One-compatible server.                                                          |
+| Uses a pointer head to select an option                | [Kev-4B](https://huggingface.co/jaredpalmer/kev-4b), [Drex v2](https://huggingface.co/nace-ai/drex-v2.0)      | Their model cards document System One-compatible serving.                                                                   |
+| Adds a decision head to a language model               | [Perplexity Decider v1.1](https://huggingface.co/perplexity-ai/pplx-decider-v1.1-27b)                         | Its model card documents Python inference; it is also listed on OpenRouter.                                                 |
+| Scores a whole question schema in one head             | [Clef](https://huggingface.co/Cloudflare/clef) and [Clef-Flash](https://huggingface.co/Cloudflare/clef-flash) | The Clef model card documents a self-hosted System One endpoint through SGLang.                                             |
+
+Laya documents its own input and option limits and a [confidence calculation that differs from Jev's](https://github.com/NandhaKishorM/laya#self-hosting-http-server-jev-compatible). SemIf and Verdict do not document native HTTP services. The endpoint path alone cannot tell you which limits or probability calculation a model uses.
+
+OpenRouter's [public Decisions catalog](https://openrouter.ai/api/v1/models?output_modalities=decisions) listed 23 model IDs on October 15, 2026, including aliases, versions, and free variants. Beyond the models above, it lists Microsoft Decision-1, Upstage Solar Decide, Liquid d1, Inception Mercury Decide, Respan Span-01, Together Tev1, and ScaleDown Classify-1. The catalog count is not a count of independent model families; OpenJev and Laya were absent when we checked. OpenRouter's [multimodal Decisions guide](https://openrouter.ai/docs/guides/community/multimodal-decisions) shows Clef-Flash on its shared route.
+
+## Where MLflow fits
+
+In MLflow 3.17.1, [`make_judge()`](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/supported-models/#decision-models) can use Jev through `typesafe:/jev-latest` and OpenAI Decisions through `openai:/gpt-6-luna` with `model_api=ModelAPI.DECISIONS`. Both judge paths support Boolean and finite categorical feedback. TypeSafe permits numeric or boolean values inside a finite `Literal[...]`; OpenAI Decisions accepts string or boolean choices. Neither path exposes the native Score or Box question types as judge outputs.
+
+For an OpenJev or Laya server, the documented [custom System One endpoint option](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/typesafe/#custom-system-one-endpoints) uses a `typesafe:/` model URI with `base_url` and, if needed, `extra_headers`. That is protocol compatibility, not a dedicated MLflow integration for either model.
+
+MLflow AI Gateway currently serves TypeSafe Jev and Jev through OpenRouter on its [System One route](https://mlflow.org/docs/latest/genai/governance/ai-gateway/endpoints/model-providers/#typesafe). It does not expose OpenAI's native `/decisions` route or the full OpenRouter Decisions catalog.
+
+For measured judge results, see our [companion comparison of Jev, OpenAI Decisions, OpenJev, and Laya](https://github.com/mlflow/mlflow-website/pull/779). It tests one MLflow QA task and a small set of harder examples. We have not benchmarked the other projects in the table above. To choose a model for your own judge, start with labeled examples from your application and inspect the mistakes each route makes.
