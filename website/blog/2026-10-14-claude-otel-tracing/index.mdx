@@ -71,11 +71,26 @@ Create an experiment for your traces (`mlflow experiments create -n claude-trace
 
 ## Step 2: Send Claude traces via OTLP
 
-Every product sends traces to the same place: the MLflow endpoint `http://<your-server>/v1/traces`, with the header `x-mlflow-experiment-id: <your experiment ID>`.
+MLflow receives traces at `http://<your-server>/v1/traces`, with the header `x-mlflow-experiment-id: <your experiment ID>`.
 
 ### Claude Platform UI: Messages API and Managed Agents
 
-In [Claude Platform](https://platform.claude.com/), open **OpenTelemetry → + Add destination** and choose **Custom**. Set the endpoint to `https://YOUR_MLFLOW_SERVER/v1/traces` and add the `x-mlflow-experiment-id` header with your experiment ID, along with any authentication headers.
+In [Claude Platform](https://platform.claude.com/), open **OpenTelemetry → + Add destination** and choose **Custom**. Set **OTLP endpoint URL** to your server's base HTTPS URL, such as `https://YOUR_MLFLOW_SERVER`, **without `/v1/traces`**: [Claude Platform appends it automatically](https://platform.claude.com/docs/en/manage-claude/opentelemetry/api).
+
+Under **Request headers**, add `x-mlflow-experiment-id` with your experiment ID. If your server uses [MLflow basic authentication](https://mlflow.org/docs/latest/self-hosting/security/basic-http-auth/), also add an `Authorization` header. Its value is `Basic ` followed by the Base64-encoded `username:password`. Generate the complete value locally with:
+
+```bash
+python3 -c '
+import base64
+import getpass
+
+username = input("MLflow username: ")
+password = getpass.getpass("MLflow password: ")
+print("Basic " + base64.b64encode(f"{username}:{password}".encode()).decode())
+'
+```
+
+Paste the output directly into the `Authorization` value field, keeping the space after `Basic`; do not URL-encode it. For a server that accepts bearer tokens, use `Bearer YOUR_TOKEN` instead.
 
 :::warning Use a remote MLflow server
 
