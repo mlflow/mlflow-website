@@ -1,0 +1,223 @@
+---
+title: "5 Simple Tips to Supercharge Your Claude SDK Experience with MLflow"
+description: The Claude SDKs now emit OpenTelemetry traces natively. Five tips to trace your agent with standard OpenTelemetry, see each run as one trace, find where the tokens go, score every run, and prove that a change makes it better.
+slug: claude-sdk-otel-tips
+authors: [joshua-wong]
+tags: [genai, tracing, evaluation, claude, anthropic, opentelemetry]
+thumbnail: /img/blog/claude-sdk-otel-tips-thumbnail.png
+image: /img/blog/claude-sdk-otel-tips-thumbnail.png
+---
+
+import TOCInline from "@theme/TOCInline";
+import { BlogImage } from "@site/src/components/BlogImage/BlogImage";
+
+The Claude SDKs now emit OpenTelemetry (OTel) traces natively, so you can see what your agent does and whether it is any good with standard OTel and no vendor-specific code. The five tips below show how to get more out of the Claude SDK with [MLflow](https://mlflow.org/), the open-source [AI agent platform](/ai-platform), using a small travel agent as the example. Let's start by getting our agent observed in MLflow.
+
+<TOCInline toc={toc} maxHeadingLevel={3} />
+
+## Prerequisites
+
+- MLflow 3.17.1 or newer (`pip install "mlflow>=3.17.1"`)
+- The Claude SDK and the OTel exporter: `pip install -U anthropic opentelemetry-sdk opentelemetry-exporter-otlp-proto-http` (use the latest `anthropic` release)
+
+## Tip 1: Turn on tracing with standard OpenTelemetry
+
+Start an MLflow server and create an experiment:
+
+```bash
+mlflow server --host 127.0.0.1 --port 5000
+
+# In a second terminal:
+mlflow experiments create -n travel-agent
+```
+
+Run both commands from the same directory. If you run the second one somewhere else, set `MLFLOW_TRACKING_URI=http://127.0.0.1:5000` first, or the experiment is created outside your server.
+
+The Claude SDK creates a span for each Messages API call and sends it to whatever OTel exporter your application sets up. Point an exporter at MLflow's OTLP endpoint, with the experiment ID from the command above in a header:
+
+```python
+from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+
+def setup_tracing(experiment_id: str) -> None:
+    provider = TracerProvider()
+    provider.add_span_processor(
+        BatchSpanProcessor(
+            OTLPSpanExporter(
+                endpoint="http://127.0.0.1:5000/v1/traces",
+                headers={"x-mlflow-experiment-id": experiment_id},
+            )
+        )
+    )
+    trace.set_tracer_provider(provider)
+
+
+setup_tracing("YOUR_EXPERIMENT_ID")
+```
+
+That's the whole setup. There is no MLflow import in your application, and the same exporter works with any other OTLP backend if you change the endpoint and headers.
+
+By default the SDK exports metadata only, without prompts, responses, or tool arguments. Set this before you start your application to include them. It makes spans larger, so use it for development and evaluation:
+
+```bash
+export ANTHROPIC_OPEN_TELEMETRY_TRACES_CONTENT_MODE=content
+```
+
+## Tip 2: See each agent run as one trace
+
+An agent run makes several Messages API calls, but you want to read it as one unit. Here is our travel agent, with one tool that searches flights. The SDK's [tool runner](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-runner) runs the agent loop for you: it calls the model, runs the tools that the model asks for, and sends back the results until the model has an answer. The `@beta_tool` decorator turns a plain Python function into a tool, building the tool definition from its type hints and docstring:
+
+```python
+import json
+
+import anthropic
+from anthropic import beta_tool
+
+client = anthropic.Anthropic()
+tracer = trace.get_tracer("travel-agent")
+SYSTEM_PROMPT = (
+    "You are a travel agent. Use the flight search tool to answer questions. "
+    "Confirm every price by searching the route again before you answer."
+)
+
+
+@beta_tool
+def search_flights(origin: str, destination: str) -> str:
+    """Search flights between two cities."""
+    return f"{origin} -> {destination}, 11h, $890"
+
+
+def as_messages(role: str, text: str) -> str:
+    return json.dumps([{"role": role, "parts": [{"type": "text", "content": text}]}])
+
+
+def run_travel_agent(query: str, system_prompt: str = SYSTEM_PROMPT) -> str:
+    with tracer.start_as_current_span(
+        "invoke_agent travel-agent", attributes={"gen_ai.operation.name": "invoke_agent"}
+    ) as span:
+        span.set_attribute("gen_ai.input.messages", as_messages("user", query))
+        runner = client.beta.messages.tool_runner(
+            model="claude-sonnet-5-5",
+            max_tokens=1024,
+            system=system_prompt,
+            tools=[search_flights],
+            messages=[{"role": "user", "content": query}],
+        )
+        answer = "".join(b.text for b in runner.until_done().content if b.type == "text")
+        span.set_attribute("gen_ai.output.messages", as_messages("assistant", answer))
+        return answer
+
+
+print(run_travel_agent("Find me the cheapest flight from San Francisco to Tokyo."))
+```
+
+The tool runner's spans nest under whichever span is current, which is why the code wraps the run in a span of your own, as [Anthropic's docs](https://platform.claude.com/docs/en/manage-claude/opentelemetry/api#connect-api-spans-to-your-own-traces) do. Under the agent span, the tool runner adds a span for the loop, a model call for each Messages API call, and a tool span for each tool the model ran. Open the trace in the MLflow UI: the agent span shows the question and the final answer, and each model call shows its token count and cost.
+
+<BlogImage
+  src={require("./claude-sdk-trace.png").default}
+  alt="MLflow trace of the travel agent, with the invoke_agent span selected to show the question and the final answer, and the model calls and tool calls under it"
+/>
+
+## Tip 3: Find where the tokens go
+
+Agent runs can be expensive in ways that are hard to see from the answer alone. A run that calls the model many times, or re-sends a large tool result, can cost several times more than a typical one. MLflow adds up the token counts from every model call into the trace, so you can find the outliers with a few lines of code:
+
+```python
+import mlflow
+
+mlflow.set_tracking_uri("http://127.0.0.1:5000")
+
+traces = mlflow.search_traces(locations=["YOUR_EXPERIMENT_ID"], return_type="list")
+for t in sorted(traces, key=lambda t: t.info.token_usage["total_tokens"], reverse=True)[:5]:
+    print(t.info.trace_id, t.info.token_usage, t.info.execution_duration)
+```
+
+Open the most expensive trace in the UI to see which call used the tokens.
+
+Tracing shows what the agent did. To know whether it did a good job, score many runs the same way, and compare them after each change.
+
+## Tip 4: Score every run
+
+An LLM judge that reads the whole `{{ trace }}` sees every model call, including the tool calls that the model asked for. This one checks whether the agent searched the same route twice:
+
+```python
+from mlflow.genai.judges import make_judge
+
+redundancy_judge = make_judge(
+    name="search_redundancy",
+    model="anthropic:/claude-sonnet-5-5",
+    instructions=(
+        "Analyze {{ trace }} and check whether the agent searched flights for "
+        "the same route more than once. Return 'pass' if every search was "
+        "distinct, 'fail' if any were redundant."
+    ),
+)
+```
+
+Then write a small helper that runs the agent on a set of test prompts, picks up the traces those runs produced, and scores them in a named evaluation run:
+
+```python
+import time
+
+test_prompts = [
+    "Find me the cheapest flight from San Francisco to Tokyo.",
+    "Should I fly from New York to London or to Paris for a weekend trip?",
+    "What are my options for flying from Boston to Rome next month?",
+]
+
+
+def evaluate_agent(system_prompt: str, run_name: str) -> None:
+    start_ms = int(time.time() * 1000)
+    for prompt in test_prompts:
+        run_travel_agent(prompt, system_prompt)
+    # Send the batched spans to MLflow before reading them back.
+    trace.get_tracer_provider().force_flush()
+
+    traces = mlflow.search_traces(
+        locations=["YOUR_EXPERIMENT_ID"], filter_string=f"trace.timestamp_ms >= {start_ms}"
+    )
+    with mlflow.start_run(run_name=run_name):
+        mlflow.genai.evaluate(data=traces, scorers=[redundancy_judge])
+
+
+mlflow.set_experiment(experiment_id="YOUR_EXPERIMENT_ID")
+evaluate_agent(SYSTEM_PROMPT, run_name="baseline")
+```
+
+Each run gets a verdict from the judge, with an explanation, so you can see why a run failed.
+
+## Tip 5: Prove a change makes it better
+
+Suppose the redundancy judge fails on several runs, and you add one line to the system prompt to fix it. Did it work, and did it break anything else?
+
+Run the same helper with the new system prompt. The traces and the new evaluation run go to the same experiment, next to the baseline:
+
+```python
+evaluate_agent(SYSTEM_PROMPT + " Search each route at most once.", run_name="search-once")
+```
+
+Open the experiment's **Evaluation runs** tab, select both runs, and choose **Actions → Compare** to see them side by side: whether the redundancy judge now passes, and whether the token usage on the traces went down. With the same prompts and the same judge, you keep a change only when the numbers show it helps.
+
+<BlogImage
+  src={require("./claude-sdk-evaluation.png").default}
+  alt="MLflow evaluation runs compare view: the search-once run passes the redundancy judge on every prompt with fewer tokens than the baseline run, which fails it"
+/>
+
+---
+
+## Wrapping up
+
+The Claude SDK makes it fast to build an agent. With native OTel export and MLflow, it is just as fast to know whether the agent works:
+
+1. Trace every model call by pointing a standard OTel exporter at MLflow.
+2. See each run as one trace, with the model calls and tool calls under one agent span.
+3. Find the expensive runs from the token usage on each trace.
+4. Score every run with an LLM judge that reads the trace.
+5. Prove each change by comparing evaluation runs with the same prompts and judge.
+
+If you find this useful, give us a star on GitHub: **[github.com/mlflow/mlflow](https://github.com/mlflow/mlflow)**⭐️
+
+Questions or feedback? Reach out to our community on [Slack](https://go.mlflow.org/slack), or [file a GitHub issue](https://github.com/mlflow/mlflow/issues).
