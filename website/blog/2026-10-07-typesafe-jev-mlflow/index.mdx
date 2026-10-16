@@ -1,0 +1,89 @@
+---
+title: "Jev in MLflow: Evaluation, Gateway, and Tracing"
+description: "Use TypeSafe's Jev as an MLflow judge, route TypeSafe and OpenRouter Decision API models through AI Gateway, and inspect answers and probabilities in traces."
+slug: typesafe-jev-mlflow
+authors: [yuki-watanabe]
+tags: [genai, evaluation, tracing, ai-gateway, typesafe]
+thumbnail: /img/blog/typesafe-jev-mlflow-tracing.png
+image: /img/blog/typesafe-jev-mlflow-tracing.png
+---
+
+import { BlogImage } from "@site/src/components/BlogImage/BlogImage";
+
+A support agent replies to a password-reset question. To grade it, an evaluator only needs to decide whether the reply answers the question. The same app might classify the request or decide whether a human should review it. Sending each check through a text-generating judge can add time and cost to a decision with only a few allowed answers.
+
+[Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev), TypeSafe's System One model, takes state and typed questions and returns answers with probabilities. It does not write a rationale. With MLflow 3.17, you can use Jev as a judge, route TypeSafe models or Jev models from OpenRouter's Decision API through AI Gateway, and trace calls from TypeSafe's Python and JavaScript/TypeScript SDKs. The trace viewer displays Jev's answers and probability details alongside the state and questions that produced them.
+
+{/* truncate */}
+
+## Use Jev as an MLflow judge
+
+Our [first Jev benchmark](/blog/jev-llm-judge/) wrapped the TypeSafe SDK in a custom scorer. You can now give `make_judge()` a `typesafe:/` model URI and use the judge in an ordinary `mlflow.genai.evaluate()` run. With `TYPESAFE_API_KEY` set and MLflow tracking configured:
+
+```python
+import mlflow
+from mlflow.genai.judges import make_judge
+
+answer_correctness = make_judge(
+    name="answer_correctness",
+    instructions=(
+        "Answer yes or no: Is {{ outputs }} correct for the question "
+        "and reference information in {{ inputs }}?"
+    ),
+    model="typesafe:/jev-latest",
+    feedback_value_type=bool,
+)
+
+data = [
+    {
+        "inputs": {
+            "question": "How do I reset my password?",
+            "reference": "Select Forgot password on the sign-in page.",
+        },
+        "outputs": "Select Forgot password on the sign-in page.",
+    }
+]
+
+mlflow.set_experiment("jev-judge-example")
+result = mlflow.genai.evaluate(data=data, scorers=[answer_correctness])
+print(result.result_df[["answer_correctness/value"]])
+```
+
+<BlogImage
+  src="/img/blog/typesafe-jev-mlflow-evaluation.png"
+  alt="Jev judge code with the typesafe:/jev-latest model URI highlighted above an MLflow Boolean assessment."
+/>
+
+MLflow records the Boolean verdict as an assessment. A Noul (yes/no) probability of at least 0.5 becomes `True`, and the probability is kept in assessment metadata under `typesafe.probability`. For a category check, set `feedback_value_type` to a finite `Literal[...]`; MLflow records the selected choice and its distribution under `typesafe.probabilities`. Jev does not provide a written explanation, so inspect close decisions and compare the judge with human-labeled examples before relying on it for a new task. Use a versioned Jev model when you need to compare evaluation runs over time.
+
+[See how to configure TypeSafe judges](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/typesafe/).
+
+## Put System One decisions behind AI Gateway
+
+Create an AI Gateway endpoint backed by a TypeSafe Jev model or an OpenRouter Decision API model such as `typesafe/jev-1.13`. Once the endpoint is named `jev-evaluator`, the judge above can use `model="gateway:/jev-evaluator"`. An application using the native System One request format can call `POST /gateway/typesafe/v1/systemone` with `"model": "jev-evaluator"` in the request body.
+
+<BlogImage
+  src="/img/blog/typesafe-jev-mlflow-gateway.png"
+  alt="MLflow AI Gateway endpoint creation screen showing TypeSafe Jev models in the model picker."
+/>
+
+Gateway keeps provider credentials on the server and gives the endpoint one place for usage tracking and budgets. You can change the model behind the endpoint without changing callers, or configure a compatible System One model as a fallback after an upstream error or rate limit. TypeSafe and OpenRouter Jev decision models can share that endpoint.
+
+[Create a Gateway endpoint](https://mlflow.org/docs/latest/genai/governance/ai-gateway/endpoints/create-and-manage/) or [see the System One request format](https://mlflow.org/docs/latest/genai/governance/ai-gateway/endpoints/query-endpoints/#typesafe-passthrough).
+
+## Inspect Jev decisions in a trace
+
+When an agent uses Jev to choose a path, the final answer alone is rarely enough to debug a surprising decision. MLflow's TypeSafe tracing records the state, questions, structured answers, model, latency, and errors. It records token usage when the SDK returns it.
+
+In Python, `mlflow.typesafe.autolog()` traces synchronous and asynchronous `system_one()` calls. In JavaScript and TypeScript, wrap a TypeSafe client with `tracedTypeSafe()` from `@mlflow/typesafe` to trace `systemOne()` calls. The dedicated trace view presents Noul, Choice, and Score answers with their probability details. You can open a Jev span in the context of the rest of an agent's trace rather than reconstructing the decision from a raw JSON response.
+
+<BlogImage
+  src="/img/blog/typesafe-jev-mlflow-tracing.png"
+  alt="MLflow trace view showing a Jev Noul answer, a Choice answer, and the Choice probability distribution beside the input state and questions."
+/>
+
+[Set up TypeSafe tracing in Python or JavaScript/TypeScript](https://mlflow.org/docs/latest/genai/tracing/integrations/listing/typesafe/).
+
+## Try it on a decision you already evaluate
+
+Start with a yes/no or category check for which you have human labels. Compare Jev's decisions with your current judge, review the cases where they disagree, and decide which probabilities need another check. Our [follow-up benchmark on harder answers](/blog/jev-llm-judge-part-2/) shows why this matters: Jev was fast in that test, but it also accepted some answers with a subtle, material error. Once you know where the model works for your data, Gateway can keep the model choice behind one endpoint, while tracing gives you a record of the decisions your application made.
