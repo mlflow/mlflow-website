@@ -1,6 +1,6 @@
 ---
 title: "5 Simple Tips to Supercharge Your Claude SDK Experience with MLflow"
-description: The Claude SDKs now emit OpenTelemetry traces natively. Five tips to trace your agent with standard OpenTelemetry, see each run as one trace, find where the tokens go, score every run, and show that a change makes it better.
+description: The Claude SDKs now emit OpenTelemetry traces natively. Five tips to trace your agent with standard OpenTelemetry, see each run as one trace, find where the tokens go, score every run, and compare the outcomes from different prompts.
 slug: claude-sdk-otel-tips
 authors: [joshua-wong]
 tags: [genai, tracing, evaluation, claude, anthropic, opentelemetry]
@@ -137,9 +137,9 @@ for t in sorted(traces, key=lambda t: t.info.token_usage["total_tokens"], revers
 
 Open the most expensive trace in the UI to see which call used the tokens.
 
-Tracing shows what the agent did. To know whether it did a good job, score many runs the same way, and compare them after each change.
-
 ## Tip 4: Score every run
+
+Tracing shows what the agent did, but not whether it did a good job. Evaluation answers that: you run the agent on a fixed set of test prompts and score each trace with the same judges, so you can compare the scores before and after a change. A judge is an LLM that inspects a trace and returns a verdict with an explanation.
 
 A judge that takes `{{ trace }}` can inspect every span in the run, including the tool calls the model asked for. This one checks whether the agent searched the same route twice:
 
@@ -189,7 +189,7 @@ evaluate_agent(SYSTEM_PROMPT, run_name="baseline")
 
 Each trace gets a verdict from the judge, with an explanation, so you can see why a trace failed.
 
-## Tip 5: Show that a change makes it better
+## Tip 5: Compare outcomes from different prompts
 
 Suppose the redundancy judge fails on several traces because the system prompt tells the agent to search every route again, so you write a new system prompt without that instruction. Did it work, and did it break anything else?
 
@@ -221,7 +221,7 @@ The Claude SDK makes it fast to build an agent. With native OTel export and MLfl
 2. See each run as one trace, with the model calls and tool calls under one agent span.
 3. Find the expensive runs from the token usage on each trace.
 4. Score every run with an LLM judge that inspects the trace.
-5. Show that each change helps by comparing evaluation runs with the same prompts and judge.
+5. Compare outcomes from different system prompts by evaluating each with the same test prompts and judge.
 
 If you find this useful, give us a star on GitHub: **[github.com/mlflow/mlflow](https://github.com/mlflow/mlflow)**⭐️
 
