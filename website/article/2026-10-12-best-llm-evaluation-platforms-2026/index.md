@@ -14,7 +14,7 @@ tags:
 date: 2026-10-12
 ---
 
-**Last reviewed: October 12, 2026.** _This is Part 1 of a two-part series. Part 2, on the best open-source LLM evaluation tools, is coming soon._
+**Last reviewed: October 12, 2026.** _This is Part 1 of a two-part series. [Part 2](/articles/best-open-source-llm-evaluation-tools-2026) compares the best open-source LLM evaluation tools you can self-host._
 
 An LLM evaluation platform tells you whether your LLM app or agent gives correct, safe, and useful answers, before and after you ship. The best LLM evaluation platforms in 2026 do more than score outputs. They find failures in production traces, turn those failures into test cases, and help you fix the prompt or the judge that caused them.
 
@@ -91,7 +91,7 @@ This changes the order of work. A typical evaluation workflow starts by defining
 MLflow connects evaluation to optimization:
 
 - **Prompt optimization.** [`mlflow.genai.optimize_prompts()`](https://mlflow.org/docs/latest/genai/prompt-registry/optimize-prompts/) improves a prompt against your evaluation data. It gives you a structured way to iterate: every candidate prompt is scored with the same evaluation dataset and judges, and every optimized prompt is saved as a new version in the MLflow Prompt Registry. Each step is measured, not guessed, so you can hill-climb on quality with full confidence that a new version is better than the last one, and roll back if it is not. GEPA and DSPy optimizers sit behind one API, so you can switch algorithms without rewriting your code.
-- **Judge alignment.** [MemAlign](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/memalign/) and [SIMBA](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/alignment/#the-simba-alignment-optimizer) tune an LLM judge with human feedback, so the judge agrees with your domain experts. MemAlign adapts with fewer than 50 labeled examples.
+- **Judge alignment.** [MemAlign](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/memalign/) and [SIMBA](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/alignment/#the-simba-alignment-optimizer) tune an LLM judge with human feedback, so the judge agrees with your domain experts. MemAlign shows improvement with a handful of labeled examples.
 
 ### Key evaluation features
 
@@ -213,7 +213,7 @@ Use a platform that analyzes traces for you. MLflow's Automatic Issue Detection 
 
 ### How do I make an LLM judge agree with human experts?
 
-Collect a small set of human labels, then align the judge to them. In MLflow, MemAlign and SIMBA tune a judge with human feedback. MemAlign needs fewer than 50 labeled examples.
+Collect a small set of human labels, then align the judge to them. In MLflow, MemAlign and SIMBA tune a judge with human feedback. MemAlign shows improvement with a handful of labeled examples.
 
 ### What platform should I use for automated LLM evaluation in production?
 
@@ -227,9 +227,9 @@ Yes. Open a [feature request on GitHub](https://github.com/mlflow/mlflow/issues)
 
 Install MLflow with `pip install mlflow`, then follow the [evaluation quickstart](https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/) to run your first LLM judge in a few minutes.
 
-## Coming next: Part 2
+## Part 2: open-source LLM evaluation tools
 
-Part 2 of this series covers the best open-source LLM evaluation tools in 2026, with a new set of tools compared. Check back soon.
+[Part 2 of this series](/articles/best-open-source-llm-evaluation-tools-2026) compares six open-source LLM evaluation tools you can self-host: MLflow, Langfuse, Arize Phoenix, Opik, Promptfoo, and Ragas.
 
 ## Recommended
 
