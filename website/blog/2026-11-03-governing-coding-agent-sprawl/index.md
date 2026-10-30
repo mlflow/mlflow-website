@@ -169,9 +169,7 @@ The per-agent cost is a first approximation, not a finished chargeback report. A
 
 ![Claude agent traces](images/mlflow_ai_gateway_claude_traces.png)
 
-The gateway also ships a built-in [Usage Dashboard](https://mlflow.org/docs/latest/genai/governance/ai-gateway/usage-tracking/#usage-dashboard) charting requests, latency, tokens, and cost per endpoint over time, which is where that reconciliation is easiest to read. That is AI observability pointed at your whole agent fleet instead of one app, and it is the part of LLM Ops that makes the other four acts defensible to someone who was not in the room.
-
-
+The gateway also ships a built-in [Usage Dashboard](https://mlflow.org/docs/latest/genai/governance/ai-gateway/usage-tracking/#usage-dashboard) charting requests, latency, tokens, and cost per endpoint over time, which is where that reconciliation is easiest to read. That is AI observability pointed at your whole agent fleet instead of one app.
 
 ![endpoint usage](images/mlflow_ai_gateway_endpoints_usage.png)
 
