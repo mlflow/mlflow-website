@@ -8,7 +8,7 @@ thumbnail: /img/blog/govern-coding-agent-sprawl.png
 image: /img/blog/govern-coding-agent-sprawl.png
 ---
 
-*Five coding agents. Five API keys. One invoice nobody can explain.*
+_Five coding agents. Five API keys. One invoice nobody can explain._
 
 The agents are not the problem. The path each one takes is. Every tool holds its own provider API key, reports usage and traces to its own dashboard, and shows up on its own invoice, so nothing about your fleet of agents adds up in one place.
 
@@ -18,7 +18,7 @@ Your team already runs more coding agents than you can name. Cursor sits in the 
 
 ## How Do You Govern Coding-Agent Sprawl?
 
-The [MLflow AI Gateway](https://mlflow.org/docs/latest/genai/governance/ai-gateway/) puts one governed endpoint in front of all of them. It routes each request by endpoint name, runs it past PII and safety guardrails, caps spend with a budget policy, and traces every call with token counts and `agent` / `provider` / `endpoint` tags. This post walks the [runnable demo](https://github.com/dmatrix/mlflow-genai-tutorials/blob/main/ai_gateway_governance/README.md) on MLflow 3.17.1. The notebook runs in five acts: 
+The [MLflow AI Gateway](https://mlflow.org/docs/latest/genai/governance/ai-gateway/) puts one governed endpoint in front of all of them. It routes each request by endpoint name, runs it past PII and safety guardrails, caps spend with a budget policy, and traces every call with token counts and `agent` / `provider` / `endpoint` tags. This post walks the [runnable demo](https://github.com/dmatrix/mlflow-genai-tutorials/blob/main/ai_gateway_governance/README.md) on MLflow 3.17.1. The notebook runs in five acts:
 
 1. Verify the endpoints
 2. Turn five agents loose on clean work
@@ -28,13 +28,13 @@ The [MLflow AI Gateway](https://mlflow.org/docs/latest/genai/governance/ai-gatew
 
 ## Why Is Coding-Agent Sprawl a Governance Problem?
 
-The key you hand a tool tells you how much, never who. Your provider console will tell you what that key spent, cost of tokens on invoice, but it will not tell you which agent spent it, which developer was driving, or what went out in the prompt. Now, spread five agents across three providers and you get three dashboards that each answer a different question and none that answer yours. 
+The key you hand a tool tells you how much, never who. Your provider console will tell you what that key spent, cost of tokens on invoice, but it will not tell you which agent spent it, which developer was driving, or what went out in the prompt. Now, spread five agents across three providers and you get three dashboards that each answer a different question and none that answer yours.
 
 The second problem is that an agent stuck in a retry loop can burn hundreds of dollars of tokens overnight, and you find out when finance forwards the invoice. For instance, in my demo (see the notebook), one call in my own trace data cost $0.0141 for 533 tokens, which sounds like nothing until you multiply it by five agents running all day across a 40-person team.
 
 Third, data leakage is the cost you notice too late. A developer pastes a config file with a live credential into a prompt, or a test fixture carrying a customer SSN, and that data has now left your perimeter with no record it ever happened. You cannot grep for a thing you never logged, which is what a security review will press on.
 
-And finally, you want to protect against malicious content agents generating it. While each provider may have a way to mitigate it, there is no central place to manage or govern it. 
+And finally, you want to protect against malicious content agents generating it. While each provider may have a way to mitigate it, there is no central place to manage or govern it.
 
 ## How does MLflow AI Gateway help with Governance?
 
@@ -115,7 +115,7 @@ The DAN jailbreak aimed at Claude Code and the instruction-override prompt-leak 
 
 > I can't reveal my system/developer prompts or ignore the instructions that govern my behavior.
 
-Treat the guardrail and the model's own refusal as two independent controls. Guardrails are [probabilistic](https://mlflow.org/blog/mlflow-guardrails-scorers/) because each one is an MLflow judge, the same scorer primitive you use for offline evaluations, now running inline on live traffic. The demo's own numbers show it: 6 of 8 caught at the gateway, 2 of 8 caught by the model. 
+Treat the guardrail and the model's own refusal as two independent controls. Guardrails are [probabilistic](https://mlflow.org/blog/mlflow-guardrails-scorers/) because each one is an MLflow judge, the same scorer primitive you use for offline evaluations, now running inline on live traffic. The demo's own numbers show it: 6 of 8 caught at the gateway, 2 of 8 caught by the model.
 
 ## How Do You Cap LLM Spend Without Killing the Agents?
 
