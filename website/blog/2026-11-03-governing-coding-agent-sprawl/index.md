@@ -81,7 +81,7 @@ resp = client.chat.completions.create(
 )
 ```
 
-Notice the missing provider API key. The gateway authenticates to the model and the agent authenticates to the gateway, so a leaked client config no longer leaks a live model credential.
+Notice the missing provider API key. The gateway holds provider credentials server-side in an [LLM Connection](https://mlflow.org/docs/latest/genai/governance/ai-gateway/api-keys/create-and-manage/), so a leaked client config no longer leaks a live model credential. Note that the gateway itself is unauthenticated here: `api_key="not-needed"` is a placeholder the OpenAI SDK requires, not a credential the gateway checks.
 
 The traces roll up per provider. Ten normal coding tasks across five agents produced this table on a clean run on my machine.
 
