@@ -179,6 +179,6 @@ The gateway also ships a built-in [Usage Dashboard](https://mlflow.org/docs/late
 
 We started with five agents, five API keys, and an invoice nobody could explain. We end with one gateway that routes every agent, blocks most of the bad traffic with a 400, caps spend with a 429, and writes a trace for every call including the ones it refused. The agents did not change at all. The path they take did, and that path is now the one place where policy, cost, and the audit trail live.
 
-The MLflow AI Gateway is a central checkpoint, not a wall. On my runs it caught rejected all malicious requests and  allowed 5 clean ones, so tune the judge rubrics against your own traffic before you promise anyone a number. Read the rationales in the traces when something surprises you. 
+The MLflow AI Gateway is a central checkpoint, not a wall. On my runs it caught and rejected all malicious requests and allowed 5 clean ones. Read the rationales in the traces when something surprises you.
 
 Clone the [demo](https://github.com/dmatrix/mlflow-genai-tutorials/blob/main/ai_gateway_governance/README.md), create the three endpoints in the MLflow UI, and run the notebook top to bottom. I used Databricks hosted models, but you can use any providers: they all will work equally.
