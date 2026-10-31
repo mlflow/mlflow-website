@@ -1,12 +1,13 @@
 ---
-title: "Governing Coding-Agent Sprawl with One MLflow AI Gateway"
+
+## title: "Governing Coding-Agent Sprawl with One MLflow AI Gateway"
+
 description: "A demonstration of how to use MLflow AI Gateway to manage coding agent sprawl"
 slug: govern-coding-agent-sprawl
 authors: [jules-damji]
 tags: [genai, agents, llm, governance]
 thumbnail: /img/blog/govern-coding-agent-sprawl.png
 image: /img/blog/govern-coding-agent-sprawl.png
----
 
 _Five coding agents. Five API keys. One invoice nobody can explain._
 
@@ -23,12 +24,12 @@ The [MLflow AI Gateway](https://mlflow.org/docs/latest/genai/governance/ai-gatew
 1. Verify the endpoints
 2. Turn five agents loose on clean work
 3. Trip the guardrails
-4. Trip the budget
+4. Exceed the budget
 5. Observe and read it all back as traces.
 
 ## Why Is Coding-Agent Sprawl a Governance Problem?
 
-The key you hand a tool tells you how much, never who. Your provider console will tell you what that key spent, cost of tokens on invoice, but it will not tell you which agent spent it, which developer was driving, or what went out in the prompt. Now, spread five agents across three providers and you get three dashboards that each answer a different question and none that answer yours.
+For a few resaons. First, the key you hand a tool tells you how much, never who. Your provider console will tell you what that key spent, cost of tokens on invoice, but it will not tell you which agent spent it, which developer was driving, or what went out in the prompt. Now, spread five agents across three providers and you get three dashboards that each answer a different question and none that answer yours.
 
 The second problem is that an agent stuck in a retry loop can burn hundreds of dollars of tokens overnight, and you find out when finance forwards the invoice. For instance, in my demo (see the notebook), one call in my own trace data cost $0.0141 for 533 tokens, which sounds like nothing until you multiply it by five agents running all day across a 40-person team.
 
@@ -44,13 +45,13 @@ The demo notebook wires five agents to three endpoints, one per model family, al
 
 ![MLflow AI Gateway architecture: five coding agents route through one gateway to three governed model endpoints, with guardrails, budget policy, usage tracking, and MLflow tracing enforced centrally](images/ai_gateway_architecture.png)
 
-This demo notebook points at Databricks-hosted models. MLflow supports any provider connection you configure in the UI and behaves the same way, whether OpenAI, Anthropic, or Google, because the gateway normalizes them onto the OpenAI chat schema. That uniformity lets you reason about five agents at once, instead of multiple times.
+This demo notebook points at Databricks-hosted models. MLflow supports any provider connection you configure in the MLflow UI and behaves the same way, whether OpenAI, Anthropic, or Google, because the gateway normalizes them onto the OpenAI chat schema. That uniformity lets you reason about five agents at once, instead of five agents multiple times.
 
-## How Do You Route Five Coding Agents Through One Endpoint?
+## How Do You Route Five Coding Agents Through One Gateway URL?
 
 You point each agent's OpenAI-compatible client at the gateway URL and send the endpoint name as the `model` field. The gateway reads that field, forwards the request to the configured model, and returns the response on the schema the agent already speaks. Nothing else about the agent changes.
 
-The setup takes three moves. Aim the SDK at the gateway, turn on autologging so every call becomes a trace, and bound the client so a slow gateway fails fast.
+The setup takes three moves: point the OpenAI client at the gateway with `base_url`, turn on autologging so every call becomes a trace, and set `timeout` and `max_retries` so a slow gateway fails fast.
 
 ```python
 import mlflow
@@ -81,7 +82,7 @@ resp = client.chat.completions.create(
 )
 ```
 
-Notice the missing provider API key. The gateway holds provider credentials server-side in an [LLM Connection](https://mlflow.org/docs/latest/genai/governance/ai-gateway/api-keys/create-and-manage/), so a leaked client config no longer leaks a live model credential. Note that the gateway itself is unauthenticated here: `api_key="not-needed"` is a placeholder the OpenAI SDK requires, not a credential the gateway checks.
+Notice the missing provider API key. The gateway holds provider credentials server-side in an [LLM Connection](https://mlflow.org/docs/latest/genai/governance/ai-gateway/api-keys/create-and-manage/), so a leaked client config no longer leaks a live model credential.
 
 The traces roll up per provider. Ten normal coding tasks across five agents produced this table on a clean run on my machine.
 
@@ -93,7 +94,7 @@ The traces roll up per provider. Ten normal coding tasks across five agents prod
 
 That is attribution you did not have before. It is also your first hint that guardrails are not free: twelve seconds for a short coding answer is slow, because each request pays for the LLM judges enforcing them. Each judge call took 1.9 to 3.0 seconds in my spans, and three guardrails on an endpoint means paying that tax two or three times per request.
 
-## Guardrails Blocked 6 of 8 Malicious Requests, and the Model Refused the Other 2
+## Guardrails Blocked 6 of 8 Malicious Requests, and the Model Refused 2
 
 The demo fires eight deliberately bad requests at the gateway. Six come back blocked with **HTTP 400**: three carry PII (an SSN in a code comment, a credit card in a variable, contact details in a `.env`), three are injection attempts, and two ask for harmful content. A block arrives as `openai.BadRequestError` with the judge's reasoning in the body, so you are never guessing why.
 
@@ -146,7 +147,7 @@ The cap applies to everything on that endpoint. Leave a 5-cent budget enabled an
 
 ## Turn On Usage Tracking and Each Request Produces Traces You Can Audit
 
-Usage tracking on an endpoint buys you another trace. Your client-side trace carries the `agent` / `provider` / `endpoint` tags and the response. The gateway-side trace, written into that endpoint's own experiment, carries a `gateway/<endpoint>` span wrapping a `guardrail/PII Detection` span, a `judge` span with the verdict and rationale, and a `provider/databricks/<model>` span with token usage and cost.
+Usage tracking on an endpoint buys you another trace. Your client-side trace carries the `agent` / `provider` / `endpoint` tags and the response, because the demo sets those tags itself. The gateway-side trace lands in that endpoint's own experiment, and it nests. A `gateway/<endpoint>` span wraps the whole request. Inside it sits one `guardrail/<name>` span per guardrail, and inside each of those a `judge` span holding the verdict and the rationale. A `provider/databricks/<model>` span carries the token usage and the cost.
 
 Reading them back in code takes one call. Note that `search_traces` takes `experiment_ids`, not experiment names, in MLflow 3.17.1:
 
@@ -163,15 +164,13 @@ print(traces[["trace_id", "state", "execution_duration", "tags"]].head())
 
 Every call is captured. Allowed, blocked, and budget-rejected alike get a trace, which is the difference between an audit trail and a record of your successes, and the refused calls are precisely what a security or finance review wants to read.
 
-The per-agent cost is a first approximation, not a finished chargeback report. A request blocked after the model answers was still billed, and in my traces that cost landed on the endpoint's own trace while the agent-tagged one recorded nothing, so per-agent spend reads low by exactly the amount you wasted. Reconcile against the endpoint traces before you send anyone a number.
-
 ![Claude agent traces](images/mlflow_ai_gateway_claude_traces.png)
 
-The gateway also ships a built-in [Usage Dashboard](https://mlflow.org/docs/latest/genai/governance/ai-gateway/usage-tracking/#usage-dashboard) charting requests, latency, tokens, and cost per endpoint over time, which is where that reconciliation is easiest to read. That is AI observability pointed at your whole agent fleet instead of one app.
+The gateway also ships a built-in [Usage Dashboard](https://mlflow.org/docs/latest/genai/governance/ai-gateway/usage-tracking/#usage-dashboard) charting requests, latency, tokens, and cost per endpoint over time. That is AI observability pointed at your whole agent fleet instead of one app.
 
 ![endpoint usage](images/mlflow_ai_gateway_endpoints_usage.png)
 
-## The Bottom Line
+## Our Final Takeway
 
 We started with five agents, five API keys, and an invoice nobody could explain. We end with one gateway that routes every agent, blocks most of the bad traffic with a 400, caps spend with a 429, and writes a trace for every call including the ones it refused. The agents did not change at all. The path they take did, and that path is now the one place where policy, cost, and the audit trail live.
 
