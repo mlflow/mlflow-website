@@ -177,3 +177,10 @@ We started with five agents, five API keys, and an invoice nobody could explain.
 The MLflow AI Gateway is a central checkpoint, not a wall. On my runs it caught and rejected all malicious requests and allowed 5 clean ones. Read the rationales in the traces when something surprises you.
 
 Clone the [demo](https://github.com/dmatrix/mlflow-genai-tutorials/blob/main/ai_gateway_governance/README.md), create the three endpoints in the MLflow UI, and run the notebook top to bottom. I used Databricks hosted models, but you can use any providers: they all will work equally.
+
+## Resources and References
+1. [Enforce Content Policies at the Gateway with AI Gateway Guardrails](https://mlflow.org/blog/gateway-guardrails/)
+2. [How to Prevent Runaway Agent Costs with MLflow AI Gateway](https://mlflow.org/blog/agent-costs-mlflow-gateway/)
+3. [Introducing MLflow AI Gateway: Governed, Observable Access to LLMs](https://mlflow.org/blog/mlflow-ai-gateway/)
+4. [Route Claude Code Through MLflow AI Gateway](https://mlflow.org/blog/gateway-claude-code/)
+5. [Control LLM Spend with AI Gateway Budget Alerts and Limits](https://mlflow.org/blog/gateway-budget-alerts-limits/)
