@@ -144,11 +144,9 @@ The cap applies to everything on that endpoint. Leave a 5-cent budget enabled an
 
 ![daily limit exceeded](images/mlflow_ai_gateway_budget_rejects.png)
 
-## Every Gateway Request Produces Two Traces You Can Audit
+## Turn On Usage Tracking and Each Request Produces Traces You Can Audit
 
-Usage tracking on an endpoint buys you a second trace. Your client-side trace carries the `agent` / `provider` / `endpoint` tags and the response. The gateway-side trace, written into that endpoint's own experiment, carries a `gateway/<endpoint>` span wrapping a `guardrail/PII Detection` span, a `judge` span with the verdict and rationale, and a `provider/databricks/<model>` span with token usage and cost.
-
-That second trace is how I diagnosed both false positives. The judge's rationale is right there in the span output, next to the `passed` boolean it contradicted. Without it you would see an unexplained 400 in Act 2 and have nothing to chase.
+Usage tracking on an endpoint buys you another trace. Your client-side trace carries the `agent` / `provider` / `endpoint` tags and the response. The gateway-side trace, written into that endpoint's own experiment, carries a `gateway/<endpoint>` span wrapping a `guardrail/PII Detection` span, a `judge` span with the verdict and rationale, and a `provider/databricks/<model>` span with token usage and cost.
 
 Reading them back in code takes one call. Note that `search_traces` takes `experiment_ids`, not experiment names, in MLflow 3.17.1:
 
