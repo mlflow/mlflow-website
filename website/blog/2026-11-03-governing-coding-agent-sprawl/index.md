@@ -1,6 +1,6 @@
 ---
-title: "Governing Coding-Agent Sprawl with One MLflow AI Gateway"
-description: "A demonstration of how to use MLflow AI Gateway to manage coding agent sprawl"
+title: "Governing Coding-Agent Sprawl with MLflow AI Gateway"
+description: "A demonstration of how to use MLflow AI Gateway to manage coding agent sprawl."
 slug: govern-coding-agent-sprawl
 authors: [jules-damji]
 tags: [genai, agents, llm, governance]
