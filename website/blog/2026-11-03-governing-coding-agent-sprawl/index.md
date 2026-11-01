@@ -1,13 +1,12 @@
 ---
-
-## title: "Governing Coding-Agent Sprawl with One MLflow AI Gateway"
-
+title: "Governing Coding-Agent Sprawl with One MLflow AI Gateway"
 description: "A demonstration of how to use MLflow AI Gateway to manage coding agent sprawl"
 slug: govern-coding-agent-sprawl
 authors: [jules-damji]
 tags: [genai, agents, llm, governance]
 thumbnail: /img/blog/govern-coding-agent-sprawl.png
 image: /img/blog/govern-coding-agent-sprawl.png
+---
 
 _Five coding agents. Five API keys. One invoice nobody can explain._
 
@@ -179,6 +178,7 @@ The MLflow AI Gateway is a central checkpoint, not a wall. On my runs it caught 
 Clone the [demo](https://github.com/dmatrix/mlflow-genai-tutorials/blob/main/ai_gateway_governance/README.md), create the three endpoints in the MLflow UI, and run the notebook top to bottom. I used Databricks hosted models, but you can use any providers: they all will work equally.
 
 ## Resources and References
+
 1. [Enforce Content Policies at the Gateway with AI Gateway Guardrails](https://mlflow.org/blog/gateway-guardrails/)
 2. [How to Prevent Runaway Agent Costs with MLflow AI Gateway](https://mlflow.org/blog/agent-costs-mlflow-gateway/)
 3. [Introducing MLflow AI Gateway: Governed, Observable Access to LLMs](https://mlflow.org/blog/mlflow-ai-gateway/)
