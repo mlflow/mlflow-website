@@ -1,6 +1,6 @@
 ---
 title: "Top LLM Observability Tools in 2026: A Pro Guide"
-description: "A fair comparison of 10 LLM and agent observability tools in 2026: licenses, self-hosting, OpenTelemetry support, prompt versioning, and evals, sourced to each project's docs."
+description: "A comparison of 10 LLM and agent observability tools in 2026: licenses, self-hosting, OpenTelemetry support, prompt versioning, and evals, sourced to each project's docs."
 slug: top-llm-observability-tools-in-2026-a-pro-guide
 tags:
   [
