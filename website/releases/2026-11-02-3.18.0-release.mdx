@@ -1,0 +1,134 @@
+---
+title: "MLflow 3.18.0 Highlights: Skill Registry, Evaluation Comparisons, and Actionable Issue Detection"
+sidebar_label: MLflow 3.18.0
+slug: 3.18.0
+authors: [mlflow-maintainers]
+---
+
+MLflow 3.18.0 helps teams share agent skills, compare changes to their agents, and turn trace findings into fixes. This release introduces an experimental **Skill Registry**, makes the redesigned **evaluation runs and comparison UI** the default, and expands **issue detection** with span evidence, recurring schedules, and run history. It also adds statistical evaluation comparisons and automatic evaluation with code-based scorers.
+
+## 1. **A Registry for Agent Skills**
+
+<img
+  src="/img/releases/3.18.0/skill-registry-list.png"
+  alt="The MLflow Skills catalog showing registered skills, organizations, versions, statuses, and sources."
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+/>
+
+Agent skills become harder to manage as teams collect instructions and supporting files across repositories. The new experimental **MLflow Skill Registry** gives them a shared catalog. Upload a local skill directory or register content from Git, an OCI registry, or a ZIP URL, then find skills through the UI, Python, or CLI.
+
+Track changes with numbered versions, mark versions as draft, active, or deprecated, and assign aliases such as `production`. Teammates can pull a specific version or alias into the directory their coding agent uses. Source digests help detect changed content, while registry permissions govern who can read, edit, and manage entries.
+
+[Learn more about Skill Registry](https://mlflow.org/docs/latest/genai/skill-registry/)
+
+## 2. **Compare Evaluation Runs from Summary to Source Trace**
+
+<img
+  src="/img/releases/3.18.0/eval-comparison-overview.png"
+  alt="An evaluation comparison showing baseline and candidate runs, scorer changes, token usage, and estimated costs."
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+/>
+
+The redesigned evaluation runs experience is now on by default. Pin a baseline, inspect the dataset and scorer lineage behind a run, and compare runs without moving between separate pages.
+
+Start with the comparison overview to review scorer results, errors, tokens, and estimated cost. Open **Details** to align results by input, filter for improvements or regressions, or compare multi-turn conversations session by session. From a result, open the source traces to compare their span trees and input/output differences. Pairwise review lets a reviewer choose the better trace and save that preference as feedback.
+
+[Learn more about evaluating GenAI applications](https://mlflow.org/docs/latest/genai/eval-monitor/)
+
+## 3. **From Detected Issues to Investigated Fixes**
+
+<video
+  controls
+  muted
+  playsInline
+  preload="metadata"
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+>
+  <source
+    src={require("/img/releases/3.18.0/issue-detection.mp4").default}
+    type="video/mp4"
+  />
+</video>
+
+_The demo shortens the analysis wait._
+
+On SQL-backed servers with AI Gateway enabled, the experiment's **Issues** tab now brings detection, evidence, and triage together. Findings link to affected traces and can include a walkthrough of the spans that explain the problem. Detection also considers unusual spending alongside correctness, latency, execution, and other quality concerns, and matches new findings against issues already reported.
+
+Each issue includes a copyable fix prompt with context and trace references for a coding agent. Review the proposed change, evaluate it, and mark the issue as resolved when the fix is verified. Dismissing a false positive as **Not an issue** helps guide future detection.
+
+Run detection when needed or schedule it daily or weekly with a model, time, timezone, and optional trace filters. Run history shows both manual and scheduled attempts, including failures and runs with no findings. Scheduling requires the server's background jobs and periodic tasks; each occurrence uses the selected model and incurs model usage costs. Scheduling is currently unavailable with the executor job engine used by job containers.
+
+[Learn more about automatic issue detection](https://mlflow.org/docs/latest/genai/eval-monitor/ai-insights/detect-issues/)
+
+## 4. **Statistical Comparisons for Evaluation Changes**
+
+A higher average score can be encouraging without establishing that an agent improved. The experimental `mlflow.genai.compare_evaluations()` API compares a candidate and baseline on paired evaluation examples, reporting per-scorer differences, confidence intervals, significance tests, and effect sizes.
+
+Inspect the summary to assess the size and uncertainty of a change. Use `assert_improved()` when a CI gate should require statistically significant improvement on selected scorers. The API reports unmatched examples and insufficient samples, so review those alongside the results. After evaluating a baseline and candidate with the same data and scorers:
+
+```python
+import mlflow
+
+comparison = mlflow.genai.compare_evaluations(
+    candidate_run_id=candidate.run_id,
+    baseline_run_id=baseline.run_id,
+)
+print(comparison.summary())
+comparison.assert_improved(scorers=["correctness"])
+```
+
+_Thanks to community contributor [@AbdulAliMamnun](https://github.com/AbdulAliMamnun) for this addition!_
+
+[Learn more about comparing evaluation runs](https://mlflow.org/docs/latest/genai/eval-monitor/comparing-evaluation-runs/)
+
+## 5. **Automatic Evaluation with Code-Based Scorers**
+
+Self-hosted MLflow servers can now run registered `@scorer` functions automatically as new traces and sessions arrive. The experimental job-container backend runs scorer code in short-lived Docker containers without network access, while the server handles trace sampling and records the resulting assessments.
+
+This gives teams an automatic path for checks implemented in Python, such as response length or application-specific validation. Operators must configure the container backend and provide an image containing the scorer's dependencies. The feature currently requires a local Docker daemon, a SQL backend, and a single server replica.
+
+[Learn more about code-based scorers in job containers](https://mlflow.org/docs/latest/self-hosting/job-containers/)
+
+## More Improvements
+
+- **Databricks System One judges:** Custom judges and built-in Guidelines scorers can use Databricks-hosted System One models with a `databricks:/` Unity Catalog model URI and `model_api="decisions"`. [Learn more about System One judges](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/custom-judges/typesafe/).
+- **CrewAI tracing:** Autologging handles the executor changes in CrewAI 1.15.29 and records each native tool call with its arguments, result, and parent span. [Learn more about CrewAI tracing](https://mlflow.org/docs/latest/genai/tracing/integrations/listing/crewai/).
+- **Hierarchical sessions:** Python tracing can record nested session IDs, and offline session-level scorers can select a named level to evaluate. [Learn more about tracking sessions](https://mlflow.org/docs/latest/genai/tracing/track-users-sessions/).
+- **Cloudflare Agents tracing guide:** A new guide explains how to send native Workers traces to MLflow through OpenTelemetry export and inspect model calls, tool executions, and token usage. [Read the guide](https://mlflow.org/docs/latest/genai/tracing/integrations/listing/cloudflare-agents/).
+
+## Before You Upgrade
+
+For a SQL-backed server, back up the database and plan a maintenance window. Stop the servers and other writers that use the database, run `mlflow db upgrade <database-url>` with MLflow 3.18.0 installed, then restart the servers on the new version. See the [database upgrade guidance](https://mlflow.org/docs/latest/self-hosting/architecture/backend-store/).
+
+Review these behavior changes:
+
+- **Logged-model metric searches:** SQL stores now filter and sort `search_logged_models()` using the latest metric value, selected by highest step and then latest timestamp. A model that met a threshold at an earlier step may no longer match. The `datasets` argument now narrows sorting as well as filtering. [Details](https://github.com/mlflow/mlflow/pull/27215).
+- **Downloaded model contents:** Downloads from `models:/` URIs no longer add `registered_model_meta`. Code that read this file should obtain the model name and version from the URI or Model Registry. [Details](https://github.com/mlflow/mlflow/pull/27173).
+- **MCP version identity:** MySQL and SQL Server now distinguish MCP server versions that differ only by case. If an existing alias, tag, or endpoint references a version with different casing, the migration stops before making its schema changes. Back up the database, correct the references to match the stored version text, and retry. [Details](https://github.com/mlflow/mlflow/pull/25920).
+
+## Full Changelog
+
+For a comprehensive list of changes, see the [release change log](https://github.com/mlflow/mlflow/releases/tag/v3.18.0).
+
+## What's Next
+
+### Get Started
+
+Upgrade to try these new features:
+
+```bash
+pip install mlflow==3.18.0
+```
+
+### Share Your Feedback
+
+- [GitHub Issues](https://github.com/mlflow/mlflow/issues) - Report bugs or request features
+- [MLflow Roadmap](https://github.com/mlflow/mlflow/discussions/19855) - See what's coming next and share your ideas
+- [Star us on GitHub](https://github.com/mlflow/mlflow) - Show your support for the project
+
+### Learn More
+
+- Check out the [MLflow documentation](https://mlflow.org/docs/latest) for detailed guides
