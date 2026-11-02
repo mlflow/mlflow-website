@@ -60,7 +60,7 @@ mlflow.openai.autolog()
 
 ## 2. Arize Phoenix: best for local trace and eval debugging with OpenInference
 
-Arize Phoenix is an open-source, self-hosted LLM tracing and evaluation app built on OpenTelemetry. It uses OpenInference instrumentation for frameworks such as LangGraph, CrewAI, LlamaIndex, and DSPy. Its code is released under Elastic License 2.0, which is source-available rather than OSI-approved open source.
+Arize Phoenix is a source-available, self-hosted LLM tracing and evaluation app built on OpenTelemetry. It uses OpenInference instrumentation for frameworks such as LangGraph, CrewAI, LlamaIndex, and DSPy. Its code is released under Elastic License 2.0, which the Open Source Initiative (OSI) does not approve as an open-source license.
 
 **Evidence:** The [Phoenix README](https://github.com/Arize-ai/phoenix) describes tracing "using OpenTelemetry-based instrumentation" and lists Docker Compose and Kubernetes/Helm for self-hosting. The [LICENSE file](https://github.com/Arize-ai/phoenix/blob/main/LICENSE) is Elastic License 2.0 (ELv2). Arize sells a separate managed product, Arize AX, that accepts the same instrumentation.
 
