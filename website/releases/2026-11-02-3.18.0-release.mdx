@@ -23,8 +23,6 @@ MLflow 3.18.0 helps you turn agent failures into fixes, share your team's expert
   />
 </video>
 
-_The demo shortens the analysis wait._
-
 Find recurring agent problems without reading traces one by one. The dedicated **Issues** tab groups related failures, from incorrect answers and broken tool calls to slow responses and unusual spending. Each finding links to affected traces, with span evidence to help you understand where the agent went wrong.
 
 Move from investigation to a proposed fix with a copyable prompt that gives your coding agent the issue context and trace references. Evaluate the change, then resolve the issue once you have verified the fix. Mark false positives as **Not an issue** to guide future detection.
@@ -36,8 +34,8 @@ Run detection on demand or schedule daily or weekly checks to keep finding probl
 ## 2. **Agent Skill Registry**
 
 <img
-  src="/img/releases/3.18.0/skill-registry-use.png"
-  alt="The Use code-review dialog with a pinned skill version and a CLI command to install it for a coding agent."
+  src="/img/releases/3.18.0/skill-registry-list.png"
+  alt="The Skill Registry catalog with reusable code-review, documentation, release-note, and testing skills, plus filters for organization, status, and source."
   width="100%"
   style={{ display: "block", marginBottom: 24 }}
 />
@@ -46,13 +44,22 @@ Turn the expertise your team has captured in agent skills into something everyon
 
 Register skills from a local folder or an existing Git, OCI, or ZIP source. Choose a specific version for reproducible behavior, or use an alias such as `production` to share the version your team recommends. The UI provides CLI and Python instructions for placing the skill where your agent loads it, making it easier to carry useful workflows across projects.
 
+<img
+  src="/img/releases/3.18.0/skill-registry-use.png"
+  alt="The Use code-review dialog with a pinned skill version and a CLI command to install it for a coding agent."
+  width="100%"
+  style={{ display: "block", marginBottom: 24 }}
+/>
+
+Registered skills are ready for developers to use across agent harnesses, including coding agents such as Claude Code, Codex, and Cursor. Choose your agent in the **Use skill** dialog to get the CLI or Python instructions for installing the selected skill version.
+
 [Learn more about Skill Registry](https://mlflow.org/docs/latest/genai/skill-registry/)
 
 ## 3. **Find Regressions with Better Evaluation and Trace Comparisons**
 
 <img
-  src="/img/releases/3.18.0/eval-comparison-details.png"
-  alt="Evaluation results aligned by input across a baseline and two candidates, with improvements and regressions in duration, tokens, and scores."
+  src="/img/releases/3.18.0/eval-run-comparison.png"
+  alt="An evaluation-run comparison showing the baseline and two candidates together, with scorer results, token usage, cost, and errors."
   width="100%"
   style={{ display: "block", marginBottom: 24 }}
 />
@@ -91,37 +98,18 @@ _Thanks to community contributor [@AbdulAliMamnun](https://github.com/AbdulAliMa
 
 <img
   src="/img/releases/3.18.0/online-evaluation-code.png"
-  alt="Python example defining a concise-answer scorer, registering it, and starting automatic evaluation with a 100 percent sample rate. The copyable example follows below."
+  alt="Python example: a concise-answer scorer checks for at most 100 words, then register() and start() enable automatic scoring of all new traces."
   width="100%"
   style={{ display: "block", marginBottom: 24 }}
 />
 
 Keep checking the rules that matter to your application after it goes live. Custom Python scorers can now automatically assess new traces and multi-turn conversations on a configured self-hosted MLflow server. Use them to check response length, validate structured outputs, or enforce application-specific rules without manually starting another evaluation run.
 
-Define a check, register it, and call `.start()` to turn on automatic scoring. After following the [job-container setup guide](https://mlflow.org/docs/latest/self-hosting/job-containers/), set `MLFLOW_SERVER_ENABLE_CUSTOM_SCORERS=true` in your client environment too. This example checks whether a string response stays within 100 words and scores every new trace in the experiment:
+Define a check, register it, and call `.start()` to turn on automatic scoring. The example above checks whether a string response stays within 100 words. New traces receive a `concise_answer` assessment automatically. Adjust the sample rate to check a fraction of traffic; session-level scorers can assess whole conversations.
 
-```python
-import mlflow
-from mlflow.genai.scorers import ScorerSamplingConfig, scorer
+The new job-container backend isolates custom scorer code with networking disabled, a read-only root filesystem, and CPU, memory, and time limits. Containers receive only their job's inputs without inheriting the server's credentials. MLflow validates their results before recording assessments, and container-only execution prevents fallback to running scorer code on the server host.
 
-mlflow.set_tracking_uri("http://localhost:5000")
-mlflow.set_experiment("support-agent")
-
-
-@scorer
-def concise_answer(outputs: str) -> bool:
-    return len(outputs.split()) <= 100
-
-
-registered = concise_answer.register()
-registered.start(
-    sampling_config=ScorerSamplingConfig(sample_rate=1.0),
-)
-```
-
-New traces receive a `concise_answer` assessment automatically. Adjust the sample rate to check a fraction of traffic; session-level scorers can assess whole conversations.
-
-Code-based online evaluation is experimental and requires a SQL backend, a local Docker daemon, and one server replica. Scorer code runs in containers without network access.
+Code-based online evaluation is experimental and requires a SQL backend, a local Docker daemon, and one server replica. Follow the job-container setup guide and set `MLFLOW_SERVER_ENABLE_CUSTOM_SCORERS=true` in your client environment too.
 
 [Learn more about code-based scorers in job containers](https://mlflow.org/docs/latest/self-hosting/job-containers/)
 
