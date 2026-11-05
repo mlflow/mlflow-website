@@ -249,23 +249,23 @@ This is separate from tracing your own MCP calls. It lets a coding assistant suc
 
 ### How do I trace AI agent activity end to end?
 
-Record each step of one run as a span in a single trace, with an `AGENT` span at the root and `LLM` and `TOOL` spans below it. Use an autolog call for supported frameworks and the `@mlflow.trace` decorator for custom code. Add a session ID to group multi-turn conversations.
+Start an `mlflow server`, call your framework's autolog function (for example `mlflow.openai.autolog()` or `mlflow.langchain.autolog()`) before you create the client, and run one request. If the tree has a long gap with no child span, some work runs outside traced code. Wrap that code in `@mlflow.trace` and run the request again.
 
 ### How do I trace MCP tool calls?
 
-Check whether your framework already traces them. PydanticAI's MLflow integration records MCP `call_tool` and `list_tools` as spans. If yours does not, wrap the client's `call_tool` call in a function decorated with `@mlflow.trace(span_type=SpanType.TOOL)`, as in Step 3.
+First, run one request and look for a `TOOL` span under the `LLM` span that asked for the tool. If there is none, your framework does not trace MCP. Then put the client's `call_tool` call inside `mlflow.start_span(name=..., span_type=SpanType.TOOL)`, so the span records the tool name, its arguments, and its result.
 
 ### Can I trace an MCP server that runs in another process?
 
-Yes, but the trace will be separate unless you propagate context. For HTTP services, MLflow can pass W3C trace-context headers so the spans join one trace. For a `stdio` server, trace the tool function inside the server, log to the same experiment, and share a session ID.
+For an HTTP server, yes. The client sends headers from `get_tracing_context_headers_for_http_request`, and the server reads them with `set_tracing_context_from_http_request_headers`. Both sides must log to the same tracking server and experiment, or the spans do not merge. A `stdio` server has no HTTP headers, so trace inside the server and use the same session ID to find its traces.
 
 ### Do I need OpenTelemetry to trace an agent?
 
-No. The MLflow SDK works without any OpenTelemetry setup. MLflow Tracing is built on OpenTelemetry, so you can add an OTLP exporter or send spans from other languages later.
+No. You only need it when spans come from services that do not use the MLflow SDK. Those services set `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` to `<tracking-uri>/v1/traces` and pass `x-mlflow-experiment-id=<experiment-id>` in `OTEL_EXPORTER_OTLP_TRACES_HEADERS`.
 
 ### How do I make agent behavior observable in production?
 
-Trace every run, attach user and session IDs, and keep a dashboard of errors, latency, and token use. Then review the slowest and failed traces on a schedule. Tracing shows what happened; to judge quality at scale, add evaluation on top of the same traces.
+Attach a user and a session to each trace (the `session_id` and `user` parameters, or the `mlflow.trace.session` and `mlflow.trace.user` metadata keys before MLflow 3.11.0), so you can filter by customer and conversation. Mask passwords, tokens, and personal data before they reach a span. When you fix a bug, keep the failing trace as a test case, so the same failure is caught next time.
 
 ## Conclusion
 
