@@ -54,7 +54,7 @@ Anthropic's engineering team makes the same split in [Demystifying evals for AI 
 
 ## Which tool should you use for production-trace evaluation?
 
-MLflow is a good fit when you want tracing, judges, datasets, and automatic scoring in one open-source server. It is Apache-2.0 licensed and hosted by the Linux Foundation under LF AI & Data.
+MLflow is a good fit when you want tracing, judges, datasets, and automatic scoring in one open-source server. It is Apache-2.0 licensed and a Linux Foundation project.
 
 Disclosure: this guide was written by MLflow maintainers. Read the MLflow-specific code as one option. Other platforms such as Langfuse, LangSmith, and Braintrust take their own approach to scoring production traces, and our [comparison of agent observability tools](/top-5-agent-observability-tools) covers the trade-offs. The workflow below does not depend on the tool.
 
@@ -289,4 +289,4 @@ Every external claim in this guide comes from one of these sources.
 - [Who Validates the Validators?](https://arxiv.org/abs/2404.12272), Shankar et al., 2024
 - [Evaluation-Driven Development and Operations of LLM Agents: A Process Model and Reference Architecture](https://arxiv.org/abs/2411.13768), Xia et al., 2024
 - [Eval-driven development: lessons from evaluating GenAI at scale](https://airbnb.tech/ai-ml/eval-driven-development-lessons-from-evaluating-genai-at-scale/), Airbnb Engineering
-- MLflow documentation pages linked inline above, checked against MLflow 3.17.x source
+- MLflow documentation pages linked inline above, checked against MLflow 3.18.0 source
