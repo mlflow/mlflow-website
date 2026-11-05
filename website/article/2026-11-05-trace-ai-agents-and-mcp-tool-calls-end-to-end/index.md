@@ -188,7 +188,7 @@ with mlflow.tracing.context(session_id="session-123", user="user-456"):
     agent_turn("What is the status of order A-1001?")  # your agent's entry point
 ```
 
-The `session_id` and `user` parameters need MLflow 3.11.0 or newer. On older versions, set the `mlflow.trace.session` or `mlflow.trace.user` key in the trace metadata. See [Track Users & Sessions](https://mlflow.org/docs/latest/genai/tracing/track-users-sessions/).
+The `session_id` and `user` parameters need MLflow 3.12.0 or newer. On older versions, set the `mlflow.trace.session` or `mlflow.trace.user` key in the trace metadata. See [Track Users & Sessions](https://mlflow.org/docs/latest/genai/tracing/track-users-sessions/).
 
 In a web app, wrap the request handler with this context manager. Every trace from that request then carries the user and session without any change to your agent code.
 
@@ -265,7 +265,7 @@ No. You only need it when spans come from services that do not use the MLflow SD
 
 ### How do I make agent behavior observable in production?
 
-Attach a user and a session to each trace (the `session_id` and `user` parameters, or the `mlflow.trace.session` and `mlflow.trace.user` metadata keys before MLflow 3.11.0), so you can filter by customer and conversation. Mask passwords, tokens, and personal data before they reach a span. When you fix a bug, keep the failing trace as a test case, so the same failure is caught next time.
+Attach a user and a session to each trace (the `session_id` and `user` parameters, or the `mlflow.trace.session` and `mlflow.trace.user` metadata keys before MLflow 3.12.0), so you can filter by customer and conversation. Mask passwords, tokens, and personal data before they reach a span. When you fix a bug, keep the failing trace as a test case, so the same failure is caught next time.
 
 ## Conclusion
 
