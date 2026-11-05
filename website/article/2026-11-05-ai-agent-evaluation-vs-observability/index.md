@@ -74,7 +74,7 @@ Three terms from that post are worth borrowing:
 - **Transcript (also called a trace or trajectory):** "the complete record of a trial, including outputs, tool calls, reasoning," and intermediate results.
 - **Outcome:** the final state of the environment. A booking agent's outcome is whether the reservation exists in the database, not whether the agent says it does.
 
-The same post says agent evaluations typically combine three grader types: code-based, model-based, and human. Code-based graders are fast, cheap, and objective but brittle. Model-based graders handle nuance but are non-deterministic and need calibration against human judgment. Human graders are the gold standard but are expensive and slow, so they are mostly used to calibrate the model-based ones.
+The same post says agent evaluations typically combine three grader types: code-based, model-based, and human. Code-based graders are fast, cheap, and objective but brittle. Model-based graders handle nuance but are non-deterministic and need calibration against human judgment. Human graders are the most reliable, but they are expensive and slow, so they are mostly used to calibrate the model-based ones.
 
 Evaluation is built for questions like these:
 
@@ -231,7 +231,7 @@ This is the same pattern we describe in [Continuous LLM Evaluation](https://mlfl
 
 ### Step 3: Score the trajectory, not only the answer
 
-Built-in scorers include `ToolCallCorrectness` and `ToolCallEfficiency`, which judge the tools an agent called and the arguments it passed, and `ConversationCompleteness` and `UserFrustration` for multi-turn conversations. You can also write a code scorer that reads the trace directly.
+Built-in scorers include `ToolCallCorrectness`, which judges whether the agent called the right tools with the right arguments, `ToolCallEfficiency`, which flags redundant tool calls, and `ConversationCompleteness` and `UserFrustration` for multi-turn conversations. You can also write a code scorer that reads the trace directly.
 
 ```python
 from mlflow.entities import SpanType, Trace
