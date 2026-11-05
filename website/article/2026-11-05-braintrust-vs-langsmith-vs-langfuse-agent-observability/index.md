@@ -19,7 +19,7 @@ For agent observability, pick Langfuse if you want a tracing-first product with 
 
 This page compares the four on those three points, using each vendor's own pricing page, documentation, and repository, all checked on 2026-11-05.
 
-Disclosure: the MLflow team wrote this page, and MLflow is one of the four tools. MLflow was created by Databricks and is now governed by the Linux Foundation, and Databricks also sells a managed MLflow service. This page covers the open-source project only. We kept the criteria the same for every tool and say where MLflow falls short.
+Disclosure: this page was written by MLflow maintainers, and MLflow is one of the four tools. This page covers the open-source project only. We kept the criteria the same for every tool and say where MLflow falls short.
 
 ## TL;DR
 
