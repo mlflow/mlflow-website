@@ -20,7 +20,7 @@ AI agent observability records what an agent did: every model call, tool call, a
 
 The failure this guide is about is a quiet one: the dashboard stays green, every status code is 200, and the agent still gives a wrong answer. Observability alone cannot catch that, and the two words are often used as if they meant the same thing, so we wrote down where the line sits. It is for engineers who run an agent in production, or are about to.
 
-A disclosure: we work on MLflow at Databricks, which created the project. MLflow is Apache-2.0 licensed and governed by the Linux Foundation (LF AI & Data). The examples use MLflow Tracing and `mlflow.genai.evaluate`, and the concepts hold in any tool.
+Disclosure: this guide was written by MLflow maintainers. The examples use MLflow Tracing and `mlflow.genai.evaluate`, and the concepts hold in any tool.
 
 ## TL;DR
 
