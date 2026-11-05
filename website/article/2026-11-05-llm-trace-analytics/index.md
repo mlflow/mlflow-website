@@ -61,7 +61,7 @@ The sections below cover what each tool's own documentation describes. Features 
 
 ### MLflow: the Overview tab
 
-MLflow is an Apache-2.0 open-source platform for agents, LLMs, and ML models, governed by the Linux Foundation's LF AI & Data. In an LLM or agent experiment, the **Overview** tab holds the analytics. The [Overview documentation](https://mlflow.org/docs/latest/genai/tracing/observe-with-traces/dashboard/) describes three views:
+MLflow is an Apache-2.0 open-source platform for agents, LLMs, and ML models, a Linux Foundation project. In an LLM or agent experiment, the **Overview** tab holds the analytics. The [Overview documentation](https://mlflow.org/docs/latest/genai/tracing/observe-with-traces/dashboard/) describes three views:
 
 - **Usage:** requests over time with an average reference line, latency, errors, and token usage and token stats.
 - **Quality:** a summary of scorer results and a chart for each assessment type found on your traces.
