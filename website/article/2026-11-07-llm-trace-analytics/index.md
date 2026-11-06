@@ -12,7 +12,7 @@ tags:
     AI agent monitoring,
     token usage and cost tracking,
   ]
-date: 2026-11-05
+date: 2026-11-07
 ---
 
 LLM trace analytics turns the traces your AI app already records into charts you can act on: request volume, latency, errors, token use, cost, tool calls, and quality scores. You find it in the dashboard of an LLM tracing tool such as MLflow, Langfuse, or LangSmith, or in an OpenTelemetry backend you already run. This guide covers where to look and which seven metrics to track first.
