@@ -13,7 +13,7 @@ tags:
     LLM-as-a-judge,
     AI agent tracing,
   ]
-date: 2026-11-05
+date: 2026-11-18
 ---
 
 AI agent observability records what an agent did: every model call, tool call, and intermediate step, with latency, token counts, and errors. AI agent evaluation scores whether what it did was good, using code checks, LLM judges, or human review. Observability gives you the evidence. Evaluation gives you the verdict. You need both, and the traces you collect for the first are the raw material for the second.
