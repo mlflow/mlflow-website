@@ -12,7 +12,7 @@ tags:
     OpenTelemetry LLM tracing,
     self-hosted LLM observability,
   ]
-date: 2026-11-05
+date: 2026-11-22
 ---
 
 For agent observability, pick Langfuse if you want a tracing-first product with an MIT-licensed core, LangSmith if you build on LangChain or LangGraph and want a managed service, Braintrust if you want a hosted evaluation workflow, and MLflow if you want Apache-2.0 tracing and evaluation in one server you run yourself. The right answer depends on three things: who hosts your trace data, how the license reads, and how the bill scales.
