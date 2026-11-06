@@ -12,12 +12,12 @@ tags:
     online evaluation,
     MLflow evaluation,
   ]
-date: 2026-11-05
+date: 2026-11-14
 ---
 
 To evaluate an AI agent using production traces, record every run as a trace, pull a sample of those traces, and score them without re-running the agent. Use trace-based judges for the path the agent took (which tools it called, with what arguments) and session-level judges for whole conversations. Then turn each failure into a test case, so the next version has to pass it.
 
-**Last reviewed: November 5, 2026.**
+**Last reviewed: November 14, 2026.**
 
 This guide is for engineers who already have an agent in production and a tracing setup, and want to know whether the agent is any good. We work on MLflow, so the code uses MLflow. The steps carry over to any tool that stores full agent traces.
 
