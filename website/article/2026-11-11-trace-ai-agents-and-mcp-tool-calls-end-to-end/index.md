@@ -13,7 +13,7 @@ tags:
     MLflow Tracing,
     debug AI agents,
   ]
-date: 2026-11-05
+date: 2026-11-11
 ---
 
 To trace an AI agent end to end, record every step of one run as a span inside a single trace: the user request, each LLM call, each tool or MCP call, and the final answer. Then group the traces by session. With MLflow Tracing, that takes a tracking server, one autolog call for your framework, and one decorator around each MCP tool call.
@@ -273,4 +273,4 @@ Before tracing, an agent bug is a guess. After tracing, it is a span you can ope
 
 Next step: copy the example from Step 3 into a file, run it against a local MLflow server, and open the trace in the UI. The [MLflow Tracing overview](https://mlflow.org/llm-tracing/) shows what to add next.
 
-_Updated 2026-11-05._
+_Updated 2026-11-11._
