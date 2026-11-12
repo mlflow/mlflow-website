@@ -1,0 +1,2576 @@
+{
+  "schema_version": 2,
+  "description": "Matched 29-case MLflow QA pilot: TypeSafe Jev, OpenAI Decisions, OpenJev, and Laya. One unscored preflight per model.",
+  "label_provenance_note": "The frozen source_dataset.provenance describes the examples at creation, before human review. corrected_human_reference contains the subsequent human labels and the QA-016 correction.",
+  "created_at_utc": "2026-10-15T01:50:11.857165+00:00",
+  "source_dataset": {
+    "dataset_name": "mlflow-assistant-qa-judge-pilot-v1",
+    "dataset_sha256": "afa658c75976bf3a58c411ae66013eb9753014ff836f94688c2cee290aaa3dde",
+    "criterion": "Judge the candidate answer's factual and API correctness for the question, using the supplied MLflow documentation. Correct means there is no material factual or API error. Incorrect means at least one claim or instruction is materially wrong or misleading. Unclear means the evidence is insufficient or ambiguous. Do not penalize style or harmless omissions. An omission that makes the requested technical answer misleading is material. Respect any version specified in the question. If your knowledge conflicts with the source snapshot, mark unclear and explain. Add a reason for incorrect or unclear.",
+    "provenance": "Synthetic MLflow Assistant-style questions and candidate answers authored by Codex for a pilot. These are not recorded Assistant responses or production traffic. Some answers contain deliberate errors. Human labels are pending.",
+    "cases": [
+      {
+        "case_id": "QA-001",
+        "topic": "Feedback review",
+        "family_id": "assessment-revision",
+        "question": "A human reviewer disagrees with an automated feedback score. How can I record the correction while retaining the original score for review?",
+        "answer": "Use mlflow.override_feedback() to record the human correction while preserving the original automated feedback. This keeps the original available for analysis. Updating the existing feedback instead would modify it in place.",
+        "context": "The `override_feedback` function allows human experts to correct automated evaluations while preserving the original for audit trails and learning.\n\n### When to Override vs Update[​](#when-to-override-vs-update \"Direct link to When to Override vs Update\")\n\n* **Override**: Use when correcting automated feedback - preserves original for analysis\n* **Update**: Use when fixing mistakes in existing feedback - modifies in place",
+        "source_url": "https://mlflow.org/docs/latest/genai/assessments/feedback.md",
+        "source_id": "feedback",
+        "source_sha256": "b7657f1a3a1b870196f1145a91e296202ed61ed2f36adf20c94ad081f9092fe2",
+        "source_retrieved_at": "2026-09-20T02:54:31.706214+00:00"
+      },
+      {
+        "case_id": "QA-002",
+        "topic": "Custom scorer metric names",
+        "family_id": "scorer-metric-naming",
+        "question": "My `@scorer` function is called `check_answer`, but it returns `Feedback(name=\"answer_quality\", value=True)`. Which name appears as the metric?",
+        "answer": "The metric is named `check_answer`, because decorated scorers always use the Python function name. To show `answer_quality` in the results, rename the function to that name.",
+        "context": "1. If the scorer returns one or more `Feedback` objects, then `Feedback.name` fields take precedence, if specified.\n2. For primitive return values or unnamed `Feedback`s, the function name (for the `@scorer` decorator) or the `Scorer.name` field (for the `Scorer` class) are used.",
+        "source_url": "https://mlflow.org/docs/latest/genai/eval-monitor/scorers/custom.md",
+        "source_id": "scorers",
+        "source_sha256": "994b895f2b6194e318f703de88bb9402b46d24cae6dd41c6e89401bf318c00c0",
+        "source_retrieved_at": "2026-09-20T02:54:31.070300+00:00"
+      },
+      {
+        "case_id": "QA-003",
+        "topic": "Custom scorer return values",
+        "family_id": "scorer-return-values",
+        "question": "Do I need to create a `Feedback` object to record response word count as an MLflow evaluation metric?",
+        "answer": "No. A custom scorer can return an integer directly for a numeric metric. For example:\n\n```python\nfrom mlflow.genai.scorers import scorer\n\n@scorer\ndef response_length(outputs: str) -> int:\n    return len(outputs.split())\n```",
+        "context": "Output primitive values for straightforward pass/fail or numeric assessments. Below are simple scorers for an AI app that returns a string as a response.\n\npython\n\n```\n@scorer\n\ndef response_length(outputs: str) -> int:\n\n    # Return a numeric metric\n\n    return len(outputs.split())\n\n\n\n\n\n@scorer\n\ndef contains_citation(outputs: str) -> str:\n\n    # Return pass/fail string\n\n    return \"yes\" if \"[source]\" in outputs else \"no\"\n```",
+        "source_url": "https://mlflow.org/docs/latest/genai/eval-monitor/scorers/custom.md",
+        "source_id": "scorers",
+        "source_sha256": "994b895f2b6194e318f703de88bb9402b46d24cae6dd41c6e89401bf318c00c0",
+        "source_retrieved_at": "2026-09-20T02:54:31.070300+00:00"
+      },
+      {
+        "case_id": "QA-004",
+        "topic": "RetrievalGroundedness trace requirements",
+        "family_id": "retrieval-groundedness-requirements",
+        "question": "What needs to be present in an MLflow trace before I can use the built-in `RetrievalGroundedness` judge on it?",
+        "answer": "The trace must include at least one span whose `span_type` is `RETRIEVER`. Its root span must also contain the application’s `inputs` and `outputs`.",
+        "context": "The RetrievalGroundedness judge can be invoked directly for single trace assessment or used with MLflow's evaluation framework for batch evaluation.\n\n**Requirements:**\n\nTrace requirements:\n\n* The MLflow Trace must contain at least one span with `span_type` set to `RETRIEVER`\n* `inputs` and `outputs` must be on the Trace's root span",
+        "source_url": "https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/rag/groundedness.md",
+        "source_id": "groundedness",
+        "source_sha256": "516f5849a91eeeb1d51f0fe1356240c8366e3872f314cb14ef07ce3ee29a5e1f",
+        "source_retrieved_at": "2026-09-20T02:54:31.244396+00:00"
+      },
+      {
+        "case_id": "QA-005",
+        "topic": "Assessment types",
+        "family_id": "assessment-meaning",
+        "question": "A reviewer gives one Assistant answer a helpfulness score of 0.8. Should I store that score as an expectation or as feedback?",
+        "answer": "Store it as an expectation because it comes from a human reviewer. Expectations are the place for human ratings of completed answers, while feedback is reserved for ratings produced by automated judges or code.",
+        "context": "[Feedback](/docs/latest/genai/concepts/feedback.md) captures evaluations of how well your AI performed. It measures the actual quality of what your AI produced across various dimensions like accuracy, relevance, safety, and helpfulness. Unlike [expectations](/docs/latest/genai/assessments/expectations.md) that define what should happen, feedback tells you what actually happened and how well it met your quality standards.\n\n## Prerequisites[​](#prerequisites \"Direct link to Prerequisites\")\n\nBefore using feedback collection in MLflow, ensure you have:\n\n* MLflow 3.2.0 or later installed\n* An active MLflow tracking server or local tracking setup\n* Traces that have been logged from your LLM application or AI agent to an MLflow Experiment\n\n## Sources of Feedback[​](#sources-of-feedback \"Direct link to Sources of Feedback\")\n\nMLflow supports three types of feedback sources, each with unique strengths. You can use a single source or combine multiple sources for comprehensive quality coverage.\n\n#### LLM Judge Evaluation\n\nAI-powered evaluation at scale. LLM judges provide consistent quality assessments for nuanced dimensions like relevance, tone, and safety without human intervention.\n\n#### Programmatic Code Checks\n\nDeterministic rule-based evaluation. Perfect for format validation, compliance checks, and business logic rules that need instant, cost-effective assessment.\n\n#### Human Expert Review\n\nDomain expert evaluation for high-stakes content. Human feedback captures nuanced insights that automated systems miss and serves as the gold standard.",
+        "source_url": "https://mlflow.org/docs/latest/genai/assessments/feedback.md",
+        "source_id": "feedback",
+        "source_sha256": "b7657f1a3a1b870196f1145a91e296202ed61ed2f36adf20c94ad081f9092fe2",
+        "source_retrieved_at": "2026-09-20T02:54:31.706214+00:00"
+      },
+      {
+        "case_id": "QA-006",
+        "topic": "Prompt aliases",
+        "family_id": "prompt-alias-resolution",
+        "question": "Our production alias points to version 2 of a prompt. If I register version 3, will production automatically start resolving to version 3?",
+        "answer": "Yes. A named alias such as production follows the newest version after it is created, so registering version 3 advances production automatically. You only need set_prompt_alias() when you want to roll back to an older version.",
+        "context": "Alias is a strong mechanism to managing prompt versions in production systems, without hardcoding version numbers in the application code. You can create an alias for a specific version of a prompt using either the MLflow UI or Python API.\n\nThe common use case for aliases is to build a robust **deployment pipeline** for your LLM applications and AI agents. For example, you can set a stage name such as `beta`, `staging`, `production`, etc., to refer to the version used in that environment. By switching the alias to a different version, you can easily maintain multiple prompt versions for different environments and perform tasks such as roll-back A/B testing.",
+        "source_url": "https://mlflow.org/docs/latest/genai/prompt-registry/manage-prompt-lifecycles-with-aliases.md",
+        "source_id": "prompt-aliases",
+        "source_sha256": "23f54ef798e90d19bffd0a0319d70b4f90164a3750c0297e8a5b1ff50a6813a4",
+        "source_retrieved_at": "2026-09-20T02:54:31.603405+00:00"
+      },
+      {
+        "case_id": "QA-007",
+        "topic": "Custom model cost",
+        "family_id": "tracing-manual-cost",
+        "question": "Our custom model does not have automatic pricing in MLflow. How can I attach its token counts and USD cost to an active span?",
+        "answer": "Set the `mlflow.chat.tokenUsage` attribute to a dictionary containing `input_tokens`, `output_tokens`, and `total_tokens`. Set `mlflow.llm.cost` to a dictionary containing `input_cost`, `output_cost`, and `total_cost`, with the cost values in USD. You can use `span.set_attribute(...)` for both attributes when automatic calculation is unavailable or you need to override it.",
+        "context": "If automatic cost tracking is not available for your model or you want to override the calculated cost, you can manually set token and cost information on a span:\n\npython\n\n```\nimport mlflow\n\n\n\n\n\n@mlflow.trace\n\ndef my_llm_call():\n\n    # Get the current span\n\n    span = mlflow.get_current_active_span()\n\n\n\n    # Your LLM call logic here...\n\n\n\n    # Manually set token usage\n\n    span.set_attribute(\n\n        \"mlflow.chat.tokenUsage\",\n\n        {\n\n            \"input_tokens\": 100,\n\n            \"output_tokens\": 50,\n\n            \"total_tokens\": 150,\n\n        },\n\n    )\n\n\n\n    # Manually set cost (in USD)\n\n    span.set_attribute(\n\n        \"mlflow.llm.cost\",\n\n        {\n\n            \"input_cost\": 0.0001,\n\n            \"output_cost\": 0.0002,\n\n            \"total_cost\": 0.0003,\n\n        },\n\n    )\n\n\n\n    return \"response\"\n```",
+        "source_url": "https://mlflow.org/docs/latest/genai/tracing/token-usage-cost.md",
+        "source_id": "cost",
+        "source_sha256": "2a8b05c84b5502a66ece4d0159ccb8abe22bf790e1bcb71697940031db76d298",
+        "source_retrieved_at": "2026-09-20T02:54:30.774335+00:00"
+      },
+      {
+        "case_id": "QA-008",
+        "topic": "Dataset schema",
+        "family_id": "dataset-schema-evolution",
+        "question": "My evaluation dataset started with only a question in inputs. Do I have to recreate the dataset before adding records whose inputs also contain context?",
+        "answer": "Yes. The first records fix the dataset schema, so later records must have the same input fields. Recreate the dataset with both question and context before adding those records.",
+        "context": "Dataset schemas automatically evolve as you add records with new fields. The `schema` property tracks all field names and types encountered across records, while `profile` maintains statistical summaries. This automatic adaptation means you can start with simple test cases and progressively add complexity without manual schema migrations.\n\nWhen new fields are introduced in subsequent records, they're automatically incorporated into the schema. Existing records without those fields are handled gracefully during evaluation and analysis.",
+        "source_url": "https://mlflow.org/docs/latest/genai/concepts/evaluation-datasets.md",
+        "source_id": "dataset-concepts",
+        "source_sha256": "896b18adac54e13342718ec9acfcf650bc8e045b0ec52b2b6a36c978e6e5e4af",
+        "source_retrieved_at": "2026-09-20T02:54:31.235974+00:00"
+      },
+      {
+        "case_id": "QA-009",
+        "topic": "Cost display",
+        "family_id": "tracing-zero-cost",
+        "question": "My MLflow trace has token counts, but the model cost displays as $0.00. Is it safe to count this request as zero spend in my cost report?",
+        "answer": "Yes. Once token counts are available, the $0.00 cost means the request incurred no charge. You can include it as zero spend without adding a separate model price.",
+        "context": "Some providers or models may not return token usage information. In these cases, the `token_usage` and `cost` fields will be `None`.\n\nCost can also appear as $0.00 even when token counts are tracked correctly. This happens when the model name recorded on the span has no matching entry in LiteLLM's price table. Databricks serving-endpoint names (for example, `databricks-claude-opus-4-8`) are one such case: LiteLLM cannot infer the provider from the bare endpoint name, so it returns no price.\n\nIn either case, you can [set the token and cost attributes directly on the span](#manually-setting-token-and-cost-information).",
+        "source_url": "https://mlflow.org/docs/latest/genai/tracing/token-usage-cost.md",
+        "source_id": "cost",
+        "source_sha256": "2a8b05c84b5502a66ece4d0159ccb8abe22bf790e1bcb71697940031db76d298",
+        "source_retrieved_at": "2026-09-20T02:54:30.774335+00:00"
+      },
+      {
+        "case_id": "QA-010",
+        "topic": "Custom scorer errors",
+        "family_id": "scorer-error-handling",
+        "question": "If my custom scorer raises an exception on one example, must I catch it myself to keep MLflow evaluating the other examples?",
+        "answer": "Yes. An uncaught scorer exception stops the entire evaluation run, so you must catch it inside the scorer if you want other examples to be processed.",
+        "context": "When a scorer encounters an error for a trace, MLflow can capture error details for that trace and then continue executing gracefully. For capturing error details, MLflow provides two approaches:\n\n* Let exceptions propagate (recommended) so that MLflow can capture error messages for you.\n* Handle exceptions explicitly.\n\n### Let exceptions propagate (recommended)[​](#let-exceptions-propagate-recommended \"Direct link to Let exceptions propagate (recommended)\")\n\nThe simplest approach is to let exceptions throw naturally. MLflow automatically captures the exception and creates a [`Feedback`](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.entities.html#mlflow.entities.Feedback) object with the following error details:\n\n* `value`: `None`\n* `error`: The exception details, such as exception object, error message, and stack trace\n\nThe error information is displayed in the evaluation results. Open the corresponding row to see the error details.",
+        "source_url": "https://mlflow.org/docs/latest/genai/eval-monitor/scorers/custom.md",
+        "source_id": "scorers",
+        "source_sha256": "994b895f2b6194e318f703de88bb9402b46d24cae6dd41c6e89401bf318c00c0",
+        "source_retrieved_at": "2026-09-20T02:54:31.070300+00:00"
+      },
+      {
+        "case_id": "QA-011",
+        "topic": "Prompt aliases",
+        "family_id": "prompt-alias-resolution",
+        "question": "I want a development script to load the newest registered version of summarization-prompt without hardcoding a version number. Which URI can I use?",
+        "answer": "Use mlflow.genai.load_prompt(\"prompts:/summarization-prompt@latest\"). The latest alias is reserved, and MLflow resolves it to the latest available version of that prompt.",
+        "context": "The `@latest` alias is a reserved alias name and MLflow will automatically find the latest available version of the prompt. This is useful when you want to dynamically load the latest version of a prompt without updating the application code.\n\npython\n\n```\nprompt = mlflow.genai.load_prompt(\"prompts:/summarization-prompt@latest\")\n```",
+        "source_url": "https://mlflow.org/docs/latest/genai/prompt-registry/manage-prompt-lifecycles-with-aliases.md",
+        "source_id": "prompt-aliases",
+        "source_sha256": "23f54ef798e90d19bffd0a0319d70b4f90164a3750c0297e8a5b1ff50a6813a4",
+        "source_retrieved_at": "2026-09-20T02:54:31.603405+00:00"
+      },
+      {
+        "case_id": "QA-012",
+        "topic": "Session metadata compatibility",
+        "family_id": "tracing-session-metadata",
+        "question": "My Python application is pinned to MLflow 3.10.0. How should I attach a session ID to the current trace?",
+        "answer": "Use `mlflow.update_current_trace(session_id=\"session-123\")` inside the traced function. The dedicated `session_id` parameter is available in MLflow 3.10.0, so you can pass the ID directly.",
+        "context": "The `session_id` and `user` parameters are supported since MLflow 3.11.0. For earlier versions, set `mlflow.trace.session` or `mlflow.trace.user` key to the trace metadata directly.\n\ntext\n\n```\nmlflow.update_current_trace(metadata={\"mlflow.trace.session\": session_id})\n```",
+        "source_url": "https://mlflow.org/docs/latest/genai/tracing/track-users-sessions.md",
+        "source_id": "sessions",
+        "source_sha256": "c8a67d478c7f9b4277adf2a2d2b3aa17ddaab334504a399298abbbdc7e514888",
+        "source_retrieved_at": "2026-09-20T02:54:30.745712+00:00"
+      },
+      {
+        "case_id": "QA-013",
+        "topic": "Distributed trace destinations",
+        "family_id": "tracing-distributed-experiments",
+        "question": "Our two backend services log to the same MLflow tracking server but use different experiments. If we forward the trace context headers, can their spans be merged into one distributed trace?",
+        "answer": "Yes. Forwarding the trace context headers is sufficient to join the spans, even when each service logs to a different experiment. You can keep separate experiments for the two services and still inspect their execution as one trace.",
+        "context": "For distributed tracing to work, **both services must log traces to the same MLflow tracking server and the same experiment**:\n\n1. Start an MLflow tracking server (or use a shared remote server).\n2. In every service, set the tracking URI and experiment before creating spans.\n\nbash\n\n```\nexport MLFLOW_TRACKING_URI=\"http://localhost:5000\"\n\nexport MLFLOW_EXPERIMENT_NAME=\"distributed-tracing-demo\"\n```\n\nor\n\npython\n\n```\nimport mlflow\n\n\n\nmlflow.set_tracking_uri(\"http://localhost:5000\")\n\nmlflow.set_experiment(\"distributed-tracing-demo\")\n```\n\nIf services use different experiments, their spans will end up in separate traces instead of being merged into one.",
+        "source_url": "https://mlflow.org/docs/latest/genai/tracing/app-instrumentation/distributed-tracing.md",
+        "source_id": "distributed-tracing",
+        "source_sha256": "3e0174de4ad664900c2009c783fbf4b672f079c510311a08d274c6b25b46a157",
+        "source_retrieved_at": "2026-09-20T02:54:30.725449+00:00"
+      },
+      {
+        "case_id": "QA-014",
+        "topic": "Function instrumentation",
+        "family_id": "tracing-function-wrapper",
+        "question": "I need to trace a helper from a third-party Python package, but I can't edit its source. How can I capture the helper's inputs and outputs?",
+        "answer": "Wrap the existing function with `mlflow.trace`, then call the wrapped version. For example, `traced_helper = mlflow.trace(helper)` lets you call `traced_helper(...)` without changing the original definition. The wrapper captures the call’s inputs, outputs, and execution context.",
+        "context": "Function wrapping provides a flexible way to add tracing to existing functions without modifying their definitions. This is particularly useful when you want to add tracing to third-party functions or functions defined outside of your control. By wrapping an external function with `mlflow.trace`, you can capture its inputs, outputs, and execution context.\n\n* Python\n* TypeScript\n\nnote\n\nWhen wrapping functions dynamically, the concept of \"outermost\" still applies. The tracing wrapper should be applied at the point where you want to capture the entire call to the wrapped function.\n\npython\n\n```\nimport math\n\nimport mlflow\n\n\n\n\n\ndef invocation(x, exp=2):\n\n    # Wrap an external function from the math library\n\n    traced_pow = mlflow.trace(math.pow)\n\n    raised = traced_pow(x, exp)\n\n\n\n    traced_factorial = mlflow.trace(math.factorial)\n\n    factorial = traced_factorial(int(raised))\n\n    return factorial\n\n\n\n\n\ninvocation(4, 2)\n```",
+        "source_url": "https://mlflow.org/docs/latest/genai/tracing/app-instrumentation/manual-tracing.md",
+        "source_id": "manual-tracing",
+        "source_sha256": "1270dd84c14424a2e1879db4e39a000299a5b36a74b40eeda6a15c5d60ee2eeb",
+        "source_retrieved_at": "2026-09-20T02:54:30.769017+00:00"
+      },
+      {
+        "case_id": "QA-015",
+        "topic": "RetrievalGroundedness feedback",
+        "family_id": "retrieval-groundedness-feedback",
+        "question": "My trace contains two retriever spans. Does `RetrievalGroundedness` assess their retrieved context together or return a result for each span?",
+        "answer": "It combines the retrieved context from both spans and returns one `Feedback` object for the trace. That single verdict says whether the final answer is supported by the combined context.",
+        "context": "The RetrievalGroundedness judge evaluates each retriever span separately and returns a separate Feedback object for each retriever span in your trace. Each [`Feedback`](/docs/latest/api_reference/python_api/mlflow.entities.html#mlflow.entities.Feedback) object contains:\n\n* **value**: \"yes\" if response is grounded in the retrieved context, \"no\" if it contains hallucinations\n\n* **rationale**: Detailed explanation identifying:\n\n  <!-- -->\n\n  * Which statements are supported by the context\n  * Which statements lack support (hallucinations)\n  * Specific quotes from context that support or contradict claims",
+        "source_url": "https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/rag/groundedness.md",
+        "source_id": "groundedness",
+        "source_sha256": "516f5849a91eeeb1d51f0fe1356240c8366e3872f314cb14ef07ce3ee29a5e1f",
+        "source_retrieved_at": "2026-09-20T02:54:31.244396+00:00"
+      },
+      {
+        "case_id": "QA-016",
+        "topic": "Dataset records",
+        "family_id": "dataset-record-identity",
+        "question": "I call dataset.merge_records() twice with identical inputs, but the second record has an additional expectation and a new tag. Will I get two test cases?",
+        "answer": "Yes. MLflow identifies a dataset record from the entire record, including its expectations and tags. Because the second record has different annotation fields, merge_records() adds a separate test case and leaves the first unchanged.",
+        "context": "Records are uniquely identified by a **hash of their inputs**. When merging records with [`mlflow.genai.datasets.EvaluationDataset.merge_records()`](/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.datasets.EvaluationDataset.merge_records), if a record with identical inputs already exists, its expectations and tags are merged rather than creating a duplicate. This enables iterative refinement of test cases without data duplication.",
+        "source_url": "https://mlflow.org/docs/latest/genai/concepts/evaluation-datasets.md",
+        "source_id": "dataset-concepts",
+        "source_sha256": "896b18adac54e13342718ec9acfcf650bc8e045b0ec52b2b6a36c978e6e5e4af",
+        "source_retrieved_at": "2026-09-20T02:54:31.235974+00:00"
+      },
+      {
+        "case_id": "QA-017",
+        "topic": "Custom scorer arguments",
+        "family_id": "scorer-function-arguments",
+        "question": "My custom scorer only counts the words in the final response. Does its function still need to accept `inputs`, `expectations`, and `trace`?",
+        "answer": "Yes. Every custom scorer must declare all four arguments in its signature, even if it only uses `outputs`. Add the unused arguments so the evaluation harness can invoke it.",
+        "context": "Scorers receive the complete [MLflow trace](/docs/latest/genai/concepts/trace.md) containing all spans, attributes, and outputs. As a convenience, MLflow also extracts commonly needed data and passes it as named arguments. All input arguments are optional, so declare only what your scorer needs:\n\n* `inputs`: The request sent to your app (e.g., user query, context).\n* `outputs`: The response from your app (e.g., generated text, tool calls)\n* `expectations`: Ground truth or labels (e.g., expected response, guidelines, etc.)\n* `trace`: The complete [MLflow trace](/docs/latest/genai/concepts/trace.md) with all spans, allowing analysis of intermediate steps, latency, tool usage, and more. The trace is passed to the custom scorer as an instantiated [`mlflow.entities.Trace` class](/docs/latest/api_reference/python_api/mlflow.entities.html#mlflow.entities.Trace) class.\n\nWhen running [mlflow.genai.evaluate()](/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.evaluate), the `inputs`, `outputs`, and `expectations` parameters can be specified in the `data` argument, or parsed from the trace.",
+        "source_url": "https://mlflow.org/docs/latest/genai/eval-monitor/scorers/custom.md",
+        "source_id": "scorers",
+        "source_sha256": "994b895f2b6194e318f703de88bb9402b46d24cae6dd41c6e89401bf318c00c0",
+        "source_retrieved_at": "2026-09-20T02:54:31.070300+00:00"
+      },
+      {
+        "case_id": "QA-018",
+        "topic": "Trace attributes",
+        "family_id": "tracing-run-metric",
+        "question": "I want `retrieval_score` to appear on the current trace in the Traces tab. Can I add it by calling `mlflow.log_metric(\"retrieval_score\", 0.8)` inside my traced function?",
+        "answer": "Yes. When `mlflow.log_metric()` runs inside a traced function, it attaches the metric to the active span. You can inspect `retrieval_score` on that trace in the Traces tab.",
+        "context": "Use span attributes, not `mlflow.log_metric`, to attach data to a trace\n\n`mlflow.log_metric()` writes to an **MLflow Run**, not to the current span. Calling it inside a traced function will not add that value to the trace or make it visible in the Traces tab. Use `span.set_attribute(key, value)` or `span.set_attributes({...})` to attach data to a span.",
+        "source_url": "https://mlflow.org/docs/latest/genai/tracing/app-instrumentation/manual-tracing.md",
+        "source_id": "manual-tracing",
+        "source_sha256": "1270dd84c14424a2e1879db4e39a000299a5b36a74b40eeda6a15c5d60ee2eeb",
+        "source_retrieved_at": "2026-09-20T02:54:30.769017+00:00"
+      },
+      {
+        "case_id": "QA-019",
+        "topic": "Span output recording",
+        "family_id": "tracing-explicit-outputs",
+        "question": "Inside a function decorated with `@mlflow.trace`, I call `span.set_outputs({\"summary\": \"done\"})` and then return a larger result dictionary. Which value is stored as the span output?",
+        "answer": "The larger return value is stored as the span output. The decorator captures it when the function exits and replaces the value supplied earlier with `span.set_outputs()`.",
+        "context": ":::note Overriding auto-captured inputs and outputs inside a decorated function\n\n`span.set_inputs()` / `span.set_outputs()` (Python) and `span.setInputs()` / `span.setOutputs()` (TypeScript) called inside a decorated function override the values the decorator captures automatically. If you set the outputs explicitly, the decorator keeps your value. If you leave them unset, it records the function's return value as before. Inputs behave the same way.\n\nTo change only what appears in the `Response` column of the Traces UI without changing the stored span output, use `mlflow.update_current_trace(response_preview=...)` in Python or `updateCurrentTrace(...)` in TypeScript (see [Customizing Request and Response Previews in the UI](#customizing-request-and-response-previews-in-the-ui)). :::",
+        "source_url": "https://mlflow.org/docs/latest/genai/tracing/app-instrumentation/manual-tracing.md",
+        "source_id": "manual-tracing",
+        "source_sha256": "1270dd84c14424a2e1879db4e39a000299a5b36a74b40eeda6a15c5d60ee2eeb",
+        "source_retrieved_at": "2026-09-20T02:54:30.769017+00:00"
+      },
+      {
+        "case_id": "QA-020",
+        "topic": "Session context",
+        "family_id": "tracing-session-metadata",
+        "question": "I use `mlflow.langchain.autolog()` and do not control the library’s traced functions. How can I associate the traces created during one request with a session and user?",
+        "answer": "Wrap the request’s invocation in `with mlflow.tracing.context(session_id=\"session-123\", user=\"user-456\"):`. Traces created inside that scope receive the session and user metadata, so you do not have to edit the library’s traced functions. The dedicated parameters require MLflow 3.11.0 or later.",
+        "context": "When using auto-instrumented libraries (e.g. `mlflow.langchain.autolog()`), you don't control the traced function directly. Use [`mlflow.tracing.context()`](/docs/latest/api_reference/python_api/mlflow.tracing.html#mlflow.tracing.context) to inject user and session information into any trace created within its scope.\n\npython\n\n```\nimport mlflow\n\n\n\nmlflow.langchain.autolog()\n\n\n\nwith mlflow.tracing.context(session_id=\"session-123\", user=\"user-456\"):\n\n    # Any trace created inside this block will carry the session and user metadata.\n\n    agent.invoke(\"What is the capital of France?\")\n```\n\nThis is especially useful in web applications where you can wrap request handlers with the context manager to automatically associate all traces with the current user and session.\n\nnote\n\nThe `session_id` and `user` parameters are supported since MLflow 3.11.0. For earlier versions, set `mlflow.trace.session` or `mlflow.trace.user` key to the trace metadata directly.\n\ntext\n\n```\nmlflow.update_current_trace(metadata={\"mlflow.trace.session\": session_id})\n```",
+        "source_url": "https://mlflow.org/docs/latest/genai/tracing/track-users-sessions.md",
+        "source_id": "sessions",
+        "source_sha256": "c8a67d478c7f9b4277adf2a2d2b3aa17ddaab334504a399298abbbdc7e514888",
+        "source_retrieved_at": "2026-09-20T02:54:30.745712+00:00"
+      },
+      {
+        "case_id": "QA-021",
+        "topic": "Correctness reference information",
+        "family_id": "correctness-reference-format",
+        "question": "For the built-in `Correctness` judge, can I give a list of facts instead of writing one ideal reference answer?",
+        "answer": "Yes. Use `expected_facts` instead of `expected_response` to provide the key facts. The response does not need to match a reference answer word for word; it needs to contain those facts.",
+        "context": "Use `expected_facts` rather than `expected_response` for more flexible evaluation - the response doesn't need to match word-for-word, just contain the key facts.",
+        "source_url": "https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/response-quality/correctness.md",
+        "source_id": "correctness",
+        "source_sha256": "c942b93edb8eaa0817f62d5eabd7ef140653b72b5654abd59b5047f991b0ee24",
+        "source_retrieved_at": "2026-09-20T02:54:31.239733+00:00"
+      },
+      {
+        "case_id": "QA-022",
+        "topic": "Evaluation of saved responses",
+        "family_id": "evaluation-saved-responses",
+        "question": "I have saved questions, responses, and reference answers. Can I run field-based scorers on those responses without calling my application again?",
+        "answer": "Yes. Put each saved response in the row’s `outputs` field, alongside `inputs` and `expectations`, then call `mlflow.genai.evaluate(data=rows, scorers=[my_scorer])`. You can omit `predict_fn` when scoring those existing outputs.",
+        "context": "eval_dataset = [\n\n    {\n\n        \"inputs\": {\"question\": \"How many countries are there in the world?\"},\n\n        \"outputs\": \"195\",\n\n        \"expectations\": {\"expected_response\": \"195\"},\n\n    },\n\n    {\n\n        \"inputs\": {\"question\": \"What is the capital of France?\"},\n\n        \"outputs\": \"The capital of France is Paris.\",\n\n        \"expectations\": {\"expected_response\": \"Paris\"},\n\n    },\n\n]\n\n\n\nmlflow.genai.evaluate(\n\n    data=eval_dataset,\n\n    scorers=[exact_match, is_short],\n\n)\n```",
+        "source_url": "https://mlflow.org/docs/latest/genai/eval-monitor/scorers/custom.md",
+        "source_id": "scorers",
+        "source_sha256": "994b895f2b6194e318f703de88bb9402b46d24cae6dd41c6e89401bf318c00c0",
+        "source_retrieved_at": "2026-09-20T02:54:31.070300+00:00"
+      },
+      {
+        "case_id": "QA-023",
+        "topic": "Evaluation input mapping",
+        "family_id": "evaluation-input-mapping",
+        "question": "My prediction function is `answer(question: str)`, but each evaluation row has `inputs={\"prompt\": \"What is MLflow?\"}`. Will `mlflow.genai.evaluate()` pass that string to `question` automatically?",
+        "answer": "Yes. For a single-argument prediction function, MLflow passes the only value in `inputs` to that argument regardless of the key name, so you can keep `prompt` in the dataset.",
+        "context": "The evaluation dataset is a list of samples, each with an `inputs` and `expectations` field.\n\n* `inputs`: The input to the `predict_fn` function above. **The key(s) must match the parameter name of the `predict_fn` function**.\n* `expectations`: The expected output from the `predict_fn` function, namely, ground truth for the answer.\n\nThe dataset can be a list of dictionaries, a pandas DataFrame, a spark DataFrame. Here we use a list of dictionaries for simplicity.",
+        "source_url": "https://mlflow.org/docs/latest/genai/eval-monitor/quickstart.md",
+        "source_id": "evaluate",
+        "source_sha256": "5a025018285b9f0a8c3ac1cdb221ee8a099395ddcac2d1e6e4af050264b69c6a",
+        "source_retrieved_at": "2026-09-20T02:54:30.787376+00:00"
+      },
+      {
+        "case_id": "QA-024",
+        "topic": "Dataset storage",
+        "family_id": "dataset-storage",
+        "question": "Can I use MLflow Evaluation Datasets with the local FileStore backend, or do I need a different tracking backend?",
+        "answer": "Evaluation Datasets require a tracking server backed by a SQL database. The local FileStore backend does not support this feature. SQLite is one supported option if you want a lightweight SQL backend.",
+        "context": "Evaluation Datasets require an MLflow Tracking Server with a **[SQL backend](/docs/latest/self-hosting/architecture/backend-store.md#types-of-backend-stores)** (PostgreSQL, MySQL, SQLite, or MSSQL). This feature is **not available** in FileStore (local mode) due to the relational data requirements for managing dataset records, associations, and schema evolution.",
+        "source_url": "https://mlflow.org/docs/latest/genai/concepts/evaluation-datasets.md",
+        "source_id": "dataset-concepts",
+        "source_sha256": "896b18adac54e13342718ec9acfcf650bc8e045b0ec52b2b6a36c978e6e5e4af",
+        "source_retrieved_at": "2026-09-20T02:54:31.235974+00:00"
+      },
+      {
+        "case_id": "QA-025",
+        "topic": "Expectation scope",
+        "family_id": "expectation-span-scope",
+        "question": "Can I attach a list of expected document IDs specifically to a retrieval span rather than only to the whole trace?",
+        "answer": "Expectations are attached only to the whole trace, so log the expected document IDs there and identify the retrieval step in metadata. The expectations API does not accept a span_id for targeting an individual operation.",
+        "context": "### Span-Level Expectations[​](#span-level-expectations \"Direct link to Span-Level Expectations\")\n\nFor specific operations within your AI pipeline:\n\npython\n\n```\n# Expected documents for RAG retrieval\n\nmlflow.log_expectation(\n\n    trace_id=trace_id,\n\n    span_id=retrieval_span_id,\n\n    name=\"expected_documents\",\n\n    value=[\"policy_doc_2024\", \"faq_section_3\", \"user_guide_ch5\"],\n\n    source=AssessmentSource(\n\n        source_type=AssessmentSourceType.HUMAN,\n\n        source_id=\"information_architect@company.com\",\n\n    ),\n\n)\n```",
+        "source_url": "https://mlflow.org/docs/latest/genai/assessments/expectations.md",
+        "source_id": "expectations",
+        "source_sha256": "658eb55ae25b3001879dae8ea9a429587ed5f23b118d344cfede21904bdeece2",
+        "source_retrieved_at": "2026-09-20T02:54:31.690217+00:00"
+      },
+      {
+        "case_id": "QA-026",
+        "topic": "HTTP trace propagation",
+        "family_id": "tracing-http-context",
+        "question": "Which MLflow APIs should my caller and callee use to propagate the active trace context over HTTP?",
+        "answer": "On the caller, use `get_tracing_context_headers_for_http_request()` to obtain headers for the active trace, and send them with the HTTP request. On the callee, use `set_tracing_context_from_http_request_headers()` to extract the incoming trace and span context. MLflow uses W3C TraceContext headers for this propagation.",
+        "context": "MLflow is OpenTelemetry-compatible, so trace context is propagated through the HTTP headers following the [W3C TraceContext](https://www.w3.org/TR/trace-context/) specification. MLflow provides two APIs to simplify handling the headers at the client and server sides:\n\n* Use [get\\_tracing\\_context\\_headers\\_for\\_http\\_request](/docs/latest/api_reference/python_api/mlflow.tracing.html#mlflow.tracing.get_tracing_context_headers_for_http_request) in the **client side** (caller service) to get headers containing the current trace context.\n* Use [set\\_tracing\\_context\\_from\\_http\\_request\\_headers](/docs/latest/api_reference/python_api/mlflow.tracing.html#mlflow.tracing.set_tracing_context_from_http_request_headers) in the **server side** (callee service) to extract the trace and span information from the incoming request headers.",
+        "source_url": "https://mlflow.org/docs/latest/genai/tracing/app-instrumentation/distributed-tracing.md",
+        "source_id": "distributed-tracing",
+        "source_sha256": "3e0174de4ad664900c2009c783fbf4b672f079c510311a08d274c6b25b46a157",
+        "source_retrieved_at": "2026-09-20T02:54:30.725449+00:00"
+      },
+      {
+        "case_id": "QA-027",
+        "topic": "Evaluation function wrappers",
+        "family_id": "evaluation-input-mapping",
+        "question": "My dataset uses an input key named `question`, but my existing app accepts `user_message`. How can I evaluate it without changing the app or dataset?",
+        "answer": "Define a wrapper whose argument matches the dataset, and translate that argument when calling the app. Pass the wrapper as `predict_fn`:\n\n```python\ndef predict_for_eval(question: str):\n    return app(user_message=question)\n```",
+        "context": "If your app expects different parameter names or data structures than your evaluation dataset's `inputs`, wrap it in a callable function. This is useful when there are parameter name mismatches between your app's parameters and evaluation dataset `input` keys (for example, `user_input` vs `question`), or when data format conversions are required (for example, string to list or JSON parsing).",
+        "source_url": "https://mlflow.org/docs/latest/genai/eval-monitor/running-evaluation/eval-examples.md",
+        "source_id": "eval-examples",
+        "source_sha256": "925f26e2221698d4e08c2b2aef7a7c52c901816a33ebe01d5215b188b0fd7caf",
+        "source_retrieved_at": "2026-09-20T02:54:30.664508+00:00"
+      },
+      {
+        "case_id": "QA-028",
+        "topic": "Dataset records",
+        "family_id": "dataset-record-fields",
+        "question": "I already saved my application answers and want to evaluate them later. Can an MLflow evaluation dataset store these answers alongside the test inputs?",
+        "answer": "Yes. Store the saved application answers in each record's optional outputs field and keep the test inputs in inputs. Expectations are a separate optional field for reference answers or quality criteria, so the saved answer itself does not belong there.",
+        "context": "* **inputs** (required): The test input data that will be passed to your model or application\n* **outputs** (optional): The actual outputs generated by your model (typically used for post-hoc evaluation)\n* **expectations** (optional): The expected outputs or quality criteria that define correct behavior\n* **source** (optional): Provenance information about how this record was created (automatically inferred if not provided)\n* **tags** (optional): Metadata specific to this individual record for organization and filtering",
+        "source_url": "https://mlflow.org/docs/latest/genai/concepts/evaluation-datasets.md",
+        "source_id": "dataset-concepts",
+        "source_sha256": "896b18adac54e13342718ec9acfcf650bc8e045b0ec52b2b6a36c978e6e5e4af",
+        "source_retrieved_at": "2026-09-20T02:54:31.235974+00:00"
+      },
+      {
+        "case_id": "QA-029",
+        "topic": "Code block instrumentation",
+        "family_id": "tracing-block-inputs",
+        "question": "I am using `with mlflow.start_span(name=\"retrieve\") as span:` around a block of retrieval code. Will it record the block’s inputs and outputs automatically?",
+        "answer": "You need to set the inputs and outputs explicitly with `span.set_inputs(...)` and `span.set_outputs(...)`. The context manager captures execution time, exceptions, and the parent-child relationship automatically, but you supply the span’s name, inputs, and outputs.",
+        "context": "In addition to the decorator, MLflow allows for creating a span that can then be accessed within any encapsulated arbitrary code block. It can be useful for capturing complex interactions within your code in finer detail than what is possible by capturing the boundaries of a single function.\n\nSimilarly to the decorator, the code block automatically captures parent-child relationship, exceptions, execution time, and works with auto-tracing. However, the name, inputs, and outputs of the span must be provided manually.\n\n* Python\n* TypeScript\n\nUse the [`mlflow.start_span()`](/docs/latest/api_reference/python_api/mlflow.html#mlflow.start_span) context manager.\n\npython\n\n```\nimport mlflow\n\n\n\nwith mlflow.start_span(name=\"my_span\") as span:\n\n    span.set_inputs({\"x\": 1, \"y\": 2})\n\n    z = x + y\n\n    span.set_outputs(z)\n```",
+        "source_url": "https://mlflow.org/docs/latest/genai/tracing/app-instrumentation/manual-tracing.md",
+        "source_id": "manual-tracing",
+        "source_sha256": "1270dd84c14424a2e1879db4e39a000299a5b36a74b40eeda6a15c5d60ee2eeb",
+        "source_retrieved_at": "2026-09-20T02:54:30.769017+00:00"
+      },
+      {
+        "case_id": "QA-030",
+        "topic": "Prompt versions",
+        "family_id": "prompt-versioning",
+        "question": "I registered a prompt named support-answer. How should I save an improved template while keeping its history?",
+        "answer": "Call mlflow.genai.register_prompt() again with name=\"support-answer\" and the new template. MLflow creates a new version and increments the version number. Existing prompt versions remain immutable, so their original templates stay available.",
+        "context": "Once a prompt version is created, its template and initial metadata are **immutable**. Editing an existing prompt means creating a *new version* of that prompt with your changes. This Git-like behavior ensures a complete history and allows you to revert to previous versions if needed.\n\n* UI\n* Python\n\n1. Navigate to the specific prompt you wish to edit in the Prompt Registry.\n2. Select the version you want to base your new version on (often the latest).\n3. Look for an \"Edit Prompt\" or \"Create New Version\" button.\n4. Modify the template, update metadata, or change tags as needed.\n5. Provide a new **Commit Message** describing the changes you made for this new version.\n\n![Update Prompt UI](/docs/latest/assets/images/update-prompt-ui-9fe89b08b9318729754441fbe67f0a90.png)\n\nTo create a new version of an existing prompt, you again use the [`mlflow.genai.register_prompt()`](/docs/latest/api_reference/python_api/mlflow.genai.html#mlflow.genai.register_prompt) function, but this time, you provide the `name` of an existing prompt. MLflow will automatically increment the version number.",
+        "source_url": "https://mlflow.org/docs/latest/genai/prompt-registry/create-and-edit-prompts.md",
+        "source_id": "prompts",
+        "source_sha256": "15dfbac3142849453012f1a31d77ebcef335a30e73dd442e267558cc55b06c19",
+        "source_retrieved_at": "2026-09-20T02:54:31.511750+00:00"
+      }
+    ]
+  },
+  "corrected_human_reference": [
+    {
+      "case_id": "QA-001",
+      "expectations": {
+        "human_correctness": "correct",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-002",
+      "expectations": {
+        "human_correctness": "incorrect",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-003",
+      "expectations": {
+        "human_correctness": "correct",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-004",
+      "expectations": {
+        "human_correctness": "correct",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-005",
+      "expectations": {
+        "human_correctness": "incorrect",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-006",
+      "expectations": {
+        "human_correctness": "incorrect",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-007",
+      "expectations": {
+        "human_correctness": "correct",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-008",
+      "expectations": {
+        "human_correctness": "incorrect",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-009",
+      "expectations": {
+        "human_correctness": "incorrect",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-010",
+      "expectations": {
+        "human_correctness": "incorrect",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-011",
+      "expectations": {
+        "human_correctness": "correct",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-012",
+      "expectations": {
+        "human_correctness": "incorrect",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-013",
+      "expectations": {
+        "human_correctness": "incorrect",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-014",
+      "expectations": {
+        "human_correctness": "correct",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-015",
+      "expectations": {
+        "human_correctness": "incorrect",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-016",
+      "expectations": {
+        "human_correctness": "incorrect",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-017",
+      "expectations": {
+        "human_correctness": "incorrect",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-018",
+      "expectations": {
+        "human_correctness": "unclear",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-019",
+      "expectations": {
+        "human_correctness": "incorrect",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-020",
+      "expectations": {
+        "human_correctness": "correct",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-021",
+      "expectations": {
+        "human_correctness": "correct",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-022",
+      "expectations": {
+        "human_correctness": "correct",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-023",
+      "expectations": {
+        "human_correctness": "incorrect",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-024",
+      "expectations": {
+        "human_correctness": "correct",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-025",
+      "expectations": {
+        "human_correctness": "incorrect",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-026",
+      "expectations": {
+        "human_correctness": "correct",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-027",
+      "expectations": {
+        "human_correctness": "correct",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-028",
+      "expectations": {
+        "human_correctness": "correct",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-029",
+      "expectations": {
+        "human_correctness": "correct",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    },
+    {
+      "case_id": "QA-030",
+      "expectations": {
+        "human_correctness": "correct",
+        "human_rationale": "",
+        "human_reviewer": "Yuki Watanabe"
+      }
+    }
+  ],
+  "source_hashes": {
+    "dataset_sha256": "afa658c75976bf3a58c411ae66013eb9753014ff836f94688c2cee290aaa3dde",
+    "human_label_sha256": "b2a5161878eceb46e0df50152f5738e6a192c5420ab2fa410e6faaa3ac209e71",
+    "criterion_sha256": "c22db3302b6a81031997f6e1cbb5476fb7dbda9faf824251cc3e7b8b11f1c76b"
+  },
+  "protocol": {
+    "criterion": "Is the candidate answer factually and technically correct for the question, using the supplied MLflow documentation and respecting any version specified in the question? Answer yes if there is no material factual or API error. Answer no if at least one claim or instruction is materially wrong or misleading. Do not penalize style or harmless omissions. An omission is material when it makes the requested technical answer misleading.",
+    "request_state": "json.dumps({\"question\": question, \"context\": context, \"answer\": answer}, sort_keys=True, ensure_ascii=False, separators=(\",\", \":\"))",
+    "request_state_field": "state for TypeSafe /v1/systemone; input for /v1/decisions",
+    "questions": {
+      "jev": {
+        "correct": {
+          "type": "noul",
+          "instructions": "Is the candidate answer factually and technically correct for the question, using the supplied MLflow documentation and respecting any version specified in the question? Answer yes if there is no material factual or API error. Answer no if at least one claim or instruction is materially wrong or misleading. Do not penalize style or harmless omissions. An omission is material when it makes the requested technical answer misleading."
+        }
+      },
+      "decisions": [
+        {
+          "type": "predicate",
+          "name": "correct",
+          "instructions": "Is the candidate answer factually and technically correct for the question, using the supplied MLflow documentation and respecting any version specified in the question? Answer yes if there is no material factual or API error. Answer no if at least one claim or instruction is materially wrong or misleading. Do not penalize style or harmless omissions. An omission is material when it makes the requested technical answer misleading."
+        }
+      ]
+    },
+    "threshold": "correct if probability >= 0.5; incorrect otherwise",
+    "scored_cases": 29,
+    "excluded_case_ids": ["QA-018"],
+    "exclusion_reason": "human reference label is unclear",
+    "preflight": "repeat QA-001 once before the 29 scored cases; exclude it from summary",
+    "concurrency": 1,
+    "sdk_retries": 0,
+    "latency_scope": "synchronous SDK call, including serialization, network transit when hosted, server processing, and response decoding",
+    "human_labels_sent_to_models": false,
+    "comparison_note": "All four runs send the same canonical JSON text. The original September 2026 Jev pilot sent a structured JSON object as state; its 29/29 result is a separate protocol.",
+    "runtime": {
+      "local_hardware": "Apple M2 Max, 64 GB unified memory, macOS 26.6.2",
+      "local_hosting_note": "Local OpenJev used MLX; local Laya used CPU. Hosted and local latency figures are not a controlled speed ranking."
+    },
+    "routes": {
+      "jev": {
+        "api": "TypeSafe POST /v1/systemone",
+        "model": "jev-1.13.0",
+        "sdk": "typesafe-sdk 0.5.7",
+        "hosting": "TypeSafe API"
+      },
+      "openai": {
+        "api": "OpenAI POST /v1/decisions",
+        "model": "gpt-6-luna",
+        "sdk": "openai 3.26.0",
+        "hosting": "OpenAI API"
+      },
+      "openjev": {
+        "api": "OpenJev OpenAI-compatible POST /v1/decisions",
+        "model": "openjev-0.1",
+        "sdk": "openai 3.26.0",
+        "hosting": "local MLX",
+        "server": "openjev 0.7.2",
+        "server_git_commit": "b4339c640f5331ef75098637d1be2c787715ee88",
+        "checkpoint": "mlx-community/diffusiongemma-26B-A4B-it-4bit",
+        "checkpoint_revision": "a7a81407613811e8ba63af92ac0d852b809e191f",
+        "mlx": "0.32.3",
+        "mlx-vlm": "0.6.15",
+        "mlx_cache_limit_gb": 4
+      },
+      "laya": {
+        "api": "OpenJev OpenAI-compatible POST /v1/decisions",
+        "model": "laya-1.0",
+        "sdk": "openai 3.26.0",
+        "hosting": "local CPU",
+        "server": "openjev 0.7.2",
+        "server_git_commit": "b4339c640f5331ef75098637d1be2c787715ee88",
+        "checkpoint": "convaiinnovations/laya-typed-decisions",
+        "checkpoint_revision": "e929ae5cf69bc34259cd2f95c9e91145b818b1f0",
+        "laya": "0.3.6",
+        "torch": "2.14.1",
+        "transformers": "5.19.0",
+        "encoder_config_and_tokenizer": "answerdotai/ModernBERT-large",
+        "encoder_revision": "45bb4654a4d5aaff24dd11d4781fa46d39bf8c13",
+        "token_limit": 1024,
+        "truncated_scored_cases": 0
+      }
+    }
+  },
+  "runs": {
+    "jev": {
+      "summary": {
+        "scored_requests": 29,
+        "completed_scored_requests": 29,
+        "human_agreement_count": 28,
+        "human_agreement_denominator": 29,
+        "false_accept_case_ids": ["QA-019"],
+        "false_reject_case_ids": [],
+        "median_latency_ms": 109.67387500568293,
+        "max_latency_ms": 167.54062499967404,
+        "input_tokens": 17076,
+        "output_tokens": 580,
+        "preflight_status": "completed"
+      },
+      "calls": [
+        {
+          "case_id": "QA-001",
+          "phase": "preflight",
+          "request_sha256": "e7fe8defff432f7d1db80e3eaf97207b65e918c964e529fd7e51ca4972325899",
+          "started_at": "2026-10-15T01:41:53.714463+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.83,
+          "prediction": "correct",
+          "latency_ms": 215.08379199076444,
+          "usage": { "input_tokens": 507, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-001",
+          "phase": "evaluation",
+          "request_sha256": "e7fe8defff432f7d1db80e3eaf97207b65e918c964e529fd7e51ca4972325899",
+          "started_at": "2026-10-15T01:41:53.929735+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.78,
+          "prediction": "correct",
+          "latency_ms": 106.76270900876261,
+          "usage": { "input_tokens": 507, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-002",
+          "phase": "evaluation",
+          "request_sha256": "380ce58441dd065349bf7a7daf20e6e0085638736a1ee6f8b6dac75ee643e93d",
+          "started_at": "2026-10-15T01:41:54.036696+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.07,
+          "prediction": "incorrect",
+          "latency_ms": 140.46525000594556,
+          "usage": { "input_tokens": 498, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-003",
+          "phase": "evaluation",
+          "request_sha256": "c4af9af32ab2dee32fc0fc27ce26e46e42aa9c906c039bdf468d4953a660714f",
+          "started_at": "2026-10-15T01:41:54.177381+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.7,
+          "prediction": "correct",
+          "latency_ms": 130.34720800351351,
+          "usage": { "input_tokens": 563, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-004",
+          "phase": "evaluation",
+          "request_sha256": "f04f5206ca0dad8961e5affc0b30da166f26317654d9b3095ddfe36230a9ecc1",
+          "started_at": "2026-10-15T01:41:54.307993+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.9,
+          "prediction": "correct",
+          "latency_ms": 113.56545799935702,
+          "usage": { "input_tokens": 509, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-005",
+          "phase": "evaluation",
+          "request_sha256": "19bf5ea62b0fae6057eef152b6fd3f85eb5f41a1ee96ae220ad85016ed6c1ebe",
+          "started_at": "2026-10-15T01:41:54.421799+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.1,
+          "prediction": "incorrect",
+          "latency_ms": 103.67700000642799,
+          "usage": { "input_tokens": 762, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-006",
+          "phase": "evaluation",
+          "request_sha256": "0a7a6c5c40670dfa6728843dd92a18917e0ea8592ca21370d638d97be9f75080",
+          "started_at": "2026-10-15T01:41:54.526001+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.1,
+          "prediction": "incorrect",
+          "latency_ms": 111.46604199893773,
+          "usage": { "input_tokens": 563, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-007",
+          "phase": "evaluation",
+          "request_sha256": "3d50e6e999bfb02fb523ea4ff80e8b2811a8b986cfb8a061d38610a2dbfda7cb",
+          "started_at": "2026-10-15T01:41:54.637685+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.88,
+          "prediction": "correct",
+          "latency_ms": 98.98687500390224,
+          "usage": { "input_tokens": 746, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-008",
+          "phase": "evaluation",
+          "request_sha256": "ed6c0b56540cdcfdacf456fc9c7154edc26d4679d4a347c68635162458eba430",
+          "started_at": "2026-10-15T01:41:54.736867+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.09,
+          "prediction": "incorrect",
+          "latency_ms": 101.10245799296536,
+          "usage": { "input_tokens": 505, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-009",
+          "phase": "evaluation",
+          "request_sha256": "5b411d46078009a591195055d626702af86a4d12b3b2f27100111be4a1cee9aa",
+          "started_at": "2026-10-15T01:41:54.838434+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.48,
+          "prediction": "incorrect",
+          "latency_ms": 98.32216700306162,
+          "usage": { "input_tokens": 580, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-010",
+          "phase": "evaluation",
+          "request_sha256": "dcc7395598eed8f78f2ddd1a518aebb4b552d939f24812b798efe6462a0fb02f",
+          "started_at": "2026-10-15T01:41:54.936982+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.07,
+          "prediction": "incorrect",
+          "latency_ms": 167.54062499967404,
+          "usage": { "input_tokens": 612, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-011",
+          "phase": "evaluation",
+          "request_sha256": "993200091efe51a70565ab3d2ebf8aba489e5bd351080e1f5a769d7910cdea5d",
+          "started_at": "2026-10-15T01:41:55.104787+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.83,
+          "prediction": "correct",
+          "latency_ms": 129.19937500555534,
+          "usage": { "input_tokens": 510, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-012",
+          "phase": "evaluation",
+          "request_sha256": "da45881e44ec91ca1686a112e14c138f170e70394bf38272f5e1d62456d20870",
+          "started_at": "2026-10-15T01:41:55.234508+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.04,
+          "prediction": "incorrect",
+          "latency_ms": 97.14366699336097,
+          "usage": { "input_tokens": 509, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-013",
+          "phase": "evaluation",
+          "request_sha256": "d0a89f00d4dcd6ef00618fc035639d312c71e8126ebcbe867f9948833fccd8bc",
+          "started_at": "2026-10-15T01:41:55.332158+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.09,
+          "prediction": "incorrect",
+          "latency_ms": 106.56879199086688,
+          "usage": { "input_tokens": 619, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-014",
+          "phase": "evaluation",
+          "request_sha256": "808de1c9526872dddafeb5f0247fa80ad28289c5b7e7f43efc739c0202026527",
+          "started_at": "2026-10-15T01:41:55.439228+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.87,
+          "prediction": "correct",
+          "latency_ms": 120.33337500179186,
+          "usage": { "input_tokens": 683, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-015",
+          "phase": "evaluation",
+          "request_sha256": "65dc5fe12258ba3fd3a3e67f9d37c6bc9b1367913ddd21c29bfd471e785550ea",
+          "started_at": "2026-10-15T01:41:55.560103+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.03,
+          "prediction": "incorrect",
+          "latency_ms": 109.56995900778566,
+          "usage": { "input_tokens": 561, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-016",
+          "phase": "evaluation",
+          "request_sha256": "f7d8cc2bf1ee1a1af82f2e0510401e06b7289d228c6db0567e2071ab6cc57c22",
+          "started_at": "2026-10-15T01:41:55.670186+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.07,
+          "prediction": "incorrect",
+          "latency_ms": 104.2802090087207,
+          "usage": { "input_tokens": 518, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-017",
+          "phase": "evaluation",
+          "request_sha256": "1decf35d7f5237067de7b8efaa9b67f4dbeea1dcbaae848016d52721ac6783a5",
+          "started_at": "2026-10-15T01:41:55.775074+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.07,
+          "prediction": "incorrect",
+          "latency_ms": 123.3618340047542,
+          "usage": { "input_tokens": 688, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-019",
+          "phase": "evaluation",
+          "request_sha256": "58c59289332ea8cc590376a578efca69e0a6ecb21dc7d6263f1e3f75b8f44b69",
+          "started_at": "2026-10-15T01:41:55.898996+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.67,
+          "prediction": "correct",
+          "latency_ms": 112.84716700902209,
+          "usage": { "input_tokens": 616, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-020",
+          "phase": "evaluation",
+          "request_sha256": "0ca729daa5f55714beb96001e0a548b06b956c2a3ac1a1c2a8d127aa5553c7b9",
+          "started_at": "2026-10-15T01:41:56.012076+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.84,
+          "prediction": "correct",
+          "latency_ms": 94.71754101105034,
+          "usage": { "input_tokens": 741, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-021",
+          "phase": "evaluation",
+          "request_sha256": "bd3ef1a75e6fbd27b19c5330afd8700d8a530fd798020aec3930adeab83ec686",
+          "started_at": "2026-10-15T01:41:56.107412+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.75,
+          "prediction": "correct",
+          "latency_ms": 99.07195898995269,
+          "usage": { "input_tokens": 456, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-022",
+          "phase": "evaluation",
+          "request_sha256": "0fc6e0ea901f1b04ca10a44b35548d1c89acc58006837bba6a3f9c529e672cac",
+          "started_at": "2026-10-15T01:41:56.207023+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.82,
+          "prediction": "correct",
+          "latency_ms": 109.67387500568293,
+          "usage": { "input_tokens": 616, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-023",
+          "phase": "evaluation",
+          "request_sha256": "9d1c69248ecf15b038b6f35f0eeb1746b402fe14e4ecd54fccd094d48538cb87",
+          "started_at": "2026-10-15T01:41:56.317280+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.37,
+          "prediction": "incorrect",
+          "latency_ms": 123.10295899806079,
+          "usage": { "input_tokens": 562, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-024",
+          "phase": "evaluation",
+          "request_sha256": "16a6c804a3a0c541e2ec8c93033cfcdcab349e6367ad620d6ffb3277167b073a",
+          "started_at": "2026-10-15T01:41:56.440929+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.87,
+          "prediction": "correct",
+          "latency_ms": 114.76670800766442,
+          "usage": { "input_tokens": 504, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-025",
+          "phase": "evaluation",
+          "request_sha256": "caf6ab086f2b13d3ef3828d50b52490263c75dd03988443f2fbb953164959dda",
+          "started_at": "2026-10-15T01:41:56.555937+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.23,
+          "prediction": "incorrect",
+          "latency_ms": 108.75887499423698,
+          "usage": { "input_tokens": 594, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-026",
+          "phase": "evaluation",
+          "request_sha256": "a124d0aedbf438e10fffe1e47d02380e264da5e5232a9327f3856aebb803730f",
+          "started_at": "2026-10-15T01:41:56.664961+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.95,
+          "prediction": "correct",
+          "latency_ms": 134.45504099945538,
+          "usage": { "input_tokens": 651, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-027",
+          "phase": "evaluation",
+          "request_sha256": "86178c2c68f3da76447b4d760793cd23a39ce45edc5906d2bf4a9ce0dee29ee3",
+          "started_at": "2026-10-15T01:41:56.799645+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.92,
+          "prediction": "correct",
+          "latency_ms": 130.9289579949109,
+          "usage": { "input_tokens": 520, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-028",
+          "phase": "evaluation",
+          "request_sha256": "1b01c5b4e04d9f313630bdfd5d10bd47a0ca89bc5e737481bcf1d9b0529c18c2",
+          "started_at": "2026-10-15T01:41:56.930779+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.84,
+          "prediction": "correct",
+          "latency_ms": 112.77183299534954,
+          "usage": { "input_tokens": 540, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-029",
+          "phase": "evaluation",
+          "request_sha256": "ef2dc7086e6f11ea08e2519ac83ec72d6a335ccc9fe51e17df41cb48e7b03a73",
+          "started_at": "2026-10-15T01:41:57.043750+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.93,
+          "prediction": "correct",
+          "latency_ms": 100.55045899935067,
+          "usage": { "input_tokens": 651, "output_tokens": 20 }
+        },
+        {
+          "case_id": "QA-030",
+          "phase": "evaluation",
+          "request_sha256": "e05d86e8aa4facd59d8877cea9e3916ce436269d957af9e3dbc756b180519720",
+          "started_at": "2026-10-15T01:41:57.144569+00:00",
+          "status": "completed",
+          "model": "jev-1.13.0",
+          "probability_correct": 0.88,
+          "prediction": "correct",
+          "latency_ms": 99.5860409893794,
+          "usage": { "input_tokens": 692, "output_tokens": 20 }
+        }
+      ]
+    },
+    "openai": {
+      "summary": {
+        "scored_requests": 29,
+        "completed_scored_requests": 29,
+        "human_agreement_count": 28,
+        "human_agreement_denominator": 29,
+        "false_accept_case_ids": ["QA-002"],
+        "false_reject_case_ids": [],
+        "median_latency_ms": 181.48212500091176,
+        "max_latency_ms": 395.2657089976128,
+        "input_tokens": 13311,
+        "output_tokens": 0,
+        "preflight_status": "completed"
+      },
+      "calls": [
+        {
+          "case_id": "QA-001",
+          "phase": "preflight",
+          "request_sha256": "e7fe8defff432f7d1db80e3eaf97207b65e918c964e529fd7e51ca4972325899",
+          "started_at": "2026-10-15T01:42:06.358929+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 1.0,
+          "prediction": "correct",
+          "latency_ms": 1106.896583994967,
+          "usage": { "input_tokens": 383, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-001",
+          "phase": "evaluation",
+          "request_sha256": "e7fe8defff432f7d1db80e3eaf97207b65e918c964e529fd7e51ca4972325899",
+          "started_at": "2026-10-15T01:42:07.466235+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 1.0,
+          "prediction": "correct",
+          "latency_ms": 221.20641700166743,
+          "usage": { "input_tokens": 383, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-002",
+          "phase": "evaluation",
+          "request_sha256": "380ce58441dd065349bf7a7daf20e6e0085638736a1ee6f8b6dac75ee643e93d",
+          "started_at": "2026-10-15T01:42:07.687695+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.95,
+          "prediction": "correct",
+          "latency_ms": 202.7606250048848,
+          "usage": { "input_tokens": 375, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-003",
+          "phase": "evaluation",
+          "request_sha256": "c4af9af32ab2dee32fc0fc27ce26e46e42aa9c906c039bdf468d4953a660714f",
+          "started_at": "2026-10-15T01:42:07.890611+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 1.0,
+          "prediction": "correct",
+          "latency_ms": 169.76583399809897,
+          "usage": { "input_tokens": 437, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-004",
+          "phase": "evaluation",
+          "request_sha256": "f04f5206ca0dad8961e5affc0b30da166f26317654d9b3095ddfe36230a9ecc1",
+          "started_at": "2026-10-15T01:42:08.060573+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 1.0,
+          "prediction": "correct",
+          "latency_ms": 166.57575000135694,
+          "usage": { "input_tokens": 379, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-005",
+          "phase": "evaluation",
+          "request_sha256": "19bf5ea62b0fae6057eef152b6fd3f85eb5f41a1ee96ae220ad85016ed6c1ebe",
+          "started_at": "2026-10-15T01:42:08.227314+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.11,
+          "prediction": "incorrect",
+          "latency_ms": 181.48212500091176,
+          "usage": { "input_tokens": 626, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-006",
+          "phase": "evaluation",
+          "request_sha256": "0a7a6c5c40670dfa6728843dd92a18917e0ea8592ca21370d638d97be9f75080",
+          "started_at": "2026-10-15T01:42:08.410020+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.0,
+          "prediction": "incorrect",
+          "latency_ms": 170.86937499698251,
+          "usage": { "input_tokens": 440, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-007",
+          "phase": "evaluation",
+          "request_sha256": "3d50e6e999bfb02fb523ea4ff80e8b2811a8b986cfb8a061d38610a2dbfda7cb",
+          "started_at": "2026-10-15T01:42:08.581097+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.97,
+          "prediction": "correct",
+          "latency_ms": 177.96941699634772,
+          "usage": { "input_tokens": 605, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-008",
+          "phase": "evaluation",
+          "request_sha256": "ed6c0b56540cdcfdacf456fc9c7154edc26d4679d4a347c68635162458eba430",
+          "started_at": "2026-10-15T01:42:08.759306+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.0,
+          "prediction": "incorrect",
+          "latency_ms": 160.1662079920061,
+          "usage": { "input_tokens": 380, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-009",
+          "phase": "evaluation",
+          "request_sha256": "5b411d46078009a591195055d626702af86a4d12b3b2f27100111be4a1cee9aa",
+          "started_at": "2026-10-15T01:42:08.919657+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.07,
+          "prediction": "incorrect",
+          "latency_ms": 395.2657089976128,
+          "usage": { "input_tokens": 453, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-010",
+          "phase": "evaluation",
+          "request_sha256": "dcc7395598eed8f78f2ddd1a518aebb4b552d939f24812b798efe6462a0fb02f",
+          "started_at": "2026-10-15T01:42:09.315104+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.0,
+          "prediction": "incorrect",
+          "latency_ms": 207.65325000684243,
+          "usage": { "input_tokens": 486, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-011",
+          "phase": "evaluation",
+          "request_sha256": "993200091efe51a70565ab3d2ebf8aba489e5bd351080e1f5a769d7910cdea5d",
+          "started_at": "2026-10-15T01:42:09.522988+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 1.0,
+          "prediction": "correct",
+          "latency_ms": 189.97295800363645,
+          "usage": { "input_tokens": 380, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-012",
+          "phase": "evaluation",
+          "request_sha256": "da45881e44ec91ca1686a112e14c138f170e70394bf38272f5e1d62456d20870",
+          "started_at": "2026-10-15T01:42:09.713213+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.0,
+          "prediction": "incorrect",
+          "latency_ms": 166.52520799834747,
+          "usage": { "input_tokens": 382, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-013",
+          "phase": "evaluation",
+          "request_sha256": "d0a89f00d4dcd6ef00618fc035639d312c71e8126ebcbe867f9948833fccd8bc",
+          "started_at": "2026-10-15T01:42:09.879963+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.01,
+          "prediction": "incorrect",
+          "latency_ms": 178.0991670093499,
+          "usage": { "input_tokens": 485, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-014",
+          "phase": "evaluation",
+          "request_sha256": "808de1c9526872dddafeb5f0247fa80ad28289c5b7e7f43efc739c0202026527",
+          "started_at": "2026-10-15T01:42:10.058264+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.95,
+          "prediction": "correct",
+          "latency_ms": 215.58504200947937,
+          "usage": { "input_tokens": 550, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-015",
+          "phase": "evaluation",
+          "request_sha256": "65dc5fe12258ba3fd3a3e67f9d37c6bc9b1367913ddd21c29bfd471e785550ea",
+          "started_at": "2026-10-15T01:42:10.274160+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.0,
+          "prediction": "incorrect",
+          "latency_ms": 197.93174999358598,
+          "usage": { "input_tokens": 429, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-016",
+          "phase": "evaluation",
+          "request_sha256": "f7d8cc2bf1ee1a1af82f2e0510401e06b7289d228c6db0567e2071ab6cc57c22",
+          "started_at": "2026-10-15T01:42:10.472289+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.0,
+          "prediction": "incorrect",
+          "latency_ms": 161.88479099946562,
+          "usage": { "input_tokens": 392, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-017",
+          "phase": "evaluation",
+          "request_sha256": "1decf35d7f5237067de7b8efaa9b67f4dbeea1dcbaae848016d52721ac6783a5",
+          "started_at": "2026-10-15T01:42:10.634608+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.0,
+          "prediction": "incorrect",
+          "latency_ms": 194.76987500092946,
+          "usage": { "input_tokens": 562, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-019",
+          "phase": "evaluation",
+          "request_sha256": "58c59289332ea8cc590376a578efca69e0a6ecb21dc7d6263f1e3f75b8f44b69",
+          "started_at": "2026-10-15T01:42:10.829619+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.01,
+          "prediction": "incorrect",
+          "latency_ms": 157.7392909966875,
+          "usage": { "input_tokens": 481, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-020",
+          "phase": "evaluation",
+          "request_sha256": "0ca729daa5f55714beb96001e0a548b06b956c2a3ac1a1c2a8d127aa5553c7b9",
+          "started_at": "2026-10-15T01:42:10.987546+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 1.0,
+          "prediction": "correct",
+          "latency_ms": 201.02487498661503,
+          "usage": { "input_tokens": 601, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-021",
+          "phase": "evaluation",
+          "request_sha256": "bd3ef1a75e6fbd27b19c5330afd8700d8a530fd798020aec3930adeab83ec686",
+          "started_at": "2026-10-15T01:42:11.188849+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 1.0,
+          "prediction": "correct",
+          "latency_ms": 178.42508399917278,
+          "usage": { "input_tokens": 332, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-022",
+          "phase": "evaluation",
+          "request_sha256": "0fc6e0ea901f1b04ca10a44b35548d1c89acc58006837bba6a3f9c529e672cac",
+          "started_at": "2026-10-15T01:42:11.367437+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.95,
+          "prediction": "correct",
+          "latency_ms": 188.39091599511448,
+          "usage": { "input_tokens": 484, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-023",
+          "phase": "evaluation",
+          "request_sha256": "9d1c69248ecf15b038b6f35f0eeb1746b402fe14e4ecd54fccd094d48538cb87",
+          "started_at": "2026-10-15T01:42:11.556093+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.01,
+          "prediction": "incorrect",
+          "latency_ms": 203.8041250052629,
+          "usage": { "input_tokens": 435, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-024",
+          "phase": "evaluation",
+          "request_sha256": "16a6c804a3a0c541e2ec8c93033cfcdcab349e6367ad620d6ffb3277167b073a",
+          "started_at": "2026-10-15T01:42:11.760165+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.99,
+          "prediction": "correct",
+          "latency_ms": 158.7282079999568,
+          "usage": { "input_tokens": 374, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-025",
+          "phase": "evaluation",
+          "request_sha256": "caf6ab086f2b13d3ef3828d50b52490263c75dd03988443f2fbb953164959dda",
+          "started_at": "2026-10-15T01:42:11.919208+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.0,
+          "prediction": "incorrect",
+          "latency_ms": 177.12566698901355,
+          "usage": { "input_tokens": 450, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-026",
+          "phase": "evaluation",
+          "request_sha256": "a124d0aedbf438e10fffe1e47d02380e264da5e5232a9327f3856aebb803730f",
+          "started_at": "2026-10-15T01:42:12.096696+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 1.0,
+          "prediction": "correct",
+          "latency_ms": 173.4329169994453,
+          "usage": { "input_tokens": 522, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-027",
+          "phase": "evaluation",
+          "request_sha256": "86178c2c68f3da76447b4d760793cd23a39ce45edc5906d2bf4a9ce0dee29ee3",
+          "started_at": "2026-10-15T01:42:12.270400+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 1.0,
+          "prediction": "correct",
+          "latency_ms": 189.1453339922009,
+          "usage": { "input_tokens": 396, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-028",
+          "phase": "evaluation",
+          "request_sha256": "1b01c5b4e04d9f313630bdfd5d10bd47a0ca89bc5e737481bcf1d9b0529c18c2",
+          "started_at": "2026-10-15T01:42:12.459756+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.99,
+          "prediction": "correct",
+          "latency_ms": 241.63200000475626,
+          "usage": { "input_tokens": 412, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-029",
+          "phase": "evaluation",
+          "request_sha256": "ef2dc7086e6f11ea08e2519ac83ec72d6a335ccc9fe51e17df41cb48e7b03a73",
+          "started_at": "2026-10-15T01:42:12.701565+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.99,
+          "prediction": "correct",
+          "latency_ms": 307.52762500196695,
+          "usage": { "input_tokens": 522, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-030",
+          "phase": "evaluation",
+          "request_sha256": "e05d86e8aa4facd59d8877cea9e3916ce436269d957af9e3dbc756b180519720",
+          "started_at": "2026-10-15T01:42:13.009312+00:00",
+          "status": "completed",
+          "model": "gpt-6-luna",
+          "probability_correct": 0.96,
+          "prediction": "correct",
+          "latency_ms": 171.63395800162107,
+          "usage": { "input_tokens": 558, "output_tokens": 0 }
+        }
+      ]
+    },
+    "laya": {
+      "summary": {
+        "scored_requests": 29,
+        "completed_scored_requests": 29,
+        "human_agreement_count": 14,
+        "human_agreement_denominator": 29,
+        "false_accept_case_ids": [],
+        "false_reject_case_ids": [
+          "QA-001",
+          "QA-003",
+          "QA-004",
+          "QA-007",
+          "QA-011",
+          "QA-014",
+          "QA-020",
+          "QA-021",
+          "QA-022",
+          "QA-024",
+          "QA-026",
+          "QA-027",
+          "QA-028",
+          "QA-029",
+          "QA-030"
+        ],
+        "median_latency_ms": 298.8435000006575,
+        "max_latency_ms": 494.4925830059219,
+        "input_tokens": 10573,
+        "output_tokens": 0,
+        "preflight_status": "completed"
+      },
+      "calls": [
+        {
+          "case_id": "QA-001",
+          "phase": "preflight",
+          "request_sha256": "e7fe8defff432f7d1db80e3eaf97207b65e918c964e529fd7e51ca4972325899",
+          "started_at": "2026-10-15T01:45:31.767037+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.3066,
+          "prediction": "incorrect",
+          "latency_ms": 263.51237499329727,
+          "usage": { "input_tokens": 270, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-001",
+          "phase": "evaluation",
+          "request_sha256": "e7fe8defff432f7d1db80e3eaf97207b65e918c964e529fd7e51ca4972325899",
+          "started_at": "2026-10-15T01:45:32.030804+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.3066,
+          "prediction": "incorrect",
+          "latency_ms": 230.0127079943195,
+          "usage": { "input_tokens": 270, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-002",
+          "phase": "evaluation",
+          "request_sha256": "380ce58441dd065349bf7a7daf20e6e0085638736a1ee6f8b6dac75ee643e93d",
+          "started_at": "2026-10-15T01:45:32.261066+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.3477,
+          "prediction": "incorrect",
+          "latency_ms": 226.1573750001844,
+          "usage": { "input_tokens": 268, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-003",
+          "phase": "evaluation",
+          "request_sha256": "c4af9af32ab2dee32fc0fc27ce26e46e42aa9c906c039bdf468d4953a660714f",
+          "started_at": "2026-10-15T01:45:32.487735+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.3222,
+          "prediction": "incorrect",
+          "latency_ms": 293.6634170036996,
+          "usage": { "input_tokens": 349, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-004",
+          "phase": "evaluation",
+          "request_sha256": "f04f5206ca0dad8961e5affc0b30da166f26317654d9b3095ddfe36230a9ecc1",
+          "started_at": "2026-10-15T01:45:32.781910+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.2847,
+          "prediction": "incorrect",
+          "latency_ms": 233.63449999305885,
+          "usage": { "input_tokens": 269, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-005",
+          "phase": "evaluation",
+          "request_sha256": "19bf5ea62b0fae6057eef152b6fd3f85eb5f41a1ee96ae220ad85016ed6c1ebe",
+          "started_at": "2026-10-15T01:45:33.016122+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.3976,
+          "prediction": "incorrect",
+          "latency_ms": 420.72158301016316,
+          "usage": { "input_tokens": 537, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-006",
+          "phase": "evaluation",
+          "request_sha256": "0a7a6c5c40670dfa6728843dd92a18917e0ea8592ca21370d638d97be9f75080",
+          "started_at": "2026-10-15T01:45:33.437142+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.2996,
+          "prediction": "incorrect",
+          "latency_ms": 262.40833300107624,
+          "usage": { "input_tokens": 321, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-007",
+          "phase": "evaluation",
+          "request_sha256": "3d50e6e999bfb02fb523ea4ff80e8b2811a8b986cfb8a061d38610a2dbfda7cb",
+          "started_at": "2026-10-15T01:45:33.700055+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.388,
+          "prediction": "incorrect",
+          "latency_ms": 494.4925830059219,
+          "usage": { "input_tokens": 550, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-008",
+          "phase": "evaluation",
+          "request_sha256": "ed6c0b56540cdcfdacf456fc9c7154edc26d4679d4a347c68635162458eba430",
+          "started_at": "2026-10-15T01:45:34.195024+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.3567,
+          "prediction": "incorrect",
+          "latency_ms": 325.1679169916315,
+          "usage": { "input_tokens": 266, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-009",
+          "phase": "evaluation",
+          "request_sha256": "5b411d46078009a591195055d626702af86a4d12b3b2f27100111be4a1cee9aa",
+          "started_at": "2026-10-15T01:45:34.520708+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.2542,
+          "prediction": "incorrect",
+          "latency_ms": 283.8264580059331,
+          "usage": { "input_tokens": 340, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-010",
+          "phase": "evaluation",
+          "request_sha256": "dcc7395598eed8f78f2ddd1a518aebb4b552d939f24812b798efe6462a0fb02f",
+          "started_at": "2026-10-15T01:45:34.804772+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.4111,
+          "prediction": "incorrect",
+          "latency_ms": 309.737417002907,
+          "usage": { "input_tokens": 396, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-011",
+          "phase": "evaluation",
+          "request_sha256": "993200091efe51a70565ab3d2ebf8aba489e5bd351080e1f5a769d7910cdea5d",
+          "started_at": "2026-10-15T01:45:35.115064+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.2885,
+          "prediction": "incorrect",
+          "latency_ms": 243.2893340010196,
+          "usage": { "input_tokens": 270, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-012",
+          "phase": "evaluation",
+          "request_sha256": "da45881e44ec91ca1686a112e14c138f170e70394bf38272f5e1d62456d20870",
+          "started_at": "2026-10-15T01:45:35.358910+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.347,
+          "prediction": "incorrect",
+          "latency_ms": 249.17533299594652,
+          "usage": { "input_tokens": 278, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-013",
+          "phase": "evaluation",
+          "request_sha256": "d0a89f00d4dcd6ef00618fc035639d312c71e8126ebcbe867f9948833fccd8bc",
+          "started_at": "2026-10-15T01:45:35.608600+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.3332,
+          "prediction": "incorrect",
+          "latency_ms": 311.32691699895076,
+          "usage": { "input_tokens": 395, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-014",
+          "phase": "evaluation",
+          "request_sha256": "808de1c9526872dddafeb5f0247fa80ad28289c5b7e7f43efc739c0202026527",
+          "started_at": "2026-10-15T01:45:35.920447+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.4017,
+          "prediction": "incorrect",
+          "latency_ms": 391.4474580087699,
+          "usage": { "input_tokens": 487, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-015",
+          "phase": "evaluation",
+          "request_sha256": "65dc5fe12258ba3fd3a3e67f9d37c6bc9b1367913ddd21c29bfd471e785550ea",
+          "started_at": "2026-10-15T01:45:36.312189+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.4859,
+          "prediction": "incorrect",
+          "latency_ms": 322.1622919954825,
+          "usage": { "input_tokens": 333, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-016",
+          "phase": "evaluation",
+          "request_sha256": "f7d8cc2bf1ee1a1af82f2e0510401e06b7289d228c6db0567e2071ab6cc57c22",
+          "started_at": "2026-10-15T01:45:36.634845+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.4256,
+          "prediction": "incorrect",
+          "latency_ms": 298.8435000006575,
+          "usage": { "input_tokens": 292, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-017",
+          "phase": "evaluation",
+          "request_sha256": "1decf35d7f5237067de7b8efaa9b67f4dbeea1dcbaae848016d52721ac6783a5",
+          "started_at": "2026-10-15T01:45:36.933837+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.3681,
+          "prediction": "incorrect",
+          "latency_ms": 412.24745800718665,
+          "usage": { "input_tokens": 485, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-019",
+          "phase": "evaluation",
+          "request_sha256": "58c59289332ea8cc590376a578efca69e0a6ecb21dc7d6263f1e3f75b8f44b69",
+          "started_at": "2026-10-15T01:45:37.346349+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.4016,
+          "prediction": "incorrect",
+          "latency_ms": 405.1009170070756,
+          "usage": { "input_tokens": 394, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-020",
+          "phase": "evaluation",
+          "request_sha256": "0ca729daa5f55714beb96001e0a548b06b956c2a3ac1a1c2a8d127aa5553c7b9",
+          "started_at": "2026-10-15T01:45:37.751635+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.3243,
+          "prediction": "incorrect",
+          "latency_ms": 468.5409170051571,
+          "usage": { "input_tokens": 543, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-021",
+          "phase": "evaluation",
+          "request_sha256": "bd3ef1a75e6fbd27b19c5330afd8700d8a530fd798020aec3930adeab83ec686",
+          "started_at": "2026-10-15T01:45:38.220446+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.2057,
+          "prediction": "incorrect",
+          "latency_ms": 221.04516699619126,
+          "usage": { "input_tokens": 216, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-022",
+          "phase": "evaluation",
+          "request_sha256": "0fc6e0ea901f1b04ca10a44b35548d1c89acc58006837bba6a3f9c529e672cac",
+          "started_at": "2026-10-15T01:45:38.442063+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.3258,
+          "prediction": "incorrect",
+          "latency_ms": 338.14358300878666,
+          "usage": { "input_tokens": 390, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-023",
+          "phase": "evaluation",
+          "request_sha256": "9d1c69248ecf15b038b6f35f0eeb1746b402fe14e4ecd54fccd094d48538cb87",
+          "started_at": "2026-10-15T01:45:38.780757+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.2524,
+          "prediction": "incorrect",
+          "latency_ms": 277.68999998806976,
+          "usage": { "input_tokens": 324, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-024",
+          "phase": "evaluation",
+          "request_sha256": "16a6c804a3a0c541e2ec8c93033cfcdcab349e6367ad620d6ffb3277167b073a",
+          "started_at": "2026-10-15T01:45:39.059020+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.3406,
+          "prediction": "incorrect",
+          "latency_ms": 234.67879100644495,
+          "usage": { "input_tokens": 265, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-025",
+          "phase": "evaluation",
+          "request_sha256": "caf6ab086f2b13d3ef3828d50b52490263c75dd03988443f2fbb953164959dda",
+          "started_at": "2026-10-15T01:45:39.294192+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.3302,
+          "prediction": "incorrect",
+          "latency_ms": 294.9906660069246,
+          "usage": { "input_tokens": 372, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-026",
+          "phase": "evaluation",
+          "request_sha256": "a124d0aedbf438e10fffe1e47d02380e264da5e5232a9327f3856aebb803730f",
+          "started_at": "2026-10-15T01:45:39.589690+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.2672,
+          "prediction": "incorrect",
+          "latency_ms": 401.72858399455436,
+          "usage": { "input_tokens": 453, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-027",
+          "phase": "evaluation",
+          "request_sha256": "86178c2c68f3da76447b4d760793cd23a39ce45edc5906d2bf4a9ce0dee29ee3",
+          "started_at": "2026-10-15T01:45:39.991981+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.2591,
+          "prediction": "incorrect",
+          "latency_ms": 238.3376249927096,
+          "usage": { "input_tokens": 284, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-028",
+          "phase": "evaluation",
+          "request_sha256": "1b01c5b4e04d9f313630bdfd5d10bd47a0ca89bc5e737481bcf1d9b0529c18c2",
+          "started_at": "2026-10-15T01:45:40.230825+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.2279,
+          "prediction": "incorrect",
+          "latency_ms": 258.2151249953313,
+          "usage": { "input_tokens": 295, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-029",
+          "phase": "evaluation",
+          "request_sha256": "ef2dc7086e6f11ea08e2519ac83ec72d6a335ccc9fe51e17df41cb48e7b03a73",
+          "started_at": "2026-10-15T01:45:40.489533+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.2386,
+          "prediction": "incorrect",
+          "latency_ms": 341.2188329966739,
+          "usage": { "input_tokens": 451, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-030",
+          "phase": "evaluation",
+          "request_sha256": "e05d86e8aa4facd59d8877cea9e3916ce436269d957af9e3dbc756b180519720",
+          "started_at": "2026-10-15T01:45:40.831277+00:00",
+          "status": "completed",
+          "model": "laya-1.0",
+          "probability_correct": 0.4041,
+          "prediction": "incorrect",
+          "latency_ms": 459.3748330080416,
+          "usage": { "input_tokens": 480, "output_tokens": 0 }
+        }
+      ]
+    },
+    "openjev": {
+      "summary": {
+        "scored_requests": 29,
+        "completed_scored_requests": 29,
+        "human_agreement_count": 27,
+        "human_agreement_denominator": 29,
+        "false_accept_case_ids": ["QA-009"],
+        "false_reject_case_ids": ["QA-029"],
+        "median_latency_ms": 799.1452499991283,
+        "max_latency_ms": 1020.5692910094513,
+        "input_tokens": 11775,
+        "output_tokens": 0,
+        "preflight_status": "completed"
+      },
+      "calls": [
+        {
+          "case_id": "QA-001",
+          "phase": "preflight",
+          "request_sha256": "e7fe8defff432f7d1db80e3eaf97207b65e918c964e529fd7e51ca4972325899",
+          "started_at": "2026-10-15T01:48:09.994553+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.557914139040315,
+          "prediction": "correct",
+          "latency_ms": 4712.056707998272,
+          "usage": { "input_tokens": 311, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-001",
+          "phase": "evaluation",
+          "request_sha256": "e7fe8defff432f7d1db80e3eaf97207b65e918c964e529fd7e51ca4972325899",
+          "started_at": "2026-10-15T01:48:14.706895+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.557914139040315,
+          "prediction": "correct",
+          "latency_ms": 335.7814579940168,
+          "usage": { "input_tokens": 311, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-002",
+          "phase": "evaluation",
+          "request_sha256": "380ce58441dd065349bf7a7daf20e6e0085638736a1ee6f8b6dac75ee643e93d",
+          "started_at": "2026-10-15T01:48:15.043142+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.043223540677405484,
+          "prediction": "incorrect",
+          "latency_ms": 711.7033749964321,
+          "usage": { "input_tokens": 305, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-003",
+          "phase": "evaluation",
+          "request_sha256": "c4af9af32ab2dee32fc0fc27ce26e46e42aa9c906c039bdf468d4953a660714f",
+          "started_at": "2026-10-15T01:48:15.755062+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.9685018395604431,
+          "prediction": "correct",
+          "latency_ms": 799.1452499991283,
+          "usage": { "input_tokens": 386, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-004",
+          "phase": "evaluation",
+          "request_sha256": "f04f5206ca0dad8961e5affc0b30da166f26317654d9b3095ddfe36230a9ecc1",
+          "started_at": "2026-10-15T01:48:16.554754+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.998811414741602,
+          "prediction": "correct",
+          "latency_ms": 717.7077080123127,
+          "usage": { "input_tokens": 311, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-005",
+          "phase": "evaluation",
+          "request_sha256": "19bf5ea62b0fae6057eef152b6fd3f85eb5f41a1ee96ae220ad85016ed6c1ebe",
+          "started_at": "2026-10-15T01:48:17.273090+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.06781558578124927,
+          "prediction": "incorrect",
+          "latency_ms": 981.8007919966476,
+          "usage": { "input_tokens": 568, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-006",
+          "phase": "evaluation",
+          "request_sha256": "0a7a6c5c40670dfa6728843dd92a18917e0ea8592ca21370d638d97be9f75080",
+          "started_at": "2026-10-15T01:48:18.255178+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.0028147802430974578,
+          "prediction": "incorrect",
+          "latency_ms": 522.5613330112537,
+          "usage": { "input_tokens": 369, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-007",
+          "phase": "evaluation",
+          "request_sha256": "3d50e6e999bfb02fb523ea4ff80e8b2811a8b986cfb8a061d38610a2dbfda7cb",
+          "started_at": "2026-10-15T01:48:18.777950+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.9903793050682308,
+          "prediction": "correct",
+          "latency_ms": 1020.5692910094513,
+          "usage": { "input_tokens": 612, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-008",
+          "phase": "evaluation",
+          "request_sha256": "ed6c0b56540cdcfdacf456fc9c7154edc26d4679d4a347c68635162458eba430",
+          "started_at": "2026-10-15T01:48:19.799038+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.02369403630092436,
+          "prediction": "incorrect",
+          "latency_ms": 711.9143750023795,
+          "usage": { "input_tokens": 309, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-009",
+          "phase": "evaluation",
+          "request_sha256": "5b411d46078009a591195055d626702af86a4d12b3b2f27100111be4a1cee9aa",
+          "started_at": "2026-10-15T01:48:20.511527+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.9424541353202136,
+          "prediction": "correct",
+          "latency_ms": 794.1401670104824,
+          "usage": { "input_tokens": 389, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-010",
+          "phase": "evaluation",
+          "request_sha256": "dcc7395598eed8f78f2ddd1a518aebb4b552d939f24812b798efe6462a0fb02f",
+          "started_at": "2026-10-15T01:48:21.306728+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.0534770785462039,
+          "prediction": "incorrect",
+          "latency_ms": 828.8208329904592,
+          "usage": { "input_tokens": 427, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-011",
+          "phase": "evaluation",
+          "request_sha256": "993200091efe51a70565ab3d2ebf8aba489e5bd351080e1f5a769d7910cdea5d",
+          "started_at": "2026-10-15T01:48:22.135799+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.9999054627681693,
+          "prediction": "correct",
+          "latency_ms": 465.04758299852256,
+          "usage": { "input_tokens": 312, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-012",
+          "phase": "evaluation",
+          "request_sha256": "da45881e44ec91ca1686a112e14c138f170e70394bf38272f5e1d62456d20870",
+          "started_at": "2026-10-15T01:48:22.601595+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.0039962360809650925,
+          "prediction": "incorrect",
+          "latency_ms": 742.1967909904197,
+          "usage": { "input_tokens": 332, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-013",
+          "phase": "evaluation",
+          "request_sha256": "d0a89f00d4dcd6ef00618fc035639d312c71e8126ebcbe867f9948833fccd8bc",
+          "started_at": "2026-10-15T01:48:23.344022+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.0006346928269819291,
+          "prediction": "incorrect",
+          "latency_ms": 836.3406249991385,
+          "usage": { "input_tokens": 438, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-014",
+          "phase": "evaluation",
+          "request_sha256": "808de1c9526872dddafeb5f0247fa80ad28289c5b7e7f43efc739c0202026527",
+          "started_at": "2026-10-15T01:48:24.180925+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.9998748794180974,
+          "prediction": "correct",
+          "latency_ms": 928.4217090025777,
+          "usage": { "input_tokens": 522, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-015",
+          "phase": "evaluation",
+          "request_sha256": "65dc5fe12258ba3fd3a3e67f9d37c6bc9b1367913ddd21c29bfd471e785550ea",
+          "started_at": "2026-10-15T01:48:25.109590+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.0014496137428813003,
+          "prediction": "incorrect",
+          "latency_ms": 515.4183329868829,
+          "usage": { "input_tokens": 363, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-016",
+          "phase": "evaluation",
+          "request_sha256": "f7d8cc2bf1ee1a1af82f2e0510401e06b7289d228c6db0567e2071ab6cc57c22",
+          "started_at": "2026-10-15T01:48:25.625225+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.026890651014075583,
+          "prediction": "incorrect",
+          "latency_ms": 813.433333998546,
+          "usage": { "input_tokens": 336, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-017",
+          "phase": "evaluation",
+          "request_sha256": "1decf35d7f5237067de7b8efaa9b67f4dbeea1dcbaae848016d52721ac6783a5",
+          "started_at": "2026-10-15T01:48:26.438906+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.0006431109033747091,
+          "prediction": "incorrect",
+          "latency_ms": 929.5523340115324,
+          "usage": { "input_tokens": 520, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-019",
+          "phase": "evaluation",
+          "request_sha256": "58c59289332ea8cc590376a578efca69e0a6ecb21dc7d6263f1e3f75b8f44b69",
+          "started_at": "2026-10-15T01:48:27.368676+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.21274802582802443,
+          "prediction": "incorrect",
+          "latency_ms": 841.2297500035493,
+          "usage": { "input_tokens": 428, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-020",
+          "phase": "evaluation",
+          "request_sha256": "0ca729daa5f55714beb96001e0a548b06b956c2a3ac1a1c2a8d127aa5553c7b9",
+          "started_at": "2026-10-15T01:48:28.210088+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.6052742749519304,
+          "prediction": "correct",
+          "latency_ms": 999.8203750001267,
+          "usage": { "input_tokens": 591, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-021",
+          "phase": "evaluation",
+          "request_sha256": "bd3ef1a75e6fbd27b19c5330afd8700d8a530fd798020aec3930adeab83ec686",
+          "started_at": "2026-10-15T01:48:29.210161+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.9949835978847584,
+          "prediction": "correct",
+          "latency_ms": 671.4771670085611,
+          "usage": { "input_tokens": 265, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-022",
+          "phase": "evaluation",
+          "request_sha256": "0fc6e0ea901f1b04ca10a44b35548d1c89acc58006837bba6a3f9c529e672cac",
+          "started_at": "2026-10-15T01:48:29.882138+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.998198838111489,
+          "prediction": "correct",
+          "latency_ms": 835.3616669919575,
+          "usage": { "input_tokens": 434, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-023",
+          "phase": "evaluation",
+          "request_sha256": "9d1c69248ecf15b038b6f35f0eeb1746b402fe14e4ecd54fccd094d48538cb87",
+          "started_at": "2026-10-15T01:48:30.717715+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.001182260989122688,
+          "prediction": "incorrect",
+          "latency_ms": 776.6772909963038,
+          "usage": { "input_tokens": 366, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-024",
+          "phase": "evaluation",
+          "request_sha256": "16a6c804a3a0c541e2ec8c93033cfcdcab349e6367ad620d6ffb3277167b073a",
+          "started_at": "2026-10-15T01:48:31.495074+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.9846672599520835,
+          "prediction": "correct",
+          "latency_ms": 717.9880409967154,
+          "usage": { "input_tokens": 303, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-025",
+          "phase": "evaluation",
+          "request_sha256": "caf6ab086f2b13d3ef3828d50b52490263c75dd03988443f2fbb953164959dda",
+          "started_at": "2026-10-15T01:48:32.213277+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.02419630955811968,
+          "prediction": "incorrect",
+          "latency_ms": 829.8557499947492,
+          "usage": { "input_tokens": 410, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-026",
+          "phase": "evaluation",
+          "request_sha256": "a124d0aedbf438e10fffe1e47d02380e264da5e5232a9327f3856aebb803730f",
+          "started_at": "2026-10-15T01:48:33.043341+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.9992488393460238,
+          "prediction": "correct",
+          "latency_ms": 893.3051250060089,
+          "usage": { "input_tokens": 487, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-027",
+          "phase": "evaluation",
+          "request_sha256": "86178c2c68f3da76447b4d760793cd23a39ce45edc5906d2bf4a9ce0dee29ee3",
+          "started_at": "2026-10-15T01:48:33.936913+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.9999655466101208,
+          "prediction": "correct",
+          "latency_ms": 737.167417013552,
+          "usage": { "input_tokens": 329, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-028",
+          "phase": "evaluation",
+          "request_sha256": "1b01c5b4e04d9f313630bdfd5d10bd47a0ca89bc5e737481bcf1d9b0529c18c2",
+          "started_at": "2026-10-15T01:48:34.674542+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.9943506039658379,
+          "prediction": "correct",
+          "latency_ms": 740.5053749971557,
+          "usage": { "input_tokens": 339, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-029",
+          "phase": "evaluation",
+          "request_sha256": "ef2dc7086e6f11ea08e2519ac83ec72d6a335ccc9fe51e17df41cb48e7b03a73",
+          "started_at": "2026-10-15T01:48:35.415524+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.2698750362712599,
+          "prediction": "incorrect",
+          "latency_ms": 899.3090409931028,
+          "usage": { "input_tokens": 488, "output_tokens": 0 }
+        },
+        {
+          "case_id": "QA-030",
+          "phase": "evaluation",
+          "request_sha256": "e05d86e8aa4facd59d8877cea9e3916ce436269d957af9e3dbc756b180519720",
+          "started_at": "2026-10-15T01:48:36.315313+00:00",
+          "status": "completed",
+          "model": "openjev-0.1",
+          "probability_correct": 0.9994763870802954,
+          "prediction": "correct",
+          "latency_ms": 937.3526249983115,
+          "usage": { "input_tokens": 525, "output_tokens": 0 }
+        }
+      ]
+    }
+  },
+  "laya_token_audit": {
+    "model": "laya-1.0",
+    "checkpoint": "convaiinnovations/laya-typed-decisions",
+    "checkpoint_revision": "e929ae5cf69bc34259cd2f95c9e91145b818b1f0",
+    "laya_package_version": "0.3.6",
+    "method": "laya.common.build_sequence with pinned checkpoint tokenizer; same canonical request state and criterion as benchmark",
+    "max_len": 1024,
+    "head_max_len": 256,
+    "head_tokens": 102,
+    "state_room_tokens": 921,
+    "truncated_case_ids": [],
+    "cases": [
+      {
+        "case_id": "QA-001",
+        "state_tokens": 167,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 167,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 270,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-002",
+        "state_tokens": 165,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 165,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 268,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-003",
+        "state_tokens": 246,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 246,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 349,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-004",
+        "state_tokens": 166,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 166,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 269,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-005",
+        "state_tokens": 434,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 434,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 537,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-006",
+        "state_tokens": 218,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 218,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 321,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-007",
+        "state_tokens": 447,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 447,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 550,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-008",
+        "state_tokens": 163,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 163,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 266,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-009",
+        "state_tokens": 237,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 237,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 340,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-010",
+        "state_tokens": 293,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 293,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 396,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-011",
+        "state_tokens": 167,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 167,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 270,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-012",
+        "state_tokens": 175,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 175,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 278,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-013",
+        "state_tokens": 292,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 292,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 395,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-014",
+        "state_tokens": 384,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 384,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 487,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-015",
+        "state_tokens": 230,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 230,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 333,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-016",
+        "state_tokens": 189,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 189,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 292,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-017",
+        "state_tokens": 382,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 382,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 485,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-019",
+        "state_tokens": 291,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 291,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 394,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-020",
+        "state_tokens": 440,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 440,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 543,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-021",
+        "state_tokens": 113,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 113,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 216,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-022",
+        "state_tokens": 287,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 287,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 390,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-023",
+        "state_tokens": 221,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 221,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 324,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-024",
+        "state_tokens": 162,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 162,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 265,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-025",
+        "state_tokens": 269,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 269,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 372,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-026",
+        "state_tokens": 350,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 350,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 453,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-027",
+        "state_tokens": 181,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 181,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 284,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-028",
+        "state_tokens": 192,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 192,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 295,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-029",
+        "state_tokens": 348,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 348,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 451,
+        "truncated": false
+      },
+      {
+        "case_id": "QA-030",
+        "state_tokens": 377,
+        "head_tokens": 102,
+        "state_room_tokens": 921,
+        "state_tokens_used": 377,
+        "state_tokens_dropped": 0,
+        "sequence_tokens": 480,
+        "truncated": false
+      }
+    ],
+    "dataset_sha256": "afa658c75976bf3a58c411ae66013eb9753014ff836f94688c2cee290aaa3dde",
+    "criterion_sha256": "c22db3302b6a81031997f6e1cbb5476fb7dbda9faf824251cc3e7b8b11f1c76b"
+  },
+  "laya_sanity": [
+    {
+      "name": "sky-blue",
+      "state": "The sky is blue.",
+      "question": "Is the sky blue?",
+      "systemone_model": "laya-1.0",
+      "systemone_noul": 0.6324,
+      "decisions_model": "laya-1.0",
+      "decisions_predicate_probability": 0.6324
+    },
+    {
+      "name": "sky-green",
+      "state": "The sky is blue.",
+      "question": "Is the sky green?",
+      "systemone_model": "laya-1.0",
+      "systemone_noul": 0.1085,
+      "decisions_model": "laya-1.0",
+      "decisions_predicate_probability": 0.1085
+    },
+    {
+      "name": "billing-yes",
+      "state": "The customer says: I was charged twice.",
+      "question": "Is this a billing issue?",
+      "systemone_model": "laya-1.0",
+      "systemone_noul": 0.7281,
+      "decisions_model": "laya-1.0",
+      "decisions_predicate_probability": 0.7281
+    },
+    {
+      "name": "outage-no",
+      "state": "The customer says: I was charged twice.",
+      "question": "Is this a service outage?",
+      "systemone_model": "laya-1.0",
+      "systemone_noul": 0.0003,
+      "decisions_model": "laya-1.0",
+      "decisions_predicate_probability": 0.0003
+    }
+  ],
+  "source_links": {
+    "jev_pilot_part1": "https://mlflow.org/blog/jev-llm-judge/",
+    "openjev": "https://github.com/razorback16/openjev",
+    "laya_model_card": "https://huggingface.co/convaiinnovations/laya-typed-decisions",
+    "openai_decisions_guide": "https://developers.openai.com/api/docs/guides/decisions"
+  },
+  "request_evidence": "Reconstruct each call input by serializing its source_dataset case question, context, and answer with json.dumps(sort_keys=True, ensure_ascii=False, separators=(\",\", \":\")). The per-call request_sha256 verifies the exact UTF-8 text sent to all four routes. Human labels and requested model IDs are stored once in corrected_human_reference and protocol.routes."
+}

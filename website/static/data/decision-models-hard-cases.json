@@ -1,0 +1,60 @@
+{
+  "description": "Five Japanese question-answer pairs displayed in the Part 2 article, tested with newly sourced documentation excerpts. This is a new probe, not a replay of the unpublished 72-row benchmark.",
+  "source_url": "https://qiita.com/taka_yayoi/items/3cc901e872209835491a",
+  "context_retrieved_at": "2026-10-15",
+  "criterion": "Is the candidate answer factually and technically correct for the question, using the supplied documentation excerpt and respecting any version specified in the question? Answer true only if the answer is correct and consistent with the documentation excerpt. Answer false if it is wrong, contradicts the excerpt, or ignores a version constraint in the question.",
+  "threshold": 0.5,
+  "cases": [
+    {
+      "id": "merge",
+      "language": "ja",
+      "question": "MERGE で、ターゲットにないソースの行を挿入する句は?",
+      "answer": "WHEN NOT MATCHED THEN INSERT を使います。ソースに一致する行がないターゲットの行が対象です。",
+      "published_label": "incorrect",
+      "scoring_status": "scored_negative",
+      "context": "whenNotMatched 句は、一致条件に基づいてソース行がターゲット行と一致しない場合に実行されます。\nwhenNotMatched 句には、 insert アクションのみを含めることができます。",
+      "context_source_urls": ["https://docs.databricks.com/aws/ja/delta/merge"]
+    },
+    {
+      "id": "secret-privileges",
+      "language": "ja",
+      "question": "スキーマの所有者でない場合、シークレットの作成に必要な権限は?",
+      "answer": "main.default に対する CREATE SECRET と USE SCHEMA があれば足ります。",
+      "published_label": "incorrect",
+      "scoring_status": "ambiguous",
+      "context": "シークレットを作成するには、`USE CATALOG`権限を持ち、スキーマの所有者であるか、スキーマに対する`CREATE SECRET`権限と`USE SCHEMA`権限を持っている必要があります。\nすべてのユーザーは、デフォルトで`main`カタログに`USE CATALOG`を持っています。",
+      "context_source_urls": ["https://docs.databricks.com/aws/ja/security/secrets/unity-catalog-secrets", "https://docs.databricks.com/aws/ja/data-governance/unity-catalog/access-control/privileges-reference"],
+      "grading_note": "The Part 2 author labels this incorrect for omitting USE CATALOG, but main grants USE CATALOG to all users by default; the sufficiency claim is context-dependent. Report the probability without treating it as an unambiguous error."
+    },
+    {
+      "id": "deletion-vectors",
+      "language": "ja",
+      "question": "削除ベクトルが有効なとき、DELETE ですぐにファイルは書き直されるか?",
+      "answer": "すぐには書き直されません。行が物理的に削除されるのは、後で VACUUM ... APPLY (PURGE) を実行したときです。",
+      "published_label": "incorrect",
+      "scoring_status": "scored_negative",
+      "context": "代わりに、削除ベクトルはメタデータで変更済みとして行をマークし、読み取りはクエリ時に削除ベクトルのエントリを適用して現在のテーブルの状態を解決します。\n`REORG TABLE` コマンドは `APPLY (PURGE)` 構文を使用することで、論理的な削除を適用するためにデータを書き換えることが可能です。\n`VACUUM`を実行して、これらの古いファイルを削除してください。",
+      "context_source_urls": ["https://docs.databricks.com/aws/ja/tables/features/deletion-vectors", "https://docs.databricks.com/aws/ja/tables/operations/vacuum"]
+    },
+    {
+      "id": "time-travel",
+      "language": "ja",
+      "question": "2026-01-15 時点のテーブルを参照するには?",
+      "answer": "TIMESTAMP AS OF '2026-01-15' を使います。ただし日付だけの文字列はエラーになるので、完全なタイムスタンプを指定する必要があります。",
+      "published_label": "incorrect",
+      "scoring_status": "scored_negative",
+      "context": "'2018-10-18' 、つまり日付文字列です\n日付またはタイムスタンプ文字列のみが受け入れられます。たとえば、 \"2019-01-01\" と \"2019-01-01T00:00:00.000Z\" です。",
+      "context_source_urls": ["https://docs.databricks.com/aws/ja/tables/history#タイムトラベル構文"]
+    },
+    {
+      "id": "check-constraint",
+      "language": "ja",
+      "question": "CHECK 制約に違反する行を INSERT するとどうなるか?",
+      "answer": "違反している行の INSERT は失敗しますが、同じ INSERT のほかの行は書き込まれます。",
+      "published_label": "incorrect",
+      "scoring_status": "scored_negative",
+      "context": "制約に違反した場合、トランザクションはエラーで失敗します。\nCHECK : 指定されたブール式が各入力行に対して true である必要があることを示します。\nデフォルトでは、各SQL文は1つのテーブルに対してそれぞれ独立したアトミックトランザクションとして実行されます。\n原子性 とは、すべてのトランザクションが成功するか、完全に失敗することを意味します。",
+      "context_source_urls": ["https://docs.databricks.com/aws/ja/tables/constraints#適用される制約", "https://docs.databricks.com/aws/ja/lakehouse/acid"]
+    }
+  ]
+}
