@@ -162,6 +162,11 @@ const defaultItems: EcosystemItem[] = [
     href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/deepseek.html",
   },
   {
+    title: "Crusoe",
+    src: "img/crusoe.svg",
+    href: "https://mlflow.org/docs/latest/ml/plugins/#popular-community-plugins",
+  },
+  {
     title: "Haystack",
     src: "img/haystack.png",
     href: "https://mlflow.org/docs/latest/genai/tracing/integrations/listing/haystack.html",
