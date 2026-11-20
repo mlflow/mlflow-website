@@ -1,16 +1,16 @@
 ---
-title: "The Factory"
+title: "Inside the MLflow Agent Factory: From Bug Report to Merged Fix"
 description: "How MLflow turns a bug report into a merged fix: agents reproduce, fix, review and repair, inside a sandbox that cannot write anything, and a maintainer merges."
-slug: the-factory
+slug: mlflow-agent-factory
 authors: [mlflow-maintainers]
-tags: [mlflow, agents, genai, open-source, observability]
-thumbnail: /img/blog/the-factory-thumbnail.png
-image: /img/blog/the-factory-thumbnail.png
+tags: [mlflow, agents, genai, open-source, observability, databricks]
+thumbnail: /img/blog/mlflow-agent-factory-thumbnail.png
+image: /img/blog/mlflow-agent-factory-thumbnail.png
 ---
 
 Open a bug report on [mlflow/mlflow](https://github.com/mlflow/mlflow) today and an agent reproduces it, finds the root cause and posts a report, usually within ten minutes. If the fix is clear, a pull request with a regression test follows in the same run. Other agents review that pull request, answer review comments and repair CI. A maintainer merges it.
 
-We call the whole system the factory. This post covers how it works, how we keep it safe, how we choose models, how we watch the agents, and what the numbers look like after six weeks. All numbers come from the GitHub API as of November 20, 2026.
+We call the whole system the factory. It runs on GitHub Actions, with Databricks behind it for model access and observability. This post covers how it works, how we keep it safe, how we choose models, how we watch the agents, and what the numbers look like after six weeks. All numbers come from the GitHub API as of November 20, 2026.
 
 ## Why we built it
 
@@ -60,9 +60,9 @@ A successful injection can change what the agent writes. It cannot push, comment
 
 ## Models: one gateway, any model
 
-Every model call the agents make goes through [Unity AI Gateway](https://www.databricks.com/product/artificial-intelligence/unity-ai-gateway). One endpoint and one short-lived token serve all the agents, and the repository holds no model vendor API keys.
+Every model call the agents make goes through [Unity AI Gateway](https://www.databricks.com/product/artificial-intelligence/unity-ai-gateway) on Databricks. One endpoint and one short-lived token serve all the agents, and the repository holds no model vendor API keys.
 
-![Three groups of jobs call one gateway with the same endpoint and token. The gateway routes each group to a different model: Claude Opus 5.5, Claude Sonnet 5.5 and a GPT model. Which model each job uses is a setting.](images/models.png)
+![Three groups of jobs call Unity AI Gateway on Databricks with the same endpoint and token. The gateway routes each group to a different model: Claude Opus 5.5, Claude Sonnet 5.5 and a GPT model. Which model each job uses is a setting.](images/models.png)
 
 Each job gets the model that fits it:
 
@@ -78,24 +78,24 @@ Switching is a setting, not a project. For most agents the model and effort are 
 
 We have used this more than once. Triage effort dropped to medium and went back to high a week later, each time by changing a setting. New models ship every few months, and a pipeline that hardcodes one has a migration waiting for it.
 
-## Monitoring: watching the agents with MLflow
+## Monitoring: watching the agents with MLflow on Databricks
 
-An unattended agent that comments on public issues needs the same observability as any production service. We use MLflow for it.
+An unattended agent that comments on public issues needs the same observability as any production service. We use MLflow on Databricks for it. Traces land in Unity Catalog tables, so we can read one run in the MLflow trace view or query all of them with SQL.
 
-![Each agent run exports traces to MLflow and makes model calls through the gateway. Traces are used to debug a bad run, compare models and find waste. Gateway usage is used to track cost per agent.](images/monitoring.png)
+![Each agent run exports traces to MLflow on Databricks and makes model calls through Unity AI Gateway. Traces are used to debug a bad run, compare models and find waste. Gateway usage is used to track cost per agent.](images/monitoring.png)
 
 Two streams leave every run:
 
-| Source                                     | What it answers                            |
-| ------------------------------------------ | ------------------------------------------ |
-| Agent traces in MLflow, over OpenTelemetry | What the agent did in a given run, and why |
-| Gateway usage, tagged per agent            | How much each agent spends                 |
+| Source                                                   | What it answers                            |
+| -------------------------------------------------------- | ------------------------------------------ |
+| Agent traces in MLflow on Databricks, over OpenTelemetry | What the agent did in a given run, and why |
+| Gateway usage, tagged per agent                          | How much each agent spends                 |
 
 Each trace links to its issue and workflow run, and is tagged with the verdict, the model, the effort and whether a pull request was proposed. We use them to:
 
 - **Debug a bad triage.** Open the trace from the issue and read the tool calls in order.
 - **Compare models and settings.** Filter traces by verdict, model or effort.
-- **Track cost.** Spend per agent comes from gateway usage.
+- **Track cost.** A Databricks dashboard shows spend per agent.
 - **Find waste.** Traces show spend that the agent's own cost estimate leaves out.
 
 ## Results
