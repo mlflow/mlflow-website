@@ -50,7 +50,7 @@ Issue text is written by anyone, and an agent that reads it has a shell. Prompt 
 ![Issue text enters a sandbox where the agent holds only a read-only token. Model calls leave through a proxy that holds the model token, and other hosts are blocked. The only output is a report and a patch as files, which a separate publish job validates before using the write token.](images/trust-boundary.png)
 
 - **Screen before running.** Hidden text is stripped from the issue, a separate model judges whether the issue is safe to hand to an unattended agent, and each author is rate limited.
-- **Sandbox with no write credentials.** The agent runs in an OS-level sandbox with a network allowlist and a read-only token. Model calls leave through a proxy that holds the real model token.
+- **Sandbox with no write credentials.** The agent runs in an OS-level sandbox with a network allowlist and a read-only token. Model calls leave through a proxy that holds the real model token and forwards them to [Unity Gateway](https://www.databricks.com/product/artificial-intelligence/unity-gateway) on Databricks.
 - **The agent proposes, the workflow publishes.** The agent's only output is a structured report and an optional patch. A separate job validates both, and it is the only job that can comment or push. Patches may touch source, tests and docs. They may not touch CI, dependencies or the agent's own instructions.
 - **Bounded runs.** Each run has a cost cap and a time limit. There is a kill switch, and a dry-run mode for testing changes.
 - **A maintainer merges every change.**
@@ -61,20 +61,13 @@ A successful injection can change what the agent writes. It cannot push, comment
 
 An unattended agent that comments on public issues needs the same observability as any production service. We use MLflow on Databricks for it. Traces land in Unity Catalog tables, so we can read one run in the MLflow trace view or query all of them with SQL.
 
-![Each agent run exports traces to MLflow on Databricks and makes model calls through Unity Gateway. Traces are used to debug a bad run, compare models and find waste. Unity Gateway usage is used to track cost per agent.](images/monitoring.png)
+![Each agent run exports traces to MLflow on Databricks. The traces are used to debug a bad run, compare models, find waste and track cost per agent.](images/monitoring.png)
 
-Two streams leave every run:
-
-| Source                                                                                                            | What it answers                            |
-| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| Agent traces in MLflow on Databricks, over OpenTelemetry                                                          | What the agent did in a given run, and why |
-| [Unity Gateway](https://www.databricks.com/product/artificial-intelligence/unity-gateway) usage, tagged per agent | How much each agent spends                 |
-
-Each trace links to its issue and workflow run, and is tagged with the verdict, the model, the effort and whether a pull request was proposed. We use them to:
+Every run exports a trace over OpenTelemetry. Each trace links to its issue and workflow run, and is tagged with the verdict, the model, the effort and whether a pull request was proposed. We use the traces to:
 
 - **Debug a bad triage.** Open the trace from the issue and read the tool calls in order.
 - **Compare models and settings.** Filter traces by verdict, model or effort.
-- **Track cost.** A Databricks dashboard shows spend per agent.
+- **Track cost.** A Databricks dashboard built on the traces shows spend per agent.
 - **Find waste.** Traces show spend that the agent's own cost estimate leaves out.
 
 ## Results
