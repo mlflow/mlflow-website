@@ -10,7 +10,7 @@ image: /img/blog/mlflow-agent-factory-thumbnail.png
 
 Open a bug report on [mlflow/mlflow](https://github.com/mlflow/mlflow) today and an agent reproduces it, finds the root cause and posts a report, usually within ten minutes. If the fix is clear, a pull request with a regression test follows in the same run. Other agents review that pull request, answer review comments and repair CI. A maintainer merges it.
 
-We call the whole system the factory. It runs on GitHub Actions, with Databricks behind it for model access and observability. This post covers how it works, how we keep it safe, how we choose models, how we watch the agents, and what the numbers look like after six weeks. All numbers come from the GitHub API as of November 20, 2026.
+We call the whole system the factory. It runs on GitHub Actions, with Databricks behind it for model access and observability. This post covers how it works, how we keep it safe, how we watch the agents, and what the numbers look like after six weeks. All numbers come from the GitHub API as of November 20, 2026.
 
 ## Why we built it
 
@@ -57,26 +57,6 @@ Issue text is written by anyone, and an agent that reads it has a shell. Prompt 
 
 A successful injection can change what the agent writes. It cannot push, comment, or reach a host outside the allowlist, and whatever it writes still has to pass validation and a human review.
 
-## Models: one gateway, any model
-
-Every model call the agents make goes through [Unity AI Gateway](https://www.databricks.com/product/artificial-intelligence/unity-ai-gateway) on Databricks. One endpoint and one short-lived token serve all the agents, and the repository holds no model vendor API keys.
-
-![Three groups of jobs call Unity AI Gateway on Databricks with the same endpoint and token. The gateway routes each group to a different model: Claude Opus 5.5, Claude Sonnet 5.5 and a GPT model. Which model each job uses is a setting.](images/models.png)
-
-Each job gets the model that fits it:
-
-| Job                                                 | Model                        |
-| --------------------------------------------------- | ---------------------------- |
-| Triage, review responses, fixes on agent PRs        | Claude Opus 5.5, high effort |
-| Code review, nightly failure analysis, CI diagnosis | Claude Sonnet 5.5            |
-| Issue labelling and the safety check                | A GPT model                  |
-
-Two vendors, same endpoint, same token.
-
-Switching is a setting, not a project. For most agents the model and effort are settings, so changing the default needs no code change. A maintainer can run one issue through a candidate model as a dry run before changing anything, and traces are tagged with model and effort, so comparing two models is a filter.
-
-We have used this more than once. Triage effort dropped to medium and went back to high a week later, each time by changing a setting. New models ship every few months, and a pipeline that hardcodes one has a migration waiting for it.
-
 ## Monitoring: watching the agents with MLflow on Databricks
 
 An unattended agent that comments on public issues needs the same observability as any production service. We use MLflow on Databricks for it. Traces land in Unity Catalog tables, so we can read one run in the MLflow trace view or query all of them with SQL.
@@ -85,10 +65,10 @@ An unattended agent that comments on public issues needs the same observability 
 
 Two streams leave every run:
 
-| Source                                                   | What it answers                            |
-| -------------------------------------------------------- | ------------------------------------------ |
-| Agent traces in MLflow on Databricks, over OpenTelemetry | What the agent did in a given run, and why |
-| Gateway usage, tagged per agent                          | How much each agent spends                 |
+| Source                                                                                                                  | What it answers                            |
+| ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| Agent traces in MLflow on Databricks, over OpenTelemetry                                                                | What the agent did in a given run, and why |
+| [Unity AI Gateway](https://www.databricks.com/product/artificial-intelligence/unity-ai-gateway) usage, tagged per agent | How much each agent spends                 |
 
 Each trace links to its issue and workflow run, and is tagged with the verdict, the model, the effort and whether a pull request was proposed. We use them to:
 
