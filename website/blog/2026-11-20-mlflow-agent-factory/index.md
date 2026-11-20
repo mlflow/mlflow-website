@@ -14,7 +14,7 @@ Together, these agents form the MLflow agent factory. It runs on GitHub Actions,
 
 ## Why we built it
 
-MLflow has about 1,500 open issues, and roughly 700 of them are bugs. A maintainer's first hour on a bug usually goes to reproducing it. Before the factory, 57% of bug reports were closed within 7 days and 22% within 2 days.
+Before a maintainer can fix a bug, they have to reproduce it, and that step is where reports wait. Before the factory, 22% of bug reports were closed within 2 days and 57% within 7 days.
 
 We also did not want more unreviewed, AI-written pull requests. The goal was agents that work for maintainers: do the reproduction, propose a small fix with a test, and leave the decision to a human.
 
@@ -120,7 +120,7 @@ The other agents:
 - **The issue mix changed.** Bug reports went from 67 in September to 170 in October. Filing an issue became the cheapest way to get a fix, so maintainers and regular contributors file more. Of the 231 triaged bug reports, 146 came from members, collaborators or prior contributors, and 85 from first-time reporters. The before and after table compares different populations.
 - **94% reproduced is high.** Either the reports are good or the verdict is generous. We have not audited a sample yet.
 - **The agent rarely pushes back.** Only 1 issue got "needs info" and 2 got "not reproduced".
-- **The backlog is untouched.** About 1,500 issues are still open. Triage only sees new issues.
+- **The backlog is untouched.** Triage only sees new issues.
 - **Review is light for most agent PRs.** 112 of 131 merged without a human review comment or change request. They are small, but that is still a lot of trust.
 - **Six pull requests were rejected.** Maintainers closed them without merging.
 
