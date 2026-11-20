@@ -10,7 +10,7 @@ image: /img/blog/mlflow-agent-factory-thumbnail.png
 
 Open a bug report on [mlflow/mlflow](https://github.com/mlflow/mlflow) today and an agent reproduces it, finds the root cause and posts a report, usually within ten minutes. If the fix is clear, a pull request with a regression test follows in the same run. Other agents review that pull request, answer review comments and repair CI. A maintainer merges it.
 
-We call the whole system the factory. It runs on GitHub Actions, with Databricks behind it for model access and observability. This post covers how it works, how we keep it safe, how we watch the agents, and what the numbers look like after six weeks. All numbers come from the GitHub API as of November 20, 2026.
+Together, these agents form the MLflow agent factory. It runs on GitHub Actions, with Databricks behind it for model access and observability. This post covers how it works, how we keep it safe, how we watch the agents, and what the numbers look like after six weeks. All numbers come from the GitHub API as of November 20, 2026.
 
 ## Why we built it
 
