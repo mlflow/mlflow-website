@@ -41,7 +41,6 @@ We also did not want more unreviewed, AI-written pull requests. The goal was age
 A few things worth knowing:
 
 - **Small definitions:** each agent is a short instruction file plus a schema for its output.
-- **Feature requests:** these take a different path. The agent estimates effort and impact and lists open questions. It opens no pull request unless a maintainer asks.
 - **Nightly feeds Triage:** a failure found overnight can have a pull request before anyone is at work.
 
 ## Security: the agent cannot write anything
@@ -102,7 +101,7 @@ Each trace links to its issue and workflow run, and is tagged with the verdict, 
 
 Three numbers first:
 
-- **263 issues triaged** since October 6, 216 of them reproduced.
+- **231 bug reports triaged** since October 6, 216 of them reproduced.
 - **131 of 143 agent pull requests merged** since October 15, with 6 closed and 6 still open.
 - **Bugs closed within 2 days: 22% before, 66% after.**
 
@@ -127,13 +126,13 @@ The triage agent authored 131 of the 755 pull requests merged since October 15, 
 
 What the triage agent concluded:
 
-| Bug reports                       | Count | Feature requests  | Count |
-| --------------------------------- | ----- | ----------------- | ----- |
-| Reproduced                        | 216   | Feasible          | 16    |
-| Skipped (sandbox lacks resources) | 10    | Needs design      | 14    |
-| Already fixed                     | 3     | Already supported | 2     |
-| Not reproduced                    | 2     |                   |       |
-| Needs info                        | 1     |                   |       |
+| Verdict                           | Bug reports |
+| --------------------------------- | ----------- |
+| Reproduced                        | 216         |
+| Skipped (sandbox lacks resources) | 10          |
+| Already fixed                     | 3           |
+| Not reproduced                    | 2           |
+| Needs info                        | 1           |
 
 Counts are by verdict label, and one issue carries two.
 
@@ -145,8 +144,8 @@ The other agents:
 
 ## What the numbers hide
 
-- **The issue mix changed.** Bug reports went from 67 in September to 170 in October. Filing an issue became the cheapest way to get a fix, so maintainers and regular contributors file more. Of the 263 triaged issues, 157 came from members, collaborators or prior contributors, and 106 from first-time reporters. The before and after table compares different populations.
-- **82% reproduced is high.** Either the reports are good or the verdict is generous. We have not audited a sample yet.
+- **The issue mix changed.** Bug reports went from 67 in September to 170 in October. Filing an issue became the cheapest way to get a fix, so maintainers and regular contributors file more. Of the 231 triaged bug reports, 146 came from members, collaborators or prior contributors, and 85 from first-time reporters. The before and after table compares different populations.
+- **94% reproduced is high.** Either the reports are good or the verdict is generous. We have not audited a sample yet.
 - **The agent rarely pushes back.** Only 1 issue got "needs info" and 2 got "not reproduced".
 - **The backlog is untouched.** About 1,500 issues are still open. Triage only sees new issues.
 - **Review is light for most agent PRs.** 112 of 131 merged without a human review comment or change request. They are small, but that is still a lot of trust.
