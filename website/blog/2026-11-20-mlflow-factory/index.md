@@ -1,16 +1,16 @@
 ---
-title: "Inside the MLflow Agent Factory: From Bug Report to Merged Fix"
+title: "MLflow's Factory: How Agents Triage, Fix and Review"
 description: "How MLflow turns a bug report into a merged fix: agents reproduce, fix, review and repair, inside a sandbox that cannot write anything, and a maintainer merges."
-slug: mlflow-agent-factory
+slug: mlflow-factory
 authors: [mlflow-maintainers]
 tags: [mlflow, agents, genai, open-source, observability, databricks]
-thumbnail: /img/blog/mlflow-agent-factory-thumbnail.png
-image: /img/blog/mlflow-agent-factory-thumbnail.png
+thumbnail: /img/blog/mlflow-factory-thumbnail.png
+image: /img/blog/mlflow-factory-thumbnail.png
 ---
 
 Open a bug report on [mlflow/mlflow](https://github.com/mlflow/mlflow) today and an agent reproduces it, finds the root cause and posts a report, usually within ten minutes. If the fix is clear, a pull request with a regression test follows in the same run. Other agents review that pull request, answer review comments and repair CI. A maintainer merges it.
 
-Together, these agents form the MLflow agent factory. It runs on GitHub Actions, with Databricks behind it for model access and observability. This post covers how it works, how we keep it safe, how we watch the agents, and what the numbers look like after six weeks. All numbers come from the GitHub API as of November 20, 2026.
+Together, these agents form MLflow's factory. It runs on GitHub Actions, with Databricks behind it for model access and observability. This post covers how it works, how we keep it safe, how we watch the agents, and what the numbers look like after six weeks. All numbers come from the GitHub API as of November 20, 2026.
 
 ## Why we built it
 
