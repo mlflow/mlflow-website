@@ -123,9 +123,7 @@ Bug reports close faster than they did before triage.
 | Closed within 7 days | 94 (57%)       | 163 (80%)    |
 | Median days to close | 4.4            | 0.8          |
 
-Agents now author more than a third of merged pull requests. The Copilot coding agent's pull requests are delegated and reviewed by maintainers. The triage agent's start from an issue, with no maintainer involved until review.
-
-![Of 755 pull requests merged since October 15, the triage agent authored 131 or 17 percent, the Copilot coding agent 160 or 21 percent, and everyone else 464 or 61 percent.](images/merged-share.png)
+The triage agent authored 131 of the 755 pull requests merged since October 15, or 17%.
 
 What the triage agent concluded:
 
@@ -144,7 +142,6 @@ The other agents:
 - **Nightly:** 20 issues filed, all 20 closed as completed, with a median of 5 hours.
 - **Review:** 850 pull requests reviewed.
 - **Repair:** 139 pull requests opted in.
-- **The factory builds itself:** about 170 of 205 commits to the factory's own workflows and agent instructions since late August were authored by the Copilot coding agent, delegated and reviewed by maintainers.
 
 ## What the numbers hide
 
