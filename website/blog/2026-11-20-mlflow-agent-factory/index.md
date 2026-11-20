@@ -61,7 +61,7 @@ A successful injection can change what the agent writes. It cannot push, comment
 
 An unattended agent that comments on public issues needs the same observability as any production service. We use MLflow on Databricks for it. Traces land in Unity Catalog tables, so we can read one run in the MLflow trace view or query all of them with SQL.
 
-![Each agent run exports traces to MLflow on Databricks and makes model calls through Unity Gateway. Traces are used to debug a bad run, compare models and find waste. Gateway usage is used to track cost per agent.](images/monitoring.png)
+![Each agent run exports traces to MLflow on Databricks and makes model calls through Unity Gateway. Traces are used to debug a bad run, compare models and find waste. Unity Gateway usage is used to track cost per agent.](images/monitoring.png)
 
 Two streams leave every run:
 
