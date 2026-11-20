@@ -61,14 +61,14 @@ A successful injection can change what the agent writes. It cannot push, comment
 
 An unattended agent that comments on public issues needs the same observability as any production service. We use MLflow on Databricks for it. Traces land in Unity Catalog tables, so we can read one run in the MLflow trace view or query all of them with SQL.
 
-![Each agent run exports traces to MLflow on Databricks and makes model calls through Unity AI Gateway. Traces are used to debug a bad run, compare models and find waste. Gateway usage is used to track cost per agent.](images/monitoring.png)
+![Each agent run exports traces to MLflow on Databricks and makes model calls through Unity Gateway. Traces are used to debug a bad run, compare models and find waste. Gateway usage is used to track cost per agent.](images/monitoring.png)
 
 Two streams leave every run:
 
-| Source                                                                                                                  | What it answers                            |
-| ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| Agent traces in MLflow on Databricks, over OpenTelemetry                                                                | What the agent did in a given run, and why |
-| [Unity AI Gateway](https://www.databricks.com/product/artificial-intelligence/unity-ai-gateway) usage, tagged per agent | How much each agent spends                 |
+| Source                                                                                                            | What it answers                            |
+| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| Agent traces in MLflow on Databricks, over OpenTelemetry                                                          | What the agent did in a given run, and why |
+| [Unity Gateway](https://www.databricks.com/product/artificial-intelligence/unity-gateway) usage, tagged per agent | How much each agent spends                 |
 
 Each trace links to its issue and workflow run, and is tagged with the verdict, the model, the effort and whether a pull request was proposed. We use them to:
 
