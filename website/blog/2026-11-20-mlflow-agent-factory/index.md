@@ -24,7 +24,7 @@ We also did not want more unreviewed, AI-written pull requests. The goal was age
 
 1. **Under 2 minutes:** a comment says an agent is triaging the issue. The median is 1.4 minutes after the issue opens.
 2. **About 9 minutes:** the comment is replaced by the report. It has a verdict, expected and actual behavior, steps to reproduce, the root cause with links to the code, and a suggested fix.
-3. **Same run:** if the bug reproduced and the fix has no open design question, the bot opens a pull request with a regression test.
+3. **Same run:** if the bug reproduced and the fix has no open design question, the agent's fix is opened as a pull request with a regression test.
 4. **On the pull request:** AI review runs automatically. When a maintainer leaves a review, an agent addresses each comment and replies. Another agent watches CI and fixes failures.
 5. **A maintainer merges.** The median is 8.5 hours after the pull request opened.
 
