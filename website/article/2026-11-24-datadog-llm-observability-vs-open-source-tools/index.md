@@ -1,5 +1,5 @@
 ---
-title: "Datadog LLM Observability vs Open-Source Tools: Langfuse, Phoenix, MLflow"
+title: "Datadog LLM Observability vs Open-Source Tools: MLflow, Langfuse, Phoenix"
 description: "Datadog LLM Observability compared with Langfuse, Arize Phoenix, and MLflow: licenses, self-hosting, OpenTelemetry, pricing models, and which fits which team."
 slug: datadog-llm-observability-vs-open-source-tools
 tags:
@@ -21,16 +21,16 @@ This page compares Datadog with the three open-source tools using each vendor's 
 
 Updated 2026-11-24.
 
-Disclosure: this page was written by MLflow maintainers, and MLflow is one of the four tools. This page covers the open-source project only. We kept the criteria the same for every tool and say where MLflow falls short.
+Disclosure: this page was written by MLflow maintainers, and MLflow is one of the four tools. This page covers the open-source project only. We kept the criteria the same for every tool and say where MLflow falls short. We list MLflow first among the open-source tools because we maintain it. The order is not a ranking.
 
 ## TL;DR
 
 Short version for each tool:
 
 - **Datadog:** a proprietary SaaS product, billed per LLM span, with 15 days of trace retention by default. It is the strongest fit when your team already lives in Datadog.
+- **MLflow:** Apache-2.0, hosted by the Linux Foundation, and the one that also covers experiment tracking and a model registry. It is a broader project than a tracing-only tool.
 - **Langfuse:** a tracing-first product. The repository is MIT licensed, except the `ee` folders, and it can be self-hosted.
 - **Arize Phoenix:** an open-source, local-first tracing and evaluation tool under the Elastic License 2.0. Arize's own pricing page lists a managed option, Arize AX, separately.
-- **MLflow:** Apache-2.0, hosted by the Linux Foundation, and the one that also covers experiment tracking and a model registry. It is a broader project than a tracing-only tool.
 - All four accept OpenTelemetry traces in some form, so you can try more than one on the same instrumentation.
 
 ## Why compare Datadog with open-source tools at all?
@@ -54,16 +54,16 @@ We compared the four tools on six criteria:
 
 We left out raw speed and UI polish. We did not find a published benchmark from any of the four for either, and a screenshot is not a benchmark.
 
-## How do Datadog, Langfuse, Phoenix, and MLflow compare?
+## How do Datadog, MLflow, Langfuse, and Phoenix compare?
 
-|                  | Datadog                                                                        | Langfuse                                      | Arize Phoenix                                                      | MLflow                                                                      |
-| ---------------- | ------------------------------------------------------------------------------ | --------------------------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------- |
-| License          | Proprietary SaaS                                                               | MIT, except `ee` folders                      | Elastic License 2.0 (source-available)                             | Apache-2.0                                                                  |
-| Self-hosting     | Not described in Datadog's docs or pricing page                                | Docker Compose, Helm, and Terraform templates | Docker, Kubernetes, and one-click templates                        | `mlflow server` plus a SQL backend store and artifact storage               |
-| OpenTelemetry    | OTLP ingest over `http/protobuf` for GenAI conventions 1.37+ and OpenInference | Built on OpenTelemetry, OTLP endpoint         | Built on OpenTelemetry, with OpenInference instrumentation         | OTLP/HTTP ingest on the tracking server (3.6.0 and later), plus OTLP export |
-| Free tier        | Free plan: up to 40K LLM spans, 15-day retention                               | Hobby: $0, 50k units, 30 days, 2 users        | Phoenix self-hosted: free. Arize AX Free: 25k trace spans, 15 days | Free to self-host, no seat limit                                            |
-| First paid tier  | Pro: $160 per month annually, first 100K LLM spans                             | Core: $29 per month, 100k units, 90 days      | Arize AX Pro: $50 per month, 50k trace spans, 30 days              | Not applicable                                                              |
-| Bill scales with | LLM spans, plus retention                                                      | Units (traces, observations, scores)          | Trace spans and ingestion on AX; your infrastructure on Phoenix    | Your own infrastructure                                                     |
+|                  | Datadog                                                                        | MLflow                                                                      | Langfuse                                      | Arize Phoenix                                                      |
+| ---------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------ |
+| License          | Proprietary SaaS                                                               | Apache-2.0                                                                  | MIT, except `ee` folders                      | Elastic License 2.0 (source-available)                             |
+| Self-hosting     | Not described in Datadog's docs or pricing page                                | `mlflow server` plus a SQL backend store and artifact storage               | Docker Compose, Helm, and Terraform templates | Docker, Kubernetes, and one-click templates                        |
+| OpenTelemetry    | OTLP ingest over `http/protobuf` for GenAI conventions 1.37+ and OpenInference | OTLP/HTTP ingest on the tracking server (3.6.0 and later), plus OTLP export | Built on OpenTelemetry, OTLP endpoint         | Built on OpenTelemetry, with OpenInference instrumentation         |
+| Free tier        | Free plan: up to 40K LLM spans, 15-day retention                               | Free to self-host, no seat limit                                            | Hobby: $0, 50k units, 30 days, 2 users        | Phoenix self-hosted: free. Arize AX Free: 25k trace spans, 15 days |
+| First paid tier  | Pro: $160 per month annually, first 100K LLM spans                             | Not applicable                                                              | Core: $29 per month, 100k units, 90 days      | Arize AX Pro: $50 per month, 50k trace spans, 30 days              |
+| Bill scales with | LLM spans, plus retention                                                      | Your own infrastructure                                                     | Units (traces, observations, scores)          | Trace spans and ingestion on AX; your infrastructure on Phoenix    |
 
 Prices are list prices on each vendor's pricing page on 2026-11-24 and change often, so check the linked page before you decide. A Datadog LLM span, a Langfuse unit, and an Arize trace span are different measures, so price your own volume on each. Do not compare the three numbers directly.
 
@@ -83,33 +83,7 @@ A worked example, based on our reading of those lists: 500K LLM spans a month on
 
 **Best for:** teams already on Datadog who want LLM traces in the same place and are comfortable with a vendor-hosted, per-span bill.
 
-## 2. Langfuse: best for a tracing-first product you can self-host
-
-Langfuse is an LLM observability platform whose [repository](https://github.com/langfuse/langfuse) is "MIT licensed, except for the `ee` folders." The README says Langfuse is "built on OpenTelemetry," so any OpenTelemetry-instrumented application, framework, or collector can send it traces.
-
-**Evidence:** You can deploy it with Docker Compose on one machine, or with Helm and Terraform templates for AWS, Azure, and GCP. The README calls Helm on Kubernetes the preferred production deployment. Its [self-hosting docs](https://langfuse.com/self-hosting) cover the architecture and configuration options.
-
-**Pricing:** [Langfuse Cloud](https://langfuse.com/pricing) charges per unit, where a unit is a trace, an observation, or a score. Hobby is free with 50k units and 30 days of data access. Core is $29 per month with 100k units and 90 days. Pro is $199 per month with 3 years of access. Overage is $8.00 per 100k units up to 1M units, with lower rates above that.
-
-**Where it falls short:** The `ee` folders are not MIT, so check which enterprise features you need before you assume the whole product is permissive. A self-hosted Langfuse is more to operate than a single service, and you own upgrades and backups. Langfuse covers tracing, evaluation, and prompt management, but not APM, classical experiment tracking, or a model registry.
-
-**Best for:** teams that want a dedicated tracing product, a permissive core license, and the option to run it themselves. For a longer one-to-one view, see our [Langfuse alternative](/langfuse-alternative) page.
-
-## 3. Arize Phoenix: best for local-first debugging and notebooks
-
-Arize's [pricing page](https://arize.com/pricing/) describes Phoenix as an open-source, local-first platform for tracing, evaluation, experimentation, and prompt iteration. Its [repository](https://github.com/Arize-ai/phoenix) says it is built on OpenTelemetry and that auto-instrumentation comes from the separate OpenInference project. The same instrumentation works with Phoenix and with Arize's managed platform, Arize AX.
-
-**License:** The repository states that Phoenix "is licensed under the terms of the Elastic License 2.0 (ELv2)." ELv2 is source-available, not an OSI-approved open-source license, and it limits offering the software as a managed service. If your legal team needs an OSI license, that matters.
-
-**Self-hosting:** The repository lists Docker, Docker Compose, and Kubernetes with Helm. Arize's [self-hosting docs](https://arize.com/docs/phoenix/self-hosting) add one-click templates for Railway, Render, Google Cloud, Azure, and AWS CloudFormation, and say Phoenix is "free to self-host with no feature limitations."
-
-**Pricing:** Phoenix itself has no price. The managed Arize AX tiers are on the [Arize pricing page](https://arize.com/pricing/): Free is $0 with 25k trace spans a month, 1 GB of ingestion, and 15-day retention, and Pro is $50 per month with 50k trace spans, 10 GB, and 30-day retention.
-
-**Where it falls short:** The license is the main one. Phoenix is also built around tracing, evaluation, and experimentation, so teams that want a model registry or experiment tracking for classical ML need another tool.
-
-**Best for:** teams that want to start tracing on a laptop and later decide whether to self-host or move to a managed tier. For a longer comparison, see our [Arize Phoenix alternative](/arize-phoenix-alternative) page.
-
-## 4. MLflow: best for tracing and evaluation in one Apache-2.0 server
+## 2. MLflow: best for tracing and evaluation in one Apache-2.0 server
 
 MLflow is an Apache-2.0 open-source platform for agents, LLMs, and ML models, hosted by the Linux Foundation. MLflow Tracing captures LLM and agent calls as traces, and its [tracing docs](https://mlflow.org/docs/latest/genai/tracing/) say it is "fully compatible with OpenTelemetry and natively supports GenAI Semantic Conventions for export and ingestion."
 
@@ -132,6 +106,32 @@ That combination is how you would keep a full-retention copy of traces in MLflow
 **Where it falls short:** MLflow is a broader project than a tracing-only tool, so GenAI-only products can move faster on a narrow feature. Self-hosting means you own upgrades, storage, and access control, and fine-grained permissions for shared resources only arrived in [3.17.0](https://github.com/mlflow/mlflow/releases/tag/v3.17.0) (2026-10-07). MLflow does not replace an APM, and we have not verified that it has a built-in equivalent to Datadog's automatic sensitive-data scanning. Hosted MLflow services exist, but this entry describes the open-source project only.
 
 **Best for:** teams that want one self-hosted Apache-2.0 server for traces, evaluation, and the model lifecycle. For setup details, see our [LLM tracing guide](/llm-tracing) and the [MLflow observability overview](/genai/observability).
+
+## 3. Langfuse: best for a tracing-first product you can self-host
+
+Langfuse is an LLM observability platform whose [repository](https://github.com/langfuse/langfuse) is "MIT licensed, except for the `ee` folders." The README says Langfuse is "built on OpenTelemetry," so any OpenTelemetry-instrumented application, framework, or collector can send it traces.
+
+**Evidence:** You can deploy it with Docker Compose on one machine, or with Helm and Terraform templates for AWS, Azure, and GCP. The README calls Helm on Kubernetes the preferred production deployment. Its [self-hosting docs](https://langfuse.com/self-hosting) cover the architecture and configuration options.
+
+**Pricing:** [Langfuse Cloud](https://langfuse.com/pricing) charges per unit, where a unit is a trace, an observation, or a score. Hobby is free with 50k units and 30 days of data access. Core is $29 per month with 100k units and 90 days. Pro is $199 per month with 3 years of access. Overage is $8.00 per 100k units up to 1M units, with lower rates above that.
+
+**Where it falls short:** The `ee` folders are not MIT, so check which enterprise features you need before you assume the whole product is permissive. A self-hosted Langfuse is more to operate than a single service, and you own upgrades and backups. Langfuse covers tracing, evaluation, and prompt management, but not APM, classical experiment tracking, or a model registry.
+
+**Best for:** teams that want a dedicated tracing product, a permissive core license, and the option to run it themselves. For a longer one-to-one view, see our [Langfuse alternative](/langfuse-alternative) page.
+
+## 4. Arize Phoenix: best for local-first debugging and notebooks
+
+Arize's [pricing page](https://arize.com/pricing/) describes Phoenix as an open-source, local-first platform for tracing, evaluation, experimentation, and prompt iteration. Its [repository](https://github.com/Arize-ai/phoenix) says it is built on OpenTelemetry and that auto-instrumentation comes from the separate OpenInference project. The same instrumentation works with Phoenix and with Arize's managed platform, Arize AX.
+
+**License:** The repository states that Phoenix "is licensed under the terms of the Elastic License 2.0 (ELv2)." ELv2 is source-available, not an OSI-approved open-source license, and it limits offering the software as a managed service. If your legal team needs an OSI license, that matters.
+
+**Self-hosting:** The repository lists Docker, Docker Compose, and Kubernetes with Helm. Arize's [self-hosting docs](https://arize.com/docs/phoenix/self-hosting) add one-click templates for Railway, Render, Google Cloud, Azure, and AWS CloudFormation, and say Phoenix is "free to self-host with no feature limitations."
+
+**Pricing:** Phoenix itself has no price. The managed Arize AX tiers are on the [Arize pricing page](https://arize.com/pricing/): Free is $0 with 25k trace spans a month, 1 GB of ingestion, and 15-day retention, and Pro is $50 per month with 50k trace spans, 10 GB, and 30-day retention.
+
+**Where it falls short:** The license is the main one. Phoenix is also built around tracing, evaluation, and experimentation, so teams that want a model registry or experiment tracking for classical ML need another tool.
+
+**Best for:** teams that want to start tracing on a laptop and later decide whether to self-host or move to a managed tier. For a longer comparison, see our [Arize Phoenix alternative](/arize-phoenix-alternative) page.
 
 ## Which tool fits which team?
 
