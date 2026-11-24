@@ -195,19 +195,16 @@ DOCS = {
     "mlflow-eval": "mlflow.genai.evaluate runs scorers over a dataset and logs the results.",
 }
 
-
 @mlflow.trace(span_type="RETRIEVER")
 def retrieve(question: str) -> list[Document]:
     words = set(question.lower().split())
     hits = [(k, v) for k, v in DOCS.items() if words & set(v.lower().split())]
     return [Document(page_content=v, metadata={"doc_uri": k}) for k, v in hits]
 
-
 @mlflow.trace
 def rag_app(question: str) -> str:
     context = retrieve(question)
     return " ".join(d.page_content for d in context)  # call your LLM here
-
 
 eval_dataset = [
     {
@@ -244,8 +241,6 @@ None of this locks you in. The metrics in this article also work in Ragas, which
 Start with one metric on one small set. If you're starting from nothing, resist the urge to build a comprehensive evaluation suite on day one.
 
 Get a faithfulness check running on 20 to 50 queries in CI first, because that single metric catches the most damaging failure mode with the least setup cost. Only after that's stable should you introduce an LLM judge for relevance or completeness, and even then, validate its scores against a human-labeled sample before you let it gate a merge. The teams that skip calibration are the ones who eventually discover their "passing" system was passing a broken judge, not a working RAG pipeline. Keep growing your ground-truth pool slowly, and recalibrate the judge every time you change the underlying model.
-
-> _— Kevin_
 
 ## What Should You Do Next?
 
