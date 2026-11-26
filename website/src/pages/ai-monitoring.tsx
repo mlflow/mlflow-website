@@ -1386,7 +1386,7 @@ export default function AiMonitoring() {
               <Link href="/llm-evaluation">Agent Evaluation FAQ</Link>
             </li>
             <li>
-              <Link href="/ai-observability">AI Observability FAQ</Link>
+              <Link href="/llm-observability">AI Observability FAQ</Link>
             </li>
             <li>
               <Link href="/top-5-agent-observability-tools">

@@ -45,7 +45,7 @@ const faqCategories: FAQCategory[] = [
             <br />
             MLflow's comprehensive feature set for agents and LLM applications
             includes production-grade{" "}
-            <Link href="/ai-observability">observability</Link>,{" "}
+            <Link href="/llm-observability">observability</Link>,{" "}
             <Link href="/llm-evaluation">evaluation</Link>,{" "}
             <Link href="/prompt-registry">prompt management</Link>, an{" "}
             <Link href="/ai-gateway">AI Gateway</Link> for managing costs and
@@ -79,7 +79,7 @@ const faqCategories: FAQCategory[] = [
             these challenges requires full visibility into what your agents are
             doing, control over what they can access, and a systematic way to
             measure and improve their quality. MLflow provides the{" "}
-            <Link href="/ai-observability">observability</Link>,{" "}
+            <Link href="/llm-observability">observability</Link>,{" "}
             <Link href="/llm-evaluation">evaluation</Link>, and{" "}
             <Link href="/ai-gateway">governance</Link> capabilities you need to
             take your agents from prototype to production with confidence.
@@ -579,7 +579,7 @@ const faqCategories: FAQCategory[] = [
             use <Link href={MLFLOW_DBX_TRIAL_URL}>managed versions</Link> on
             Databricks, AWS, and others. MLflow supports any LLM provider and
             agent framework through{" "}
-            <Link href="/ai-observability">
+            <Link href="/llm-observability">
               OpenTelemetry-compatible tracing
             </Link>
             , so you're never locked into a single vendor's ecosystem. With over
@@ -656,9 +656,10 @@ const faqCategories: FAQCategory[] = [
         question: "What is the best AI observability tool?",
         answer: (
           <>
-            The best <Link href="/ai-observability">AI observability tool</Link>{" "}
-            depends on your needs. MLflow is the leading open source option,
-            with over 30 million monthly downloads. Thousands of organizations,
+            The best{" "}
+            <Link href="/llm-observability">AI observability tool</Link> depends
+            on your needs. MLflow is the leading open source option, with over
+            30 million monthly downloads. Thousands of organizations,
             developers, and research teams use MLflow each day to build and
             deploy production-grade agents and LLM applications. It offers
             complete <Link href="/llm-tracing">tracing</Link>,{" "}
@@ -1077,7 +1078,7 @@ export default function FAQ() {
 
           <h2 id="learn-more">Learn More</h2>
           <div className="learn-more-grid">
-            <Link href="/ai-observability" className="learn-more-card">
+            <Link href="/llm-observability" className="learn-more-card">
               <h3>AI Observability</h3>
               <p>
                 Monitor and debug AI agents and LLM applications with

@@ -208,6 +208,10 @@ const config: Config = {
             from: "/blog/mlflow",
             to: "/blog/langgraph-model-from-code",
           },
+          {
+            from: "/ai-observability",
+            to: "/llm-observability",
+          },
         ],
       },
     ],

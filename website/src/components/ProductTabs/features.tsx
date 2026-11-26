@@ -53,7 +53,7 @@ const llmAgentFeatures: Feature[] = [
         </Link>{" "}
         of your LLM applications and agents to get deep{" "}
         <Link
-          href="/ai-observability"
+          href="/llm-observability"
           className="text-white/90 hover:text-white underline"
         >
           insights
