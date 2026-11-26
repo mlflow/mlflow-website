@@ -49,7 +49,7 @@ const faqs: { question: string; answer: string }[] = [
     question:
       "Can MLflow find problems in my agent without me knowing what to look for?",
     answer:
-      "MLflow includes AI issue detection. The Detect Issues action in the Traces and Issues pages analyzes the traces in an experiment and groups recurring problems, such as incorrect information or ungrounded claims, with evidence from specific traces. Use it to decide which failures to turn into evaluation test cases.",
+      "MLflow includes AI issue detection. The Detect Issues button, available on the Traces page, on the Dashboard, and on the Issues tab in MLflow 3.18 and later, analyzes the traces in an experiment and groups recurring problems, such as incorrect information or ungrounded claims, with evidence from specific traces. Use it to decide which failures to turn into evaluation test cases.",
   },
   {
     question: "Does MLflow work with OpenTelemetry?",
@@ -64,7 +64,7 @@ const faqs: { question: string; answer: string }[] = [
   {
     question: "Is MLflow agent observability free?",
     answer:
-      "Yes. MLflow is open source under the Apache 2.0 license and is part of the Linux Foundation. Tracing, the dashboard, evaluation, and issue detection are included at no cost, and you control where your trace data is stored. Your own infrastructure and any LLM calls made by judges are the only costs. Managed MLflow is also available on Databricks.",
+      "Yes. MLflow is open source under the Apache 2.0 license and is part of the Linux Foundation. Tracing, the dashboard, evaluation, and issue detection are included at no cost, and you control where your trace data is stored. Your own infrastructure and any LLM calls made by judges or by issue detection are the only costs. Managed MLflow is also available on Databricks.",
   },
 ];
 
@@ -166,7 +166,7 @@ const signals: [string, string, string][] = [
   [
     "Issues",
     "Recurring failure patterns found automatically across traces, with evidence",
-    "Issues tab",
+    "Traces table Issues column; Issues tab (MLflow 3.18+)",
   ],
 ];
 
@@ -432,7 +432,7 @@ export default function AgentObservability() {
             border-top: 1px solid #e5e7eb;
             margin: 12px 0 12px 0;
           }
-          @media (max-width: 1400px) {
+          @media (max-width: 1600px) {
             .article-sidebar {
               display: none;
             }
@@ -474,16 +474,6 @@ export default function AgentObservability() {
         <div className="article-container">
           <h1>Agent Observability</h1>
 
-          <p
-            style={{
-              fontSize: "14px",
-              color: "#6b7280",
-              margin: "-8px 0 24px",
-            }}
-          >
-            Last updated: 2026-11-26
-          </p>
-
           <p>
             <strong>Agent observability</strong> is the practice of capturing
             what an AI agent does at runtime, including every LLM call, tool
@@ -495,6 +485,16 @@ export default function AgentObservability() {
             </Link>
             , a tool-call dashboard, automated quality scoring, and AI issue
             detection, under the Apache 2.0 license.
+          </p>
+
+          <p
+            style={{
+              fontSize: "14px",
+              color: "#6b7280",
+              margin: "-8px 0 24px",
+            }}
+          >
+            Last updated: 2026-11-26
           </p>
 
           <p>
@@ -822,7 +822,7 @@ registered.start(
 
           <p>
             Dashboards answer questions you already have. Issue detection helps
-            with the ones you do not. The Detect Issues action analyzes the
+            with the ones you do not. The Detect Issues button analyzes the
             traces in an experiment and groups recurring problems into issues,
             each with a severity, the affected traces, and the evidence that led
             to it. You can read more in the{" "}
@@ -868,7 +868,7 @@ registered.start(
           </ol>
 
           <h2 id="choose" data-toc="Choosing a Tool">
-            How Do You Choose an Agent Observability Tool?
+            What Should an Agent Observability Platform Support?
           </h2>
 
           <p>
