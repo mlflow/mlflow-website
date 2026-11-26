@@ -461,7 +461,7 @@ export default function OpenTelemetryLLMTracing() {
             border-top: 1px solid #e5e7eb;
             margin: 12px 0 12px 0;
           }
-          @media (max-width: 1400px) {
+          @media (max-width: 1600px) {
             .article-sidebar {
               display: none;
             }
@@ -516,9 +516,9 @@ export default function OpenTelemetryLLMTracing() {
           <p>
             MLflow Tracing is built on the OpenTelemetry SDK and reads and
             writes the{" "}
-            <Link href="#genai-semconv">
+            <a href="#genai-semconv">
               OpenTelemetry GenAI semantic conventions
-            </Link>
+            </a>
             , so your trace data is not tied to one vendor's format. You can
             instrument with the MLflow SDK, with plain OpenTelemetry libraries
             in any language, or with both in the same application.
@@ -715,8 +715,9 @@ service:
             </li>
             <li>
               Since MLflow 3.7.0 the endpoint accepts <code>gzip</code> and{" "}
-              <code>deflate</code> compressed payloads, set with{" "}
-              <code>OTEL_EXPORTER_OTLP_TRACES_COMPRESSION</code>.
+              <code>deflate</code> compressed payloads. Clients enable it with{" "}
+              <code>OTEL_EXPORTER_OTLP_TRACES_COMPRESSION</code> on their
+              exporter.
             </li>
             <li>
               When workspaces are enabled on the server, clients can send the{" "}
@@ -1046,13 +1047,13 @@ with otel_tracer.start_as_current_span("http_request") as external_span:
               <Link href="/genai" style={{ color: "#007bff" }}>
                 <strong>MLflow</strong>
               </Link>{" "}
-              is the largest open-source{" "}
+              is an open-source{" "}
               <strong>
                 AI engineering platform for agents, LLMs, and ML models
               </strong>
-              , with over 30 million monthly downloads. Backed by the Linux
-              Foundation and licensed under Apache 2.0, MLflow provides
-              OpenTelemetry-compatible tracing with no vendor lock-in.{" "}
+              , backed by the Linux Foundation and licensed under Apache 2.0,
+              MLflow provides OpenTelemetry-compatible tracing with no vendor
+              lock-in.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/"}>
                 Read the tracing docs →
               </Link>
