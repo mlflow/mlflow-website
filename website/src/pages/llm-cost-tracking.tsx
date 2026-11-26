@@ -6,7 +6,7 @@ import { Header } from "../components/Header/Header";
 import { SocialLinksFooter } from "../components/SocialLinksFooter/SocialLinksFooter";
 import { ArticleSidebar } from "../components/ArticleSidebar/ArticleSidebar";
 import { MLFLOW_GENAI_DOCS_URL } from "@site/src/constants";
-import CostDashboard from "@site/static/img/llm-cost-tracking/mlflow-demo-dashboard.png";
+import CostDashboard from "@site/static/img/llm-cost-tracking/mlflow-demo-cost-breakdown.png";
 import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 
@@ -28,22 +28,22 @@ const faqs: {
   {
     question: "How do I track LLM token usage and cost with MLflow?",
     answer:
-      "Enable tracing for your LLM library, for example mlflow.openai.autolog(), and run your application. MLflow records input, output, and total tokens on each LLM span and aggregates them on the trace. With MLflow 3.10 or later and a tracking server started with the genai extra, MLflow also estimates cost in USD per span and per trace. Read the values with trace.info.token_usage and trace.info.cost, or view them in the MLflow UI.",
+      "Enable tracing for your LLM library, for example mlflow.openai.autolog(), and run your application. MLflow records input, output, and total tokens on each LLM span and aggregates them on the trace. With MLflow 3.10 or later, MLflow also estimates cost in USD per span and per trace. Read the values with trace.info.token_usage and trace.info.cost, or view them in the MLflow UI.",
   },
   {
     question: "Which MLflow version do I need for cost tracking?",
     answer:
-      "Token usage tracking requires MLflow 3.2.0 or later. Cost tracking requires MLflow 3.10.0 or later, and the MLflow tracking server must be started with the genai extra installed (pip install 'mlflow[genai]'). Cost is computed from model pricing data provided through LiteLLM.",
+      "Token usage tracking requires MLflow 3.2.0 or later. Cost tracking requires MLflow 3.10.0 or later, and the token usage and cost documentation recommends installing the genai extra on the tracking server (pip install 'mlflow[genai]>=3.10.0'). Prices come from LiteLLM's price table when LiteLLM is installed, and from MLflow's built-in model catalog otherwise.",
   },
   {
     question: "How does MLflow calculate the cost of an LLM call?",
     answer:
-      "MLflow multiplies the input and output token counts recorded on an LLM span by the per-token price of the model, using LiteLLM's pricing table. The result is stored on the span as mlflow.llm.cost with input_cost, output_cost, and total_cost in USD, and summed into trace-level cost. The value is an estimate based on list pricing, so it can differ from your provider invoice if you have negotiated rates or discounts.",
+      "MLflow multiplies the input and output token counts recorded on an LLM span by the per-token price of the model, using its price table (LiteLLM's when installed, otherwise MLflow's built-in catalog). The result is stored on the span as mlflow.llm.cost with input_cost, output_cost, and total_cost in USD, and summed into trace-level cost. The value is an estimate based on list pricing, so it can differ from your provider invoice if you have negotiated rates or discounts.",
   },
   {
-    question: "Why does my trace show tokens but a cost of $0.00?",
+    question: "Why does my trace show tokens but no cost?",
     answer:
-      "Cost is $0.00 when the model name recorded on the span has no matching entry in the pricing table. Databricks serving endpoint names are one example, because the provider cannot be inferred from the bare endpoint name. In that case you can set the mlflow.chat.tokenUsage and mlflow.llm.cost attributes on the span yourself, which overrides the calculated values.",
+      "Cost is missing when the model name recorded on the span has no entry in the pricing table, so trace.info.cost is None while the token counts are still recorded. In that case, set the mlflow.chat.tokenUsage and mlflow.llm.cost attributes on the span yourself, which overrides the calculated values.",
   },
   {
     question: "Can I see cost per agent step or per tool call?",
@@ -58,12 +58,12 @@ const faqs: {
   {
     question: "Does MLflow AI Gateway track cost?",
     answer:
-      "Yes. When usage tracking is enabled on an AI Gateway endpoint, each request is logged as a trace, and the AI Gateway usage dashboard charts requests, latency, errors, token usage, cost breakdown, and cost over time. Budget policies can alert through a webhook or reject requests with HTTP 429 when spend passes a daily, weekly, or monthly limit.",
+      "Yes. When usage tracking is enabled on an AI Gateway endpoint, each request is logged as a trace, and the AI Gateway usage dashboard charts requests, latency, errors, token usage, cost breakdown, and cost over time. Budget policies can alert through a webhook or reject requests with HTTP 429 when spend passes a daily, weekly, or monthly limit. Token and cost charts can be empty for models whose usage or pricing is unavailable.",
   },
   {
     question: "Is MLflow LLM cost tracking free?",
     answer:
-      "Yes. MLflow is open source under the Apache 2.0 license and backed by the Linux Foundation. Token and cost tracking is included at no cost, with no per-trace fees. You pay only for your own infrastructure and for the LLM API calls your application makes. Managed MLflow is also available on Databricks and other platforms.",
+      "Yes. MLflow is open source under the Apache 2.0 license and backed by the Linux Foundation. Token and cost tracking is included at no cost, with no per-trace fees. You pay only for your own infrastructure and for the LLM API calls your application makes. Managed MLflow is also available on Databricks.",
   },
 ];
 
@@ -417,7 +417,7 @@ export default function LLMCostTracking() {
             border-top: 1px solid #e5e7eb;
             margin: 12px 0 12px 0;
           }
-          @media (max-width: 1400px) {
+          @media (max-width: 1600px) {
             .article-sidebar {
               display: none;
             }
@@ -476,7 +476,7 @@ export default function LLMCostTracking() {
           <div style={{ margin: "40px 0", textAlign: "center" }}>
             <img
               src={CostDashboard}
-              alt="MLflow experiment dashboard showing trace volume, latency, token usage, tokens per trace, and cost breakdown charts for an LLM application"
+              alt="MLflow experiment dashboard with the Cost Breakdown donut chart by model and the Cost Over Time chart, plus latency, errors, token usage, and tokens per trace, from MLflow demo data"
               style={{
                 width: "100%",
                 borderRadius: "8px",
@@ -491,8 +491,8 @@ export default function LLMCostTracking() {
                 fontStyle: "italic",
               }}
             >
-              The MLflow experiment dashboard charting token usage, tokens per
-              trace, and cost for the demo experiment
+              The MLflow experiment dashboard showing the Cost Breakdown donut
+              by model and the Cost Over Time chart, from MLflow demo data
             </p>
           </div>
 
@@ -633,11 +633,12 @@ export default function LLMCostTracking() {
           </table>
 
           <p>
-            To compute cost, start the MLflow tracking server with the{" "}
-            <code>genai</code> extra installed. Pricing comes from LiteLLM's
-            model price data, so cost is an estimate at list prices. Some
-            providers or models do not return token usage, and in those cases
-            the usage and cost fields are empty. See the{" "}
+            The documentation recommends installing the <code>genai</code> extra
+            on the tracking server to compute cost. Prices come from LiteLLM's
+            model price data when LiteLLM is installed and from MLflow's
+            built-in model catalog otherwise, so cost is an estimate at list
+            prices. Some providers or models do not return token usage, and in
+            those cases the usage and cost fields are empty. See the{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/token-usage-cost/"}>
               token usage and cost documentation
             </Link>{" "}
@@ -647,7 +648,10 @@ export default function LLMCostTracking() {
           <h2 id="quickstart">Track LLM Cost in Three Steps</h2>
 
           <p>
-            <strong>1. Start a server with cost tracking enabled.</strong>
+            <strong>
+              1. Install MLflow 3.10 or later with the genai extra and start a
+              server.
+            </strong>
           </p>
 
           <CodeBlock
@@ -712,8 +716,10 @@ if cost:
 
           <p>
             Use <code>mlflow.search_traces</code> to pull traces into Python and
-            aggregate. This example totals tokens and spend for an experiment
-            and lists the five most expensive traces.
+            aggregate. This example totals spend across the first 500 traces
+            that the search returns and lists the five most expensive of them.
+            For a full experiment, page through results with{" "}
+            <code>MlflowClient.search_traces</code>.
           </p>
 
           <CodeBlock
@@ -800,11 +806,9 @@ print(dict(by_step))`}
           <h2 id="manual">When Automatic Cost Is Unavailable</h2>
 
           <p>
-            Cost shows as <code>$0.00</code> or is missing when the model name
-            on the span has no entry in the pricing table, for example with a
-            Databricks serving endpoint name. Token counts can still be correct.
-            In these cases, set the token usage and cost attributes on the span
-            yourself:
+            Cost is missing when the model name on the span has no entry in the
+            pricing table. Token counts can still be correct. In these cases,
+            set the token usage and cost attributes on the span yourself:
           </p>
 
           <CodeBlock
@@ -875,13 +879,12 @@ def my_llm_call():
               <Link href="/genai" style={{ color: "#007bff" }}>
                 <strong>MLflow</strong>
               </Link>{" "}
-              is the largest open-source{" "}
+              is an open-source{" "}
               <strong>
                 AI engineering platform for agents, LLMs, and ML models
               </strong>
-              , with over 30 million monthly downloads. Backed by the Linux
-              Foundation and licensed under Apache 2.0, MLflow provides token
-              and cost tracking with no per-trace fees and no vendor lock-in.{" "}
+              . Backed by the Linux Foundation and licensed under Apache 2.0,
+              MLflow provides token and cost tracking with no per-trace fees.{" "}
               <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/token-usage-cost/"}>
                 Get started →
               </Link>
