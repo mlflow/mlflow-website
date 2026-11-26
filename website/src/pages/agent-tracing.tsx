@@ -451,7 +451,7 @@ export default function AgentTracing() {
             border-top: 1px solid #e5e7eb;
             margin: 12px 0 12px 0;
           }
-          @media (max-width: 1400px) {
+          @media (max-width: 1600px) {
             .article-sidebar {
               display: none;
             }
@@ -493,10 +493,6 @@ export default function AgentTracing() {
         <div className="article-container">
           <h1>Agent Tracing</h1>
 
-          <p style={{ color: "#6b7280", fontSize: "14px" }}>
-            Last updated: November 26, 2026
-          </p>
-
           <p>
             <strong>Agent tracing</strong> records every step an AI agent takes
             (each LLM call, tool call, retrieval, and handoff) as a structured,
@@ -513,6 +509,10 @@ export default function AgentTracing() {
             final output rarely shows why. A trace shows the whole run: which
             tools the agent picked, what each one returned, and which step went
             off track.
+          </p>
+
+          <p style={{ color: "#6b7280", fontSize: "14px" }}>
+            Last updated: November 26, 2026
           </p>
 
           <div className="info-box">
@@ -953,12 +953,7 @@ from mlflow.entities import SpanType
 
 @mlflow.trace(span_type=SpanType.AGENT)
 def chat(message: str, session_id: str, user_id: str) -> str:
-    mlflow.update_current_trace(
-        metadata={
-            "mlflow.trace.session": session_id,
-            "mlflow.trace.user": user_id,
-        }
-    )
+    mlflow.update_current_trace(session_id=session_id, user=user_id)
     return agent_reply(message)  # your agent logic`}
           />
 
@@ -969,7 +964,10 @@ def chat(message: str, session_id: str, user_id: str) -> str:
             >
               user and session tracking guide
             </Link>{" "}
-            covers the details and the newer helper parameters.
+            covers the details. The <code>session_id</code> and{" "}
+            <code>user</code> parameters need MLflow 3.11 or later; on older
+            versions, set the <code>mlflow.trace.session</code> and{" "}
+            <code>mlflow.trace.user</code> metadata keys instead.
           </p>
 
           <h2 id="debug-and-evaluate">
@@ -979,13 +977,17 @@ def chat(message: str, session_id: str, user_id: str) -> str:
           <p>
             Open a failing trace in the MLflow UI to step through its spans,
             search traces to find similar runs, and run scorers over traces to
-            measure quality. Once traces are in MLflow, three workflows build on
-            them. First, you debug in the UI: open a bad run, step through the
-            spans, and find the tool call with the wrong arguments or the model
-            call that lost context. Second, you search: filter traces by status,
-            span type, tags, or text to find the runs that matter. Third, you
-            evaluate: run <Link href="/llm-as-a-judge">LLM judges</Link> and
-            code-based scorers over the traces to measure quality, tool use, and
+            measure quality.
+          </p>
+
+          <p>
+            Once traces are in MLflow, three workflows build on them. First, you
+            debug in the UI: open a bad run, step through the spans, and find
+            the tool call with the wrong arguments or the model call that lost
+            context. Second, you search: filter traces by status, span type,
+            tags, or text to find the runs that matter. Third, you evaluate: run{" "}
+            <Link href="/llm-as-a-judge">LLM judges</Link> and code-based
+            scorers over the traces to measure quality, tool use, and
             efficiency, and track it over time as part of{" "}
             <Link href="/llm-evaluation">agent evaluation</Link>.
           </p>
