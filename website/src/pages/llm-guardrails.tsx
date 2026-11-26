@@ -540,7 +540,7 @@ export default function LLMGuardrails() {
           <h1>LLM Guardrails</h1>
 
           <p style={{ color: "#6b7280", fontSize: "14px", marginTop: "-16px" }}>
-            Last updated <time dateTime="2026-11-26">2026-11-26</time>
+            Last updated <span>2026-11-26</span>
           </p>
 
           <p>
