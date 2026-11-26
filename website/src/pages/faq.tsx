@@ -658,11 +658,11 @@ const faqCategories: FAQCategory[] = [
           <>
             The best{" "}
             <Link href="/llm-observability">AI observability tool</Link> depends
-            on your needs. MLflow is the leading open source option, with over
-            30 million monthly downloads. Thousands of organizations,
-            developers, and research teams use MLflow each day to build and
-            deploy production-grade agents and LLM applications. It offers
-            complete <Link href="/llm-tracing">tracing</Link>,{" "}
+            on your needs. MLflow is the leading open source option, with a
+            large and growing user base. Thousands of organizations, developers,
+            and research teams use MLflow each day to build and deploy
+            production-grade agents and LLM applications. It offers complete{" "}
+            <Link href="/llm-tracing">tracing</Link>,{" "}
             <Link href="/llm-evaluation">evaluation</Link>, and monitoring
             without vendor lock-in. Unlike proprietary tools that lock you into
             a vendor's ecosystem, MLflow is fully open source,
@@ -674,7 +674,7 @@ const faqCategories: FAQCategory[] = [
           </>
         ),
         answerText:
-          "The best AI observability tool depends on your needs. MLflow is the leading open source option, with over 30 million monthly downloads. Thousands of organizations, developers, and research teams use MLflow each day to build and deploy production-grade agents and LLM applications. It offers complete tracing, evaluation, and monitoring without vendor lock-in. Unlike proprietary tools that lock you into a vendor's ecosystem, MLflow is fully open source, OpenTelemetry-compatible, and supports any LLM provider or agent framework.",
+          "The best AI observability tool depends on your needs. MLflow is the leading open source option, with a large and growing user base. Thousands of organizations, developers, and research teams use MLflow each day to build and deploy production-grade agents and LLM applications. It offers complete tracing, evaluation, and monitoring without vendor lock-in. Unlike proprietary tools that lock you into a vendor's ecosystem, MLflow is fully open source, OpenTelemetry-compatible, and supports any LLM provider or agent framework.",
       },
       {
         question: "What is the best LLM evaluation tool?",

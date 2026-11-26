@@ -155,9 +155,11 @@ const faqs: {
     answer: (
       <>
         MLflow has one-line automatic tracing for providers such as OpenAI,
-        Anthropic, Bedrock, Gemini, Mistral, Cohere, and Ollama, and for agent
-        frameworks such as LangChain, LangGraph, LlamaIndex, CrewAI, DSPy,
-        AutoGen, and the OpenAI Agents SDK. See the full list in the{" "}
+        Anthropic, Bedrock, Gemini, and Mistral, and for any OpenAI-compatible
+        provider such as Cohere and Ollama (through mlflow.openai.autolog()),
+        and for agent frameworks such as LangChain, LangGraph, LlamaIndex,
+        CrewAI, DSPy, AutoGen, and the OpenAI Agents SDK. See the full list in
+        the{" "}
         <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/integrations/"}>
           integrations documentation
         </Link>
@@ -165,7 +167,7 @@ const faqs: {
       </>
     ),
     answerText:
-      "MLflow has one-line automatic tracing for providers such as OpenAI, Anthropic, Bedrock, Gemini, Mistral, Cohere, and Ollama, and for agent frameworks such as LangChain, LangGraph, LlamaIndex, CrewAI, DSPy, AutoGen, and the OpenAI Agents SDK. See the full list in the integrations documentation. SDKs are available for Python and TypeScript.",
+      "MLflow has one-line automatic tracing for providers such as OpenAI, Anthropic, Bedrock, Gemini, and Mistral, and for any OpenAI-compatible provider such as Cohere and Ollama (through mlflow.openai.autolog()), and for agent frameworks such as LangChain, LangGraph, LlamaIndex, CrewAI, DSPy, AutoGen, and the OpenAI Agents SDK. See the full list in the integrations documentation. SDKs are available for Python and TypeScript.",
   },
   {
     question: "How do I track LLM token usage and cost?",
@@ -414,6 +416,14 @@ export default function LLMObservability() {
             color: #0072b0 !important;
             text-decoration: underline;
           }
+          .article-container table,
+          .article-container th,
+          .article-container td {
+            color: #3d3d3d !important;
+          }
+          .article-container time {
+            color: #6b7280 !important;
+          }
           .info-box a {
             color: #0194e2 !important;
             font-weight: 500;
@@ -585,7 +595,7 @@ export default function LLMObservability() {
             border-top: 1px solid #e5e7eb;
             margin: 12px 0 12px 0;
           }
-          @media (max-width: 1400px) {
+          @media (max-width: 1600px) {
             .article-sidebar {
               display: none;
             }
@@ -652,8 +662,8 @@ export default function LLMObservability() {
             <Link href="/llm-as-a-judge">LLM judges</Link>. It is compatible
             with OpenTelemetry, works with any LLM provider or agent framework,
             and stores your data where you choose. This page covers how LLM
-            observability works and how to set it up. It is also known as AI
-            observability. For a deep dive into the tracing layer itself, see{" "}
+            observability works and how to set it up. For a deep dive into the
+            tracing layer itself, see{" "}
             <Link href="/llm-tracing">LLM tracing</Link>.
           </p>
 
