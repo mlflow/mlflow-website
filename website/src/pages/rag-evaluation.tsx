@@ -57,12 +57,12 @@ const faqs: {
   {
     question: "Do I need ground-truth labels to evaluate RAG?",
     answer:
-      "Not for all metrics. RetrievalRelevance and RetrievalGroundedness need no ground truth; they judge the retrieved chunks and the response directly. RetrievalSufficiency and Correctness compare against expected facts, so they need an expectations field in your dataset. A practical approach is to start with the label-free judges on production traces, then add expected facts for your most important questions.",
+      "Not for all metrics. RetrievalRelevance and RetrievalGroundedness need no ground truth; they judge the retrieved chunks and the response directly. RetrievalSufficiency and Correctness compare against expected facts or response, so they need an expectations field in your dataset. A practical approach is to start with the label-free judges on production traces, then add expected facts for your most important questions.",
   },
   {
     question: "Why do the RAG judges require traces?",
     answer:
-      'The retrieval judges evaluate the documents that your retriever actually returned, and MLflow reads them from the trace. They look for a span with type RETRIEVER; if a trace has several, MLflow uses the last one. Add @mlflow.trace(span_type="RETRIEVER") to your retrieval function, or use MLflow autologging for a supported framework such as LangChain or LlamaIndex, which records retriever spans for you.',
+      'The retrieval judges evaluate the documents that your retriever actually returned, and MLflow reads them from the trace. They look for spans with type RETRIEVER and score each top-level retriever span separately; a retriever nested inside another retriever is skipped. Add @mlflow.trace(span_type="RETRIEVER") to your retrieval function, or use MLflow autologging for a supported framework such as LangChain or LlamaIndex, which records retriever spans for you.',
   },
   {
     question: "Can I use RAGAS or DeepEval metrics with MLflow?",
@@ -470,7 +470,7 @@ export default function RagEvaluation() {
             border-top: 1px solid #e5e7eb;
             margin: 12px 0 12px 0;
           }
-          @media (max-width: 1400px) {
+          @media (max-width: 1600px) {
             .article-sidebar {
               display: none;
             }
@@ -671,7 +671,7 @@ export default function RagEvaluation() {
               [
                 <code key="2">RetrievalSufficiency</code>,
                 "Do the retrieved chunks contain everything needed to answer?",
-                "Yes (expected facts)",
+                "Yes (expected facts or response)",
                 "Yes",
               ],
               [
@@ -769,7 +769,8 @@ def rag_app(query: str):
           </p>
 
           <CodeBlock
-            code={`from mlflow.genai.scorers import (
+            code={`import mlflow
+from mlflow.genai.scorers import (
     RetrievalRelevance,
     RetrievalSufficiency,
     RetrievalGroundedness,
@@ -777,7 +778,7 @@ def rag_app(query: str):
 )
 
 results = mlflow.genai.evaluate(
-    data=eval_dataset,
+    data=dataset,
     predict_fn=rag_app,
     scorers=[
         RetrievalRelevance(model="openai:/gpt-4o-mini"),
@@ -825,9 +826,7 @@ dataset.merge_records(
             },
         },
     ]
-)
-
-eval_dataset = dataset`}
+)`}
           />
 
           <p>
