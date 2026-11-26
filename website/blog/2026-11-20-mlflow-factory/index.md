@@ -13,7 +13,7 @@ Before a maintainer can fix a bug, someone has to reproduce it, and on a busy op
 Today, when you open a bug report on [mlflow/mlflow](https://github.com/mlflow/mlflow), an agent reproduces it, finds the root cause and posts a report, usually within ten minutes. If the fix is clear, a pull request with a regression test follows. Other agents review that pull request, answer review comments and repair CI, and a maintainer merges it. 66% of bug reports now close within two days.
 
 <div style={{ display: "flex", justifyContent: "center" }}>
-  <img src={require("./images/triage-report.png").default} alt="The triage agent's report on a bug report: a summary that says the bug was reproduced, and a before and after diagram." width="65%" />
+  <img src={require("./images/triage-report.png").default} alt="The triage agent's report on a bug report: a summary that says the bug was reproduced, and a before and after diagram." style={{ width: "100%", maxWidth: 832 }} />
 </div>
 
 Together, these agents form MLflow's factory. In this post we walk you through:
@@ -27,7 +27,9 @@ Everything is public, so you can copy any part of it. All numbers come from the 
 
 ## What happens when you open an issue
 
-![A new issue is screened, then a sandboxed triage agent produces a report and a patch. A publish job posts the report on the issue and opens a pull request. Three agents review, respond and repair on the pull request, and a maintainer merges.](images/flow.png)
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <img src={require("./images/flow.png").default} alt="A new issue is screened, then a sandboxed triage agent produces a report and a patch. A publish job posts the report on the issue and opens a pull request. Three agents review, respond and repair on the pull request, and a maintainer merges." style={{ width: "100%", maxWidth: 832 }} />
+</div>
 
 1. **Within two minutes**, a comment tells you an agent has picked up the issue. The median is 1.4 minutes.
 2. **About nine minutes in**, that comment becomes the report: a verdict, expected and actual behavior, steps to reproduce, the root cause with links to the code, and a suggested fix.
@@ -38,7 +40,7 @@ Everything is public, so you can copy any part of it. All numbers come from the 
 Here is the pull request that followed the report above:
 
 <div style={{ display: "flex", justifyContent: "center" }}>
-  <img src={require("./images/triage-pr.png").default} alt="A merged pull request opened by the triage agent. The description links the issue it closes and explains the root cause and the fix." width="65%" />
+  <img src={require("./images/triage-pr.png").default} alt="A merged pull request opened by the triage agent. The description links the issue it closes and explains the root cause and the fix." style={{ width: "100%", maxWidth: 832 }} />
 </div>
 
 ## How it is built: five agents that hand off through GitHub
@@ -63,7 +65,9 @@ Every model call goes through a gateway, and every run exports a trace. We use D
 
 Anyone can write an issue, and the agent that reads it has a shell. Prompt injection is the obvious risk. We assume the agent can be talked into anything, and make sure it has nothing useful to do with that.
 
-![Issue text is screened and handed to a triage agent in a sandbox that holds a read-only token and an allowlisted network. The agent's only output is a report and a patch as files. A separate publish job validates the files and is the only place that holds the write token. The agent cannot push, comment or call other hosts.](images/trust-boundary.png)
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <img src={require("./images/trust-boundary.png").default} alt="Issue text is screened and handed to a triage agent in a sandbox that holds a read-only token and an allowlisted network. The agent's only output is a report and a patch as files. A separate publish job validates the files and is the only place that holds the write token. The agent cannot push, comment or call other hosts." style={{ width: "100%", maxWidth: 832 }} />
+</div>
 
 The agent that reads the issue runs in a sandbox and can only read. Its only output is two files: a report and an optional patch. A separate job, which never runs a model, validates those files, and it is the only job that can comment or push.
 
@@ -112,7 +116,9 @@ If you use Claude Code on your own machine, `mlflow autolog claude` sets up trac
 
 Each trace links back to its issue and workflow run, and is tagged with the verdict, the model, the effort and whether a pull request was proposed.
 
-![Each agent run exports traces to MLflow Tracing. The traces are used to debug a bad run, compare models, find waste and track cost per agent.](images/monitoring.png)
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <img src={require("./images/monitoring.png").default} alt="Each agent run exports traces to MLflow Tracing. The traces are used to debug a bad run, compare models, find waste and track cost per agent." style={{ width: "100%", maxWidth: 832 }} />
+</div>
 
 - **Debug a bad triage.** Open the trace from the issue and read the tool calls in order.
 - **Compare models and settings.** Filter traces by verdict, model or effort.
@@ -129,15 +135,21 @@ Three numbers first:
 - **131 of 143 agent pull requests merged** since October 15, with 6 closed and 6 still open.
 - **Bugs closed within 2 days: 22% before, 66% after.**
 
-![Stacked columns of agent pull requests opened per week from mid October to mid November 2026. Weekly totals are 9, 17, 31, 30, 26 and 30, and most are merged.](images/weekly-prs.png)
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <img src={require("./images/weekly-prs.png").default} alt="Stacked columns of agent pull requests opened per week from mid October to mid November 2026. Weekly totals are 9, 17, 31, 30, 26 and 30, and most are merged." style={{ width: "100%", maxWidth: 832 }} />
+</div>
 
 The pull requests are small: a median of 49 changed lines across 2 files. Most merge quickly.
 
-![Columns of time from pull request opened to merged for 131 merged agent PRs: 37 under 2 hours, 26 in 2 to 8 hours, 43 in 8 to 24 hours, 20 in 1 to 2 days, and 5 over 2 days.](images/time-to-merge.png)
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <img src={require("./images/time-to-merge.png").default} alt="Columns of time from pull request opened to merged for 131 merged agent PRs: 37 under 2 hours, 26 in 2 to 8 hours, 43 in 8 to 24 hours, 20 in 1 to 2 days, and 5 over 2 days." style={{ width: "100%", maxWidth: 832 }} />
+</div>
 
 Bug reports close faster than they did before triage. The median time to close went from 4.4 days to 0.8 days.
 
-![Share of bug reports closed within 2 days rose from 22 percent to 66 percent, and within 7 days from 57 percent to 80 percent.](images/close-rate.png)
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <img src={require("./images/close-rate.png").default} alt="Share of bug reports closed within 2 days rose from 22 percent to 66 percent, and within 7 days from 57 percent to 80 percent." style={{ width: "100%", maxWidth: 832 }} />
+</div>
 
 The triage agent now writes a real share of MLflow's fixes: 131 of the 755 pull requests merged since October 15, or 17%.
 
