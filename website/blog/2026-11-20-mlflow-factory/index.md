@@ -12,7 +12,9 @@ Before a maintainer can fix a bug, someone has to reproduce it, and on a busy op
 
 Today, when you open a bug report on [mlflow/mlflow](https://github.com/mlflow/mlflow), an agent reproduces it, finds the root cause and posts a report, usually within ten minutes. If the fix is clear, a pull request with a regression test follows. Other agents review that pull request, answer review comments and repair CI, and a maintainer merges it. 66% of bug reports now close within two days.
 
-![The triage agent's report on a bug report: a summary that says the bug was reproduced, a before and after diagram, expected and actual behavior, and a link to the code that fails.](images/triage-report.png)
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <img src={require("./images/triage-report.png").default} alt="The triage agent's report on a bug report: a summary that says the bug was reproduced, and a before and after diagram." width="65%" />
+</div>
 
 Together, these agents form MLflow's factory. In this post we walk you through:
 
@@ -35,7 +37,9 @@ Everything is public, so you can copy any part of it. All numbers come from the 
 
 Here is the pull request that followed the report above:
 
-![A merged pull request opened by the triage agent. The description links the issue it closes, explains the root cause and the fix, and includes the same before and after diagram.](images/triage-pr.png)
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <img src={require("./images/triage-pr.png").default} alt="A merged pull request opened by the triage agent. The description links the issue it closes and explains the root cause and the fix." width="65%" />
+</div>
 
 ## How it is built: five agents that hand off through GitHub
 
