@@ -14,9 +14,7 @@ const SEO_TITLE =
   "OpenTelemetry LLM Tracing with MLflow | OTLP & GenAI Semconv";
 const SEO_DESCRIPTION =
   "Trace LLM apps and agents with OpenTelemetry. MLflow ingests OTLP traces, exports to any OTel backend, and supports GenAI semantic conventions. Open source.";
-const SITE_URL = "https://mlflow.org";
-// Built from the site root so `npm run check-links` does not request this page before it is deployed.
-const PAGE_URL = SITE_URL + "/opentelemetry-llm-tracing";
+const PAGE_URL = "https://mlflow.org/opentelemetry-llm-tracing";
 const OTEL_DOCS = MLFLOW_GENAI_DOCS_URL + "tracing/opentelemetry/";
 
 const faqs: { question: string; answer: string }[] = [
@@ -48,7 +46,7 @@ const faqs: { question: string; answer: string }[] = [
   {
     question: "Can I export MLflow traces to Datadog, Grafana, or Jaeger?",
     answer:
-      "Yes. Set OTEL_EXPORTER_OTLP_TRACES_ENDPOINT to your OpenTelemetry Collector or backend before starting a trace, and MLflow exports spans over OTLP. Set MLFLOW_TRACE_ENABLE_OTLP_DUAL_EXPORT=true to keep sending traces to the MLflow Tracking Server at the same time. The MLflow docs link to setup guides for Datadog, New Relic, SigNoz, Splunk, Grafana, Jaeger, Dynatrace, and others.",
+      "Yes. Set OTEL_EXPORTER_OTLP_TRACES_ENDPOINT to your OpenTelemetry Collector or backend before starting a trace, and MLflow exports spans over OTLP. MLflow's exporter uses gRPC by default; set OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=http/protobuf to export to an HTTP endpoint. Set MLFLOW_TRACE_ENABLE_OTLP_DUAL_EXPORT=true to keep sending traces to the MLflow Tracking Server at the same time. The MLflow docs link to setup guides for Datadog, New Relic, SigNoz, Splunk, Grafana, Jaeger, Dynatrace, and others.",
   },
   {
     question: "What are the OpenTelemetry GenAI semantic conventions?",
@@ -742,7 +740,9 @@ service:
           <p>
             Traces created by MLflow follow the OpenTelemetry trace spec, so you
             can send them to any platform that accepts OTLP. Set the endpoint
-            before starting a trace and install the exporter package:
+            before starting a trace and install the exporter package. MLflow's
+            OTLP exporter uses gRPC unless you set the protocol, so the example
+            below selects <code>http/protobuf</code> to match an HTTP endpoint:
           </p>
 
           <CodeBlock
@@ -752,6 +752,7 @@ import os
 import mlflow
 
 os.environ["OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"] = "http://localhost:4318/v1/traces"
+os.environ["OTEL_EXPORTER_OTLP_TRACES_PROTOCOL"] = "http/protobuf"
 os.environ["OTEL_SERVICE_NAME"] = "my-llm-service"  # optional, groups traces
 
 with mlflow.start_span(name="foo") as span:
@@ -774,6 +775,7 @@ import mlflow
 
 os.environ["MLFLOW_TRACE_ENABLE_OTLP_DUAL_EXPORT"] = "true"
 os.environ["OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"] = "http://localhost:4318/v1/traces"
+os.environ["OTEL_EXPORTER_OTLP_TRACES_PROTOCOL"] = "http/protobuf"
 
 mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_experiment("my-experiment")
