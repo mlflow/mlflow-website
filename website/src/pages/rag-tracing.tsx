@@ -1054,7 +1054,7 @@ export default function RagTracing() {
               <Link href={MLFLOW_GENAI_DOCS_URL + "tracing/quickstart/"}>
                 tracing quickstart
               </Link>
-              . The quickstart takes under 10 minutes.
+              .
             </p>
           </div>
 
