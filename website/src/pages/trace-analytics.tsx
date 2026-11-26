@@ -471,7 +471,7 @@ export default function TraceAnalytics() {
             border-top: 1px solid #e5e7eb;
             margin: 12px 0 12px 0;
           }
-          @media (max-width: 1400px) {
+          @media (max-width: 1600px) {
             .article-sidebar {
               display: none;
             }
