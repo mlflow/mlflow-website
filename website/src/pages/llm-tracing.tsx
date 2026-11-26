@@ -1195,6 +1195,9 @@ const result = await generateText({
               <Link href="/llm-observability">AI Observability Guide</Link>
             </li>
             <li>
+              <Link href="/rag-tracing">RAG Tracing Guide</Link>
+            </li>
+            <li>
               <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>
                 Agent Evaluation Guide
               </Link>
