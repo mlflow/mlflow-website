@@ -23,7 +23,7 @@ const faqs: { question: string; answer: string }[] = [
   {
     question: "How do guardrails differ from LLM evaluation?",
     answer:
-      "Guardrails act on live traffic and can change the outcome of a request, for example by returning an error instead of an unsafe response. Evaluation measures quality over a set of examples and does not change what a user sees. The two share the same building blocks in MLflow: a scorer or LLM judge that returns a pass or fail verdict can power a guardrail on an AI Gateway endpoint, run in an offline evaluation with mlflow.genai.evaluate(), or run automatically on logged traces.",
+      "Guardrails act on live traffic and can change the outcome of a request, for example by returning an error instead of an unsafe response. Evaluation measures quality over a set of examples and does not change what a user sees. The two share the same building blocks in MLflow: an LLM judge that returns a pass or fail verdict can power a guardrail on an AI Gateway endpoint, run in an offline evaluation with mlflow.genai.evaluate(), or run automatically on logged traces.",
   },
   {
     question: "Does MLflow have built-in guardrails?",
@@ -33,7 +33,7 @@ const faqs: { question: string; answer: string }[] = [
   {
     question: "What happens when a guardrail blocks a request?",
     answer:
-      "When a guardrail's action is Block and the judge says the content fails, the AI Gateway rejects the request with an HTTP 400 response. The error message contains the guardrail name and the judge's rationale, so the caller can see why the request was refused. The original request or response is not passed through.",
+      "When a guardrail's action is Block and the judge says the content fails, the AI Gateway rejects a non-streaming request with an HTTP 400 response. The detail message contains the guardrail name and the judge's rationale, so the caller can see why the request was refused. On a streaming request the response has already started, so the error arrives as an error event in the stream instead of an HTTP 400. The original request or response is not passed through.",
   },
   {
     question:
@@ -44,13 +44,13 @@ const faqs: { question: string; answer: string }[] = [
   {
     question: "Do guardrails work with streaming responses?",
     answer:
-      "Pre-LLM guardrails run on streaming requests, but post-LLM guardrails are not applied to streaming responses, because the full response is not available to judge before it is sent. If a check must apply to every request, place it at the pre-LLM stage or disable streaming on that endpoint.",
+      "Pre-LLM guardrails run on streaming requests, but post-LLM guardrails are not applied to streaming responses, because the full response is not available to judge before it is sent. If a check must apply to every request, place it at the pre-LLM stage or disable streaming on that endpoint. A pre-LLM violation on a streaming request is returned as an error event in the stream.",
   },
   {
     question:
       "How do I detect PII, toxicity, or jailbreak attempts in my LLM application?",
     answer:
-      "For PII, MLflow provides the rule-based PIIDetection scorer (email, phone, SSN, credit card, and IPv4 patterns) and a PII Detection guardrail type in the AI Gateway. For toxicity, NSFW text, jailbreak and prompt injection attempts, secrets, and gibberish, use the Guardrails AI scorers in mlflow.genai.scorers.guardrails, which require the guardrails-ai package. For subjective policies, write a custom LLM judge with make_judge() or a Guidelines scorer.",
+      "For PII, MLflow provides the rule-based PIIDetection scorer (email, phone, SSN, credit card, and IPv4 patterns) and a PII Detection guardrail type in the AI Gateway that uses an LLM judge. For toxicity, NSFW text, jailbreak and prompt injection attempts, secrets, and gibberish, use the Guardrails AI scorers in mlflow.genai.scorers.guardrails, which require the guardrails-ai package. For subjective policies, write a custom LLM judge with make_judge() or a Guidelines scorer.",
   },
   {
     question: "Can I run guardrail checks on production traces?",
@@ -141,10 +141,7 @@ no_medical_advice = make_judge(
 const GATEWAY_ERROR = `HTTP/1.1 400 Bad Request
 
 {
-  "detail": {
-    "error_code": "INVALID_PARAMETER_VALUE",
-    "message": "Guardrail 'pii-detection' blocked: The request contains an email address ..."
-  }
+  "detail": "Guardrail 'pii-detection' blocked: The request contains an email address ..."
 }`;
 
 function CodeBlock({
@@ -502,7 +499,7 @@ export default function LLMGuardrails() {
             border-top: 1px solid #e5e7eb;
             margin: 12px 0 12px 0;
           }
-          @media (max-width: 1400px) {
+          @media (max-width: 1600px) {
             .article-sidebar {
               display: none;
             }
@@ -656,7 +653,7 @@ export default function LLMGuardrails() {
               [
                 "How it decides",
                 "Rules and regex, trained classifiers, or an LLM judge",
-                "PIIDetection (rules), Guardrails AI validators (classifiers), LLM judges via make_judge() and Guidelines",
+                "LLM judges on the gateway (instruction judges or make_judge()); PIIDetection (rules) and Guardrails AI validators (classifiers) in code and evaluation",
               ],
               [
                 "What it does on failure",
@@ -730,8 +727,10 @@ export default function LLMGuardrails() {
 
           <ul>
             <li>
-              <strong>Block</strong> rejects the request with an HTTP 400. The
-              error carries the guardrail name and the judge's rationale.
+              <strong>Block</strong> rejects a non-streaming request with an
+              HTTP 400 whose <code>detail</code> carries the guardrail name and
+              the judge's rationale. On a streaming request the error arrives as
+              an error event in the stream instead.
             </li>
             <li>
               <strong>Sanitize</strong> sends the flagged payload to a gateway
@@ -760,14 +759,20 @@ export default function LLMGuardrails() {
             You can run the judge on a cheaper model than your main workload,
             and guardrails work on both unified and passthrough endpoints.
             Multiple guardrails on one endpoint run in the order shown in the
-            table, and a block skips the remaining guardrails in that stage.
+            Guardrails tab, and a block skips the remaining guardrails in that
+            stage.
           </p>
 
           <p>
-            Gateway guardrails support built-in scorers and judges created with{" "}
-            <code>make_judge</code>, but not custom scorers defined with the{" "}
-            <code>@scorer</code> decorator; such a configuration fails the
-            request instead of silently skipping the guardrail.
+            Gateway guardrails run LLM judges: the instruction judges the UI
+            creates from your text, or a judge created with{" "}
+            <code>make_judge</code>. The built-in <code>Safety</code> and{" "}
+            <code>PIIDetection</code> scorers do not work as gateway guardrails,
+            because the gateway calls the scorer with <code>inputs=</code> and
+            they accept only <code>outputs</code>. Custom scorers defined with
+            the <code>@scorer</code> decorator are not supported either: the
+            gateway fails the request instead of silently skipping the
+            guardrail.
           </p>
 
           <p>
@@ -783,15 +788,16 @@ export default function LLMGuardrails() {
           <h2 id="guardrail-scorers">How Do I Run Guardrails in Code?</h2>
 
           <p>
-            The same checks are available as{" "}
+            You can also run these checks in code as{" "}
             <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/scorers/"}>
               scorers
             </Link>
             . A scorer returns a verdict you can call directly in your
             application, run over a dataset with{" "}
             <code>mlflow.genai.evaluate()</code>, or attach to production
-            traces. This is how you test a policy before you turn it on for live
-            traffic.
+            traces. This is how you test a policy offline before you turn it on
+            for live traffic. Gateway guardrails themselves run LLM judges, as
+            described above.
           </p>
 
           <h3>Which built-in scorers check safety and PII?</h3>
@@ -931,13 +937,16 @@ export default function LLMGuardrails() {
 
           <ul>
             <li>
-              <strong>Test before enforcing.</strong> Run the policy as a scorer
-              over real examples with <code>mlflow.genai.evaluate()</code> to
-              see false positives before it can block a customer.
+              <strong>Test before enforcing.</strong> Run the same instructions
+              as a <code>make_judge</code> judge over real examples with{" "}
+              <code>mlflow.genai.evaluate()</code> to see false positives before
+              it can block a customer.
             </li>
             <li>
               <strong>Layer cheap checks first.</strong> Use rule-based scorers
-              for obvious patterns and an LLM judge for subjective policies.
+              such as <code>PIIDetection</code> in your application code or
+              evaluation for obvious patterns, and an LLM judge for subjective
+              policies at the gateway.
             </li>
             <li>
               <strong>Choose the stage deliberately.</strong> Screen inputs
