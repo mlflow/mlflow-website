@@ -1,6 +1,6 @@
 ---
-title: "Catch Regressions Early With RAG Evaluation and MLflow for Engineers"
-description: "For engineers: a practical RAG evaluation playbook to stop hallucinations. Run a 20–50 query CI harness, calibrate LLM judges, and trace results with MLflow."
+title: "How to Evaluate a RAG Pipeline: Retrieval, Generation and Regression Tests"
+description: "How to evaluate a RAG pipeline: score retrieval and generation separately, calibrate LLM judges, and run a 20 to 50 query regression set in CI with MLflow."
 slug: catch-regressions-early-with-rag-evaluation-and-mlflow-for-engineers
 tags:
   [
@@ -14,14 +14,18 @@ tags:
     evaluate rag systems,
     rag performance review,
     risk assessment criteria,
+    how to evaluate a RAG pipeline,
+    RAG regression tests,
   ]
-date: 2026-09-10
+date: 2026-11-26
 image: https://csuxjmfbwmkxiegfpljm.supabase.co/storage/v1/object/public/blog-images/organization-30814/1789036525659_Engineer-reviewing-RAG-evaluation-traces.jpeg
 ---
 
 ![Engineer reviewing RAG evaluation traces](https://csuxjmfbwmkxiegfpljm.supabase.co/storage/v1/object/public/blog-images/organization-30814/1789036525659_Engineer-reviewing-RAG-evaluation-traces.jpeg)
 
-RAG evaluation measures two things at once: whether your retriever finds the right context and whether your model actually uses that context instead of hallucinating around it. Faithfulness comes first, because a system that retrieves perfectly but fabricates its answer is more dangerous than one that retrieves poorly and admits it doesn't know — so you can start with a Multi-LLM Audit to check all AI models at once. The immediate next step is small and concrete: build a 20 to 50 query offline harness that scores faithfulness before you touch anything else.
+To evaluate a RAG pipeline, score retrieval and generation separately, then run both on a fixed test set in CI. Retrieval metrics tell you whether the right context arrived. Generation metrics tell you whether the model used it faithfully instead of inventing details. A 20 to 50 query regression set catches most breakage before it ships.
+
+Disclosure: this page was written by MLflow maintainers, and the worked example uses MLflow. The metrics and workflow apply to any framework. Facts checked 2026-11-24.
 
 ---
 
@@ -29,8 +33,8 @@ RAG evaluation measures two things at once: whether your retriever finds the rig
 >
 > - Faithfulness and answer relevance are the key evaluation metrics, with faithfulness measuring if answers are supported by retrieved context and answer relevance checking if responses address the question.
 > - Evaluating the retriever, reranker, and generator separately helps diagnose failure modes and improve system components individually.
-> - Building a small, focused test set of 20 to 50 high-quality queries is sufficient for rapid CI checks, but larger datasets are better for periodic benchmarking.
-> - Using LLM judges with calibrated prompts and structured output ensures more reliable, ground-truth-free evaluation of open-ended answers.
+> - Building a small, focused test set of 20 to 50 high-quality queries is a workable starting point for rapid CI checks, but larger datasets are better for periodic benchmarking.
+> - Using LLM judges with calibrated prompts and structured output makes evaluation of open-ended answers more reliable. Faithfulness and relevance need no reference answer, while sufficiency checks do.
 > - An integrated eval workflow with a version-controlled offline harness, CI gating, and production monitoring is essential for maintaining system quality over time.
 
 ---
@@ -43,21 +47,22 @@ RAG evaluation measures two things at once: whether your retriever finds the rig
 - [How Do LLM Judges Work for RAG Evaluation?](#how-do-llm-judges-work-for-rag-evaluation)
 - [What Does a Production-Ready Evaluation Workflow Look Like?](#what-does-a-production-ready-evaluation-workflow-look-like)
 - [How Do You Monitor a RAG System After It Ships?](#how-do-you-monitor-a-rag-system-after-it-ships)
+- [How Do You Run a RAG Evaluation in MLflow?](#how-do-you-run-a-rag-evaluation-in-mlflow)
 - [How MLflow Supports the RAG Evaluation Lifecycle](#how-mlflow-supports-the-rag-evaluation-lifecycle)
 - [A Practical Starting Roadmap](#a-practical-starting-roadmap)
-- [Put Your RAG Evaluation Metrics on One Platform](#put-your-rag-evaluation-metrics-on-one-platform)
+- [What Should You Do Next?](#what-should-you-do-next)
 - [Sources](#sources)
 - [FAQ](#faq)
 
 ## What Metrics Actually Matter for RAG Evaluation?
 
-Every RAG evaluation framework eventually collapses into the same handful of questions: did the retriever find the right material, and did the model tell the truth about it? The RAG Triad framing (context relevance, groundedness, and answer relevance) has become the shorthand most teams reach for, and [Ragas](https://arxiv.org/html/2309.15217) operationalizes it with reference-free scoring that an LLM judge can compute without ground-truth answers.
+Every RAG evaluation framework eventually collapses into the same handful of questions: did the retriever find the right material, and did the model tell the truth about it? Three dimensions (context relevance, groundedness, and answer relevance) are the shorthand most teams reach for, and [Ragas](https://arxiv.org/html/2309.15217) operationalizes it with reference-free scoring that an LLM judge can compute without ground-truth answers.
 
 **Faithfulness (groundedness)** checks whether every claim in the generated answer traces back to the retrieved context. Ragas computes this by breaking the answer into individual statements, then asking a judge model whether each statement is supported by the source passages. This metric maps directly to hallucination control: a low faithfulness score means the model is inventing details the retriever never surfaced, regardless of how fluent the answer reads.
 
 **Answer relevance and correctness** measure something different: does the answer actually address what was asked? A response can be perfectly faithful to the retrieved context and still miss the question entirely, if the retriever pulled adjacent but irrelevant passages. For tasks with a known correct answer, reference-based metrics like exact match (EM) and F1 give you a hard number. For open-ended or generative tasks, judge-based relevance scoring works better because EM and F1 punish valid paraphrases.
 
-**Context precision and recall** live on the retrieval side. Precision@k tells you what fraction of the top k retrieved chunks are actually relevant; recall@k tells you what fraction of all relevant chunks in the corpus made it into the top k. Both are sensitive to chunking strategy. Practitioner notebooks that vary chunk size report [large swings in retrieval quality](https://huggingface.co/learn/cookbook/en/rag_evaluation) purely from changing how documents get split, before you even touch the model.
+**Context precision and recall** live on the retrieval side. Precision@k tells you what fraction of the top k retrieved chunks are actually relevant; recall@k tells you what fraction of all relevant chunks in the corpus made it into the top k. Both are sensitive to chunking strategy. The Hugging Face cookbook compares chunk sizes and shows [retrieval quality changing with how documents are split](https://huggingface.co/learn/cookbook/en/rag_evaluation) purely from changing how documents get split, before you even touch the model.
 
 **Hallucination rate and citation accuracy** are the production-facing cousins of faithfulness. Hallucination rate tracks the percentage of responses containing at least one unsupported claim; citation accuracy checks whether cited sources actually contain the claims attributed to them. LLM judges catch most obvious fabrications but struggle with subtle scope errors, like a citation that supports a related but slightly different claim than the one made.
 
@@ -73,7 +78,7 @@ Regulated domains (medical, legal, financial) need a higher bar across the board
 
 ## Should You Evaluate the Retriever, the Reader, or the Whole System?
 
-Both, and separately. Conflating retrieval failures with generation failures is one of the fastest ways to waste an engineering sprint chasing the wrong fix. A comprehensive survey on RAG evaluation formalizes this split as internal (component-level) evaluation versus external (system-level) evaluation, and the distinction matters because each component fails in a different, diagnosable way.
+Both, and separately. Conflating retrieval failures with generation failures is one of the fastest ways to waste an engineering sprint chasing the wrong fix. We call this component-level versus system-level evaluation, and the distinction matters because each component fails in a different, diagnosable way.
 
 **Retriever evaluation** centers on whether the right documents even entered the candidate pool.
 
@@ -86,7 +91,7 @@ Both, and separately. Conflating retrieval failures with generation failures is 
 
 **Reader (generation) evaluation** isolates the model's behavior given a fixed, known-good context. This is where faithfulness checks belong in their purest form, because you've removed retrieval noise from the equation. Also check answer completeness (did it address every part of a multi-part question) and formatting constraints (did it respect the output schema your downstream system expects).
 
-**End-to-end evaluation** looks at the full pipeline as a black box and asks two production-relevant questions: what's the boost rate (how often does adding retrieval improve the answer versus the model's parametric knowledge alone), and what's the resilience rate (how often does the system degrade gracefully, rather than confidently wrong, when retrieval fails outright)?
+**End-to-end evaluation** looks at the full pipeline as a black box and asks two production-relevant questions, which we call the boost rate and the resilience rate. These are our own labels, not standard terms. The boost rate is how often adding retrieval improves the answer versus the model's parametric knowledge alone. The resilience rate is how often the system degrades gracefully, rather than answering confidently and wrongly, when retrieval fails outright.
 
 Component failures leave fingerprints in these end-to-end numbers. A retriever that's degrading will show up as falling context precision alongside stable faithfulness, since the model is being faithful to bad context. A reader that's struggling will show up as falling faithfulness even when context precision holds steady. Running both layers side by side is what turns a vague "the system got worse" into an actionable ticket.
 
@@ -100,7 +105,7 @@ You don't need thousands of labeled examples to start. You need a small, high-qu
 4. **Filter low-quality items.** Drop anything the critique step flags: ambiguous questions, answers that leak from general knowledge rather than the retrieved snippet, and duplicates.
 5. **Add human annotation where it counts.** Synthetic generation is fast but noisy. Once you need to measure actual accuracy rather than relative regression, a human needs to write or verify the ground-truth answer, particularly for domain-specific queries where an LLM's judgment is unreliable.
 
-For CI purposes, aim for **20 to 50 high-value queries**. That's small enough to run on every pull request without burning through API budget or slowing the merge pipeline, and [practitioner guidance](https://mlflow.org/articles/tags/evaluation-metrics-for-datasets) consistently points to this range as the sweet spot for catching regressions fast. Reserve larger sets, in the hundreds, for periodic benchmarking runs rather than every commit.
+For CI purposes, aim for **20 to 50 high-value queries**. That's small enough to run on every pull request without burning through API budget or slowing the merge pipeline, and 20 to 50 is our rule of thumb for catching regressions fast, not a measured optimum. Reserve larger sets, in the hundreds, for periodic benchmarking runs rather than every commit.
 
 Whatever size you land on, capture consistent metadata alongside each example:
 
@@ -110,7 +115,7 @@ Whatever size you land on, capture consistent metadata alongside each example:
 
 **Pro Tip:** _Tag a handful of your test queries as "adversarial" on purpose, questions with a plausible-sounding but wrong answer sitting right next to the correct one in the corpus. These catch faithfulness regressions that ordinary queries miss entirely._
 
-Chunking strategy deserves its own line item in your test-set design, since notebook experiments show that chunk size changes alone can shift retrieval quality dramatically. Build a few test queries specifically designed to probe whether your current chunk boundaries split relevant information across two chunks, since that's a common and easy-to-miss failure.
+Chunking strategy deserves its own line item in your test-set design, since chunk size alone can change retrieval quality. Build a few test queries specifically designed to probe whether your current chunk boundaries split relevant information across two chunks, since that's a common and easy-to-miss failure.
 
 ![How Do You Build a RAG Evaluation Dataset? — overview diagram](https://csuxjmfbwmkxiegfpljm.supabase.co/storage/v1/object/public/blog-images/organization-30814/1789036582147_How-Do-You-Build-a-RAG-Evaluation-Dataset-overview-diagram.jpeg)
 
@@ -137,7 +142,7 @@ Known failure modes are worth watching for specifically. LLM judges struggle wit
 An evaluation workflow that only runs when someone remembers to run it manually isn't a workflow. It's a hope. The pattern that holds up in production combines four pieces: an offline harness, CI gating, regression tests, and a checklist that governs what "ready to ship" actually means.
 
 1. **Build the offline harness.** Store your test dataset under version control alongside your code, not in a spreadsheet somewhere. Every run should be deterministic: same queries, same retrieval index snapshot, same model version, logged outputs. This is what makes a score from last Tuesday comparable to a score from today.
-2. **Set CI gate thresholds.** A typical gate might require faithfulness above 0.80 and context precision above a set floor before a pull request merges. Tie these to your test-set results, not to spot checks, and fail the build automatically when a threshold isn't met.
+2. **Set CI gate thresholds.** A typical gate might require faithfulness above a floor and context precision above a floor before a pull request merges. Set both from your own baseline run, not from a number in an article. Tie these to your test-set results, not to spot checks, and fail the build automatically when a threshold isn't met.
 3. **Design regression tests for speed and impact.** Your CI suite should run in minutes, not hours. That's the entire argument for the 20 to 50 query range: small enough to run on every commit, large enough to catch the failure modes that actually recur, like a prompt change that quietly breaks citation formatting.
 4. **Enforce a production readiness checklist** before anything ships: sampling plan defined, alerting thresholds set, a human review rotation assigned, and an incident runbook written for when faithfulness drops mid-deployment.
 
@@ -156,7 +161,7 @@ Offline tests catch what you thought to test for. Production monitoring catches 
 
 Minimum viable logging for a RAG system in production includes the query itself, the full set of retrieved documents (not just the ones that made the final prompt), the generated text, model and prompt version metadata, and a timestamp. Without retrieved-document logging specifically, you can't distinguish a retrieval failure from a generation failure after the fact, which puts you back in the conflation problem from earlier.
 
-Sampling strategy determines what you actually see. A pure random sample (say, 1 to 5% of production traffic) gives you a baseline read on average quality but will miss rare, high-impact failures by design, since rare things are rare in a random sample too. Layer in edge-case triggers, like automatically flagging any query where retrieval returned unusually low similarity scores across the board, and error-driven sampling that captures every instance where a user explicitly flagged a bad response.
+Sampling strategy determines what you actually see. A pure random sample (a few percent of production traffic is a common starting point, not a measured optimum) gives you a baseline read on average quality but will miss rare, high-impact failures by design, since rare things are rare in a random sample too. Layer in edge-case triggers, like automatically flagging any query where retrieval returned unusually low similarity scores across the board, and error-driven sampling that captures every instance where a user explicitly flagged a bad response.
 
 - Watch for faithfulness drops in your sampled evaluations, which is usually the earliest signal something upstream changed.
 - Watch for a rising hallucination rate specifically on query types that were previously stable, which often points to a document update rather than a model regression.
@@ -164,38 +169,96 @@ Sampling strategy determines what you actually see. A pure random sample (say, 1
 
 When a drift signal fires, the triage playbook matters as much as the detection. Define ahead of time who gets notified (usually whoever owns the retrieval index and whoever owns the generation prompt, since the fix path differs), what data gets pulled first (the flagged query, its retrieved documents, and the last known-good version of both), and the rollback threshold at which you revert instead of patch forward. Teams that skip this step tend to spend the first two hours of an incident just figuring out who should be looking at it.
 
+## How Do You Run a RAG Evaluation in MLflow?
+
+Trace your retriever with the `RETRIEVER` span type, then pass your RAG function and a dataset to `mlflow.genai.evaluate` with the built-in retrieval scorers. MLflow's [RAG scorer docs](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/rag/) list three, and each needs a trace with at least one `RETRIEVER` span.
+
+| Question                                              | Scorer                  | Needs ground truth                |
+| ----------------------------------------------------- | ----------------------- | --------------------------------- |
+| Are the retrieved documents relevant to the request?  | `RetrievalRelevance`    | No                                |
+| Is the answer grounded in the retrieved information?  | `RetrievalGroundedness` | No                                |
+| Do the retrieved documents contain everything needed? | `RetrievalSufficiency`  | Yes, `expected_facts` per example |
+
+Here is a minimal pipeline with a traced retriever. The retriever is a toy keyword match, so replace it with your vector search and replace `rag_app`'s body with your model call:
+
+```python
+import mlflow
+from mlflow.entities import Document
+from mlflow.genai.scorers import (
+    RetrievalGroundedness,
+    RetrievalRelevance,
+    RetrievalSufficiency,
+)
+
+DOCS = {
+    "mlflow-tracing": "MLflow Tracing records each step of an LLM app as a span.",
+    "mlflow-eval": "mlflow.genai.evaluate runs scorers over a dataset and logs the results.",
+}
+
+@mlflow.trace(span_type="RETRIEVER")
+def retrieve(question: str) -> list[Document]:
+    words = set(question.lower().split())
+    hits = [(k, v) for k, v in DOCS.items() if words & set(v.lower().split())]
+    return [Document(page_content=v, metadata={"doc_uri": k}) for k, v in hits]
+
+@mlflow.trace
+def rag_app(question: str) -> str:
+    context = retrieve(question)
+    return " ".join(d.page_content for d in context)  # call your LLM here
+
+eval_dataset = [
+    {
+        "inputs": {"question": "What does MLflow Tracing record?"},
+        "expectations": {"expected_facts": ["Each step of an LLM app is recorded as a span."]},
+    },
+]
+
+results = mlflow.genai.evaluate(
+    data=eval_dataset,
+    predict_fn=rag_app,
+    scorers=[
+        RetrievalRelevance(model="openai:/gpt-4o-mini"),
+        RetrievalGroundedness(model="openai:/gpt-4o-mini"),
+        RetrievalSufficiency(model="openai:/gpt-4o-mini"),
+    ],
+)
+```
+
+The key under `inputs` must match the parameter name of `predict_fn`, here `question`. We ran the traced pipeline and the scorer setup on MLflow 3.18.0 and confirmed the trace contains a `RETRIEVER` span. The `mlflow.genai.evaluate` call needs credentials for the judge model, which we did not run here.
+
+To catch regressions, run the same script in CI on your 20 to 50 query set, and compare each run's scores with your baseline run. For answers that have a known correct reference, MLflow's [quickstart](https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/) also shows a `Correctness` scorer that reads an `expected_response` from each example.
+
+**Where it falls short:** These scorers are LLM judges, so they inherit the judge's blind spots, which is why the calibration step above still applies. Scores also depend on the judge model you choose, so keep it fixed between runs you want to compare.
+
 ## How MLflow Supports the RAG Evaluation Lifecycle
 
-Every pattern above needs somewhere to live: your test datasets, your judge outputs, your production samples, and the history that lets you tell whether faithfulness went up or down after last week's prompt change. MLflow's [genai](https://mlflow.org/genai) tooling and tracing capabilities are built around exactly that record-keeping problem.
+The worked example above covers the evaluation step. For the rest, open-source MLflow's [tracing docs](https://mlflow.org/docs/latest/genai/tracing/) cover instrumenting the retriever and the model call, and its [observability overview](https://mlflow.org/genai/observability) covers tracing in production. Our [RAG evaluation datasets guide](https://mlflow.org/articles/rag-evaluation-datasets) covers building the test set. Hosted MLflow services exist, but this section describes the open-source project only.
 
-- **Traceability.** The platform stores each evaluation run, including the query, retrieved context, generated answer, and the resulting scores, as a logged artifact, so you can compare today's faithfulness score against the version from previous deployments without reconstructing anything by hand.
-- **LLM-judge orchestration.** Instead of scripting judge calls one-off, MLflow's LLM-as-a-judge tooling runs evaluator prompts consistently across a dataset and records the rationale and score together as structured output, which is exactly the pattern the calibration step above depends on.
-- **CI and production integration.** Offline harness results can feed directly into the same tracking system that ingests production samples, so a faithfulness score computed in CI and one computed from live traffic can be compared in the same timeline.
-- **Observability handoff.** For teams connecting evaluation output to broader monitoring, MLflow's [observability tooling](https://mlflow.org/ai-observability) extends the same tracing into dashboards that flag drift signals like the ones described above.
-
-For teams building this out for the first time, MLflow's [data flow monitoring](https://mlflow.org/articles/tags/llm-data-flow-monitoring) resources and [dataset evaluation guidance](https://mlflow.org/articles/tags/how-to-evaluate-rag-datasets) walk through the practical setup with runnable examples rather than abstract description.
+None of this locks you in. The metrics in this article also work in Ragas, which this article cites, and in other evaluation frameworks.
 
 ## A Practical Starting Roadmap
 
-If you're starting from nothing, resist the urge to build a comprehensive evaluation suite on day one. Get a faithfulness check running on 20 to 50 queries in CI first, because that single metric catches the most damaging failure mode with the least setup cost. Only after that's stable should you introduce an LLM judge for relevance or completeness, and even then, validate its scores against a human-labeled sample before you let it gate a merge. The teams that skip calibration are the ones who eventually discover their "passing" system was passing a broken judge, not a working RAG pipeline. Keep growing your ground-truth pool slowly, and recalibrate the judge every time you change the underlying model.
+Start with one metric on one small set. If you're starting from nothing, resist the urge to build a comprehensive evaluation suite on day one.
 
-> _— Kevin_
+Get a faithfulness check running on 20 to 50 queries in CI first, because that single metric catches the most damaging failure mode with the least setup cost. Only after that's stable should you introduce an LLM judge for relevance or completeness, and even then, validate its scores against a human-labeled sample before you let it gate a merge. The teams that skip calibration are the ones who eventually discover their "passing" system was passing a broken judge, not a working RAG pipeline. Keep growing your ground-truth pool slowly, and recalibrate the judge every time you change the underlying model.
 
-## Put Your RAG Evaluation Metrics on One Platform
+## What Should You Do Next?
 
-Running faithfulness checks in a notebook works until you need to compare last month's scores against this month's, across three prompt versions and two embedding models, without losing track of which run produced which number. That's the gap MLflow closes: one place to log offline harness results, orchestrate LLM-judge runs, and carry those same metrics into production sampling, instead of stitching together spreadsheets and one-off scripts every time someone asks "did faithfulness actually improve?"
-
-![Mlflow](https://csuxjmfbwmkxiegfpljm.supabase.co/storage/v1/object/public/blog-images/organization-30814/1778726621079_mlflow.jpg)
-
-A lightweight script-based harness is fine when you're validating a single metric on a handful of queries. Once you're running CI gates on every pull request, calibrating judges against human labels, and tracking drift across production traffic, you need a system built for that lifecycle rather than a folder of disconnected scripts. MLflow's LLM-as-a-judge tooling automates the evaluator orchestration this article walks through, and its agent and LLM engineering platform ties those scores into the same tracing system your team already uses for deployment. Start by pointing your existing 20 to 50 query harness at evaluation tracking, and see whether last week's faithfulness score actually holds up against today's.
+Pick 20 queries from your real traffic, write the expected facts for each, and run the example above against your own retriever. Then compare the scores with a second run after your next prompt or index change. The [MLflow GenAI evaluation quickstart](https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/) walks through the setup.
 
 ## Sources
 
 - [Ragas: Automated Evaluation of Retrieval Augmented Generation](https://arxiv.org/html/2309.15217)
 - [RAG Evaluation — Hugging Face Open-Source AI Cookbook](https://huggingface.co/learn/cookbook/en/rag_evaluation)
 - [Evaluate a RAG application - LangChain docs](https://docs.langchain.com/langsmith/evaluate-rag-tutorial)
+- [MLflow RAG scorers](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/rag/)
+- [MLflow GenAI evaluation quickstart](https://mlflow.org/docs/latest/genai/eval-monitor/quickstart/)
 
 ## FAQ
+
+### How Do You Evaluate a RAG Pipeline?
+
+Score retrieval and generation separately. For retrieval, check relevance, recall, and whether the retrieved context is sufficient to answer. For generation, check faithfulness and answer relevance. Then run both on a fixed set of 20 to 50 queries on every pull request, and compare against your baseline.
 
 ### Is ChatGPT a RAG Model?
 
