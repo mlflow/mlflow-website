@@ -10,12 +10,9 @@ import { CopyButton } from "../components/CodeSnippet/CopyButton";
 import { customNightOwl, CODE_BG } from "../components/CodeSnippet/codeTheme";
 import ToolCallsDashboard from "@site/static/img/agent-observability/mlflow-agent-observability-tool-calls.png";
 
-// Built from parts: check-links would otherwise 4xx on this page's own URL until it is live.
-const PAGE_URL = "https://mlflow.org" + "/agent-observability";
-
 const SEO_TITLE = "Agent Observability: Monitor and Debug AI Agents | MLflow";
 const SEO_DESCRIPTION =
-  "Agent observability shows what your AI agents do, why they fail, and how well they perform. See how open-source MLflow traces agents, tool calls, quality, and cost.";
+  "Agent observability shows what your AI agents do, why they fail, and how well they perform. See how open-source MLflow traces agents, tools, quality, and cost.";
 
 const faqs: { question: string; answer: string }[] = [
   {
@@ -185,8 +182,11 @@ export default function AgentObservability() {
         <meta property="og:description" content={SEO_DESCRIPTION} />
         <meta property="og:type" content="website" />
         <meta property="article:modified_time" content="2026-11-26" />
-        <meta property="og:url" content={PAGE_URL} />
-        <link rel="canonical" href={PAGE_URL} />
+        <meta
+          property="og:url"
+          content="https://mlflow.org/agent-observability"
+        />
+        <link rel="canonical" href="https://mlflow.org/agent-observability" />
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
         <script type="application/ld+json">
           {JSON.stringify(softwareJsonLd)}
@@ -494,7 +494,7 @@ export default function AgentObservability() {
               MLflow Tracing
             </Link>
             , a tool-call dashboard, automated quality scoring, and AI issue
-            detection, all in one platform and with no per-trace fees.
+            detection, under the Apache 2.0 license.
           </p>
 
           <p>
