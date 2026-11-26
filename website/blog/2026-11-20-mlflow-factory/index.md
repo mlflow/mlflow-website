@@ -128,7 +128,7 @@ Each trace links back to its issue and workflow run, and is tagged with the verd
 The dashboard needs nothing beyond the exported traces. This is the view for the triage agent:
 
 <div style={{ display: "flex", justifyContent: "center", margin: "1.5rem 0" }}>
-  <img src={require("./images/cost-dashboard.png").default} alt="A cost dashboard named MLflow Factory with one tab per agent. The triage tab shows tiles for runs, total cost and average cost per run over 30 days, and a stacked column chart of cost by caller and token type." style={{ width: "100%" }} />
+  <img src={require("./images/cost-dashboard.png").default} alt="A cost dashboard named MLflow Factory with one tab per agent. The triage tab shows tiles for runs, total cost and average cost per run over 30 days, and a stacked column chart of cost by caller and token type." style={{ width: "100%", maxWidth: 1040 }} />
 </div>
 
 Reading traces one at a time does not scale. For patterns across many runs, MLflow has [automatic issue detection](https://mlflow.org/docs/latest/genai/eval-monitor/ai-insights/detect-issues/): it analyzes the traces in an experiment and groups recurring problems, such as an agent that repeats the same search, into issues you can review.
