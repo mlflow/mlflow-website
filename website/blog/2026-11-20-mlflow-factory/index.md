@@ -45,7 +45,7 @@ Here is the pull request that followed the report above:
 
 ## How it is built: five agents that hand off through GitHub
 
-The factory is not one large agent, and it has no orchestrator. It is five small agents, each with one job. Each agent is a separate GitHub Actions workflow with a short instruction file and a schema for its output. Most of them are [Claude Code](https://claude.com/product/claude-code) sessions running non-interactively, and the ones that read untrusted input run inside Anthropic's [sandbox runtime](https://github.com/anthropics/sandbox-runtime).
+The factory is five small agents, each with one job. Each agent is a separate GitHub Actions workflow with a short instruction file and a schema for its output. Most of them are [Claude Code](https://claude.com/product/claude-code) sessions running non-interactively, and the ones that read untrusted input run inside Anthropic's [sandbox runtime](https://github.com/anthropics/sandbox-runtime).
 
 The agents never talk to each other directly. They hand off through GitHub: Triage opens a pull request and requests a review, which starts Review. A maintainer's comments start Resolve. Failing CI brings in Repair. Every hand-off is an issue, a pull request or a comment, so anyone can read it and a maintainer can step in at any point.
 
