@@ -122,8 +122,14 @@ Each trace links back to its issue and workflow run, and is tagged with the verd
 
 - **Debug a bad triage.** Open the trace from the issue and read the tool calls in order.
 - **Compare models and settings.** Filter traces by verdict, model or effort.
-- **Track cost.** A dashboard built on the traces shows spend per agent.
-- **Find waste.** Traces show spend that the agent's own cost estimate leaves out.
+- **Track cost.** A dashboard built on the traces shows spend per agent, per model and per token type.
+- **Find waste.** Traces show spend that the agent's own cost estimate leaves out, such as the permission classifier in the chart below.
+
+The dashboard needs nothing beyond the exported traces. This is the view for the triage agent:
+
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <img src={require("./images/cost-dashboard.png").default} alt="A cost dashboard for the triage agent with tiles for runs, total cost and average cost per run over 30 days, and a stacked column chart of cost by caller and token type." style={{ width: "100%", maxWidth: 832 }} />
+</div>
 
 Reading traces one at a time does not scale. For patterns across many runs, MLflow has [automatic issue detection](https://mlflow.org/docs/latest/genai/eval-monitor/ai-insights/detect-issues/): it analyzes the traces in an experiment and groups recurring problems, such as an agent that repeats the same search, into issues you can review.
 
