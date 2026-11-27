@@ -602,7 +602,7 @@ export default function TraceAnalytics() {
 
           <p>
             It sits between two related practices.{" "}
-            <Link href="/ai-observability">AI observability</Link> is the
+            <Link href="/llm-observability">AI observability</Link> is the
             broader goal of seeing what your system does; trace analytics is the
             part that answers questions across many traces.{" "}
             <Link href="/llm-evaluation">Evaluation</Link> scores quality on a
@@ -981,7 +981,7 @@ mlflow.openai.autolog()  # or langchain, anthropic, and other integrations
               <Link href="/llm-tracing">LLM Tracing</Link>
             </li>
             <li>
-              <Link href="/ai-observability">AI Observability</Link>
+              <Link href="/llm-observability">AI Observability</Link>
             </li>
             <li>
               <Link href="/ai-monitoring">AI Monitoring</Link>
