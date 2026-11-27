@@ -103,8 +103,8 @@ Claude Code can export OpenTelemetry traces, and MLflow accepts OpenTelemetry on
     OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
     OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: https://<your-mlflow-server>/v1/traces
     OTEL_EXPORTER_OTLP_TRACES_HEADERS: x-mlflow-experiment-id=<experiment-id>
-    # Attach the issue and the workflow run to every span
-    OTEL_RESOURCE_ATTRIBUTES: github.issue_url=${{ github.event.issue.html_url }},github.run_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    # Attach the issue to every span
+    OTEL_RESOURCE_ATTRIBUTES: github.issue_url=${{ github.event.issue.html_url }}
   run: claude -p "$PROMPT"
 ```
 
