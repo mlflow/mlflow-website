@@ -31,8 +31,8 @@ Everything is public, so you can copy any part of it. All numbers come from the 
   <img src={require("./images/flow.png").default} alt="A new issue is screened, then a sandboxed triage agent produces a report and a patch. A publish job posts the report on the issue and opens a pull request. Three agents review, respond and repair on the pull request, and a maintainer merges." style={{ width: "100%", maxWidth: 832 }} />
 </div>
 
-1. **Within two minutes**, a comment tells you an agent has picked up the issue. The median is 1.4 minutes.
-2. **About nine minutes in**, that comment becomes the report: a verdict, expected and actual behavior, steps to reproduce, the root cause with links to the code, and a suggested fix.
+1. **An agent picks up the issue** and says so in a comment, usually within two minutes.
+2. **That comment becomes the report** about ten minutes after you opened the issue: a verdict, expected and actual behavior, steps to reproduce, the root cause with links to the code, and a suggested fix.
 3. **If the bug reproduced and the fix is clear**, the fix arrives as a pull request with a regression test. A fix that needs a design decision stays in the report as a suggestion.
 4. **On the pull request**, one agent reviews the diff. When a maintainer leaves comments, a second agent addresses each one and replies. A third watches CI and fixes failures.
 5. **A maintainer merges it.** The median is 8.5 hours after the pull request opened.
