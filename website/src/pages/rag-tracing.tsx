@@ -1090,7 +1090,7 @@ export default function RagTracing() {
               <Link href="/llm-tracing">LLM Tracing</Link>
             </li>
             <li>
-              <Link href="/ai-observability">AI Observability</Link>
+              <Link href="/llm-observability">AI Observability</Link>
             </li>
             <li>
               <Link href="/llm-evaluation">LLM Evaluation</Link>
