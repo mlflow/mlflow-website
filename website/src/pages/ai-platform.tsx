@@ -1215,7 +1215,7 @@ response = client.chat.completions.create(
               </Link>
             </li>
             <li>
-              <Link href="/ai-observability">AI Observability Overview</Link>
+              <Link href="/llm-observability">AI Observability Overview</Link>
             </li>
             <li>
               <Link href="/llm-evaluation">Agent Evaluation FAQ</Link>

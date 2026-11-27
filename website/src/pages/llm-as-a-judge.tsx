@@ -1092,7 +1092,7 @@ export default function LLMAsAJudge() {
               <Link href="/llm-evaluation">LLM & Agent Evaluation</Link>
             </li>
             <li>
-              <Link href="/ai-observability">AI Observability</Link>
+              <Link href="/llm-observability">AI Observability</Link>
             </li>
             <li>
               <Link href="/llm-tracing">LLM Tracing</Link>
