@@ -592,7 +592,7 @@ export default function AgentObservability() {
 
           <p>
             If you want the model-call view only, see{" "}
-            <Link href="/ai-observability">AI observability</Link>. For a
+            <Link href="/llm-observability">AI observability</Link>. For a
             comparison of products that offer these features, read{" "}
             <Link href="/top-5-agent-observability-tools">
               Top 5 Agent Observability Tools
@@ -964,7 +964,7 @@ registered.start(
               <Link href="/llm-tracing">LLM Tracing FAQ</Link>
             </li>
             <li>
-              <Link href="/ai-observability">AI Observability FAQ</Link>
+              <Link href="/llm-observability">AI Observability FAQ</Link>
             </li>
             <li>
               <Link href="/ai-monitoring">AI Monitoring FAQ</Link>
