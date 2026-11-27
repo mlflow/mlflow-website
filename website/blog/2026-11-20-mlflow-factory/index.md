@@ -1,6 +1,6 @@
 ---
-title: "From Bug Report to Pull Request in 10 Minutes: How We Built and Monitor MLflow's Factory"
-description: "We walk you through how MLflow turns a bug report into a reviewed pull request in about ten minutes: the agents, the sandbox that keeps them from writing anything, and how we monitor every run with MLflow Tracing."
+title: "From Bug Report to Pull Request in Minutes: How We Built and Monitor MLflow's Factory"
+description: "We walk you through how MLflow turns a bug report into a reviewed pull request in minutes: the agents, the sandbox that keeps them from writing anything, and how we monitor every run with MLflow Tracing."
 slug: mlflow-factory
 authors: [mlflow-maintainers]
 tags: [mlflow, agents, genai, open-source, observability, databricks]
