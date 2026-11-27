@@ -441,7 +441,7 @@ export default function LLMTracing() {
 
           <p>
             LLM tracing is a foundational component of{" "}
-            <Link href="/ai-observability">AI observability</Link>. While
+            <Link href="/llm-observability">AI observability</Link>. While
             observability encompasses tracing, evaluation, monitoring, and
             feedback collection, tracing provides the raw execution data that
             makes all other observability capabilities possible. LLM tracing
@@ -607,7 +607,7 @@ export default function LLMTracing() {
               <p>
                 <strong>Solution:</strong> Continuous tracing provides a
                 baseline for{" "}
-                <Link href="/ai-observability">detecting regressions</Link>,
+                <Link href="/llm-observability">detecting regressions</Link>,
                 latency spikes, and cost anomalies.
               </p>
             </div>
@@ -1192,7 +1192,7 @@ const result = await generateText({
               </Link>
             </li>
             <li>
-              <Link href="/ai-observability">AI Observability Guide</Link>
+              <Link href="/llm-observability">AI Observability Guide</Link>
             </li>
             <li>
               <Link href={MLFLOW_GENAI_DOCS_URL + "eval-monitor/"}>

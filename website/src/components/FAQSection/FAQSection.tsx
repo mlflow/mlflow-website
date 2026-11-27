@@ -128,7 +128,7 @@ const faqs: { question: string; answer: ReactNode }[] = [
         doing, control over what they can access, and a systematic way to
         measure and improve their quality. MLflow provides the{" "}
         <Link
-          to="/ai-observability"
+          to="/llm-observability"
           className="!text-white/70 !underline decoration-white/50 underline-offset-2 hover:decoration-white transition-all"
         >
           observability

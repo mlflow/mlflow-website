@@ -135,7 +135,7 @@ const faqs: {
     question: "What's the difference between LLMOps and AI observability?",
     answer: (
       <>
-        <Link href="/ai-observability">AI observability</Link> is a subset of
+        <Link href="/llm-observability">AI observability</Link> is a subset of
         LLMOps focused on monitoring and understanding AI system behavior
         (tracing, metrics, evaluation). LLMOps is broader, also encompassing
         prompt management, deployment workflows, CI/CD for LLM applications, and
@@ -696,7 +696,7 @@ export default function LLMOps() {
           <p>
             LLMOps is closely related to AIOps (the broader discipline of
             running all AI applications in production) and{" "}
-            <Link href="/ai-observability">AI observability</Link> (the
+            <Link href="/llm-observability">AI observability</Link> (the
             monitoring and debugging subset). LLMOps specifically targets
             LLM-powered applications, while AIOps also covers traditional ML
             experiment tracking and model management.
@@ -1048,7 +1048,7 @@ export default function LLMOps() {
               </Link>
             </li>
             <li>
-              <Link href="/ai-observability">AI Observability Guide</Link>
+              <Link href="/llm-observability">AI Observability Guide</Link>
             </li>
             <li>
               <Link href="/llm-tracing">LLM Tracing Guide</Link>

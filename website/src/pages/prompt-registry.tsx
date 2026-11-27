@@ -502,7 +502,7 @@ export default function PromptRegistry() {
             environment aliases for safe deployments. Prompt registries decouple
             prompts from application code, enabling faster iteration without
             redeployments. A prompt registry is a core component of{" "}
-            <Link href="/ai-observability">AI observability</Link> and{" "}
+            <Link href="/llm-observability">AI observability</Link> and{" "}
             <Link href="/llmops">LLMOps</Link>.
           </p>
 
@@ -1083,7 +1083,7 @@ results = mlflow.genai.evaluate(
               <Link href="/llm-evaluation">Agent Evaluation FAQ</Link>
             </li>
             <li>
-              <Link href="/ai-observability">AI Observability</Link>
+              <Link href="/llm-observability">AI Observability</Link>
             </li>
             <li>
               <Link href="/llmops">LLMOps and AgentOps</Link>

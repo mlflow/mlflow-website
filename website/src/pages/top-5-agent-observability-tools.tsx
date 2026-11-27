@@ -701,7 +701,7 @@ export default function Top5AgentObservabilityTools() {
             What to Look For in an Agent Observability Tool
           </h2>
           <p>
-            <Link to="/ai-observability">Agent observability</Link> is
+            <Link to="/llm-observability">Agent observability</Link> is
             end-to-end visibility into every step an AI agent takes in
             production: LLM calls, tool invocations, retrieval steps, and
             planning decisions. Every tool on this list can capture traces. The
@@ -1467,7 +1467,7 @@ export default function Top5AgentObservabilityTools() {
             Unlike traditional APM that monitors latency and errors, agent
             observability tracks output quality, faithfulness, safety, and
             behavioral drift. Learn more on the{" "}
-            <Link to="/ai-observability">AI Observability</Link> page.
+            <Link to="/llm-observability">AI Observability</Link> page.
           </p>
 
           <h3>Why is open source important for observability?</h3>
