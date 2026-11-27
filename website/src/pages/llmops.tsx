@@ -1061,6 +1061,12 @@ export default function LLMOps() {
                 MLflow for Agents and LLMs Documentation
               </Link>
             </li>
+            <li>
+              <Link href="/llm-cost-tracking">LLM Cost Tracking</Link>
+            </li>
+            <li>
+              <Link href="/llm-guardrails">LLM Guardrails</Link>
+            </li>
           </ul>
         </div>
 

@@ -1150,6 +1150,32 @@ export default function LLMObservability() {
                 MLflow Tracing Documentation
               </Link>
             </li>
+            <li>
+              <Link href="/agent-tracing">Agent Tracing</Link>
+            </li>
+            <li>
+              <Link href="/agent-observability">Agent Observability</Link>
+            </li>
+            <li>
+              <Link href="/rag-tracing">RAG Tracing</Link>
+            </li>
+            <li>
+              <Link href="/opentelemetry-llm-tracing">
+                OpenTelemetry LLM Tracing
+              </Link>
+            </li>
+            <li>
+              <Link href="/trace-analytics">Trace Analytics</Link>
+            </li>
+            <li>
+              <Link href="/llm-cost-tracking">LLM Cost Tracking</Link>
+            </li>
+            <li>
+              <Link href="/llm-guardrails">LLM Guardrails</Link>
+            </li>
+            <li>
+              <Link href="/rag-evaluation">RAG Evaluation</Link>
+            </li>
           </ul>
         </div>
 

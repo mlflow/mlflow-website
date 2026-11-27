@@ -1102,6 +1102,23 @@ results = mlflow.genai.evaluate(data=traces, scorers=[ToolCallEfficiency()])`}
             <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>
             </li>
+            <li>
+              <Link href="/agent-observability">Agent Observability</Link>
+            </li>
+            <li>
+              <Link href="/rag-tracing">RAG Tracing</Link>
+            </li>
+            <li>
+              <Link href="/opentelemetry-llm-tracing">
+                OpenTelemetry LLM Tracing
+              </Link>
+            </li>
+            <li>
+              <Link href="/trace-analytics">Trace Analytics</Link>
+            </li>
+            <li>
+              <Link href="/llm-observability">LLM Observability</Link>
+            </li>
           </ul>
         </div>
 

@@ -954,6 +954,15 @@ def my_llm_call():
                 MLflow for Agents and LLMs Documentation
               </Link>
             </li>
+            <li>
+              <Link href="/trace-analytics">Trace Analytics</Link>
+            </li>
+            <li>
+              <Link href="/agent-observability">Agent Observability</Link>
+            </li>
+            <li>
+              <Link href="/llm-guardrails">LLM Guardrails</Link>
+            </li>
           </ul>
         </div>
 
