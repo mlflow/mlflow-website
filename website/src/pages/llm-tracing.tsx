@@ -1177,6 +1177,11 @@ const result = await generateText({
 
           <ul>
             <li>
+              <Link href="/opentelemetry-llm-tracing">
+                OpenTelemetry LLM Tracing with MLflow
+              </Link>
+            </li>
+            <li>
               <Link href="/arize-phoenix-alternative">
                 Arize Phoenix Alternative Comparison
               </Link>
