@@ -1,6 +1,6 @@
 ---
 title: "Can Jev replace your LLM judge? Evaluating quality, cost, and latency"
-description: "Compare Jev with GPT, Claude, and DeepSeek as an LLM judge using MLflow across quality, cost, and latency."
+description: "Compare Jev, OpenAI Decisions, GPT, Claude, and DeepSeek as correctness judges on the same MLflow QA examples."
 slug: jev-llm-judge
 authors: [yuki-watanabe]
 tags: [genai, evaluation, judges, llm]
@@ -10,7 +10,7 @@ image: /img/blog/jev-llm-judge-comparison.png
 
 LLM judges help you evaluate answers, compare prompts, and catch regressions. Every judgment also adds another model call. As your project grows, the cost and time spent judging become a headache.
 
-[Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev), a new model from TypeSafe, is built for structured decisions and claims faster and cheaper compared to normal LLMs respond in text, which makes it a candidate for LLM judge. We compared Jev with **GPT 5.6, Claude, and DeepSeek** on human-labeled technical QA examples, measuring human-judge agreement, cost, and latency.
+[Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev), TypeSafe's model for structured decisions, is a candidate for these checks. We first compared Jev with **GPT-5.6, Claude, and DeepSeek** on human-labeled technical QA examples. After OpenAI released its [Decisions API](https://developers.openai.com/api/docs/guides/decisions), we ran it on the same frozen examples. We measured agreement with human labels, latency, and estimated cost.
 
 Can Jev distinguish correct MLflow answers from answers containing factual or API errors, and how does it compare with these LLM judges?
 
@@ -24,9 +24,9 @@ For example, give Jev a question about an MLflow API, a candidate answer, and th
 
 Many evaluations need a small decision about a large input. Does an answer use the right API? Does it respect the version in the user's question? Does an instruction contradict the supplied documentation?
 
-These tasks fit Jev's interface . You can also ask several independent questions about the same state in one request. Its [published price](https://docs.typesafe.ai/models) is $0.042 per million input tokens, with no charge for output tokens. That gives us a reason to test it for frequently repeated checks.
+These tasks fit Jev's interface. You can also ask several independent questions about the same state in one request. Its [published price](https://docs.typesafe.ai/models) is $0.042 per million input tokens, with no charge for output tokens. That gives us a reason to test it for frequently repeated checks.
 
-One caveat is that LLM judges often produces **rationale** as well, because we want to understand why a particular answer is marked bad. Jev cannot support that, instead, can only produce probability alongside the classification output.
+Jev returns a classification and probability without a written rationale. A text-generating judge can provide a reason when you need to investigate a decision.
 
 ## 3. Define an LLM judge with Jev
 
@@ -75,7 +75,9 @@ jev_correctness = make_judge(
 
 ## 4. Measure initial quality, cost, and latency
 
-We created **30 MLflow QA examples** covering tracing, evaluation, prompts, datasets, and assessments. Each contains a question, a candidate answer, and an excerpt from the official MLflow documentation. A human reviewer labeled the examples so we can measure human-judge alignment. After the label correction described below, the reference contains 15 answers labeled Correct, 15 Incorrect.
+We created **30 MLflow QA examples** covering tracing, evaluation, prompts, datasets, and assessments. Each contains a question, a candidate answer, and an excerpt from the official MLflow documentation. A human reviewer labeled 15 answers Correct, 14 Incorrect, and one Unclear after a label correction. We excluded the Unclear example before scoring, leaving **29 comparable decisions** for every judge.
+
+**Correction to the original table:** It showed agreement out of 30, but QA-018 had an Unclear human label and was excluded from the scored calls. We also corrected QA-016's human label after checking the documentation and rescored the saved judge outputs without making new provider calls. The table and chart below use the 29 eligible cases.
 
 Here is one of the incorrect answers for example:
 
@@ -111,7 +113,9 @@ data = [
 mlflow.genai.evaluate(data=data, scorers=[jev_correctness])
 ```
 
-We also tested GPT-5.6 Terra and Luna, Claude Sonnet 4.6, Claude Opus 4.8, and DeepSeek-V4.1-Flash (`deepseek-flash`) the same inputs and correctness criterion. We explicitly disabled extended reasoning and limited output to 128 tokens, testing a configuration intended for quick pass/fail checks. Here is the result from the benchmark.
+We also tested GPT-5.6 Terra and Luna, Claude Sonnet 4.6, Claude Opus 4.8, and DeepSeek-V4.1-Flash (`deepseek-flash`) on the same inputs and substantive correctness criterion. We disabled extended reasoning and limited output to 128 tokens for these text-generating judges.
+
+On October 8, 2026, we added OpenAI Decisions with `gpt-6-luna`. We sent the same question, documentation, and answer as JSON input to `POST /v1/decisions`, with one predicate question using Jev's exact criterion. A probability of at least 0.5 counted as Correct. This was a direct Decisions API call; MLflow's `make_judge(model="openai:/gpt-6-luna")` currently uses Chat Completions and does not return this probability.
 
 <a
   href={require("./judge-comparison.png").default}
@@ -121,31 +125,36 @@ We also tested GPT-5.6 Terra and Luna, Claude Sonnet 4.6, Claude Opus 4.8, and D
 >
   <img
     src={require("./judge-comparison.png").default}
-    alt="Agreement with human labels, median latency, and estimated cost for Jev, GPT, Claude, and DeepSeek"
-    width={3687}
-    height={1228}
+    alt="Agreement with human labels, median latency, and estimated cost for Jev, OpenAI Decisions, GPT, Claude, and DeepSeek on 29 scored cases"
+    width={3688}
+    height={1233}
     style={{ width: "100%", height: "auto" }}
   />
 </a>
 
-_30 human-labeled QA examples. DeepSeek cost uses off-peak pricing._
+_29 scored examples; one Unclear human label was excluded. DeepSeek cost uses off-peak pricing. OpenAI Decisions was measured on October 8, after the other models' September 20 runs._
 
-| Judge               | Agreement with human labels | Median latency | p95 latency | Estimated cost / 1,000 judgments |
-| ------------------- | --------------------------: | -------------: | ----------: | -------------------------------: |
-| Jev 1.13.0          |                30/30 (100%) |         369 ms |      411 ms |                          $0.0247 |
-| GPT-5.6 Terra       |                30/30 (100%) |       1,091 ms |    1,924 ms |                          $0.8960 |
-| GPT-5.6 Luna        |                30/30 (100%) |         947 ms |    1,435 ms |                          $0.0896 |
-| Claude Sonnet 4.6   |               27/30 (90.0%) |       1,610 ms |    3,546 ms |                          $1.6721 |
-| Claude Opus 4.8     |               28/30 (93.3%) |       1,966 ms |    9,279 ms |                          $3.7750 |
-| DeepSeek-V4.1-Flash |               29/30 (96.6%) |         910 ms |    1,188 ms |               $0.0624 (off-peak) |
+| Judge                          | Agreement with human labels | Median latency | p95 latency | Estimated cost / 1,000 judgments |
+| ------------------------------ | --------------------------: | -------------: | ----------: | -------------------------------: |
+| Jev 1.13.0                     |               29/29 (100%) |         369 ms |      411 ms |                          $0.0247 |
+| OpenAI Decisions (gpt-6-luna)  |              28/29 (96.6%) |         172 ms |      554 ms |                          $0.0459 |
+| GPT-5.6 Terra                  |               29/29 (100%) |       1,091 ms |    1,924 ms |                          $0.8960 |
+| GPT-5.6 Luna                   |               29/29 (100%) |         947 ms |    1,435 ms |                          $0.0896 |
+| Claude Sonnet 4.6              |              26/29 (89.7%) |       1,610 ms |    3,546 ms |                          $1.6721 |
+| Claude Opus 4.8                |              28/29 (96.6%) |       1,966 ms |    9,279 ms |                          $3.7750 |
+| DeepSeek-V4.1-Flash            |              28/29 (96.6%) |         910 ms |    1,188 ms |               $0.0624 (off-peak) |
 
-Jev, Terra, and Luna made identical decisions on all 30 examples. Jev had the lowest estimated cost and observed latency. Sonnet rejected one correct answer and accepted two incorrect answers. Opus also rejected an answer that correctly described session and tracing metadata. DeepSeek accepted one incorrect answer about output recording, same one as Claude mistook.
+OpenAI Decisions accepted one incorrect answer: QA-002 claims that a scorer's function name overrides an explicit `Feedback.name`. Its probability that the answer was correct was **0.79**. All 29 scored OpenAI calls completed. Jev, Terra, and Luna made identical decisions on all 29 examples. Jev had the lowest estimated cost in these runs; OpenAI Decisions had the lowest observed median latency. Sonnet rejected one correct answer and accepted two incorrect answers. Opus rejected a correct answer about session and tracing metadata. DeepSeek and Sonnet both accepted an incorrect answer about span outputs.
+
+We timed each synchronous SDK call, including the network round trip, with one worker and no retries. The table excludes one preflight call per judge. OpenAI reported 13,311 input tokens and no output tokens across the 29 scored calls. At the [Decisions API price of $0.10 per million input tokens](https://developers.openai.com/api/docs/guides/decisions#pricing-and-availability), the estimated scored cost was $0.0013311. Its 30 requests, including preflight, cost an estimated $0.0013694. These are usage-based estimates, not reconciled bills. Service conditions and network paths can change between the September and October runs, so the latency figures describe these requests rather than a general speed ranking.
+
+[Download the frozen examples, corrected labels, OpenAI probabilities, and per-call measurements](/data/jev-openai-decisions-qa-benchmark.json). The [reproduction script](/data/run-jev-openai-decisions-qa-benchmark.py) sends the same 29 scored requests, plus preflight; human labels stay local.
 
 ## 5. Decide when to use Jev and when to defer
 
-For this dataset, Jev produced the compatible human-judge alignment score as Terra and Luna at lower cost and latency. Before adopting it, we still recommend collecting real answers and check the errors that matter to your application. Jev's probabilities also let you try sending uncertain cases to another evaluator.
+For this dataset, Jev matched the human labels on all 29 scored answers at the lowest estimated cost, while OpenAI Decisions was faster in its later run and missed one incorrect answer. Before adopting either judge, collect real answers from your application and inspect the errors that matter there. Both APIs return probabilities that you can use to send uncertain cases to another evaluator, but this pilot did not test a routing threshold.
 
-Also the limitation of the lack of rationale can be important for iterating on the judge result. For example, if you are iterating on the agent quality during development phase, using normal text-based models would still be better. However, when it comes to large scale evaluation like online production monitoring, Jev could be a great option to balance quality and cost. When Jev flagged some answers as bad, you can still run the same judge with more expensive LLMs to generate human-readable rationale.
+Jev's lack of a written rationale matters when you are debugging an answer. You can send flagged cases to a text-generating judge for an explanation, then review both verdicts. For high-volume monitoring, measure whether the speed and cost of a decision-only judge help enough to justify that extra step.
 
 A binary Noul question also cannot abstain. When abstention matters, use a Choice question with an explicit `unsure` option, then route those cases to another judge or a human reviewer.
 
