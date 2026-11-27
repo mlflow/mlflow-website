@@ -157,16 +157,9 @@ Bug reports close faster than they did before triage. The median time to close w
   <img src={require("./images/close-rate.png").default} alt="Share of bug reports closed within 2 days rose from 22 percent to 66 percent, and within 7 days from 57 percent to 80 percent." style={{ width: "100%", maxWidth: 832 }} />
 </div>
 
+This is not a controlled comparison. Bug reports went from 67 in September to 170 in October, because filing an issue became the cheapest way to get a fix, and most reports now come from maintainers and regular contributors.
+
 The triage agent now writes a real share of MLflow's fixes: 131 of the 755 pull requests merged since October 15, or 17%.
-
-## Caveats
-
-These numbers do not come from a controlled experiment. If you build something similar, these are the gaps to watch for:
-
-- **The before and after groups are different.** Bug reports went from 67 in September to 170 in October. Filing an issue became the cheapest way to get a fix, so maintainers and regular contributors file more of them: 146 of the 231 triaged reports came from members, collaborators or prior contributors.
-- **We have not audited the verdicts.** The agent reproduced 94% of reports and asked for more information only once. Either the reports are good or the agent is too agreeable, and we do not know which yet.
-- **Human review is light.** 112 of the 131 merged pull requests had no human review comment or change request. They are small, but that is a lot of trust.
-- **The backlog is untouched.** Triage only sees new issues.
 
 ## What's next
 
