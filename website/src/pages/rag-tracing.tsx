@@ -1115,6 +1115,15 @@ export default function RagTracing() {
             <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>
             </li>
+            <li>
+              <Link href="/rag-evaluation">RAG Evaluation</Link>
+            </li>
+            <li>
+              <Link href="/agent-tracing">Agent Tracing</Link>
+            </li>
+            <li>
+              <Link href="/trace-analytics">Trace Analytics</Link>
+            </li>
           </ul>
         </div>
 

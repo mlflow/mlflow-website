@@ -980,6 +980,18 @@ registered.start(
             <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>
             </li>
+            <li>
+              <Link href="/agent-tracing">Agent Tracing</Link>
+            </li>
+            <li>
+              <Link href="/trace-analytics">Trace Analytics</Link>
+            </li>
+            <li>
+              <Link href="/llm-cost-tracking">LLM Cost Tracking</Link>
+            </li>
+            <li>
+              <Link href="/llm-guardrails">LLM Guardrails</Link>
+            </li>
           </ul>
         </div>
 

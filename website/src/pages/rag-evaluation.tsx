@@ -977,6 +977,12 @@ dataset.merge_records(
             <li>
               <Link href="/genai">MLflow for Agents and LLMs Overview</Link>
             </li>
+            <li>
+              <Link href="/rag-tracing">RAG Tracing</Link>
+            </li>
+            <li>
+              <Link href="/llm-observability">LLM Observability</Link>
+            </li>
           </ul>
         </div>
 
