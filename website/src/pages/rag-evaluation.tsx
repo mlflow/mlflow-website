@@ -1,7 +1,6 @@
 import { useState } from "react";
 import Head from "@docusaurus/Head";
 import Link from "@docusaurus/Link";
-import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import { Highlight } from "prism-react-renderer";
 import { Header } from "../components/Header/Header";
 import { SocialLinksFooter } from "../components/SocialLinksFooter/SocialLinksFooter";
@@ -212,8 +211,6 @@ function Table({ head, rows }: { head: string[]; rows: React.ReactNode[][] }) {
 
 export default function RagEvaluation() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
-  // Built from siteConfig so the link checker does not fetch a not-yet-live URL.
-  const pageUrl = `${useDocusaurusContext().siteConfig.url}/rag-evaluation`;
 
   return (
     <>
@@ -223,8 +220,8 @@ export default function RagEvaluation() {
         <meta property="og:title" content={SEO_TITLE} />
         <meta property="og:description" content={SEO_DESCRIPTION} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content={pageUrl} />
-        <link rel="canonical" href={pageUrl} />
+        <meta property="og:url" content="https://mlflow.org/rag-evaluation" />
+        <link rel="canonical" href="https://mlflow.org/rag-evaluation" />
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
         <script type="application/ld+json">
           {JSON.stringify(softwareJsonLd)}
