@@ -1117,7 +1117,7 @@ with otel_tracer.start_as_current_span("http_request") as external_span:
               <Link href="/llm-tracing">LLM Tracing FAQ</Link>
             </li>
             <li>
-              <Link href="/ai-observability">AI Observability FAQ</Link>
+              <Link href="/llm-observability">AI Observability FAQ</Link>
             </li>
             <li>
               <Link href="/llm-evaluation">
