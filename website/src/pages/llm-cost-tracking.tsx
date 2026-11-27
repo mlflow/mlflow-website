@@ -923,7 +923,7 @@ def my_llm_call():
               <Link href="/llm-tracing">LLM Tracing</Link>
             </li>
             <li>
-              <Link href="/ai-observability">AI Observability</Link>
+              <Link href="/llm-observability">AI Observability</Link>
             </li>
             <li>
               <Link href="/ai-gateway">AI Gateway</Link>
