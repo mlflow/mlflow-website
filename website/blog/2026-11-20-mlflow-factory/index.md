@@ -122,10 +122,10 @@ Each trace links back to its issue and workflow run, and is tagged with the verd
 
 - **Debug a bad triage.** Open the trace from the issue and read the tool calls in order.
 - **Compare models and settings.** Filter traces by verdict, model or effort.
-- **Track cost.** A dashboard built on the traces shows spend per agent, per model and per token type.
-- **Find waste.** Traces show spend that the agent's own cost estimate leaves out, such as the permission classifier in the chart below.
+- **Track cost.** Each trace records token usage, so we can see spend per agent, per model and per token type.
+- **Find waste.** Traces show spend that the agent's own cost estimate leaves out, such as the permission classifier.
 
-The dashboard needs nothing beyond the exported traces. This is the view for the triage agent:
+For cost and waste, we built a Databricks AI/BI dashboard that queries the exported traces, with one tab per agent. It needs no other data source. This is the tab for the triage agent, where the permission classifier shows up as its own caller:
 
 <div style={{ display: "flex", justifyContent: "center", margin: "1.5rem 0" }}>
   <img src={require("./images/cost-dashboard.png").default} alt="A cost dashboard named MLflow Factory with one tab per agent. The triage tab shows tiles for runs, total cost and average cost per run over 30 days, and a stacked column chart of cost by caller and token type." style={{ width: "100%", maxWidth: 1040 }} />
